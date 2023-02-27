@@ -17,6 +17,10 @@
 #define XADC_VALID_H_
 
 
+#define MEAS_PRECISION        ((double)0.001)   // precision used in measurements
+#define DISPLAY_DIGITS        3                 // number of digits to display, should match MEAS_PRECISION
+
+
 #define VOLTAGE_TOL           0.05f    // in %, experimentally determined
 
 

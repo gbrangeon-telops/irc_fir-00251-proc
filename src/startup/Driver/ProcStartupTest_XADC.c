@@ -38,6 +38,8 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    bool invalidValue = false;
 
    XADC_MeasurementID_t XADC_measIdx = INTERNAL_LENS_TEMP;
+   float measurement_min;
+   float measurement_max;
 
    //ATR_PRINTF("Connect the Thermistor Test Harness to J17 and J20.\nPress ENTER to continue...");   --> EC
    ATR_PRINTF("Connect the Thermistor Test Harness to J20 and J21.\nPress ENTER to continue...");
@@ -64,8 +66,11 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    }
 
    // Measurement output
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_INTERNAL_LENS].voltage, 3));
-   if ((extAdcChannels[XEC_INTERNAL_LENS].voltage >= INT_LENS_TEMP_MIN) && (extAdcChannels[XEC_INTERNAL_LENS].voltage <= INT_LENS_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_INTERNAL_LENS].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(INT_LENS_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(INT_LENS_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -76,11 +81,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(INT_LENS_TEMP_MIN, 3), _FFMT(INT_LENS_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_INTERNAL_LENS].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_EXTERNAL_LENS].voltage, 3));
-   if ((extAdcChannels[XEC_EXTERNAL_LENS].voltage >= EXT_LENS_TEMP_MIN) && (extAdcChannels[XEC_EXTERNAL_LENS].voltage <= EXT_LENS_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_EXTERNAL_LENS].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(EXT_LENS_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(EXT_LENS_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -91,11 +100,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(EXT_LENS_TEMP_MIN, 3), _FFMT(EXT_LENS_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_EXTERNAL_LENS].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_ICU].voltage, 3));
-   if ((extAdcChannels[XEC_ICU].voltage >= ICU_TEMP_MIN) && (extAdcChannels[XEC_ICU].voltage <= ICU_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_ICU].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(ICU_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(ICU_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -106,11 +119,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ICU_TEMP_MIN, 3), _FFMT(ICU_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_ICU].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_SFW].voltage, 3));
-   if ((extAdcChannels[XEC_SFW].voltage >= SFW_TEMP_MIN) && (extAdcChannels[XEC_SFW].voltage <= SFW_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_SFW].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(SFW_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SFW_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -121,11 +138,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SFW_TEMP_MIN, 3), _FFMT(SFW_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_SFW].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_COMPRESSOR].voltage, 3));
-   if ((extAdcChannels[XEC_COMPRESSOR].voltage >= COMPR_TEMP_MIN) && (extAdcChannels[XEC_COMPRESSOR].voltage <= COMPR_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_COMPRESSOR].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(COMPR_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(COMPR_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -136,11 +157,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(COMPR_TEMP_MIN, 3), _FFMT(COMPR_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_COMPRESSOR].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_COLD_FINGER].voltage, 3));
-   if ((extAdcChannels[XEC_COLD_FINGER].voltage >= COLD_FINGER_TEMP_MIN) && (extAdcChannels[XEC_COLD_FINGER].voltage <= COLD_FINGER_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_COLD_FINGER].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(COLD_FINGER_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(COLD_FINGER_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -151,11 +176,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(COLD_FINGER_TEMP_MIN, 3), _FFMT(COLD_FINGER_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_COLD_FINGER].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_SPARE].voltage, 3));
-   if ((extAdcChannels[XEC_SPARE].voltage >= SPARE_TEMP_MIN) && (extAdcChannels[XEC_SPARE].voltage <= SPARE_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_SPARE].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(SPARE_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SPARE_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -166,11 +195,15 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SPARE_TEMP_MIN, 3), _FFMT(SPARE_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = extAdcChannels[XEC_SPARE].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(extAdcChannels[XEC_EXT_THERMISTOR].voltage, 3));
-   if ((extAdcChannels[XEC_EXT_THERMISTOR].voltage >= EXT_THERM_TEMP_MIN) && (extAdcChannels[XEC_EXT_THERMISTOR].voltage <= EXT_THERM_TEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(extAdcChannels[XEC_EXT_THERMISTOR].voltage, MEAS_PRECISION);
+   measurement_min = floorMultiple(EXT_THERM_TEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(EXT_THERM_TEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -181,8 +214,8 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(EXT_THERM_TEMP_MIN, 3), _FFMT(EXT_THERM_TEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx].measurement = extAdcChannels[XEC_EXT_THERMISTOR].voltage;
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
 
 
    if (XADC_measIdx != EXTERNAL_TEMP) {
@@ -208,6 +241,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    bool invalidValue = false;
 
    XADC_MeasurementID_t XADC_measIdx = VOLTAGE_USB_BUS;
+   float measurement_min, measurement_min_2;
+   float measurement_max, measurement_max_2;
 
    IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);
    if (Status != IRC_SUCCESS)
@@ -230,6 +265,9 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
 
    // Measurement output
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_USB_VBUS], MEAS_PRECISION);
+   measurement_min = floorMultiple(USB_BUS_VOLTAGE_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(USB_BUS_VOLTAGE_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_USB_VBUS_SENSE].raw.unipolar <= 0xF0)
    {
@@ -238,8 +276,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_USB_VBUS], 3));
-      if ((DeviceVoltageAry[DVS_USB_VBUS] >= USB_BUS_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_USB_VBUS] <= USB_BUS_VOLTAGE_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -250,10 +288,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(USB_BUS_VOLTAGE_MIN, 3), _FFMT(USB_BUS_VOLTAGE_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_USB_VBUS];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_USB1V8], MEAS_PRECISION);
+   measurement_min = floorMultiple(USB_1V8_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(USB_1V8_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_USB_1V8_SENSE].raw.unipolar <= 0xF0)
    {
@@ -262,8 +304,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_USB1V8], 3));
-      if ((DeviceVoltageAry[DVS_USB1V8] >= USB_1V8_MIN) && (DeviceVoltageAry[DVS_USB1V8] <= USB_1V8_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -274,10 +316,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(USB_1V8_MIN, 3), _FFMT(USB_1V8_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_USB1V8];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_DDR3_VREF], MEAS_PRECISION);
+   measurement_min = floorMultiple(DDR3_VREF_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(DDR3_VREF_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_DDR3_VREF_SENSE].raw.unipolar <= 0xF0)
    {
@@ -286,8 +332,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_DDR3_VREF], 3));
-      if ((DeviceVoltageAry[DVS_DDR3_VREF] >= DDR3_VREF_MIN) && (DeviceVoltageAry[DVS_DDR3_VREF] <= DDR3_VREF_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -298,10 +344,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(DDR3_VREF_MIN, 3), _FFMT(DDR3_VREF_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_DDR3_VREF];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_VCC10GigE], MEAS_PRECISION);
+   measurement_min = floorMultiple(GIGE_VCC10_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(GIGE_VCC10_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_VCC_10GigE_SENSE].raw.unipolar <= 0xF0)
    {
@@ -310,8 +360,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_VCC10GigE], 3));
-      if ((DeviceVoltageAry[DVS_VCC10GigE] >= GIGE_VCC10_MIN) && (DeviceVoltageAry[DVS_VCC10GigE] <= GIGE_VCC10_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -322,10 +372,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(GIGE_VCC10_MIN, 3), _FFMT(GIGE_VCC10_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_VCC10GigE];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_VCCAUX_IO_P], MEAS_PRECISION);
+   measurement_min = floorMultiple(PROC_IO_VOLTAGE_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(PROC_IO_VOLTAGE_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_VCCAUX_IO_P_SENSE].raw.unipolar <= 0xF0)
    {
@@ -334,8 +388,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_VCCAUX_IO_P], 3));
-      if ((DeviceVoltageAry[DVS_VCCAUX_IO_P] >= PROC_IO_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_VCCAUX_IO_P] <= PROC_IO_VOLTAGE_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -346,10 +400,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(PROC_IO_VOLTAGE_MIN, 3), _FFMT(PROC_IO_VOLTAGE_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_VCCAUX_IO_P];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_VCCAUX_IO_O], MEAS_PRECISION);
+   measurement_min = floorMultiple(OUT_IO_VOLTAGE_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(OUT_IO_VOLTAGE_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_VCCAUX_IO_O_SENSE].raw.unipolar <= 0xF0)
    {
@@ -358,8 +416,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_VCCAUX_IO_O], 3));
-      if ((DeviceVoltageAry[DVS_VCCAUX_IO_O] >= OUT_IO_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_VCCAUX_IO_O] <= OUT_IO_VOLTAGE_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -370,10 +428,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(OUT_IO_VOLTAGE_MIN, 3), _FFMT(OUT_IO_VOLTAGE_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_VCCAUX_IO_O];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply3V3], MEAS_PRECISION);
+   measurement_min = floorMultiple(SUPPLY_3V3_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SUPPLY_3V3_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_3V3_SENSE].raw.unipolar <= 0xF0)
    {
@@ -382,8 +444,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_Supply3V3], 3));
-      if ((DeviceVoltageAry[DVS_Supply3V3] >= SUPPLY_3V3_MIN) && (DeviceVoltageAry[DVS_Supply3V3] <= SUPPLY_3V3_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -394,10 +456,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SUPPLY_3V3_MIN, 3), _FFMT(SUPPLY_3V3_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_Supply3V3];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply2V5], MEAS_PRECISION);
+   measurement_min = floorMultiple(SUPPLY_2V5_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SUPPLY_2V5_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_2V5_SENSE].raw.unipolar <= 0xF0)
    {
@@ -406,8 +472,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_Supply2V5], 3));
-      if ((DeviceVoltageAry[DVS_Supply2V5] >= SUPPLY_2V5_MIN) && (DeviceVoltageAry[DVS_Supply2V5] <= SUPPLY_2V5_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -418,10 +484,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SUPPLY_2V5_MIN, 3), _FFMT(SUPPLY_2V5_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_Supply2V5];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply1V8], MEAS_PRECISION);
+   measurement_min = floorMultiple(SUPPLY_1V8_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SUPPLY_1V8_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V8_SENSE].raw.unipolar <= 0xF0)
    {
@@ -430,8 +500,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_Supply1V8], 3));
-      if ((DeviceVoltageAry[DVS_Supply1V8] >= SUPPLY_1V8_MIN) && (DeviceVoltageAry[DVS_Supply1V8] <= SUPPLY_1V8_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -442,10 +512,16 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SUPPLY_1V8_MIN, 3), _FFMT(SUPPLY_1V8_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_Supply1V8];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply1V5], MEAS_PRECISION);
+   measurement_min = floorMultiple(SUPPLY_1V5_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SUPPLY_1V5_MAX, MEAS_PRECISION);
+   measurement_min_2 = floorMultiple(SUPPLY_1V35_MIN, MEAS_PRECISION);
+   measurement_max_2 = ceilMultiple(SUPPLY_1V35_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V5_SENSE].raw.unipolar <= 0xF0)
    {
@@ -454,9 +530,9 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_Supply1V5], 3));
-      if (((DeviceVoltageAry[DVS_Supply1V5] >= SUPPLY_1V5_MIN) && (DeviceVoltageAry[DVS_Supply1V5] <= SUPPLY_1V5_MAX)) ||
-          ((DeviceVoltageAry[DVS_Supply1V5] >= SUPPLY_1V35_MIN) && (DeviceVoltageAry[DVS_Supply1V5] <= SUPPLY_1V35_MAX)))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if (((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max)) ||
+          ((XADC_Tests[XADC_measIdx].measurement >= measurement_min_2) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max_2)))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -467,11 +543,15 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "] or [" _PCF(3) ", " _PCF(3) "]",
-            _FFMT(SUPPLY_1V5_MIN, 3), _FFMT(SUPPLY_1V5_MAX, 3), _FFMT(SUPPLY_1V35_MIN, 3), _FFMT(SUPPLY_1V35_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "] or [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS),
+            _FFMT(measurement_min_2, DISPLAY_DIGITS), _FFMT(measurement_max_2, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_Supply1V5];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_MGT1V0], MEAS_PRECISION);
+   measurement_min = floorMultiple(MGT_1V0_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(MGT_1V0_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V0MGT_SENSE].raw.unipolar <= 0xF0)
    {
@@ -480,8 +560,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_MGT1V0], 3));
-      if ((DeviceVoltageAry[DVS_MGT1V0] >= MGT_1V0_MIN) && (DeviceVoltageAry[DVS_MGT1V0] <= MGT_1V0_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -492,10 +572,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(MGT_1V0_MIN, 3), _FFMT(MGT_1V0_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_MGT1V0];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_MGT1V2], MEAS_PRECISION);
+   measurement_min = floorMultiple(MGT_1V2_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(MGT_1V2_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V2MGT_SENSE].raw.unipolar <= 0xF0)
    {
@@ -504,8 +588,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_MGT1V2], 3));
-      if ((DeviceVoltageAry[DVS_MGT1V2] >= MGT_1V2_MIN) && (DeviceVoltageAry[DVS_MGT1V2] <= MGT_1V2_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -516,10 +600,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(MGT_1V2_MIN, 3), _FFMT(MGT_1V2_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_MGT1V2];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply12V], MEAS_PRECISION);
+   measurement_min = floorMultiple(SUPPLY_12V_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SUPPLY_12V_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_12V_SENSE].raw.unipolar <= 0xF0)
    {
@@ -528,8 +616,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_Supply12V], 3));
-      if ((DeviceVoltageAry[DVS_Supply12V] >= SUPPLY_12V_MIN) && (DeviceVoltageAry[DVS_Supply12V] <= SUPPLY_12V_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -540,10 +628,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SUPPLY_12V_MIN, 3), _FFMT(SUPPLY_12V_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_Supply12V];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply5V], MEAS_PRECISION);
+   measurement_min = floorMultiple(SUPPLY_5V_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(SUPPLY_5V_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_5V0_SENSE].raw.unipolar <= 0xF0)
    {
@@ -552,8 +644,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageAry[DVS_Supply5V], 3));
-      if ((DeviceVoltageAry[DVS_Supply5V] >= SUPPLY_5V_MIN) && (DeviceVoltageAry[DVS_Supply5V] <= SUPPLY_5V_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -564,10 +656,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SUPPLY_5V_MIN, 3), _FFMT(SUPPLY_5V_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_Supply5V];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageCalibrationAry[DVCS_Ref0], MEAS_PRECISION);
+   measurement_min = floorMultiple(ADC_REF_1_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(ADC_REF_1_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_ADC_REF_1].raw.unipolar <= 0xF0)
    {
@@ -576,8 +672,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageCalibrationAry[DVCS_Ref0], 3));
-      if ((DeviceVoltageCalibrationAry[DVCS_Ref0] >= ADC_REF_1_MIN) && (DeviceVoltageCalibrationAry[DVCS_Ref0] <= ADC_REF_1_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -588,10 +684,14 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ADC_REF_1_MIN, 3), _FFMT(ADC_REF_1_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageCalibrationAry[DVCS_Ref0];
+   XADC_measIdx++;
 
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageCalibrationAry[DVCS_Ref1], MEAS_PRECISION);
+   measurement_min = floorMultiple(ADC_REF_2_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(ADC_REF_2_MAX, MEAS_PRECISION);
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_ADC_REF_2].raw.unipolar <= 0xF0)
    {
@@ -600,8 +700,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    else
    {
-      PRINTF(_PCF(3), _FFMT(DeviceVoltageCalibrationAry[DVCS_Ref1], 3));
-      if ((DeviceVoltageCalibrationAry[DVCS_Ref1] >= ADC_REF_2_MIN) && (DeviceVoltageCalibrationAry[DVCS_Ref1] <= ADC_REF_2_MAX))
+      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
          XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -612,12 +712,16 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ADC_REF_2_MIN, 3), _FFMT(ADC_REF_2_MAX, 3));
+      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageCalibrationAry[DVCS_Ref1];
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageCalibrationAry[DVCS_Ref2], 3));
-   if ((DeviceVoltageCalibrationAry[DVCS_Ref2] >= ADC_REF_3_MIN) && (DeviceVoltageCalibrationAry[DVCS_Ref2] <= ADC_REF_3_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageCalibrationAry[DVCS_Ref2], MEAS_PRECISION);
+   measurement_min = floorMultiple(ADC_REF_3_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(ADC_REF_3_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -628,8 +732,8 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ADC_REF_3_MIN, 3), _FFMT(ADC_REF_3_MAX, 3));
-   XADC_Tests[XADC_measIdx].measurement = DeviceVoltageCalibrationAry[DVCS_Ref2];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
 
 
    if (XADC_measIdx != ADC_REF_3) {
@@ -655,6 +759,8 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
    bool invalidValue = false;
 
    XADC_MeasurementID_t XADC_measIdx = FPGA_INTERNAL_TEMP;
+   float measurement_min;
+   float measurement_max;
 
    IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);
    if (Status != IRC_SUCCESS)
@@ -675,8 +781,11 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
    }
 
    // Measurement output
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceTemperatureAry[DTS_ProcessingFPGA], 3));
-   if ((DeviceTemperatureAry[DTS_ProcessingFPGA] >= FPGA_ITEMP_MIN && DeviceTemperatureAry[DTS_ProcessingFPGA] <= FPGA_ITEMP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceTemperatureAry[DTS_ProcessingFPGA], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_ITEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_ITEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -687,11 +796,15 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_ITEMP_MIN, 3), _FFMT(FPGA_ITEMP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = DeviceTemperatureAry[DTS_ProcessingFPGA];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageAry[DVS_ProcessingFPGA_VCCINT], 3));
-   if ((DeviceVoltageAry[DVS_ProcessingFPGA_VCCINT] >= FPGA_IVCC_MIN) && (DeviceVoltageAry[DVS_ProcessingFPGA_VCCINT] <= FPGA_IVCC_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_ProcessingFPGA_VCCINT], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_IVCC_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_IVCC_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -702,11 +815,15 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_IVCC_MIN, 3), _FFMT(FPGA_IVCC_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_ProcessingFPGA_VCCINT];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageAry[DVS_ProcessingFPGA_VCCAUX], 3));
-   if ((DeviceVoltageAry[DVS_ProcessingFPGA_VCCAUX] >= FPGA_AVCC_MIN) && (DeviceVoltageAry[DVS_ProcessingFPGA_VCCAUX] <= FPGA_AVCC_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_ProcessingFPGA_VCCAUX], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_AVCC_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_AVCC_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -717,11 +834,15 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_AVCC_MIN, 3), _FFMT(FPGA_AVCC_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_ProcessingFPGA_VCCAUX];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageAry[DVS_ProcessingFPGA_VREFP], 3));
-   if ((DeviceVoltageAry[DVS_ProcessingFPGA_VREFP] >= FPGA_VREFP_MIN) && (DeviceVoltageAry[DVS_ProcessingFPGA_VREFP] <= FPGA_VREFP_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_ProcessingFPGA_VREFP], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_VREFP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_VREFP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -732,11 +853,15 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_VREFP_MIN, 3), _FFMT(FPGA_VREFP_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_ProcessingFPGA_VREFP];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageAry[DVS_ProcessingFPGA_VREFN], 3));
-   if ((DeviceVoltageAry[DVS_ProcessingFPGA_VREFN] >= FPGA_VREFN_MIN) && (DeviceVoltageAry[DVS_ProcessingFPGA_VREFN] <= FPGA_VREFN_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_ProcessingFPGA_VREFN], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_VREFN_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_VREFN_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -747,11 +872,15 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_VREFN_MIN, 3), _FFMT(FPGA_VREFN_MAX, 3));
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DVS_ProcessingFPGA_VREFN];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
 
-   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageAry[DVS_ProcessingFPGA_VBRAM], 3));
-   if ((DeviceVoltageAry[DVS_ProcessingFPGA_VBRAM] >= FPGA_VBRAM_MIN) && (DeviceVoltageAry[DVS_ProcessingFPGA_VBRAM] <= FPGA_VBRAM_MAX))
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_ProcessingFPGA_VBRAM], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_VBRAM_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_VBRAM_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
       XADC_Tests[XADC_measIdx].result = XMR_PASS;
@@ -762,8 +891,8 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_VBRAM_MIN, 3), _FFMT(FPGA_VBRAM_MAX, 3));
-   XADC_Tests[XADC_measIdx].measurement = DeviceVoltageAry[DVS_ProcessingFPGA_VBRAM];
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
 
 
    if (XADC_measIdx != FPGA_BRAM) {
