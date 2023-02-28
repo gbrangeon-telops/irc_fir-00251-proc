@@ -67,7 +67,7 @@ static uint32_t DeviceTimeSource;
  */
 XADC_Test_t XADC_Tests[XADC_CHANNEL_COUNT] =
 {
-   // Test ID                 Test Description                                               Test Measurement  Test Result
+   // Test ID                 Test Description                                                Test Measurement  Test Result
    {VOLTAGE_COOLER,           "XADC -- Cooler Voltage [V]:                           ",       0.0F,             XMR_PENDING},
    {CURRENT_COOLER,           "XADC -- Cooler Current [A]:                           ",       0.0F,             XMR_PENDING},
    {VOLTAGE_24V,              "XADC -- 24V Voltage [V]:                              ",       0.0F,             XMR_PENDING},
@@ -97,12 +97,18 @@ XADC_Test_t XADC_Tests[XADC_CHANNEL_COUNT] =
    {ADC_REF_1,                "XADC -- ADC Reference 1 Voltage [V]:                  ",       0.0F,             XMR_PENDING},
    {ADC_REF_2,                "XADC -- ADC Reference 2 Voltage [V]:                  ",       0.0F,             XMR_PENDING},
    {ADC_REF_3,                "XADC -- ADC Reference 3 Voltage [V]:                  ",       0.0F,             XMR_PENDING},
-   {FPGA_INTERNAL_TEMP,       "XADC -- Internal FPGA Temperature [°C]:               ",       0.0F,             XMR_PENDING},
-   {FPGA_VCCINT,              "XADC -- Internal VCC [V]:                             ",       0.0F,             XMR_PENDING},
-   {FPGA_AUX_VCC,             "XADC -- Auxiliary VCC [V]:                            ",       0.0F,             XMR_PENDING},
-   {FPGA_VREF_POS,            "XADC -- Reference V+ [V]:                             ",       0.0F,             XMR_PENDING},
-   {FPGA_VREF_NEG,            "XADC -- Reference V- [V]:                             ",       0.0F,             XMR_PENDING},
-   {FPGA_BRAM,                "XADC -- BRAM Voltage [V]:                             ",       0.0F,             XMR_PENDING}
+   {PROC_FPGA_TEMP,           "XADC -- Processing FPGA Temperature [°C]:             ",       0.0F,             XMR_PENDING},
+   {PROC_FPGA_VCCINT,         "XADC -- Processing FPGA VCCINT [V]:                   ",       0.0F,             XMR_PENDING},
+   {PROC_FPGA_VCCAUX,         "XADC -- Processing FPGA VCCAUX [V]:                   ",       0.0F,             XMR_PENDING},
+   {PROC_FPGA_VREFP,          "XADC -- Processing FPGA VREFP [V]:                    ",       0.0F,             XMR_PENDING},
+   {PROC_FPGA_VREFN,          "XADC -- Processing FPGA VREFN [V]:                    ",       0.0F,             XMR_PENDING},
+   {PROC_FPGA_VBRAM,          "XADC -- Processing FPGA VBRAM [V]:                    ",       0.0F,             XMR_PENDING},
+   {OUTPUT_FPGA_TEMP,         "XADC -- Output FPGA Temperature [°C]:                 ",       0.0F,             XMR_PENDING},
+   {OUTPUT_FPGA_VCCINT,       "XADC -- Output FPGA VCCINT [V]:                       ",       0.0F,             XMR_PENDING},
+   {OUTPUT_FPGA_VCCAUX,       "XADC -- Output FPGA VCCAUX [V]:                       ",       0.0F,             XMR_PENDING},
+   {OUTPUT_FPGA_VREFP,        "XADC -- Output FPGA VREFP [V]:                        ",       0.0F,             XMR_PENDING},
+   {OUTPUT_FPGA_VREFN,        "XADC -- Output FPGA VREFN [V]:                        ",       0.0F,             XMR_PENDING},
+   {OUTPUT_FPGA_VBRAM,        "XADC -- Output FPGA VBRAM [V]:                        ",       0.0F,             XMR_PENDING}
 };
 
 /*

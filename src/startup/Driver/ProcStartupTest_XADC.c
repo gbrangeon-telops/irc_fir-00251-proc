@@ -20,6 +20,7 @@
 #include "XADC_valid.h"
 #include "XADC_Channels.h"
 #include "GC_Registers.h"
+#include "GC_Poller.h"
 #include "xparameters.h"
 
 #define XADC_DEVICE_ADDR                        XPAR_SYSMON_0_DEVICE_ID
@@ -757,8 +758,10 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
 
    xadcIntCh_t curIntChannel;
    bool invalidValue = false;
+   uint64_t tic;
+   extern gcPolledReg_t gcPolledRegsList[];
 
-   XADC_MeasurementID_t XADC_measIdx = FPGA_INTERNAL_TEMP;
+   XADC_MeasurementID_t XADC_measIdx = PROC_FPGA_TEMP;
    float measurement_min;
    float measurement_max;
 
@@ -778,6 +781,23 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
          ATR_ERR("Invalid XADC reading on internal channel %d.", curIntChannel);
          return IRC_FAILURE;
       }
+   }
+
+   // Make sure all registers have been polled
+   GETTIME(&tic);
+   while (elapsed_time_us(tic) < TIME_TEN_SECOND_US)
+   {
+      AutoTest_RunMinimalStateMachines();
+   }
+   if (!gcPolledRegsList[GCPR_OutputFPGATemperature].polled ||
+       !gcPolledRegsList[GCPR_OutputFPGA_VCCINTVoltage].polled ||
+       !gcPolledRegsList[GCPR_OutputFPGA_VCCAUXVoltage].polled ||
+       !gcPolledRegsList[GCPR_OutputFPGA_VREFPVoltage].polled ||
+       !gcPolledRegsList[GCPR_OutputFPGA_VREFNVoltage].polled ||
+       !gcPolledRegsList[GCPR_OutputFPGA_VBRAMVoltage].polled)
+   {
+      ATR_ERR("Cannot poll Output FPGA registers.");
+      return IRC_FAILURE;
    }
 
    // Measurement output
@@ -893,9 +913,123 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
    }
    PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
          _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
+
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceTemperatureAry[DTS_OutputFPGA], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_ITEMP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_ITEMP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
+   {
+      PRINTF("\tPASS");
+      XADC_Tests[XADC_measIdx].result = XMR_PASS;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
+
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_OutputFPGA_VCCINT], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_IVCC_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_IVCC_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
+   {
+      PRINTF("\tPASS");
+      XADC_Tests[XADC_measIdx].result = XMR_PASS;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
+
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_OutputFPGA_VCCAUX], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_AVCC_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_AVCC_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
+   {
+      PRINTF("\tPASS");
+      XADC_Tests[XADC_measIdx].result = XMR_PASS;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
+
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_OutputFPGA_VREFP], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_VREFP_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_VREFP_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
+   {
+      PRINTF("\tPASS");
+      XADC_Tests[XADC_measIdx].result = XMR_PASS;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
+
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_OutputFPGA_VREFN], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_VREFN_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_VREFN_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
+   {
+      PRINTF("\tPASS");
+      XADC_Tests[XADC_measIdx].result = XMR_PASS;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   XADC_measIdx++;
+
+   XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_OutputFPGA_VBRAM], MEAS_PRECISION);
+   measurement_min = floorMultiple(FPGA_VBRAM_MIN, MEAS_PRECISION);
+   measurement_max = ceilMultiple(FPGA_VBRAM_MAX, MEAS_PRECISION);
+   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
+   {
+      PRINTF("\tPASS");
+      XADC_Tests[XADC_measIdx].result = XMR_PASS;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
+         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
 
 
-   if (XADC_measIdx != FPGA_BRAM) {
+   if (XADC_measIdx != OUTPUT_FPGA_VBRAM) {
       ATR_ERR("Invalid XADC Measurement Index.");
    }
 

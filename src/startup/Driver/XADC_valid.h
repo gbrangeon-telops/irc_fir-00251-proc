@@ -37,22 +37,22 @@
 #define P24V_CURRENT_MIN    	(0.5f)
 
 
-#define FPGA_ITEMP_MAX        (95.0f)
+#define FPGA_ITEMP_MAX        (95.0f)     // Same for PROC and OUTPUT
 #define FPGA_ITEMP_MIN        (15.0f)
 
-#define FPGA_IVCC_MAX       	(1.0f * (1.0f + VOLTAGE_TOL))
+#define FPGA_IVCC_MAX       	(1.0f * (1.0f + VOLTAGE_TOL))     // Same for PROC and OUTPUT
 #define FPGA_IVCC_MIN       	(1.0f * (1.0f - VOLTAGE_TOL))
 								
-#define FPGA_AVCC_MAX       	(1.8f * (1.0f + VOLTAGE_TOL))
+#define FPGA_AVCC_MAX       	(1.8f * (1.0f + VOLTAGE_TOL))     // Same for PROC and OUTPUT
 #define FPGA_AVCC_MIN       	(1.8f * (1.0f - VOLTAGE_TOL))
 								
-#define FPGA_VREFP_MAX      	(1.25f * (1.0f + VOLTAGE_TOL))
+#define FPGA_VREFP_MAX      	(1.25f * (1.0f + VOLTAGE_TOL))     // Same for PROC and OUTPUT
 #define FPGA_VREFP_MIN      	(1.25f * (1.0f - VOLTAGE_TOL))
 								
-#define FPGA_VREFN_MAX      	(0.03f)
+#define FPGA_VREFN_MAX      	(0.03f)     // Same for PROC and OUTPUT
 #define FPGA_VREFN_MIN      	(-0.03f)
 								
-#define FPGA_VBRAM_MAX      	(1.0f * (1.0f + VOLTAGE_TOL))
+#define FPGA_VBRAM_MAX      	(1.0f * (1.0f + VOLTAGE_TOL))     // Same for PROC and OUTPUT
 #define FPGA_VBRAM_MIN      	(1.0f * (1.0f - VOLTAGE_TOL))
 
 
