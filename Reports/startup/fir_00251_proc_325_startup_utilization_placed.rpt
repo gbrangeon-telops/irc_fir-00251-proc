@@ -1,7 +1,7 @@
 Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
-| Date         : Sat Jun 25 08:05:38 2022
+| Date         : Tue Feb 28 10:52:22 2023
 | Host         : TELOPS212 running 64-bit major release  (build 9200)
 | Command      : report_utilization -file d:/Telops/fir-00251-Proc/Reports/startup/fir_00251_proc_325_startup_utilization_placed.rpt
 | Design       : fir_00251_proc_startup
@@ -31,37 +31,37 @@ Table of Contents
 +----------------------------+--------+-------+-----------+-------+
 |          Site Type         |  Used  | Fixed | Available | Util% |
 +----------------------------+--------+-------+-----------+-------+
-| Slice LUTs                 |  75052 |     0 |    203800 | 36.83 |
-|   LUT as Logic             |  68901 |     0 |    203800 | 33.81 |
-|   LUT as Memory            |   6151 |     0 |     64000 |  9.61 |
-|     LUT as Distributed RAM |   1856 |     0 |           |       |
-|     LUT as Shift Register  |   4295 |     0 |           |       |
-| Slice Registers            | 111490 |     0 |    407600 | 27.35 |
-|   Register as Flip Flop    | 111486 |     0 |    407600 | 27.35 |
+| Slice LUTs                 |  78313 |     0 |    203800 | 38.43 |
+|   LUT as Logic             |  71497 |     0 |    203800 | 35.08 |
+|   LUT as Memory            |   6816 |     0 |     64000 | 10.65 |
+|     LUT as Distributed RAM |   2436 |     0 |           |       |
+|     LUT as Shift Register  |   4380 |     0 |           |       |
+| Slice Registers            | 116318 |     0 |    407600 | 28.54 |
+|   Register as Flip Flop    | 116314 |     0 |    407600 | 28.54 |
 |   Register as Latch        |      0 |     0 |    407600 |  0.00 |
 |   Register as AND/OR       |      4 |     0 |    407600 | <0.01 |
-| F7 Muxes                   |    586 |     0 |    101900 |  0.58 |
-| F8 Muxes                   |     24 |     0 |     50950 |  0.05 |
+| F7 Muxes                   |    417 |     0 |    101900 |  0.41 |
+| F8 Muxes                   |     18 |     0 |     50950 |  0.04 |
 +----------------------------+--------+-------+-----------+-------+
 
 
 1.1 Summary of Registers by Type
 --------------------------------
 
-+-------+--------------+-------------+--------------+
-| Total | Clock Enable | Synchronous | Asynchronous |
-+-------+--------------+-------------+--------------+
-| 4     |            _ |           - |            - |
-| 0     |            _ |           - |          Set |
-| 0     |            _ |           - |        Reset |
-| 0     |            _ |         Set |            - |
-| 0     |            _ |       Reset |            - |
-| 0     |          Yes |           - |            - |
-| 3724  |          Yes |           - |          Set |
-| 3794  |          Yes |           - |        Reset |
-| 4255  |          Yes |         Set |            - |
-| 99735 |          Yes |       Reset |            - |
-+-------+--------------+-------------+--------------+
++--------+--------------+-------------+--------------+
+|  Total | Clock Enable | Synchronous | Asynchronous |
++--------+--------------+-------------+--------------+
+| 4      |            _ |           - |            - |
+| 0      |            _ |           - |          Set |
+| 0      |            _ |           - |        Reset |
+| 0      |            _ |         Set |            - |
+| 0      |            _ |       Reset |            - |
+| 0      |          Yes |           - |            - |
+| 3784   |          Yes |           - |          Set |
+| 4359   |          Yes |           - |        Reset |
+| 4267   |          Yes |         Set |            - |
+| 103925 |          Yes |       Reset |            - |
++--------+--------------+-------------+--------------+
 
 
 2. Slice Logic Distribution
@@ -70,27 +70,27 @@ Table of Contents
 +-------------------------------------------+-------+-------+-----------+-------+
 |                 Site Type                 |  Used | Fixed | Available | Util% |
 +-------------------------------------------+-------+-------+-----------+-------+
-| Slice                                     | 31389 |     0 |     50950 | 61.61 |
-|   SLICEL                                  | 21383 |     0 |           |       |
-|   SLICEM                                  | 10006 |     0 |           |       |
-| LUT as Logic                              | 68901 |     0 |    203800 | 33.81 |
+| Slice                                     | 32821 |     0 |     50950 | 64.42 |
+|   SLICEL                                  | 22284 |     0 |           |       |
+|   SLICEM                                  | 10537 |     0 |           |       |
+| LUT as Logic                              | 71497 |     0 |    203800 | 35.08 |
 |   using O5 output only                    |     6 |       |           |       |
-|   using O6 output only                    | 54823 |       |           |       |
-|   using O5 and O6                         | 14072 |       |           |       |
-| LUT as Memory                             |  6151 |     0 |     64000 |  9.61 |
-|   LUT as Distributed RAM                  |  1856 |     0 |           |       |
+|   using O6 output only                    | 56533 |       |           |       |
+|   using O5 and O6                         | 14958 |       |           |       |
+| LUT as Memory                             |  6816 |     0 |     64000 | 10.65 |
+|   LUT as Distributed RAM                  |  2436 |     0 |           |       |
 |     using O5 output only                  |     0 |       |           |       |
 |     using O6 output only                  |     0 |       |           |       |
-|     using O5 and O6                       |  1856 |       |           |       |
-|   LUT as Shift Register                   |  4295 |     0 |           |       |
-|     using O5 output only                  |   218 |       |           |       |
-|     using O6 output only                  |  1813 |       |           |       |
-|     using O5 and O6                       |  2264 |       |           |       |
-| LUT Flip Flop Pairs                       | 42389 |     0 |    203800 | 20.80 |
-|   fully used LUT-FF pairs                 |  8837 |       |           |       |
-|   LUT-FF pairs with one unused LUT output | 31663 |       |           |       |
-|   LUT-FF pairs with one unused Flip Flop  | 25254 |       |           |       |
-| Unique Control Sets                       |  5074 |       |           |       |
+|     using O5 and O6                       |  2436 |       |           |       |
+|   LUT as Shift Register                   |  4380 |     0 |           |       |
+|     using O5 output only                  |   219 |       |           |       |
+|     using O6 output only                  |  1823 |       |           |       |
+|     using O5 and O6                       |  2338 |       |           |       |
+| LUT Flip Flop Pairs                       | 43636 |     0 |    203800 | 21.41 |
+|   fully used LUT-FF pairs                 |  9304 |       |           |       |
+|   LUT-FF pairs with one unused LUT output | 32399 |       |           |       |
+|   LUT-FF pairs with one unused Flip Flop  | 26068 |       |           |       |
+| Unique Control Sets                       |  5137 |       |           |       |
 +-------------------------------------------+-------+-------+-----------+-------+
 * Note: Review the Control Sets Report for more information regarding control sets.
 
@@ -98,16 +98,16 @@ Table of Contents
 3. Memory
 ---------
 
-+-------------------+-------+-------+-----------+-------+
-|     Site Type     |  Used | Fixed | Available | Util% |
-+-------------------+-------+-------+-----------+-------+
-| Block RAM Tile    | 264.5 |     0 |       445 | 59.44 |
-|   RAMB36/FIFO*    |   223 |     0 |       445 | 50.11 |
-|     FIFO36E1 only |     4 |       |           |       |
-|     RAMB36E1 only |   219 |       |           |       |
-|   RAMB18          |    83 |     0 |       890 |  9.33 |
-|     RAMB18E1 only |    83 |       |           |       |
-+-------------------+-------+-------+-----------+-------+
++-------------------+------+-------+-----------+-------+
+|     Site Type     | Used | Fixed | Available | Util% |
++-------------------+------+-------+-----------+-------+
+| Block RAM Tile    |  258 |     0 |       445 | 57.98 |
+|   RAMB36/FIFO*    |  221 |     0 |       445 | 49.66 |
+|     FIFO36E1 only |    4 |       |           |       |
+|     RAMB36E1 only |  217 |       |           |       |
+|   RAMB18          |   74 |     0 |       890 |  8.31 |
+|     RAMB18E1 only |   74 |       |           |       |
++-------------------+------+-------+-----------+-------+
 * Note: Each Block RAM Tile only has one FIFO logic available and therefore can accommodate only one FIFO36E1 or one FIFO18E1. However, if a FIFO18E1 occupies a Block RAM Tile, that tile can still accommodate a RAMB18E1
 
 
@@ -128,10 +128,10 @@ Table of Contents
 +-----------------------------+------+-------+-----------+--------+
 |          Site Type          | Used | Fixed | Available |  Util% |
 +-----------------------------+------+-------+-----------+--------+
-| Bonded IOB                  |  329 |   329 |       400 |  82.25 |
-|   IOB Master Pads           |  160 |       |           |        |
-|   IOB Slave Pads            |  156 |       |           |        |
-|   IOB Flip Flops            |   22 |    22 |           |        |
+| Bonded IOB                  |  333 |   333 |       400 |  83.25 |
+|   IOB Master Pads           |  162 |       |           |        |
+|   IOB Slave Pads            |  158 |       |           |        |
+|   IOB Flip Flops            |   21 |    21 |           |        |
 | Bonded IPADs                |   12 |    12 |        26 |  46.15 |
 | Bonded OPADs                |    8 |     8 |        16 |  50.00 |
 | PHY_CONTROL                 |    3 |     3 |        10 |  30.00 |
@@ -150,8 +150,8 @@ Table of Contents
 |   IDELAYE2 only             |   64 |    64 |           |        |
 | ODELAYE2/ODELAYE2_FINEDELAY |    0 |     0 |       150 |   0.00 |
 | IBUFDS_GTE2                 |    1 |     1 |         4 |  25.00 |
-| ILOGIC                      |   87 |    87 |       400 |  21.75 |
-|   IFF_Register              |    7 |     7 |           |        |
+| ILOGIC                      |   86 |    86 |       400 |  21.50 |
+|   IFF_Register              |    6 |     6 |           |        |
 |   ISERDES                   |   80 |    80 |           |        |
 | OLOGIC                      |  129 |   129 |       400 |  32.25 |
 |   OUTFF_Register            |   15 |    15 |           |        |
@@ -198,69 +198,69 @@ Table of Contents
 8. Primitives
 -------------
 
-+--------------------------+-------+---------------------+
-|         Ref Name         |  Used | Functional Category |
-+--------------------------+-------+---------------------+
-| FDRE                     | 99735 |        Flop & Latch |
-| LUT3                     | 22018 |                 LUT |
-| LUT6                     | 17494 |                 LUT |
-| LUT4                     | 14962 |                 LUT |
-| LUT2                     | 12751 |                 LUT |
-| LUT5                     | 12096 |                 LUT |
-| SRL16E                   |  5405 |  Distributed Memory |
-| CARRY4                   |  4630 |          CarryLogic |
-| FDSE                     |  4255 |        Flop & Latch |
-| FDCE                     |  3794 |        Flop & Latch |
-| FDPE                     |  3724 |        Flop & Latch |
-| LUT1                     |  3652 |                 LUT |
-| RAMD32                   |  2816 |  Distributed Memory |
-| SRLC32E                  |  1110 |  Distributed Memory |
-| RAMS32                   |   896 |  Distributed Memory |
-| MUXF7                    |   586 |               MuxFx |
-| RAMB36E1                 |   219 |        Block Memory |
-| OBUF                     |   144 |                  IO |
-| OSERDESE2                |   106 |                  IO |
-| DSP48E1                  |   101 |    Block Arithmetic |
-| IBUF                     |    85 |                  IO |
-| RAMB18E1                 |    83 |        Block Memory |
-| ISERDESE2                |    80 |                  IO |
-| OBUFT                    |    67 |                  IO |
-| IDELAYE2                 |    64 |                  IO |
-| SRLC16E                  |    44 |  Distributed Memory |
-| OBUFT_DCIEN              |    32 |                  IO |
-| IBUF_IBUFDISABLE         |    32 |                  IO |
-| BUFG                     |    25 |               Clock |
-| MUXF8                    |    24 |               MuxFx |
-| IBUFDS                   |    20 |                  IO |
-| OBUFTDS_DCIEN            |    16 |                  IO |
-| IBUF_INTERMDISABLE       |    16 |                  IO |
-| IBUFDS_IBUFDISABLE_INT   |    16 |                  IO |
-| ODDR                     |    14 |                  IO |
-| INV                      |    12 |                 LUT |
-| PHASER_OUT_PHY           |    11 |                  IO |
-| OUT_FIFO                 |    11 |                  IO |
-| MMCME2_ADV               |     8 |               Clock |
-| PHASER_IN_PHY            |     6 |                  IO |
-| IN_FIFO                  |     6 |                  IO |
-| OBUFTDS                  |     4 |                  IO |
-| OBUFDS                   |     4 |                  IO |
-| IDELAYCTRL               |     4 |                  IO |
-| IBUFDS_INTERMDISABLE_INT |     4 |                  IO |
-| GTXE2_CHANNEL            |     4 |                  IO |
-| FIFO36E1                 |     4 |        Block Memory |
-| AND2B1L                  |     4 |              Others |
-| PHY_CONTROL              |     3 |                  IO |
-| PHASER_REF               |     3 |                  IO |
-| BUFGCTRL                 |     3 |               Clock |
-| PLLE2_ADV                |     2 |               Clock |
-| GTXE2_COMMON             |     2 |                  IO |
-| BUFH                     |     2 |               Clock |
-| XADC                     |     1 |              Others |
-| STARTUPE2                |     1 |              Others |
-| IBUFDS_GTE2              |     1 |                  IO |
-| BUFR                     |     1 |               Clock |
-| BSCANE2                  |     1 |              Others |
-+--------------------------+-------+---------------------+
++--------------------------+--------+---------------------+
+|         Ref Name         |  Used  | Functional Category |
++--------------------------+--------+---------------------+
+| FDRE                     | 103925 |        Flop & Latch |
+| LUT3                     |  23321 |                 LUT |
+| LUT6                     |  18082 |                 LUT |
+| LUT4                     |  15404 |                 LUT |
+| LUT2                     |  13242 |                 LUT |
+| LUT5                     |  12778 |                 LUT |
+| SRL16E                   |   5556 |  Distributed Memory |
+| CARRY4                   |   4601 |          CarryLogic |
+| FDCE                     |   4359 |        Flop & Latch |
+| FDSE                     |   4267 |        Flop & Latch |
+| FDPE                     |   3784 |        Flop & Latch |
+| RAMD32                   |   3686 |  Distributed Memory |
+| LUT1                     |   3628 |                 LUT |
+| RAMS32                   |   1186 |  Distributed Memory |
+| SRLC32E                  |   1118 |  Distributed Memory |
+| MUXF7                    |    417 |               MuxFx |
+| RAMB36E1                 |    217 |        Block Memory |
+| OBUF                     |    144 |                  IO |
+| OSERDESE2                |    106 |                  IO |
+| DSP48E1                  |    101 |    Block Arithmetic |
+| IBUF                     |     89 |                  IO |
+| ISERDESE2                |     80 |                  IO |
+| RAMB18E1                 |     74 |        Block Memory |
+| OBUFT                    |     67 |                  IO |
+| IDELAYE2                 |     64 |                  IO |
+| SRLC16E                  |     44 |  Distributed Memory |
+| OBUFT_DCIEN              |     32 |                  IO |
+| IBUF_IBUFDISABLE         |     32 |                  IO |
+| BUFG                     |     25 |               Clock |
+| IBUFDS                   |     20 |                  IO |
+| MUXF8                    |     18 |               MuxFx |
+| OBUFTDS_DCIEN            |     16 |                  IO |
+| IBUF_INTERMDISABLE       |     16 |                  IO |
+| IBUFDS_IBUFDISABLE_INT   |     16 |                  IO |
+| ODDR                     |     14 |                  IO |
+| INV                      |     12 |                 LUT |
+| PHASER_OUT_PHY           |     11 |                  IO |
+| OUT_FIFO                 |     11 |                  IO |
+| MMCME2_ADV               |      8 |               Clock |
+| PHASER_IN_PHY            |      6 |                  IO |
+| IN_FIFO                  |      6 |                  IO |
+| OBUFTDS                  |      4 |                  IO |
+| OBUFDS                   |      4 |                  IO |
+| IDELAYCTRL               |      4 |                  IO |
+| IBUFDS_INTERMDISABLE_INT |      4 |                  IO |
+| GTXE2_CHANNEL            |      4 |                  IO |
+| FIFO36E1                 |      4 |        Block Memory |
+| AND2B1L                  |      4 |              Others |
+| PHY_CONTROL              |      3 |                  IO |
+| PHASER_REF               |      3 |                  IO |
+| BUFGCTRL                 |      3 |               Clock |
+| PLLE2_ADV                |      2 |               Clock |
+| GTXE2_COMMON             |      2 |                  IO |
+| BUFH                     |      2 |               Clock |
+| XADC                     |      1 |              Others |
+| STARTUPE2                |      1 |              Others |
+| IBUFDS_GTE2              |      1 |                  IO |
+| BUFR                     |      1 |               Clock |
+| BSCANE2                  |      1 |              Others |
++--------------------------+--------+---------------------+
 
 
 9. Black Boxes
@@ -274,134 +274,135 @@ Table of Contents
 10. Instantiated Netlists
 -------------------------
 
-+-------------------------------+------+
-|            Ref Name           | Used |
-+-------------------------------+------+
-| t_axi4_stream32_sfifo_d256    |   29 |
-| t_axi4_stream32_sfifo_d16     |   21 |
-| t_axi4_stream32_sfifo_d64     |   20 |
-| ip_fp32_axis_mult             |   20 |
-| fwft_sfifo_w32_d16            |   19 |
-| ip_axis_fi32tofp32            |   18 |
-| ip_axis32_fanout2             |   15 |
-| ip_fp32_axis_subtract         |    9 |
-| fwft_sfifo_w32_d256           |    8 |
-| t_axi4_lite32_w_afifo_d16     |    7 |
-| ip_fp32_axis_add              |    7 |
-| ip_axis_fp32tofi32            |    7 |
-| fwft_sfifo_w3_d16             |    7 |
-| t_axi4_stream32_sfifo_d1024   |    6 |
-| fwft_sfifo_w76_d256           |    6 |
-| fwft_sfifo_w8_d16             |    5 |
-| var_shift_reg_w16_d32         |    4 |
-| ip_fp32_axis_divide           |    4 |
-| fwft_sfifo_w72_d16            |    4 |
-| fwft_sfifo_w16_d256           |    4 |
-| fwft_afifo_w96_d128           |    4 |
-| afifo_w72_d16                 |    4 |
-| fwft_sfifo_wr66_rd66_d512     |    3 |
-| fwft_afifo_wr66_rd66_d512     |    3 |
-| t_axi4_stream32_sfifo_d2048   |    2 |
-| t_axi4_stream32_afifo_d512    |    2 |
-| serdes_clkin_10_0_MHz_mmcm    |    2 |
-| ip_fp32_axis_greaterThan      |    2 |
-| ip_axis16_reg                 |    2 |
-| fwft_sfifo_w192_d16           |    2 |
-| fwft_afifo_wr18_rd72_d1024    |    2 |
-| video_mgt                     |    1 |
-| usart_mmcm                    |    1 |
-| tdp_ram_w32_d32768            |    1 |
-| tdp_ram_w32_d16384            |    1 |
-| t_axi4_stream8_sfifo_d2048    |    1 |
-| t_axi4_stream64_sfifo_d128    |    1 |
-| t_axi4_stream64_afifo_d512    |    1 |
-| t_axi4_stream64_afifo_d16     |    1 |
-| t_axi4_stream64_afifo_d1024   |    1 |
-| t_axi4_stream16_sfifo_d16     |    1 |
-| sdp_ram_w32_d128              |    1 |
-| isc0207A_5_0_MHz_mmcm         |    1 |
-| ip_fp32_axis_sqroot           |    1 |
-| ip_blk_mem_gen_w32_d8192      |    1 |
-| ip_axis64_fanout2             |    1 |
-| ip_axis32_merge_axis64        |    1 |
-| ip_axis16_merge_axis64        |    1 |
-| ip_axi_bram_ctrl              |    1 |
-| histogram_axis_tmi_4pix_0     |    1 |
-| fwft_afifo_wr72_rd18_d16      |    1 |
-| fwft_afifo_wr66_rd132_d32     |    1 |
-| fwft_afifo_wr132_rd66_d16     |    1 |
-| fwft_afifo_w8_d256            |    1 |
-| exp_mgt                       |    1 |
-| ehdri_index_mem               |    1 |
-| dp_ram_byte_w32_d64           |    1 |
-| data_mgt                      |    1 |
-| core_xbar_5                   |    1 |
-| core_xbar_4                   |    1 |
-| core_xbar_3                   |    1 |
-| core_xbar_2                   |    1 |
-| core_xbar_1                   |    1 |
-| core_xbar_0                   |    1 |
-| core_xadc_wiz_1_0             |    1 |
-| core_proc_sys_reset_1_0       |    1 |
-| core_power_management_0       |    1 |
-| core_pleora_uart_0            |    1 |
-| core_oem_uart_0               |    1 |
-| core_mig_7series_0_0          |    1 |
-| core_microblaze_1_axi_intc_0  |    1 |
-| core_microblaze_1_0           |    1 |
-| core_mdm_1_0                  |    1 |
-| core_lmb_bram_0               |    1 |
-| core_intr_concact_0           |    1 |
-| core_ilmb_v10_0               |    1 |
-| core_ilmb_bram_if_cntlr_0     |    1 |
-| core_fw_uart_0                |    1 |
-| core_fpga_output_uart_0       |    1 |
-| core_dlmb_v10_0               |    1 |
-| core_dlmb_bram_if_cntlr_0     |    1 |
-| core_clk_wiz_1_0              |    1 |
-| core_clink_uart_0             |    1 |
-| core_axis_clock_converter_2_0 |    1 |
-| core_axis_clock_converter_1_0 |    1 |
-| core_axis_clock_converter_0_0 |    1 |
-| core_axi_usb_uart_0           |    1 |
-| core_axi_timer_0_0            |    1 |
-| core_axi_quad_spi_0_0         |    1 |
-| core_axi_ndf_uart_0           |    1 |
-| core_axi_lens_uart_0          |    1 |
-| core_axi_gps_uart_0           |    1 |
-| core_axi_gpio_0_0             |    1 |
-| core_axi_dm_buffer_0          |    1 |
-| core_axi_datamover_ddrcal_0   |    1 |
-| core_auto_us_3                |    1 |
-| core_auto_us_2                |    1 |
-| core_auto_us_1                |    1 |
-| core_auto_us_0                |    1 |
-| core_auto_pc_2                |    1 |
-| core_auto_pc_1                |    1 |
-| core_auto_pc_0                |    1 |
-| core_auto_ds_9                |    1 |
-| core_auto_ds_8                |    1 |
-| core_auto_ds_7                |    1 |
-| core_auto_ds_6                |    1 |
-| core_auto_ds_5                |    1 |
-| core_auto_ds_4                |    1 |
-| core_auto_ds_3                |    1 |
-| core_auto_ds_2                |    1 |
-| core_auto_ds_13               |    1 |
-| core_auto_ds_12               |    1 |
-| core_auto_ds_11               |    1 |
-| core_auto_ds_10               |    1 |
-| core_auto_ds_1                |    1 |
-| core_auto_ds_0                |    1 |
-| core_auto_cc_2                |    1 |
-| core_auto_cc_1                |    1 |
-| core_auto_cc_0                |    1 |
-| core_GND_0                    |    1 |
-| core_FlashReset_0_0           |    1 |
-| core_CAL_DDR_MIG_0            |    1 |
-| calib_param_ram               |    1 |
-| buffer_table_ram              |    1 |
-| axis_128_to_64                |    1 |
-+-------------------------------+------+
++--------------------------------+------+
+|            Ref Name            | Used |
++--------------------------------+------+
+| t_axi4_stream32_sfifo_d256     |   29 |
+| t_axi4_stream32_sfifo_d16      |   21 |
+| t_axi4_stream32_sfifo_d64      |   20 |
+| ip_fp32_axis_mult              |   20 |
+| fwft_sfifo_w32_d16             |   19 |
+| ip_axis_fi32tofp32             |   18 |
+| ip_axis32_fanout2              |   15 |
+| ip_fp32_axis_subtract          |    9 |
+| fwft_sfifo_w32_d256            |    8 |
+| t_axi4_lite32_w_afifo_d16      |    7 |
+| ip_fp32_axis_add               |    7 |
+| ip_axis_fp32tofi32             |    7 |
+| fwft_sfifo_w3_d16              |    7 |
+| t_axi4_stream32_sfifo_d1024    |    6 |
+| fwft_sfifo_w76_d256            |    6 |
+| fwft_sfifo_w8_d16              |    5 |
+| var_shift_reg_w16_d32          |    4 |
+| ip_fp32_axis_divide            |    4 |
+| fwft_sfifo_w72_d16             |    4 |
+| fwft_sfifo_w16_d256            |    4 |
+| fwft_afifo_w96_d128            |    4 |
+| afifo_w72_d16                  |    4 |
+| fwft_sfifo_wr66_rd66_d512      |    3 |
+| fwft_afifo_wr66_rd66_d512      |    3 |
+| t_axi4_stream32_afifo_d512     |    2 |
+| t_axi4_stream128_afifo_d512    |    2 |
+| serdes_clkin_10_0_MHz_mmcm     |    2 |
+| ip_fp32_axis_greaterThan       |    2 |
+| ip_axis16_reg                  |    2 |
+| fwft_sfifo_w192_d16            |    2 |
+| fwft_afifo_wr18_rd72_d1024     |    2 |
+| fwft_afifo_wr132_rd66_d16      |    2 |
+| video_mgt                      |    1 |
+| usart_mmcm                     |    1 |
+| tdp_ram_w32_d32768             |    1 |
+| tdp_ram_w32_d16384             |    1 |
+| t_axi4_stream8_sfifo_d2048     |    1 |
+| t_axi4_stream64_sfifo_d128     |    1 |
+| t_axi4_stream64_afifo_d16      |    1 |
+| t_axi4_stream32_sfifo_d2048    |    1 |
+| t_axi4_stream16_sfifo_d16      |    1 |
+| sdp_ram_w32_d128               |    1 |
+| isc0207A_5_0_MHz_mmcm          |    1 |
+| ip_fp32_axis_sqroot            |    1 |
+| ip_blk_mem_gen_w32_d8192       |    1 |
+| ip_axis64_fanout2              |    1 |
+| ip_axi_bram_ctrl               |    1 |
+| histogram_axis_tmi_4pix_0      |    1 |
+| fwft_afifo_wr72_rd18_d16       |    1 |
+| fwft_afifo_wr66_rd132_d512     |    1 |
+| fwft_afifo_wr66_rd132_d32      |    1 |
+| fwft_afifo_w8_d256             |    1 |
+| exp_mgt                        |    1 |
+| ehdri_index_mem                |    1 |
+| dp_ram_byte_w32_d64            |    1 |
+| data_mgt                       |    1 |
+| core_xbar_5                    |    1 |
+| core_xbar_4                    |    1 |
+| core_xbar_3                    |    1 |
+| core_xbar_2                    |    1 |
+| core_xbar_1                    |    1 |
+| core_xbar_0                    |    1 |
+| core_xadc_wiz_1_0              |    1 |
+| core_proc_sys_reset_1_0        |    1 |
+| core_power_management_0        |    1 |
+| core_pleora_uart_0             |    1 |
+| core_oem_uart_0                |    1 |
+| core_mig_7series_0_0           |    1 |
+| core_microblaze_1_axi_intc_0   |    1 |
+| core_microblaze_1_0            |    1 |
+| core_mdm_1_0                   |    1 |
+| core_lmb_bram_0                |    1 |
+| core_intr_concact_0            |    1 |
+| core_ilmb_v10_0                |    1 |
+| core_ilmb_bram_if_cntlr_0      |    1 |
+| core_fw_uart_0                 |    1 |
+| core_fpga_output_uart_0        |    1 |
+| core_dlmb_v10_0                |    1 |
+| core_dlmb_bram_if_cntlr_0      |    1 |
+| core_clk_wiz_1_0               |    1 |
+| core_clink_uart_0              |    1 |
+| core_axis_dwidth_converter_0_0 |    1 |
+| core_axis_clock_converter_4_0  |    1 |
+| core_axis_clock_converter_3_0  |    1 |
+| core_axis_clock_converter_2_0  |    1 |
+| core_axis_clock_converter_1_0  |    1 |
+| core_axis_clock_converter_0_0  |    1 |
+| core_axi_usb_uart_0            |    1 |
+| core_axi_timer_0_0             |    1 |
+| core_axi_quad_spi_0_0          |    1 |
+| core_axi_ndf_uart_0            |    1 |
+| core_axi_lens_uart_0           |    1 |
+| core_axi_gps_uart_0            |    1 |
+| core_axi_gpio_0_0              |    1 |
+| core_axi_dm_buffer_0           |    1 |
+| core_axi_datamover_ddrcal_0    |    1 |
+| core_auto_us_3                 |    1 |
+| core_auto_us_2                 |    1 |
+| core_auto_us_1                 |    1 |
+| core_auto_us_0                 |    1 |
+| core_auto_pc_2                 |    1 |
+| core_auto_pc_1                 |    1 |
+| core_auto_pc_0                 |    1 |
+| core_auto_ds_9                 |    1 |
+| core_auto_ds_8                 |    1 |
+| core_auto_ds_7                 |    1 |
+| core_auto_ds_6                 |    1 |
+| core_auto_ds_5                 |    1 |
+| core_auto_ds_4                 |    1 |
+| core_auto_ds_3                 |    1 |
+| core_auto_ds_2                 |    1 |
+| core_auto_ds_13                |    1 |
+| core_auto_ds_12                |    1 |
+| core_auto_ds_11                |    1 |
+| core_auto_ds_10                |    1 |
+| core_auto_ds_1                 |    1 |
+| core_auto_ds_0                 |    1 |
+| core_auto_cc_2                 |    1 |
+| core_auto_cc_1                 |    1 |
+| core_auto_cc_0                 |    1 |
+| core_GND_0                     |    1 |
+| core_FlashReset_0_0            |    1 |
+| core_CAL_DDR_MIG_0             |    1 |
+| calib_param_ram                |    1 |
+| buffer_table_ram               |    1 |
+| axis_128_to_64                 |    1 |
++--------------------------------+------+
 
 
