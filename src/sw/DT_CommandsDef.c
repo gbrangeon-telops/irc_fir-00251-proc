@@ -188,7 +188,7 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read IRIGB command argument
-      arglen = GetNextArg(cbuf, argStr, 4);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if (arglen == 0)
       {
          DT_ERR("Invalid IRIGB command argument.");
@@ -207,7 +207,7 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
       }
 
       // Read IRIGB command parameter value
-      arglen = GetNextArg(cbuf, argStr, 12);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       switch (cmd)
       {
          case 1: // IRIGB
@@ -279,7 +279,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read FPA command argument
-      arglen = GetNextArg(cbuf, argStr, 4);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if (arglen == 0)
       {
          DT_ERR("Invalid FPA command argument.");
@@ -362,7 +362,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       }
 
       // Read FPA command parameter value
-      arglen = GetNextArg(cbuf, argStr, 12);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       switch (cmd)
       {
          case 1: // POL
@@ -953,7 +953,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
    switch (cmd)
    {
       case 0: // debug mode on/off
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
             DT_ERR("Invalid data length.");
@@ -982,7 +982,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       case 2: // invalidate and reload
          if (TDCStatusTst(WaitingForImageCorrectionMask) == 0 && TDCStatusTst(AcquisitionStartedMask) == 0)
          {
-            arglen = GetNextArg(cbuf, argStr, 10);
+            arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
             if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
             {
                value = 0; // clear current by default
@@ -1010,7 +1010,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 3: // clear buffer on/off
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
             DT_ERR("Invalid data length.");
@@ -1044,7 +1044,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 6: // AEC on/off
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
             DT_ERR("Invalid data length.");
@@ -1066,7 +1066,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 7: // Verbose on/off
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
             DT_ERR("Invalid data length.");
@@ -1097,7 +1097,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 10: // FR value
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (ParseFloatNumDec((char *)argStr, arglen, &fValue) != IRC_SUCCESS)
          {
             DT_ERR("Invalid data length.");
@@ -1118,7 +1118,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 11: // Constant value data on/off
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
             DT_ERR("Invalid data length.");
@@ -1607,7 +1607,7 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read show packet value
-      arglen = GetNextArg(cbuf, argStr, 1);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if ((ParseNumArg((char *)argStr, arglen, &showNMEA) != IRC_SUCCESS) ||
             ((showNMEA != 0) && (showNMEA != 1)))
       {
@@ -2057,7 +2057,7 @@ IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf)
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read GenICam poller state
-      arglen = GetNextArg(cbuf, argStr, 1);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if ((ParseNumArg((char *)argStr, arglen, &gcpState) != IRC_SUCCESS) ||
             ((gcpState != 0) && (gcpState != 1)))
       {

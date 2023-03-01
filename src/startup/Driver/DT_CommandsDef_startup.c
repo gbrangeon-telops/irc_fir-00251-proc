@@ -35,7 +35,7 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
          uint16_t arglen;
          uint8_t  argStr[11];
 
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
 
          if (strncasecmp(((char *)argStr), "EX", arglen) == 0) {
             waitingForTI = false;
@@ -74,7 +74,7 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
          uint16_t arglen;
          uint8_t  argStr[11];
 
-         arglen = GetNextArg(cbuf, argStr, 10);
+         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
          if (strncasecmp(((char *)argStr), "BREAK", arglen) == 0) {
             ATR_INF("Aborting Batch Mode...");
             breakBatchMode = true;
