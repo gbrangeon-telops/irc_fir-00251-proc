@@ -124,9 +124,11 @@
 #define THERM_VAL_1_MAX       (0.210f)       // experimentally determined
 #define THERM_VAL_1_MIN       (0.204f)
 
-#define THERM_VAL_2           0.83333333f    // Volt value for R=100k
-#define THERM_VAL_2_MAX       (THERM_VAL_2 * (1.0f + THERM_TOL))
-#define THERM_VAL_2_MIN       (THERM_VAL_2 * (1.0f - THERM_TOL))
+//#define THERM_VAL_2           0.83333333f    // Volt value for R=100k
+//#define THERM_VAL_2_MAX       (THERM_VAL_2 * (1.0f + THERM_TOL))
+//#define THERM_VAL_2_MIN       (THERM_VAL_2 * (1.0f - THERM_TOL))
+#define THERM_VAL_2_MAX       (0.834f)       // experimentally determined
+#define THERM_VAL_2_MIN       (0.828f)
 								
 #define INT_LENS_TEMP_MAX   	THERM_VAL_1_MAX
 #define INT_LENS_TEMP_MIN   	THERM_VAL_1_MIN

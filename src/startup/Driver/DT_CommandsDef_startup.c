@@ -94,7 +94,7 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
       return IRC_FAILURE;
    }
 
-   if (gNetworkIntf.currentState != NIS_READY)
+   if (TDCStatusTst(WaitingForOutputFPGAMask))
    {
       DT_ERR("Cannot run Automated Tests: Network Interface is not Ready.");
       return IRC_FAILURE;

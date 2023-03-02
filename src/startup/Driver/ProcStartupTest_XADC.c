@@ -785,7 +785,7 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
 
    // Make sure all registers have been polled
    GETTIME(&tic);
-   while (elapsed_time_us(tic) < TIME_TEN_SECOND_US)
+   while (elapsed_time_us(tic) < 3*TIME_ONE_SECOND_US)
    {
       AutoTest_RunMinimalStateMachines();
    }
