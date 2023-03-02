@@ -442,7 +442,7 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    }
    else
    {
-      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      PRINTF(_PCF(3), _FFMT(XADC_Tests[XADC_measIdx].measurement, 3));
       if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
@@ -454,8 +454,8 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
-            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]",
+            _FFMT(measurement_min, 3), _FFMT(measurement_max, 3));
    }
    XADC_measIdx++;
 
@@ -470,7 +470,7 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    }
    else
    {
-      PRINTF(_PCF(DISPLAY_DIGITS), _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+      PRINTF(_PCF(3), _FFMT(XADC_Tests[XADC_measIdx].measurement, 3));
       if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
       {
          PRINTF("\tPASS");
@@ -482,15 +482,15 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
          XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
-      PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
-            _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]",
+            _FFMT(measurement_min, 3), _FFMT(measurement_max, 3));
    }
    XADC_measIdx++;
 
    XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceVoltageAry[DVS_Supply24V], MEAS_PRECISION);
    measurement_min = floorMultiple(P24V_VOLTAGE_MIN, MEAS_PRECISION);
    measurement_max = ceilMultiple(P24V_VOLTAGE_MAX, MEAS_PRECISION);
-   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, 3));
    if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
@@ -502,14 +502,14 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
-         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]",
+         _FFMT(measurement_min, 3), _FFMT(measurement_max, 3));
    XADC_measIdx++;
 
    XADC_Tests[XADC_measIdx].measurement = roundMultiple(DeviceCurrentAry[DCS_Supply24V], MEAS_PRECISION);
    measurement_min = floorMultiple(P24V_CURRENT_MIN, MEAS_PRECISION);
    measurement_max = ceilMultiple(P24V_CURRENT_MAX, MEAS_PRECISION);
-   ATR_PRINTF("%s" _PCF(DISPLAY_DIGITS), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, DISPLAY_DIGITS));
+   ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, 3));
    if ((XADC_Tests[XADC_measIdx].measurement >= measurement_min) && (XADC_Tests[XADC_measIdx].measurement <= measurement_max))
    {
       PRINTF("\tPASS");
@@ -521,8 +521,8 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
-   PRINTF("\tValid interval = [" _PCF(DISPLAY_DIGITS) ", " _PCF(DISPLAY_DIGITS) "]",
-         _FFMT(measurement_min, DISPLAY_DIGITS), _FFMT(measurement_max, DISPLAY_DIGITS));
+   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]",
+         _FFMT(measurement_min, 3), _FFMT(measurement_max, 3));
 
 
    if (XADC_measIdx != CURRENT_24V) {
