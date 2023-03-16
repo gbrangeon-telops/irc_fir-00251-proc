@@ -33,7 +33,7 @@ enum builtInTestIDEnum {
    BITID_FlashSettingsManagerInitialization,
    BITID_FileSystemInitialization,
    BITID_FileManagerInitialization,
-   BITID_QSPIFlashInerfaceInitialization,
+   BITID_QSPIFlashInterfaceInitialization,
    BITID_FirmwareUpdaterInitialization,
    BITID_FANControllerInitialization,
    BITID_EHDRIControllerInitialization,

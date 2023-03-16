@@ -154,7 +154,7 @@ void disable_caches()
    WAIT_US(30);
 
    BuiltInTest_Execute(BITID_InterruptControllerInitialization);
-   BuiltInTest_Execute(BITID_QSPIFlashInerfaceInitialization);
+   BuiltInTest_Execute(BITID_QSPIFlashInterfaceInitialization);
    BuiltInTest_Execute(BITID_FileSystemInitialization);
    BuiltInTest_Execute(BITID_FlashDynamicValuesInitialization);
    BuiltInTest_Execute(BITID_DeviceSerialPortsInitialization);

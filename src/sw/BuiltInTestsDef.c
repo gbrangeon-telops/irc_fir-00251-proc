@@ -31,7 +31,7 @@ builtInTest_t builtInTests[BITID_Count] =
    {BITID_FlashSettingsManagerInitialization, "Initializing flash settings loader", Proc_FlashSettings_Init, BITR_Pending},
    {BITID_FileSystemInitialization, "Initializing file system", Proc_FileSystem_Init, BITR_Pending},
    {BITID_FileManagerInitialization, "Initializing file manager", Proc_FM_Init, BITR_Pending},
-   {BITID_QSPIFlashInerfaceInitialization, "Initializing QSPI flash interface", Proc_QSPIFlash_Init, BITR_Pending},
+   {BITID_QSPIFlashInterfaceInitialization, "Initializing QSPI flash interface", Proc_QSPIFlash_Init, BITR_Pending},
    {BITID_FirmwareUpdaterInitialization, "Initializing firmware updater", Proc_FU_Init, BITR_Pending},
    {BITID_FANControllerInitialization, "Initializing fan controller", Proc_Fan_Init, BITR_Pending},
    {BITID_EHDRIControllerInitialization, "Initializing EHDRI controller", Proc_EHDRI_Init, BITR_Pending},
