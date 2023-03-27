@@ -127,8 +127,8 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal int_cfg_i                       : int_cfg_type;
    signal exp_struct_cfg                  : int_cfg_type;
    signal subtraction_possible            : std_logic := '0';
-   
-   signal roic_read_reg_i	               : std_logic_vector(7 downto 0);
+   signal exp_pause_cnt                   : unsigned(2 downto 0);
+   signal roic_read_reg_i	              : std_logic_vector(7 downto 0);
    
 begin
    
@@ -357,7 +357,7 @@ begin
             exp_ser_cfg_dval <= '0';
             exp_cfg_in_progress <= '0';
             at_least_one_exp_cfg_received <= '0';
-            
+            exp_pause_cnt <= (others => '0');
          else             
             
             -- checksum_base_add <= resize(unsigned(mb_struct_cfg.int_cmd_dlen), checksum_base_add'length) + 4;  -- +4 pour tenir compte de l'overhead de la cmd.         
@@ -421,6 +421,7 @@ begin
                   elsif byte_cnt = 19 then
                      exp_ser_cfg_add <= std_logic_vector(resize(mb_struct_cfg.int_checksum_add, exp_ser_cfg_add'length));
                      exp_ser_cfg_data <= std_logic_vector(unsigned(not std_logic_vector(exp_checksum)) + 1); 
+                     exp_pause_cnt <= to_unsigned(1,exp_pause_cnt'length);
                      exp_cfg_gen_fsm <= pause_st; 
                   else  -- si byte cnt vaut 16 à 18  
                      exp_ser_cfg_data <= (others => '0');       -- le fait qu'il y ait des zeros entre byte16 et byte18 donne le temps au cheksum d'etre prêt avant le byte 19.
@@ -428,10 +429,13 @@ begin
                   end if;              
                
                when pause_st =>  -- on envoie ensuite la partie structurale
-                  exp_ser_cfg_dval <= '0'; 
-                  exp_cfg_gen_fsm <= idle;               
-                  at_least_one_exp_cfg_received <= '1';
-               
+                  exp_pause_cnt <= exp_pause_cnt +1;
+                  if exp_pause_cnt(2) = '1' then
+                     exp_ser_cfg_dval <= '0'; 
+                     exp_cfg_gen_fsm <= idle;               
+                     at_least_one_exp_cfg_received <= '1'; 
+                  end if;
+   	   
                when others =>                  
                
             end case;        
