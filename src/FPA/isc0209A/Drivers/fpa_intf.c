@@ -135,7 +135,7 @@
 #define ELCORR_REFERENCE2_MAX_DL          16300
 
 // Electrical correction : valeurs cibles (desirées) apres correction
-#define ELCORR_TARGET_STARVATION_DL       650         // @ centered pix (160, 128)
+#define ELCORR_TARGET_STARVATION_DL       850         // @ centered pix (160, 128)
 #define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (160, 128)
 
 // Electrical correction : les differents modes
