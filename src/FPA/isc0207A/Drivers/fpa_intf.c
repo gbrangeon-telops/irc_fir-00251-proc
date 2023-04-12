@@ -373,7 +373,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // ajustement de delais de la chaine
    if (init_done == 0)
-     gFpaDebugRegF  = 13;         // ENO: 05 nov 2019: valeur ajustée sur M2K avec fleGX
+     gFpaDebugRegF  = 21;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
    ptrA->real_mode_active_pixel_dly  = (uint32_t)gFpaDebugRegF;
       
    // accélerateurs 
@@ -454,12 +454,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
    if (init_done == 0)
-      gFpaDebugRegC = 3;
-   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;      // ENO: 05 nov 2019: valeur ajustée sur M2K avec fleGX
+      gFpaDebugRegC = 2;
+   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
 
    if (init_done == 0)
-      gFpaDebugRegD = 200;
-   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;   // ENO: 05 nov 2019: valeur ajustée sur M2K avec fleGX
+      gFpaDebugRegD = 840;
+   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
    
    // autres    
    ptrA->boost_mode              = 0;   // n'est plus utilisé                

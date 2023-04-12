@@ -34,6 +34,7 @@ acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d1024\t_axi4_stream64
 -- acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d1024\t_axi4_stream64_sfifo_d1024_sim_netlist.vhdl
 #acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d2048\t_axi4_stream64_sfifo_d2048_sim_netlist.vhdl
 #acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d16384_lim\t_axi4_stream64_sfifo_d16384_lim_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_wr66_rd132_d512\fwft_afifo_wr66_rd132_d512_sim_netlist.vhdl
 
 #acom D:\Telops\FIR-00251-Proc\IP\160\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
 #acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl
@@ -58,6 +59,7 @@ acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim
 --acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w72_d128\fwft_afifo_w72_d128_sim_netlist.vhdl
 -- acom D:\Telops\FIR-00251-Proc\IP\160\afifo_w72_d256\afifo_w72_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w72_d16\fwft_afifo_w72_d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\160\afpa_single_div_ip\afpa_single_div_ip_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207a\src\afpa_single_div_ip.vhd
 #acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w80_d256\fwft_sfifo_w80_d256_sim_netlist.vhdl 
@@ -96,6 +98,7 @@ acom d:\Telops\Common_HDL\SPI\spi_tx.vhd
 acom d:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_adc_ctrl.vhd
 acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync_v2.vhd
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd
 
 do D:\Telops\FIR-00251-Proc\src\FPA\isc0207a\HDL\compil_isc0207a.do
  
