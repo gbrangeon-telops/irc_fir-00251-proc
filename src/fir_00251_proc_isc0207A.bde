@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 56323
+ FREEID 56357
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -3994,7 +3994,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="DIN_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -4097,7 +4097,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_CTRL_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -4132,7 +4132,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_HDER_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -4167,7 +4167,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_IMG_INFO"
       #NUMBER="0"
       #SIDE="left"
@@ -4219,7 +4219,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="DIN_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -4254,7 +4254,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_CTRL_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -4272,7 +4272,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_EXP_INFO"
       #NUMBER="0"
       #SIDE="left"
@@ -4290,7 +4290,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_HDER_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -16324,13 +16324,12 @@ PAGE ""
    {
     #COMPONENT="fir_00251_proc_acq"
     #CUSTOM_NAME=""
-    #GENERIC0="CAL_2CH : boolean := false"
-    #GENERIC1="IMG_WIDTH_MAX : integer := XSIZE_MAX"
+    #GENERIC0="TRIG_MEASURE_GEN : boolean := true"
+    #GENERIC1="MGT_2CH : boolean := MGT_2CH"
     #GENERIC2="G_4DDR : boolean := G_4DDR"
-    #GENERIC3="IMG_HEIGHT_MAX : integer := YSIZE_MAX"
-    #GENERIC4="TRIG_MEASURE_GEN : boolean := true"
-    #GENERIC5="MGT_2CH : boolean := MGT_2CH"
-    #IMPL="sch"
+    #GENERIC3="CAL_2CH : boolean := CAL_2CH"
+    #GENERIC4="IMG_WIDTH_MAX : integer := XSIZE_MAX"
+    #GENERIC5="IMG_HEIGHT_MAX : integer := YSIZE_MAX"
     #LIBRARY="work"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -16980,8 +16979,9 @@ PAGE ""
 "-- Change default value to apply to isc0207A\n"+
 "MGT_2CH : boolean := false;\n"+
 "G_4DDR : boolean := false;\n"+
+"CAL_2CH : boolean := false;\n"+
 ""
-   RECT (4980,5840,5740,6020)
+   RECT (4980,5840,5740,6080)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,219,179),0)
    MARGINS (20,20)
@@ -17086,7 +17086,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  56306, 0, 0
+  TEXT  56340, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17097,7 +17097,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56307, 0, 0
+  TEXT  56341, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -17108,7 +17108,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  56308, 0, 0
+  TEXT  56342, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -17118,7 +17118,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56309, 0, 0
+  TEXT  56343, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17130,7 +17130,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  56310, 0, 0
+  TEXT  56344, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -17143,7 +17143,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  56311, 0, 0
+  TEXT  56345, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -17153,7 +17153,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56312, 0, 0
+  TEXT  56346, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17165,7 +17165,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  56313, 0, 0
+  TEXT  56347, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -17175,7 +17175,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56314, 0, 0
+  TEXT  56348, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -17186,7 +17186,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  56315, 0, 0
+  GROUP  56349, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6220,8601,6601)
@@ -17198,7 +17198,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56316, 0, 0
+  GROUP  56350, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6420,8601,6421)
@@ -17210,7 +17210,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56317, 0, 0
+  GROUP  56351, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6360,8601,6361)
@@ -17222,7 +17222,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56318, 0, 0
+  GROUP  56352, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6480,8601,6481)
@@ -17234,7 +17234,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56319, 0, 0
+  GROUP  56353, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6540,8601,6541)
@@ -17246,7 +17246,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56320, 0, 0
+  GROUP  56354, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6220,7901,6361)
@@ -17257,7 +17257,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  56321, 0, 0
+  GROUP  56355, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6360,7901,6601)
@@ -17268,7 +17268,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  56322, 0, 0
+  BMPPICT  56356, 0, 0
   {
    PAGEALIGN 10
    RECT (7740,6280,7879,6325)
