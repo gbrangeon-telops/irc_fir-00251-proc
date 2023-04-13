@@ -26,8 +26,8 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
       pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2)*pGCRegs->Width* sizeof(uint16_t);
       pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
       pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
-      pFB_ctrl->fb_lval_pause_min        = 1; // minimum pause between lines (CLINK limit : CL_LVAL_PAUSE_FAST = 1)
-      pFB_ctrl->fb_fval_pause_min        = 3; // minimum pause between frames and between header end image, (CLINK limit : CL_FVAL_PAUSE_FAST = 3)
+      pFB_ctrl->fb_lval_pause_min        = CL_LVAL_PAUSE_FAST;
+      pFB_ctrl->fb_fval_pause_min        = CL_FVAL_PAUSE_FAST;
 
       WriteStruct(pFB_ctrl);
       return IRC_SUCCESS;

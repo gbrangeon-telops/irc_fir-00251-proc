@@ -76,7 +76,11 @@
 
 #define FPA_MCLK_RATE_HZ               5E+6F          // le master clock du FPA
 
-#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR) 
+#ifdef STARTUP
+   #define FPA_PIX_THROUGHPUT_PEAK        340E+6F // force camera link full @ 85MHz for startup 4DDR only
+#else
+   #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR)
+#endif
 
 #define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
