@@ -67,7 +67,7 @@ lappend detector_list {suphawkA325}
 #lappend detector_list {xro3503A160}
 lappend detector_list {xro3503A325}
 
-lappend detector_list {mockfpa325}
+#lappend detector_list {mockfpa325}
 
 #DO NOT MODIFY BEYOND THIS POINT
 
