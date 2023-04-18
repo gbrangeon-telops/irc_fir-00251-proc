@@ -33,8 +33,8 @@ static uint32_t AEC_TimeStamps_d1[SFW_FILTER_NB];
 uint64_t AECP_Int_Sum_Cnts;
 uint32_t AECP_Int_Data_Valid, AEC_NbPixelTotal;
 float AECP_Int_SumExpTime;
-float AECPlusMaximumTotalFlux = 0;
-float FluxRatio[2] = {0, 0};
+float AECPlusMaximumTotalFlux;
+float FluxRatio[2];
 uint8_t MinNDFPosition, MaxNDFPosition;
 
 static timerData_t AECPlusDataPrintf, AECPlusArmedDelay;
@@ -705,9 +705,9 @@ void AEC_UpdateAECPlusParameters(void)
 {
    uint32_t blockIndex;
 
-   AECPlusMaximumTotalFlux = flashSettings.MaximumTotalFlux;
-   FluxRatio[0] = flashSettings.FluxRatio01;
-   FluxRatio[1] = flashSettings.FluxRatio12;
+   AECPlusMaximumTotalFlux = 0.0F;
+   FluxRatio[0] = 1.0F;
+   FluxRatio[1] = 1.0F;
 
    // Reset available filter position
    MinNDFPosition = (AvailabilityFlagsTst(NDFilter1IsAvailableMask) ? NDFP_NDFilter1 : NDFP_NDFilter2);
@@ -727,10 +727,13 @@ void AEC_UpdateAECPlusParameters(void)
       }
    }
 
-   // If both flux ratio from collection are configured then use them
-   if ((calibrationInfo.collection.FluxRatio01 != 0) && (calibrationInfo.collection.FluxRatio12 != 0))
+   // If flux ratio from collection are configured then use them
+   if (calibrationInfo.collection.FluxRatio01 != 0)
    {
       FluxRatio[0] = calibrationInfo.collection.FluxRatio01;
+   }
+   if (calibrationInfo.collection.FluxRatio12 != 0)
+   {
       FluxRatio[1] = calibrationInfo.collection.FluxRatio12;
    }
 

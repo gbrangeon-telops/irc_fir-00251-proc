@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.13.1
+ * Generated from the flash settings file structure definition XLS file version 2.14.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -74,7 +74,6 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ImageCorrectionStabilizationTime2 = */ 0,
    /* ImageCorrectionTimeout2 = */ 300000,
    /* DetectorPolarizationVoltage = */ 0,
-   /* ExternalMemoryBufferPresent = */ 0,
    /* NDFPresent = */ 0,
    /* NDFNumberOfFilters = */ 3,
    /* NDFClearFOVWidth = */ 40,
@@ -112,9 +111,6 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* BPNoiseThreshold = */ 1.333147F,
    /* BPDuration = */ 60000,
    /* BPNCoadd = */ 64,
-   /* MaximumTotalFlux = */ FLT_MAX,
-   /* FluxRatio01 = */ 1.0F,
-   /* FluxRatio12 = */ 1.0F,
    /* AECPlusExpTimeMargin = */ 0.600000F,
    /* AECPlusFluxMargin = */ 0.9F,
    /* BPOutlierThreshold = */ 3.306613F,
@@ -126,6 +122,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* DeviceKeyHigh = */ 0x00000000,
    /* DetectorElectricalTapsRef = */ 0.000000F,
    /* DetectorElectricalRefOffset = */ 0.000000F,
+   /* AECBadPixelsIncluded = */ 0,
    /* ADCReadoutEnabled = */ 0,
    /* ADCReadout_b = */ 0,
    /* ADCReadout_m = */ 1.0F,
@@ -299,7 +296,7 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ImageCorrectionStabilizationTime2, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&hdr->ImageCorrectionTimeout2, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&hdr->DetectorPolarizationVoltage, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
-      memcpy(&hdr->ExternalMemoryBufferPresent, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 1; // Skip FREE space
       numBytes += 1; // Skip FREE space
       memcpy(&hdr->NDFPresent, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->NDFNumberOfFilters, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -341,9 +338,9 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->BPDuration, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&hdr->BPNCoadd, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       numBytes += 2; // Skip FREE space
-      memcpy(&hdr->MaximumTotalFlux, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      memcpy(&hdr->FluxRatio01, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      memcpy(&hdr->FluxRatio12, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      numBytes += 4; // Skip FREE space
+      numBytes += 4; // Skip FREE space
+      numBytes += 4; // Skip FREE space
       memcpy(&hdr->AECPlusExpTimeMargin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->AECPlusFluxMargin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->BPOutlierThreshold, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
@@ -355,7 +352,7 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->DeviceKeyHigh, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&hdr->DetectorElectricalTapsRef, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->DetectorElectricalRefOffset, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 1; // Skip FREE space
+      memcpy(&hdr->AECBadPixelsIncluded, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->ADCReadoutEnabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->ADCReadout_b, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
       memcpy(&hdr->ADCReadout_m, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
@@ -564,7 +561,7 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ImageCorrectionStabilizationTime2, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&buffer[numBytes], &hdr->ImageCorrectionTimeout2, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&buffer[numBytes], &hdr->DetectorPolarizationVoltage, sizeof(int16_t)); numBytes += sizeof(int16_t);
-      memcpy(&buffer[numBytes], &hdr->ExternalMemoryBufferPresent, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
       memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
       memcpy(&buffer[numBytes], &hdr->NDFPresent, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->NDFNumberOfFilters, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -606,9 +603,9 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->BPDuration, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&buffer[numBytes], &hdr->BPNCoadd, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
-      memcpy(&buffer[numBytes], &hdr->MaximumTotalFlux, sizeof(float)); numBytes += sizeof(float);
-      memcpy(&buffer[numBytes], &hdr->FluxRatio01, sizeof(float)); numBytes += sizeof(float);
-      memcpy(&buffer[numBytes], &hdr->FluxRatio12, sizeof(float)); numBytes += sizeof(float);
+      memset(&buffer[numBytes], 0, 4); numBytes += 4; // FREE space
+      memset(&buffer[numBytes], 0, 4); numBytes += 4; // FREE space
+      memset(&buffer[numBytes], 0, 4); numBytes += 4; // FREE space
       memcpy(&buffer[numBytes], &hdr->AECPlusExpTimeMargin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->AECPlusFluxMargin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->BPOutlierThreshold, sizeof(float)); numBytes += sizeof(float);
@@ -620,7 +617,7 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->DeviceKeyHigh, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&buffer[numBytes], &hdr->DetectorElectricalTapsRef, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->DetectorElectricalRefOffset, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+      memcpy(&buffer[numBytes], &hdr->AECBadPixelsIncluded, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->ADCReadoutEnabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->ADCReadout_b, sizeof(int16_t)); numBytes += sizeof(int16_t);
       memcpy(&buffer[numBytes], &hdr->ADCReadout_m, sizeof(float)); numBytes += sizeof(float);
@@ -784,7 +781,6 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ImageCorrectionStabilizationTime2: %u ms\n", hdr->ImageCorrectionStabilizationTime2);
    FPGA_PRINTF("ImageCorrectionTimeout2: %u ms\n", hdr->ImageCorrectionTimeout2);
    FPGA_PRINTF("DetectorPolarizationVoltage: %d mV\n", hdr->DetectorPolarizationVoltage);
-   FPGA_PRINTF("ExternalMemoryBufferPresent: %u\n", hdr->ExternalMemoryBufferPresent);
    FPGA_PRINTF("NDFPresent: %u\n", hdr->NDFPresent);
    FPGA_PRINTF("NDFNumberOfFilters: %u\n", hdr->NDFNumberOfFilters);
    FPGA_PRINTF("NDFClearFOVWidth: %u counts\n", hdr->NDFClearFOVWidth);
@@ -822,9 +818,6 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("BPNoiseThreshold: " _PCF(3) "\n", _FFMT(hdr->BPNoiseThreshold, 3));
    FPGA_PRINTF("BPDuration: %u ms\n", hdr->BPDuration);
    FPGA_PRINTF("BPNCoadd: %u frames\n", hdr->BPNCoadd);
-   FPGA_PRINTF("MaximumTotalFlux: " _PCF(3) " DL/us\n", _FFMT(hdr->MaximumTotalFlux, 3));
-   FPGA_PRINTF("FluxRatio01: " _PCF(3) "\n", _FFMT(hdr->FluxRatio01, 3));
-   FPGA_PRINTF("FluxRatio12: " _PCF(3) "\n", _FFMT(hdr->FluxRatio12, 3));
    FPGA_PRINTF("AECPlusExpTimeMargin: " _PCF(3) "\n", _FFMT(hdr->AECPlusExpTimeMargin, 3));
    FPGA_PRINTF("AECPlusFluxMargin: " _PCF(3) "\n", _FFMT(hdr->AECPlusFluxMargin, 3));
    FPGA_PRINTF("BPOutlierThreshold: " _PCF(3) "\n", _FFMT(hdr->BPOutlierThreshold, 3));
@@ -836,6 +829,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("DeviceKeyHigh: %u\n", hdr->DeviceKeyHigh);
    FPGA_PRINTF("DetectorElectricalTapsRef: " _PCF(3) " mV\n", _FFMT(hdr->DetectorElectricalTapsRef, 3));
    FPGA_PRINTF("DetectorElectricalRefOffset: " _PCF(3) " mV\n", _FFMT(hdr->DetectorElectricalRefOffset, 3));
+   FPGA_PRINTF("AECBadPixelsIncluded: %u\n", hdr->AECBadPixelsIncluded);
    FPGA_PRINTF("ADCReadoutEnabled: %u\n", hdr->ADCReadoutEnabled);
    FPGA_PRINTF("ADCReadout_b: %d counts\n", hdr->ADCReadout_b);
    FPGA_PRINTF("ADCReadout_m: " _PCF(3) " counts/mV\n", _FFMT(hdr->ADCReadout_m, 3));

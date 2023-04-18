@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.13.1
+ * Generated from the flash settings file structure definition XLS file version 2.14.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,8 +23,8 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      13
-#define FLASHSETTINGS_FILESUBMINORVERSION_V2   1
+#define FLASHSETTINGS_FILEMINORVERSION_V2      14
+#define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_CHUNKSIZE_V2   512
@@ -80,7 +80,6 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint32_t ImageCorrectionStabilizationTime2;   /**< Minimum stabilisation time in second stabilization phase. */
    uint32_t ImageCorrectionTimeout2;   /**< Maximum waiting time during second stabilization phase. */
    int16_t DetectorPolarizationVoltage;   /**< Detector photodiodes polarization voltage. */
-   uint8_t ExternalMemoryBufferPresent;   /**< Indicates whether an external memory buffer board is installed in the camera. */
    uint8_t NDFPresent;   /**< Indicates whether a neutral density filter fan is installed in the camera. */
    uint8_t NDFNumberOfFilters;   /**< Indicates the number of neutral density filters in the camera head  neutral density filter fan. */
    uint16_t NDFClearFOVWidth;   /**< Edge to edge raw distance of clear FOV. */
@@ -118,9 +117,6 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float BPNoiseThreshold;   /**< Threshold for tagging a pixel as flicker (T > threshold). */
    uint32_t BPDuration;   /**< Duration of the acquisition. */
    uint16_t BPNCoadd;   /**< Number of frames to use for average estimation. */
-   float MaximumTotalFlux;   /**< The maximum flux the detector can support without current saturation. */
-   float FluxRatio01;   /**< Flux ratio between filter 0 and filter 1. */
-   float FluxRatio12;   /**< Flux ratio between filter 1 and filter 2. */
    float AECPlusExpTimeMargin;   /**< Margin on the exposure time for hysteresis purpose of the AEC+. */
    float AECPlusFluxMargin;   /**< Margin on the detector's flux for hysteresis purpose of the AEC+. */
    float BPOutlierThreshold;   /**< Threshold for tagging a pixel as an outlier. */
@@ -132,6 +128,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint32_t DeviceKeyHigh;   /**< Device 64-bit key (MSB). */
    float DetectorElectricalTapsRef;   /**< Electrical reference of detector taps. */
    float DetectorElectricalRefOffset;   /**< Electrical offset of detector taps reference opamp. */
+   uint8_t AECBadPixelsIncluded;   /**< Forces the AEC to include the bad pixels (legacy mode). If the bad pixels exclusion is not supported, this field is ignored and the bad pixels are always included in the AEC. */
    uint8_t ADCReadoutEnabled;   /**< Indicates whether the ADC channel readout is enabled. */
    int16_t ADCReadout_b;   /**< ADC channel readout calibration offset. */
    float ADCReadout_m;   /**< ADC channel readout calibration gain. */

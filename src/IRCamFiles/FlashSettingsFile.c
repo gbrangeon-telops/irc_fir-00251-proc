@@ -161,7 +161,7 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
 
                case 3:
                   // 1.3.x -> 1.4.x
-                  hdr_v1.ExternalMemoryBufferPresent = FlashSettings_FlashSettingsFileHeader_default.ExternalMemoryBufferPresent;
+                  // ExternalMemoryBufferPresent has been removed in version 2.14.0
                   hdr_v1.FileStructureMinorVersion = 4;
 
                case 4:
@@ -216,9 +216,9 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr_v1.BPNoiseThreshold = FlashSettings_FlashSettingsFileHeader_default.BPNoiseThreshold;
                   hdr_v1.BPDuration = FlashSettings_FlashSettingsFileHeader_default.BPDuration;
                   hdr_v1.BPNCoadd = FlashSettings_FlashSettingsFileHeader_default.BPNCoadd;
-                  hdr_v1.MaximumTotalFlux = FlashSettings_FlashSettingsFileHeader_default.MaximumTotalFlux;
-                  hdr_v1.FluxRatio01 = FlashSettings_FlashSettingsFileHeader_default.FluxRatio01;
-                  hdr_v1.FluxRatio12 = FlashSettings_FlashSettingsFileHeader_default.FluxRatio12;
+                  // MaximumTotalFlux has been removed in version 2.14.0
+                  // FluxRatio01 has been removed in version 2.14.0
+                  // FluxRatio12 has been removed in version 2.14.0
                   hdr_v1.AECPlusExpTimeMargin = FlashSettings_FlashSettingsFileHeader_default.AECPlusExpTimeMargin;
                   hdr_v1.AECPlusFluxMargin = FlashSettings_FlashSettingsFileHeader_default.AECPlusFluxMargin;
                   hdr_v1.FileStructureMinorVersion = 8;
@@ -298,7 +298,7 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->ImageCorrectionStabilizationTime2 = hdr_v1.ActualizationStabilizationTime2;
                   hdr->ImageCorrectionTimeout2 = hdr_v1.ActualizationTimeout2;
                   hdr->DetectorPolarizationVoltage = hdr_v1.DetectorPolarizationVoltage;
-                  hdr->ExternalMemoryBufferPresent = hdr_v1.ExternalMemoryBufferPresent;
+                  // ExternalMemoryBufferPresent has been removed in version 2.14.0
                   hdr->NDFPresent = hdr_v1.NDFPresent;
                   hdr->NDFNumberOfFilters = hdr_v1.NDFNumberOfFilters;
                   hdr->NDFClearFOVWidth = hdr_v1.NDFClearFOVWidth;
@@ -336,9 +336,9 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->BPNoiseThreshold = hdr_v1.BPNoiseThreshold;
                   hdr->BPDuration = hdr_v1.BPDuration;
                   hdr->BPNCoadd = hdr_v1.BPNCoadd;
-                  hdr->MaximumTotalFlux = hdr_v1.MaximumTotalFlux;
-                  hdr->FluxRatio01 = hdr_v1.FluxRatio01;
-                  hdr->FluxRatio12 = hdr_v1.FluxRatio12;
+                  // MaximumTotalFlux has been removed in version 2.14.0
+                  // FluxRatio01 has been removed in version 2.14.0
+                  // FluxRatio12 has been removed in version 2.14.0
                   hdr->AECPlusExpTimeMargin = hdr_v1.AECPlusExpTimeMargin;
                   hdr->AECPlusFluxMargin = hdr_v1.AECPlusFluxMargin;
                   hdr->BPOutlierThreshold = hdr_v1.BPOutlierThreshold;
@@ -491,6 +491,11 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 13;
 
                case 13:
+                  // 2.13.x -> 2.14.x
+                  hdr->AECBadPixelsIncluded = FlashSettings_FlashSettingsFileHeader_default.AECBadPixelsIncluded;
+                  hdr->FileStructureMinorVersion = 14;
+
+               case 14:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

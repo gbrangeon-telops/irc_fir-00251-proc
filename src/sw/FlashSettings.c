@@ -394,13 +394,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gFpaElCorrMeasAtReference1 = p_flashSettings->ElCorrMeasAtReference1;
    gFpaElCorrMeasAtReference2 = p_flashSettings->ElCorrMeasAtReference2;   
 
-   // Validate ExternalMemoryBufferPresent field
-   if (XOR(p_flashSettings->ExternalMemoryBufferPresent, externalMemoryBufferDetected))
-   {
-      FS_ERR("ExternalMemoryBufferPresent field value (%d) doesn't match external memory buffer detection (%d).",
-            p_flashSettings->ExternalMemoryBufferPresent, externalMemoryBufferDetected);
-   }
-
    // Update external fan speed setpoint
    gcRegsData.ExternalFanSpeedSetpoint = p_flashSettings->ExternalFanSpeedSetpoint;
 
