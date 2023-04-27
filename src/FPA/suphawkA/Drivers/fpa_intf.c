@@ -159,9 +159,9 @@
 #define  VHD_DEFINE_FPA_SIDEBAND_MCLK_ID        1    // horloge de la bande laterale
 #define  VHD_DEFINE_FPA_LINEPAUSE_MCLK_ID       2    // horloge de la zone interligne
 
-#define REGC_DEFAULT_VAL 4             // valeur pour le registre REGC
-#define REGD_DEFAULT_VAL 282           // valeur pour le registre REGD
-#define REGF_DEFAULT_VAL 11            // valeur pour le registre REGF
+#define REGC_DEFAULT_VAL 2             // valeur pour le registre REGC
+#define REGD_DEFAULT_VAL 528           // valeur pour le registre REGD
+#define REGF_DEFAULT_VAL 12            // valeur pour le registre REGF
 
 struct s_ProximCfgConfig 
 {   
