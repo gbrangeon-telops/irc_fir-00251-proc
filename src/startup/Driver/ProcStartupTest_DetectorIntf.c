@@ -31,9 +31,10 @@ IRC_Status_t AutoTest_Detector(void) {
    uint64_t tic_fpaInitTimeout;
    IRC_Status_t status = IRC_NOT_DONE;
 
-   ATR_PRINTF("Connect an ADC board (EFA-00253-4xx) with these harnesses:");
-   ATR_PRINTF("\tADC power harness from ADC_DDC connector on the 252.");
-   ATR_PRINTF("\tSamtec 80-pin cable to the Detector connector (J14) on the 251.");
+   ATR_PRINTF("Connect ADC (EFA-00253-4xx), HiFleG (EFA-00272-001) and Hi-X (EFA-00271-001) boards with these harnesses:");
+   ATR_PRINTF("\tADC power harness from ADC_DDC connector on the 252 to ADC board.");
+   ATR_PRINTF("\tSamtec 80-pin cable from ADC board to Detector connector (J14) on the 251.");
+   ATR_PRINTF("\tSamtec 60-pin cable from FleG board to ADC board.");
    PRINTF("\n");
    ATR_PRINTF("Press ENTER to continue...");
    AutoTest_getUserNULL();
@@ -63,7 +64,7 @@ IRC_Status_t AutoTest_Detector(void) {
             status = IRC_FAILURE;
          }
       }
-      else if (elapsed_time_us(tic_fpaInitTimeout) > (7 * TIME_ONE_SECOND_US))
+      else if (elapsed_time_us(tic_fpaInitTimeout) > (10 * TIME_ONE_SECOND_US))
       {
          ATR_ERR("Sensor initialization timeout.");
          status = IRC_FAILURE;

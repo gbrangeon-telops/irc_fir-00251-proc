@@ -29,22 +29,29 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
 
    if (isRunningATR)
    {
+      uint32_t value;
+      uint16_t arglen;
+      uint8_t  argStr[11];
+
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid ATR command argument.");
+         return IRC_FAILURE;
+      }
+      argStr[arglen] = '\0'; // Add string terminator
+      // arglen does not include the string terminator to be used with ParseNumArg
+
       if (waitingForTI)
       {
-         uint32_t value;
-         uint16_t arglen;
-         uint8_t  argStr[11];
-
-         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-
-         if (strncasecmp(((char *)argStr), "EX", arglen) == 0) {
+         if (strcasecmp((char *)argStr, "EX") == 0) {
             waitingForTI = false;
             exitUnitaryTests = true;
             unitaryTestIndex = 0;            // Ensure testIndex is not ATID_Count, which would launch tests in batch mode
             return IRC_SUCCESS;
          }
 
-         if (strncasecmp(((char *)argStr), "BM", arglen) == 0) {
+         if (strcasecmp((char *)argStr, "BM") == 0) {
             waitingForTI = false;
             exitUnitaryTests = true;
             unitaryTestIndex = ATID_Count;   // Setting testIndex to ATID_Count launches all tests in batch mode.
@@ -64,23 +71,12 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
          }
       }
 
-      else if (DebugTerminal_CommandIsEmpty(cbuf))
-      {
-         DT_ERR("ATR: Test Routine is already running.");
-         return IRC_FAILURE;
-      }
-
       else {
-         uint16_t arglen;
-         uint8_t  argStr[11];
-
-         arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-         if (strncasecmp(((char *)argStr), "BREAK", arglen) == 0) {
+         if (strcasecmp((char *)argStr, "BREAK") == 0) {
             ATR_INF("Aborting Batch Mode...");
             breakBatchMode = true;
             return IRC_SUCCESS;
          }
-
          else {
             DT_ERR("Unsupported command arguments.");
             return IRC_FAILURE;
