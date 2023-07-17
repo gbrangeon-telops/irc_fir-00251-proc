@@ -61,7 +61,7 @@ begin
    
    AOI_SOL_POS <= std_logic_vector(to_unsigned(1, AOI_SOL_POS'LENGTH));
    AOI_EOL_POS <= std_logic_vector(to_unsigned(640, AOI_EOL_POS'LENGTH));
-   FULL_WIDTH <= std_logic_vector(to_unsigned(640, FULL_WIDTH'LENGTH));
+   FULL_WIDTH  <= std_logic_vector(to_unsigned(640, FULL_WIDTH'LENGTH));
    AOI_FLI_POS <= std_logic_vector(to_unsigned(1, AOI_FLI_POS'LENGTH));
    AOI_LLI_POS <= std_logic_vector(to_unsigned(512, AOI_LLI_POS'LENGTH));
    
