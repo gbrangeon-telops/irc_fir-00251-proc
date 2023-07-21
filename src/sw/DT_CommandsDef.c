@@ -999,6 +999,9 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                DT_PRINTF("all actualizations were invalidated");
             }
 
+            if(GC_MemoryBufferNotEmpty)
+               DT_PRINTF("WARNING : Memory buffer is not empty. It won't be possible to download sequences with the invalidated actualization");
+
             // reload the calibration to unapply the actualization
             Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.collection.POSIXTime);
          }
@@ -1260,7 +1263,7 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
          i = 0;
          while ((ep = uffs_readdir(dp)) != NULL)
          {
-            sprintf(filename, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
+            snprintf(filename,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
             uffs_stat(filename, &filestat);
             DT_PRINTF("%3d: %s (%d)", i++, ep->d_name, filestat.st_size);
          }
@@ -2644,10 +2647,12 @@ IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
    DT_PRINTF("FB_BUFFER_A_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_A_BASE_ADDR_OFFSET));
    DT_PRINTF("FB_BUFFER_B_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_B_BASE_ADDR_OFFSET));
    DT_PRINTF("FB_BUFFER_C_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_C_BASE_ADDR_OFFSET));
-   DT_PRINTF("FB_FRAME_BYTE_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FRAME_BYTE_SIZE_OFFSET));
-   DT_PRINTF("FB_HDR_PIX_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_HDR_PIX_SIZE_OFFSET));
-   DT_PRINTF("FB_IMG_PIX_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_IMG_PIX_SIZE_OFFSET));
-   DT_PRINTF("FB_LVAL_PAUSE_MIN = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_LVAL_PAUSE_MIN_OFFSET));
+   DT_PRINTF("FB_FRAME_BYTE_SIZE    = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FRAME_BYTE_SIZE_OFFSET));
+   DT_PRINTF("FB_HDR_PIX_SIZE       = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_HDR_PIX_SIZE_OFFSET));
+   DT_PRINTF("FB_IMG_PIX_SIZE       = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_IMG_PIX_SIZE_OFFSET));
+   DT_PRINTF("FB_LVAL_PAUSE_MIN     = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_LVAL_PAUSE_MIN_OFFSET));
+   DT_PRINTF("FB_FVAL_PAUSE_MIN     = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FVAL_PAUSE_MIN_OFFSET));
+   DT_PRINTF("FB_BYPASS             = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BYPASS_OFFSET));
 
    status = FB_getStatusAndErrors(&gFB_ctrl);
 

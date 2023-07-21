@@ -120,7 +120,7 @@ end component;
    signal lval_cnt                   : unsigned(31 downto 0);
    signal lval_pause_cnt             : unsigned(31 downto 0);
    signal width                      : unsigned(31 downto 0);                                                                    
-   signal cmd_cnt                    : unsigned(31 downto 0); 
+   signal cmd_cnt                    : unsigned(1 downto 0); 
                                     
    signal mm2s_cmd_tvalid_last       : std_logic; 
    signal stall_i                    : std_logic; 
@@ -364,10 +364,10 @@ begin
                         reader_sm <= error_rd;
                      end if;
 
-                   else   
-                      mm2s_cmd_mosi.tvalid <= '0';
-                      mm2s_sts_miso.tready <= '1';
-                   end if;
+                  else   
+                     mm2s_cmd_mosi.tvalid <= '0';
+                     mm2s_sts_miso.tready <= '1';
+                  end if;
 
                when error_rd =>
                   mm2s_err_o <= mm2s_err_o;

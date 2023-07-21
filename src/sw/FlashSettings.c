@@ -320,7 +320,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    // Update FW
-   p_flashSettings->FWPresent &= ~gDisableFilterWheel;
+   p_flashSettings->FWPresent &= !gDisableFilterWheel;
    gcRegsData.FWFilterNumber = p_flashSettings->FWNumberOfFilters;
    TDCFlagsClr(FWIsImplementedMask | FWSynchronouslyRotatingModeIsImplementedMask);
    if (p_flashSettings->FWPresent && (p_flashSettings->FWNumberOfFilters > 0))

@@ -52,8 +52,7 @@
 #define FPA_INPUT_TYPE                    0x04      // 0x04 -> input LVCMOS33 .provient du fichier fpa_common_pkg.vhd. La valeur 0x03 est celle de LVTTL50
 
  // adresse d'écriture du régistre du reset du module FPA
-#define AW_CTRLED_RESET                   0xAF0
-
+#define AW_CTRLED_RESET                    0xAF0
 #define FLOW_CTLER_DVAL_ADDR               0x000
 #define FLOW_CTLER_STALLED_CNT_ADDR        0x004
 #define FLOW_CTLER_VALID_CNT_ADDR          0x008
@@ -131,18 +130,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
    mockfpa_param_t hh;
 
-   // extern float gFpaDetectorElectricalRefOffset;
-   extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
-   extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe 
-   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
-   extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
-   //extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
+      extern int32_t gFpaDebugRegA;
+   extern int32_t gFpaDebugRegB;
+   extern int32_t gFpaDebugRegC;
+   extern int32_t gFpaDebugRegD;
 
-
-   //static uint8_t roic_dbg_reg_unlocked = 0;
-
-    //if(gFpaDebugRegE != 0)
-    //AXI4L_write32((uint32_t)gFpaDebugRegF, XPAR_FPA_CTRL_BASEADDR + (uint32_t)gFpaDebugRegE);
     AXI4L_write32(0, XPAR_FPA_CTRL_BASEADDR + AW_CTRLED_RESET);             // mb_ctrled_reset_i
 
     AXI4L_write32((uint32_t)0, XPAR_FPA_CTRL_BASEADDR + FLOW_CTLER_DVAL_ADDR);   //dval to 0, user-config in progress = 1
@@ -184,10 +176,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 	AXI4L_write32(ptrA->fpa_height  , XPAR_FPA_CTRL_BASEADDR + FPA_HEIGHT_ADDR);
 	AXI4L_write32(ptrA->fpa_width, XPAR_FPA_CTRL_BASEADDR + FPA_WIDTH_ADDR);
 
-
-   // on bâtit les parametres specifiques du 0804
-   FPA_SpecificParams(&hh, ptrA, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
-
+   FPA_SpecificParams(&hh, ptrA, 0.0F, pGCRegs);
 }
 
 //--------------------------------------------------------------------------                                                                            

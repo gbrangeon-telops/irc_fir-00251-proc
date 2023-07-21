@@ -20,18 +20,19 @@ entity moi_flag_gen is
    
    port(
    
-      SEQ_WRITE_DONE           : in  STD_LOGIC;
-      EXTERNAL_SEQ_WRITE_DONE  : in  STD_LOGIC;
-      BUFFER_SWITCH            : in  std_logic_vector(3 downto 0); 
-      BUFFER_MODE              : in  BufferMode;
-      ACQ_STOP                 : in  STD_LOGIC; 
+      SEQ_WRITE_DONE             : in  STD_LOGIC;
+      EXTERNAL_SEQ_WRITE_DONE    : in  STD_LOGIC;
+      BUFFER_SWITCH              : in external_buffer_switch_type;
+ 
+      BUFFER_MODE                : in  BufferMode;
+      ACQ_STOP                   : in  STD_LOGIC; 
       
-      MOI_SIGNAL               : in STD_LOGIC;      
+      MOI_SIGNAL                 : in STD_LOGIC;      
       
-      BUFFERING_FLAG           : out buffering_flag_type;
+      BUFFERING_FLAG             : out buffering_flag_type;
       BUFFERING_FLAG_UPDATE_DONE : in  std_logic;
-      ARESETN                  : in  std_logic;
-      CLK                      : in  std_logic     
+      ARESETN                    : in  std_logic;
+      CLK                        : in  std_logic     
       );
 end moi_flag_gen;
 
@@ -94,7 +95,7 @@ architecture RTL of moi_flag_gen is
 begin    
    
    areset <= not ARESETN;
-   seq_write_done_i <= SEQ_WRITE_DONE when BUFFER_SWITCH(1) = '1' else external_seq_write_done_sync;
+   seq_write_done_i <= SEQ_WRITE_DONE when BUFFER_SWITCH.sel(2) /= '1' else external_seq_write_done_sync;
    BUFFERING_FLAG <= buffering_flag_new; 
    --------------------------------------------------
    -- synchro reset 
@@ -174,7 +175,7 @@ begin
    end process;      
    
    ------------------------------------------------------------------------------
-   -- Process to handle the buffering flag transmission the trig stamper module.
+   -- Process to handle the buffering flag transmission to trig stamper module.
    ------------------------------------------------------------------------------
    U6 : process(CLK)
    begin

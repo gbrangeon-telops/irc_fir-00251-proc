@@ -91,23 +91,22 @@ architecture rtl of calib_param_sequencer is
    constant POW2_RANGE_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(10, ram_info_index_type'length);
    constant NLC_POW2_M_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(11, ram_info_index_type'length);
    constant NLC_POW2_B_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(12, ram_info_index_type'length);
-   constant DELTA_TEMP_FP32_INDEX               : ram_info_index_type   := to_unsigned(13, ram_info_index_type'length);
-   constant ALPHA_OFFSET_FP32_INDEX             : ram_info_index_type   := to_unsigned(14, ram_info_index_type'length);
-   constant POW2_ALPHA_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(15, ram_info_index_type'length);
-   constant POW2_BETA0_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(16, ram_info_index_type'length);
-   constant POW2_KAPPA_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(17, ram_info_index_type'length);
-   constant NUC_MULT_FACTOR_FP32_INDEX          : ram_info_index_type   := to_unsigned(18, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_X_MIN_INDEX           : ram_info_index_type   := to_unsigned(19, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_X_RANGE_INDEX         : ram_info_index_type   := to_unsigned(20, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_LUT_SIZE_INDEX        : ram_info_index_type   := to_unsigned(21, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_LUT_START_ADD_INDEX   : ram_info_index_type   := to_unsigned(22, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_LUT_END_ADD_INDEX     : ram_info_index_type   := to_unsigned(23, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_LUT_FACTOR_INDEX      : ram_info_index_type   := to_unsigned(24, ram_info_index_type'length);
-   constant RQC_LUT_PARAM_LUT_FACTOR_INV_INDEX  : ram_info_index_type   := to_unsigned(25, ram_info_index_type'length);
-   constant RQC_POW2_M_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(26, ram_info_index_type'length);
-   constant RQC_POW2_B_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(27, ram_info_index_type'length);
-   constant OFFSET_FP32_INDEX                   : ram_info_index_type   := to_unsigned(28, ram_info_index_type'length);
-   constant POW2_LSB_FP32_INDEX                 : ram_info_index_type   := to_unsigned(29, ram_info_index_type'length);
+   constant ALPHA_OFFSET_FP32_INDEX             : ram_info_index_type   := to_unsigned(13, ram_info_index_type'length);
+   constant POW2_ALPHA_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(14, ram_info_index_type'length);
+   constant POW2_BETA0_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(15, ram_info_index_type'length);
+   constant POW2_KAPPA_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(16, ram_info_index_type'length);
+   constant NUC_MULT_FACTOR_FP32_INDEX          : ram_info_index_type   := to_unsigned(17, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_X_MIN_INDEX           : ram_info_index_type   := to_unsigned(18, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_X_RANGE_INDEX         : ram_info_index_type   := to_unsigned(19, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_LUT_SIZE_INDEX        : ram_info_index_type   := to_unsigned(20, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_LUT_START_ADD_INDEX   : ram_info_index_type   := to_unsigned(21, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_LUT_END_ADD_INDEX     : ram_info_index_type   := to_unsigned(22, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_LUT_FACTOR_INDEX      : ram_info_index_type   := to_unsigned(23, ram_info_index_type'length);
+   constant RQC_LUT_PARAM_LUT_FACTOR_INV_INDEX  : ram_info_index_type   := to_unsigned(24, ram_info_index_type'length);
+   constant RQC_POW2_M_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(25, ram_info_index_type'length);
+   constant RQC_POW2_B_EXP_FP32_INDEX           : ram_info_index_type   := to_unsigned(26, ram_info_index_type'length);
+   constant OFFSET_FP32_INDEX                   : ram_info_index_type   := to_unsigned(27, ram_info_index_type'length);
+   constant POW2_LSB_FP32_INDEX                 : ram_info_index_type   := to_unsigned(28, ram_info_index_type'length);
    constant RAM_INFO_LAST_INDEX                 : ram_info_index_type   := POW2_LSB_FP32_INDEX;
    
    constant RAM_INFO_READ_LATENCY : ram_info_index_type := to_unsigned(2, ram_info_index_type'length);   --Read latency is 2 clock cycles
@@ -131,11 +130,6 @@ architecture rtl of calib_param_sequencer is
    signal ram_info : std_logic_vector(RAM_RD_DATA'range);
    signal output_en : std_logic;
    signal read_state : read_state_type;
-   
-   attribute KEEP: string;
-   attribute KEEP of output_en : signal is "TRUE";
-   attribute KEEP of ram_info_data_index : signal is "TRUE";
-   attribute KEEP of ram_info : signal is "TRUE";
    
    
 begin
@@ -252,7 +246,6 @@ begin
          CALIB_PARAM.pow2_range_exp_fp32_wr_en      <= '0';
          CALIB_PARAM.nlc_pow2_m_exp_fp32_wr_en      <= '0';
          CALIB_PARAM.nlc_pow2_b_exp_fp32_wr_en      <= '0';
-         CALIB_PARAM.delta_temp_fp32_wr_en          <= '0';
          CALIB_PARAM.alpha_offset_fp32_wr_en        <= '0';
          CALIB_PARAM.pow2_alpha_exp_fp32_wr_en      <= '0';
          CALIB_PARAM.pow2_beta0_exp_fp32_wr_en      <= '0';
@@ -323,11 +316,7 @@ begin
                when NLC_POW2_B_EXP_FP32_INDEX => 
                   CALIB_PARAM.nlc_pow2_b_exp_fp32 <= ram_info;
                   CALIB_PARAM.nlc_pow2_b_exp_fp32_wr_en <= '1';
-                  
-               when DELTA_TEMP_FP32_INDEX => 
-                  CALIB_PARAM.delta_temp_fp32 <= ram_info;
-                  CALIB_PARAM.delta_temp_fp32_wr_en <= '1';
-                  
+
                when ALPHA_OFFSET_FP32_INDEX => 
                   CALIB_PARAM.alpha_offset_fp32 <= ram_info;
                   CALIB_PARAM.alpha_offset_fp32_wr_en <= '1';

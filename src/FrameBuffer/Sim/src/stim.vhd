@@ -24,6 +24,7 @@ use ieee.numeric_std.all;
 use work.tel2000.all; 
 use work.fb_testbench_pkg.all; 
 use work.fbuffer_define.all;
+use work.BufferingDefine.all;
 
 entity stim is
    port(                                
@@ -37,11 +38,17 @@ entity stim is
       MB_MISO          : in t_axi4_lite_miso;
       MB_MOSI          : out  t_axi4_lite_mosi;
          
-         
-      AXIS_MOSI : out t_axi4_stream_mosi128;     
-      AXIS_MISO : in t_axi4_stream_miso
+      SW_PARAM		   : out std_logic;
+      BM_SW_CFG		   : out external_buffer_switch_type;
 
-
+      AXIS_MOSI        : out t_axi4_stream_mosi128;     
+      AXIS_MISO        : in t_axi4_stream_miso;
+  
+      FILE_NAME1       : out string(1 to 255);  
+      FILE_NAME2       : out string(1 to 255);  
+      FILE_NAME3       : out string(1 to 255);
+      FILE_NAME4       : out string(1 to 255)  
+  
       );
 end stim;
 
@@ -49,16 +56,19 @@ architecture stim of stim is
 
 ------------------- Constants definition -------------------------- 
 -- Clocks frequency 
---constant CLK85_PERIOD : time := 11.764705882352941176470588235294 ns; 
+constant CLK85_PERIOD : time := 11.764705882352941176470588235294 ns; 
 constant CLK100_PERIOD : time := 10 ns; 
---constant CLK142_5_PERIOD : time := 7.0175438596491228070175438596491 ns; 
---constant CLK142_5_PERIOD : time := 10 ns; 
-constant CLK85_PERIOD : time := 50 ns; 
 constant CLK142_5_PERIOD : time := 10 ns; 
 
+
+--constant CLK142_5_PERIOD : time := 10 ns; 
+--constant CLK85_PERIOD : time := 50 ns; 
+--constant CLK142_5_PERIOD : time := 60 ns; 
+--constant CLK142_5_PERIOD : time := 7.1428571428571428571428571428571 ns;
+
 --IMAGE PARAM
-constant FRAME_WIDTH : unsigned := to_unsigned(16,32);
-constant FRAME_HEIGHT : unsigned := to_unsigned(4,32); --header included
+constant FRAME_WIDTH : unsigned := to_unsigned(64,32);
+constant FRAME_HEIGHT : unsigned := to_unsigned(6,32); --header included
 constant FRAME_SIZE : unsigned := resize(FRAME_HEIGHT * FRAME_WIDTH,32);
 constant IMG_DLY : unsigned := to_unsigned(10,32);
 constant HDR_DLY : unsigned := to_unsigned(0,32);
@@ -74,7 +84,17 @@ constant LVAL_PAUSE_MIN     : unsigned(31 downto 0) := to_unsigned(0,32);
 constant FVAL_PAUSE_MIN     : unsigned(31 downto 0) := to_unsigned(0,32); 
 
 constant LVAL_PAUSE_MIN2     : unsigned(31 downto 0) := to_unsigned(5,32); 
-constant NB_CFG_PARAM       : integer := 8;                      ---------------------------------------??
+constant NB_CFG_PARAM       : integer := 8;                      
+---------------------------------------
+constant null_string        : string(1 to 255) := (others => nul);
+constant filename_out1      : string(1 to 75) := "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\compfiles\inswdatafile_rx1.txt";
+constant filename_out2      : string(1 to 75) := "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\compfiles\inswdatafile_rx2.txt";
+constant filename_out3      : string(1 to 75) := "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\compfiles\inswdatafile_tx3.txt"; 
+constant filename_out4      : string(1 to 75) := "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\compfiles\inswdatafile_tx4.txt";
+constant filename_out_long1 : string(1 to 255) := filename_out1 & null_string(filename_out1'right+1 to 255);
+constant filename_out_long2 : string(1 to 255) := filename_out2 & null_string(filename_out2'right+1 to 255);
+constant filename_out_long3 : string(1 to 255) := filename_out3 & null_string(filename_out3'right+1 to 255);
+constant filename_out_long4 : string(1 to 255) := filename_out4 & null_string(filename_out4'right+1 to 255);
 
 
 type  frame_gen_state_t is (Frame_Reset, transmit_hdr, hdr_delay_st ,transmit_img, img_delay_st);
@@ -96,7 +116,7 @@ signal frame_index : unsigned(15 downto 0);
 signal cfg_vector                : unsigned(NB_CFG_PARAM*32-1 downto 0);
 signal cfg_i                     : frame_buffer_cfg_type;
 
-
+signal sw_type_cng : std_logic:= '0';
 
 begin  
    
@@ -106,6 +126,14 @@ begin
    CLK_MB <= clk_mb_o;
 
    ARESETN <= rst_n; 
+   SW_PARAM <= sw_type_cng;
+--   BM_SW_CFG.dval <= '1';
+   FILE_NAME1 <= filename_out_long1;
+   FILE_NAME2 <= filename_out_long2;  
+   FILE_NAME3 <= filename_out_long3;  
+   FILE_NAME4 <= filename_out_long4;  
+--   BM_SW_CFG.dval <= '1';
+   
    
    --! Output Clock generation 
    CLK_DIN_GENERATION: process(clk_din_o)
@@ -130,7 +158,7 @@ begin
          if rst_n = '0' then  
             frame_gen_state <=  Frame_Reset; 
             pixel_index <= (others => '0');
-            frame_index <= (others => '0');
+            frame_index <= to_unsigned(1,16);
             cnt <= (others => '0');
             AXIS_MOSI.TDATA <= (others => '0');
             AXIS_MOSI.TVALID  <= '0';
@@ -138,7 +166,8 @@ begin
             AXIS_MOSI.TKEEP <= (others => '1');
             AXIS_MOSI.TDEST <= (others => '0');
             AXIS_MOSI.TUSER   <= (others => '0');
-            AXIS_MOSI.TID     <= "0";
+            AXIS_MOSI.TID     <= "0"; 
+            AXIS_MOSI.TSTRB   <= (others => '1');
                     
          else   
             
@@ -149,21 +178,21 @@ begin
                      AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
                      AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
                      AXIS_MOSI.TDATA(63 downto 48) <= (others => '0'); 
-					 
-		 			 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0'); --newADU
+                     AXIS_MOSI.TDATA(79 downto 64)   <= std_logic_vector(frame_index); 
                      AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
                      AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
                      AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
-					 
+
                      AXIS_MOSI.TVALID  <= '0';
                      AXIS_MOSI.TLAST <= '0';
                      AXIS_MOSI.TKEEP <= (others => '1');
                      AXIS_MOSI.TDEST <= (others => '0');
                      AXIS_MOSI.TUSER   <= (others => '0');
                      AXIS_MOSI.TID     <= (others => '1');
+                     AXIS_MOSI.TSTRB   <= (others => '1');
+ 
                      frame_index <= to_unsigned(1,16);
-                     pixel_index <= to_unsigned(8,16);	 --new
-                     --pixel_index <= (others => '0');  
+                     pixel_index <= to_unsigned(8,16);	
                      
                      if transmit = '1' then 
                         frame_gen_state <= transmit_hdr;
@@ -176,57 +205,50 @@ begin
                   when transmit_hdr => 
                   
                      AXIS_MOSI.TVALID  <= '1';
-                     
- 
-                  
+
                         if AXIS_MISO.TREADY = '1' then    
-                           
-                              
+
                            case pixel_index is 
                              when to_unsigned(0,16) => -- correspond to first half of 32 bit hdr
                                  AXIS_MOSI.TDATA(15 downto 0) <= x"43" & x"54";    --TC
                                  AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
                                  AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
                                  AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
-								 
-								 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
-			                     AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
+                                 AXIS_MOSI.TDATA(79 downto 64)   <= std_logic_vector(frame_index);
+                                 AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+                                 AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
                               
                               when to_unsigned(4,16) =>
                                  AXIS_MOSI.TDATA(15 downto 0) <= std_logic_vector(frame_index);
                                  AXIS_MOSI.TDATA(31 downto 16) <= (others => '0');
                                  AXIS_MOSI.TDATA(47 downto 32) <= (others => '0');
                                  AXIS_MOSI.TDATA(63 downto 48) <= (others => '0'); 
-								 
-								 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
-			                     AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
+                                 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+                                 AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
  
                               when to_unsigned(16,16) => 
-							  	 AXIS_MOSI.TDATA(15 downto 0) <= (others => '0');
+                                 AXIS_MOSI.TDATA(15 downto 0) <= (others => '0');
                                  AXIS_MOSI.TDATA(31 downto 16) <= (others => '0');
                                  AXIS_MOSI.TDATA(47 downto 32) <= (others => '0');
                                  AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
-								 
-								 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
-			                     AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
+                                 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+                                 AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
  
                                  
                               when to_unsigned(128,16) =>
-							     AXIS_MOSI.TDATA(15 downto 0) <= (others => '0');
-							     AXIS_MOSI.TDATA(31 downto 16) <= (others => '0');
+                                 AXIS_MOSI.TDATA(15 downto 0) <= (others => '0');
+                                 AXIS_MOSI.TDATA(31 downto 16) <= (others => '0');
                                  AXIS_MOSI.TDATA(47 downto 32) <= (others => '0');
                                  AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
-								 
-								 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-			                     AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
-			                     AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
+                                 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+                                 AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+                                 AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
  
                                  
                               when others =>
@@ -234,8 +256,7 @@ begin
                                  AXIS_MOSI.TDATA(31 downto 16) <= std_logic_vector(pixel_index + 1);
                                  AXIS_MOSI.TDATA(47 downto 32) <= std_logic_vector(pixel_index + 2);
                                  AXIS_MOSI.TDATA(63 downto 48) <= std_logic_vector(pixel_index + 3); 
-								 
-								 AXIS_MOSI.TDATA(79 downto 64)  <= std_logic_vector(pixel_index + 4);
+                                 AXIS_MOSI.TDATA(79 downto 64)  <= std_logic_vector(pixel_index + 4);
                                  AXIS_MOSI.TDATA(95 downto 80) <= std_logic_vector(pixel_index + 5);
                                  AXIS_MOSI.TDATA(111 downto 96) <= std_logic_vector(pixel_index + 6);
                                  AXIS_MOSI.TDATA(127 downto 112) <= std_logic_vector(pixel_index + 7);
@@ -263,6 +284,7 @@ begin
                      AXIS_MOSI.TDATA <= (others => '0');
                      AXIS_MOSI.TVALID  <= '0'; 
                      AXIS_MOSI.TID     <= (others => '0');
+                     AXIS_MOSI.TSTRB   <= (others => '1');
                      
                      if cnt > HDR_DLY then
                         frame_gen_state <= transmit_img;
@@ -280,12 +302,10 @@ begin
                         AXIS_MOSI.TDATA(31 downto 16) <= std_logic_vector(pixel_index + 1);
                         AXIS_MOSI.TDATA(47 downto 32) <= std_logic_vector(pixel_index + 2);
                         AXIS_MOSI.TDATA(63 downto 48) <= std_logic_vector(pixel_index + 3);
-						
-				        AXIS_MOSI.TDATA(79 downto 64)  <= std_logic_vector(pixel_index + 4);
+                        AXIS_MOSI.TDATA(79 downto 64)  <= std_logic_vector(pixel_index + 4);
                         AXIS_MOSI.TDATA(95 downto 80) <= std_logic_vector(pixel_index + 5);
                         AXIS_MOSI.TDATA(111 downto 96) <= std_logic_vector(pixel_index + 6);
                         AXIS_MOSI.TDATA(127 downto 112) <= std_logic_vector(pixel_index + 7);
-																									 --new
                         pixel_index <= pixel_index + 8; 
                         
                         if pixel_index = frame_size_i-8 then
@@ -300,24 +320,24 @@ begin
                            frame_index <= frame_index + 1;
                            cnt <= to_unsigned(1,32);
                            AXIS_MOSI.TVALID  <= '0';  
-						   
-			               pixel_index <= to_unsigned(8,16);
-			               AXIS_MOSI.TLAST <= '0';
-			               AXIS_MOSI.TDATA(15 downto 0) <= x"43" & x"54";    --TC
-			               AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
-			               AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
-			               AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
-						   
-				           AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-	                       AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-	                       AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
-	                       AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
-						   
-			               AXIS_MOSI.TVALID  <= '0'; 
-			               AXIS_MOSI.TID     <= (others => '1');
-								 
-					 
-					 if IMG_DLY > 0 then
+
+                           pixel_index <= to_unsigned(8,16);
+                           AXIS_MOSI.TLAST <= '0';
+                           AXIS_MOSI.TDATA(15 downto 0) <= x"43" & x"54";    --TC
+                           AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
+                           AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
+                           AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
+
+                           AXIS_MOSI.TDATA(79 downto 64)   <= std_logic_vector(frame_index);
+   	                     AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+   	                     AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+   	                     AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
+
+                           AXIS_MOSI.TVALID  <= '0'; 
+                           AXIS_MOSI.TID     <= (others => '1');
+                           AXIS_MOSI.TSTRB   <= (others => '1');
+
+                           if IMG_DLY > 0 then
                               frame_gen_state <= img_delay_st;
                            else   
                               
@@ -325,11 +345,11 @@ begin
                               AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
                               AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
                               AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');	
-							  
-				           	  AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-	                       	  AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-	                       	  AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
-	                          AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');							  
+ 
+                              AXIS_MOSI.TDATA(79 downto 64)   <= std_logic_vector(frame_index);
+                              AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+                              AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+                              AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');							  
                               AXIS_MOSI.TVALID  <= '0';
                               AXIS_MOSI.TLAST <= '0';
                               AXIS_MOSI.TKEEP <= (others => '1');
@@ -339,6 +359,7 @@ begin
                               pixel_index <= to_unsigned(8,16);   --new
                               
                               if transmit = '1' then 
+
                                  frame_gen_state <= transmit_hdr;
                                  AXIS_MOSI.TVALID  <= '1';
                               else
@@ -358,13 +379,14 @@ begin
                      AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
                      AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
                      AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');	
-					  
-		           	 AXIS_MOSI.TDATA(79 downto 64)   <= (others => '0');
-                   	 AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
-                   	 AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
+ 
+                     AXIS_MOSI.TDATA(79 downto 64)   <= std_logic_vector(frame_index);
+                     AXIS_MOSI.TDATA(95 downto 80)   <= (others => '0');
+                     AXIS_MOSI.TDATA(111 downto 96)  <= (others => '0');
                      AXIS_MOSI.TDATA(127 downto 112) <= (others => '0');
                      AXIS_MOSI.TVALID  <= '0'; 
                      AXIS_MOSI.TID     <= (others => '1');
+                     AXIS_MOSI.TSTRB   <= (others => '1');
                      if cnt >= IMG_DLY then
                         if transmit = '1' then 
                            AXIS_MOSI.TVALID  <= '1';
@@ -395,7 +417,6 @@ sim: process is
    begin  
       rst_n <= '0';
       transmit <= '0';
-      
       MB_MOSI.awaddr <= (others => '0');
       MB_MOSI.awprot <= (others => '0');
       MB_MOSI.wdata <= (others => '0');
@@ -408,13 +429,8 @@ sim: process is
       MB_MOSI.bready <= '0';
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';  
-      
-      wait for 150 ns;
-      rst_n <= '1';
-      wait for 1 us; 
-      
-      frame_width_i  <= FRAME_WIDTH;
-      frame_size_i   <= FRAME_SIZE;
+      BM_SW_CFG.dval <= '0'; 
+      sw_type_cng    <= '0';
 
       cfg_i.buffer_a_addr   <= BUFFER_A_ADDR;
       cfg_i.buffer_b_addr   <= BUFFER_B_ADDR;
@@ -423,10 +439,19 @@ sim: process is
       cfg_i.hdr_pix_size    <= HDR_PIX_SIZE;
       cfg_i.img_pix_size    <= IMG_PIX_SIZE;
       cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN;
-      cfg_i.fval_pause_min  <= FVAL_PAUSE_MIN;
+      
+      frame_width_i  <= FRAME_WIDTH;
+      frame_size_i   <= FRAME_SIZE;
+      BM_SW_CFG.sel <= "0000";
+      BM_SW_CFG.dval <= '1';
+      
+      wait for 150 ns; 
+      wait until rising_edge(clk_din_o);
+      rst_n <= '1';      
+      wait for 1 us; 
+
       wait for 150 ns;
-
-
+      wait until rising_edge(clk_mb_o);    
       cfg_vector <= to_intf_cfg(cfg_i);  
       for ii in 0 to NB_CFG_PARAM-1 loop 
          wait until rising_edge(clk_mb_o);      
@@ -438,14 +463,18 @@ sim: process is
       
       wait for 1 us;
       transmit <= '1'; 
-      
       wait for 50 us;
       transmit <= '0';
-      wait for 10 us;
+      wait until (frame_gen_state = Frame_Reset);
+      wait for 10 us;   
       
       frame_width_i  <= resize(2*FRAME_WIDTH,32);
-      frame_size_i   <= resize(2*FRAME_SIZE,32);
-      wait for 100 ns; 
+      frame_size_i   <= resize(2*FRAME_SIZE,32); 
+      BM_SW_CFG.sel <= "0000";
+      BM_SW_CFG.dval <= '1';
+
+      wait for 150 ns;
+      wait until rising_edge(clk_mb_o); 
       cfg_i.buffer_a_addr   <= resize(2*BUFFER_A_ADDR,32);
       cfg_i.buffer_b_addr   <= resize(2*BUFFER_B_ADDR,32);
       cfg_i.buffer_c_addr   <= resize(2*BUFFER_C_ADDR,32);
@@ -456,8 +485,8 @@ sim: process is
       cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN; 
       cfg_i.fval_pause_min  <= FVAL_PAUSE_MIN;
       
-      wait for 100 ns;   
-      
+      wait for 150 ns;
+      wait until rising_edge(clk_mb_o); 
       cfg_vector <= to_intf_cfg(cfg_i);  
       for ii in 0 to NB_CFG_PARAM-1 loop 
          wait until rising_edge(clk_mb_o);      
@@ -466,67 +495,9 @@ sim: process is
          write_axi_lite(clk_mb_o, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop; 
-      wait for 100 ns;
-      transmit <= '1'; 
-      
-      wait for 50 us;
-      
-      
-     transmit <= '0';
-      wait for 10 us;
-      
-      frame_width_i  <= resize(4*FRAME_WIDTH,32);
-      frame_size_i   <= resize(4*FRAME_SIZE,32);
-      wait for 100 ns; 
-      cfg_i.buffer_a_addr   <= resize(4*BUFFER_A_ADDR,32);
-      cfg_i.buffer_b_addr   <= resize(4*BUFFER_B_ADDR,32);
-      cfg_i.buffer_c_addr   <= resize(4*BUFFER_C_ADDR,32);
-      
-      cfg_i.frame_byte_size <= resize(2*frame_size_i,32); 
-      cfg_i.hdr_pix_size    <= resize(4*HDR_PIX_SIZE,32);
-      cfg_i.img_pix_size    <= resize(4*IMG_PIX_SIZE,32);
-      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN; 
-      cfg_i.fval_pause_min  <= FVAL_PAUSE_MIN;
---      
---      frame_width_i  <= resize(FRAME_WIDTH,32);
---      frame_size_i   <= resize(FRAME_SIZE,32);
---      cfg_i.buffer_a_addr   <= BUFFER_A_ADDR;
---      cfg_i.buffer_b_addr   <= BUFFER_B_ADDR;
---      cfg_i.buffer_c_addr   <= BUFFER_C_ADDR;
---      cfg_i.frame_byte_size <= FRAME_BYTE_SIZE; 
---      cfg_i.hdr_pix_size    <= HDR_PIX_SIZE;
---      cfg_i.img_pix_size    <= IMG_PIX_SIZE;
---      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN;
-      
-      wait for 100 ns;   
-      
-      cfg_vector <= to_intf_cfg(cfg_i);  
-      for ii in 0 to NB_CFG_PARAM-1 loop 
-         wait until rising_edge(clk_mb_o);      
-         start_pos := cfg_vector'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite(clk_mb_o, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop; 
-      wait for 100 ns;
-      transmit <= '1'; 
-   
-      
---
---      
---      cfg_vector <= to_intf_cfg(cfg_i);  
---      for ii in 0 to NB_CFG_PARAM-1 loop 
---         wait until rising_edge(clk_mb_o);      
---         start_pos := cfg_vector'length -1 - 32*ii;
---         end_pos   := start_pos - 31;
---         write_axi_lite(clk_mb_o, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
---         wait for 30 ns;
---      end loop; 
---      wait for 100 ns;      
---      
---     
 
-      
+      wait for 100 ns;
+      transmit <= '1'; 
       wait;
       
       report "FCR written"; 

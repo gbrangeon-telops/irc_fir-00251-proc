@@ -29,7 +29,10 @@ entity calib_fast_hder_gen is
       
       -- envoi de la partie du Header
       HDER_MOSI           : out t_axi4_lite_mosi;
-      HDER_MISO           : in t_axi4_lite_miso  
+      HDER_MISO           : in t_axi4_lite_miso; 
+      
+      HEADER_DONE         : out std_logic
+      
       );
 end calib_fast_hder_gen;
 
@@ -81,7 +84,8 @@ begin
             hder_mosi_i.arvalid <= '0';
             hder_mosi_i.bready <= '1';
             hder_mosi_i.rready <= '0';
-            hder_mosi_i.arprot <= (others => '0');
+            hder_mosi_i.arprot <= (others => '0'); 
+            HEADER_DONE <= '1';
          else            
             -- sortie de la partie header fast provenant du module
             case fast_hder_sm is
@@ -93,8 +97,10 @@ begin
                   hcnt <= to_unsigned(1, hcnt'length);
                   frame_id_i <= FRAME_ID;
                   hder_info_i <= HDER_INFO;
+                  HEADER_DONE <= '1';
                   if HDER_SEND_START = '1' then
-                     fast_hder_sm <= send_hder_st;                     
+                     fast_hder_sm <= send_hder_st;
+                     HEADER_DONE <= '0';
                   end if;
                
                when send_hder_st =>
@@ -113,40 +119,48 @@ begin
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= DataExpBWE;
                         
-                     elsif hcnt = 3 then    -- cal_block_index
+                     elsif hcnt = 3 then -- delta temp
+                        hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(DeltaTempAdd32, 8));
+                        hder_mosi_i.awvalid <= '1';
+                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.delta_temp_fp32), 32), DeltaTempShift));
+                        hder_mosi_i.wvalid <= '1';
+                        hder_mosi_i.wstrb <= DeltaTempBWE;
+
+                     elsif hcnt = 4 then    -- cal_block_index
                         hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(CalibrationBlockIndexAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <=  std_logic_vector(shift_left(resize(hder_info_i.cal_block_index, 32), CalibrationBlockIndexShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= CalibrationBlockIndexBWE;
                         
-                     elsif hcnt = 4 then -- low_cut
+                     elsif hcnt = 5 then -- low_cut
                         hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(LowCutAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.low_cut), 32), LowCutShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= LowCutBWE;
                         
-                     elsif hcnt = 5 then -- high_cut
+                     elsif hcnt = 6 then -- high_cut
                         hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(HighCutAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.high_cut), 32), HighCutShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= HighCutBWE;
                         
-                     elsif hcnt = 6 then -- cal_block_posix
+                     elsif hcnt = 7 then -- cal_block_posix
                         hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(CalibrationBlockPOSIXTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.cal_block_posix), 32), CalibrationBlockPOSIXTimeShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= CalibrationBlockPOSIXTimeBWE;
                         
-                     elsif hcnt = 7 then -- block_act_posix
+                     elsif hcnt = 8 then -- block_act_posix
                         hder_mosi_i.awaddr <= x"FFFF" & frame_id_i & std_logic_vector(resize(ImageCorrectionPOSIXTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.block_act_posix), 32), ImageCorrectionPOSIXTimeShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= ImageCorrectionPOSIXTimeBWE;
+                        HEADER_DONE <= '1';
                         fast_hder_sm <= idle;
                      end if;
                      hcnt <= hcnt + 1;

@@ -439,7 +439,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float frame_period, fpaAcquisitionFrameRate;
    uint8_t det_vbias_idx;
    static uint8_t cfg_num = 0;
-   extern int32_t gFpaDebugRegA, gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegF, gFpaDebugRegG, gFpaDebugRegH;
+   extern int32_t gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegG, gFpaDebugRegH;
    extern uint8_t gFpaScdDiodeBiasEnum;
 
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
@@ -607,7 +607,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    // int : cmd structurelle + serielle
    //-----------------------------------------   
-   ptrA->int_cmd_id                      = 0x8500;           // est utilisé par le vhd pour bâtir la cmd serielle de l'integration
+   ptrA->int_cmd_id                      = ROIC_WRITE_CMD_ID;           // est utilisé par le vhd pour bâtir la cmd serielle de l'integration
    ptrA->int_cmd_data_size               = 9;                // la taille de la partie cmd_data de la commande. L'adresse d'offset est exclue
    ptrA->int_cmd_dlen                    = ptrA->int_cmd_data_size + 1;            // +1 pour tenir compte du roic_cmd_offs_add
    ptrA->int_cmd_offs                    = 8;                // voir p.46 de atlascmd_datasheet 2.17
@@ -619,7 +619,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    // op : cmd serielle
    //-----------------------------------------
-   ptrA->op_cmd_id                       = 0x8500;                          // n'est pas utilisé par le vhd mais par le diverC
+   ptrA->op_cmd_id                       = ROIC_WRITE_CMD_ID;                          // n'est pas utilisé par le vhd mais par le diverC
    ptrA->op_cmd_data_size                = 23;                              // taille de la partie donnée exclusivement
    ptrA->op_cmd_dlen                     = ptrA->op_cmd_data_size + 1;      // taille de la partie donnée + taille de l'adresse d'offset
    ptrA->op_cmd_sof_add                  = (uint32_t)AW_SERIAL_OP_CMD_RAM_ADD;
@@ -628,7 +628,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    // roic read : cmd serielle
    //-----------------------------------------
-   ptrA->roic_reg_cmd_id                    = 0x8501;                             // n'est pas utilisé par le vhd mais par le diverC
+   ptrA->roic_reg_cmd_id                    = ROIC_READ_CMD_ID;                             // n'est pas utilisé par le vhd mais par le diverC
    ptrA->roic_reg_cmd_data_size             = 1;                                  // taille de la partie donnée exclusivement
    ptrA->roic_reg_cmd_dlen                  = ptrA->roic_reg_cmd_data_size + 1;   // taille de la partie donnée + taille de l'adresse d'offset
    ptrA->roic_reg_cmd_sof_add               = (uint32_t)AW_SERIAL_ROIC_REG_CMD_RAM_ADD;
@@ -638,32 +638,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // temp : cmd serielle
    //-----------------------------------------
 
-   if (gFpaDebugRegF == 0) // Normal temp cmd
-   {
-      ptrA->temp_cmd_id                     = 0x8503;                         // n'est pas utilisé par le vhd mais par le diverC
+   ptrA->temp_cmd_id                     = PROXY_READ_CMD_ID;                         // n'est pas utilisé par le vhd mais par le diverC
       ptrA->temp_cmd_data_size              = 0;
       ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
-   }
-   else // Overide temp cmd
-   {
-      ptrA->temp_cmd_id                     = 0x8500 + (uint32_t)gFpaDebugRegA;                         // n'est pas utilisé par le vhd mais par le diverC
-
-      if (gFpaDebugRegA == 2) //  proxy write
-      {
-         ptrA->temp_cmd_data_size              = 1;
-         ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
-      }
-      else if(gFpaDebugRegA == 3) //  proxy read
-      {
-         ptrA->temp_cmd_data_size              = 0;
-         ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
-      }
-      else//  detector read/write
-      {
-         ptrA->temp_cmd_data_size              = 1;
-         ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 1;
-      }
-   }
 
    ptrA->temp_cmd_sof_add                = (uint32_t)AW_SERIAL_TEMP_CMD_RAM_ADD;
    ptrA->temp_cmd_eof_add                = ptrA->temp_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->temp_cmd_dlen;     // voir la cmd 0x8503 pour comprendre
@@ -789,13 +766,12 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 /* Fonction permettant de récupérer et convertir la température du fpa */
 int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 {
-
-   extern int32_t gFpaDebugRegF;
    float diode_voltage;
    float temperature = 0.0F;
+   extern int32_t gFpaDebugRegF;
 
-   if (gFpaDebugRegF == 0) // Normal temp cmd
-   {
+   if(gFpaDebugRegF == 0){
+
       FPA_GetStatus(&gStat, ptrA);
       FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle
       FPA_ReadTemperature_StructCmd(ptrA);      // envoi un interrupt au contrôleur du hw driver
@@ -830,12 +806,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
            return K_TO_CC(temperature); // Centi celsius
       }
    }
-   else
-   {
-      FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle
-      FPA_ReadTemperature_StructCmd(ptrA);      // envoi un interrupt au contrôleur du hw driver
+   else{ // Debug mode
       return FPA_COOLER_TEMP_THRES;
    }
+
 }
 
 /* Envoi de la partie structurale d'une commande pour lire la température du fpa */
@@ -858,25 +832,12 @@ void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA)
 {
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
-   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegD, gFpaDebugRegF ;
 
    // on bâtit la commande
    Cmd.hder           =  ptrA->outgoing_com_hder;
    Cmd.id             =  ptrA->temp_cmd_id;
    Cmd.dlen           =  ptrA->temp_cmd_dlen;
-
-   if(gFpaDebugRegF == 0)
-   {
-      Cmd.offs_add       =  0;
-   }
-   else
-   {
-      if (gFpaDebugRegA > 1)
-         Cmd.offs_add       =  (uint16_t)gFpaDebugRegD;
-      else
-         Cmd.offs_add       =  (((uint8_t)DONOT_SEND_THIS_BYTE & 0xFF) << 8) + (uint16_t)gFpaDebugRegD;
-      Cmd.data[0]        = (uint8_t)gFpaDebugRegB;
-   }
+   Cmd.offs_add       =  0;
 
    Cmd.data_size      =  ptrA->temp_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->temp_cmd_dlen + 1;     // +1 pour le checksum
@@ -1291,16 +1252,26 @@ float FPA_ConvertSecondToFrameTimeResolution(float seconds)
     gRoicReg19 = (uint8_t)gPrivateStat.roic_read_reg;
  }
 
- /* Pour du debug (no testé)*/
+ void FPA_ReadRoicReg(t_FpaIntf *ptrA, uint8_t regAdd)
+  {
+     FPA_EnableSerialOpCMD(ptrA, false);
+     ptrA->roic_reg_cmd_id = ROIC_READ_CMD_ID;
+     FPA_SendConfigGC(ptrA, &gcRegsData);
+
+     FPA_SendRoicRead_SerialCmd(ptrA, regAdd);   // envoi la commande serielle
+     FPA_SendRoicReg_StructCmd(ptrA);            // envoi un interrupt au contrôleur du hw driver
+  }
+
  void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal)
  {
        FPA_EnableSerialOpCMD(ptrA, false);
-       ptrA->roic_reg_cmd_id = 0x8500;
+       ptrA->roic_reg_cmd_id = ROIC_WRITE_CMD_ID;
        FPA_SendConfigGC(ptrA, &gcRegsData);
-       FPA_EnableSerialOpCMD(ptrA, true);
+
 
        FPA_SendRoicWrite_SerialCmd(ptrA, regAdd, regVal); // envoi la commande serielle
        FPA_SendRoicReg_StructCmd(ptrA); // envoi un interrupt au contrôleur du hw driver
+    //FPA_EnableSerialOpCMD(ptrA, true);
  }
 
 

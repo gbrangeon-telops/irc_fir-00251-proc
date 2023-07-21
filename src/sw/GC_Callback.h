@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 13.2.0
+// Generated from XML camera definition file version 13.3.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -216,6 +216,8 @@ void GC_MemoryBufferNumberOfImagesMaxCallback(gcCallbackPhase_t phase, gcCallbac
 void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferNumberOfSequencesMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferNumberOfSequencesMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceBadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceCalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceClearCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceClearAllCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -258,6 +260,7 @@ void GC_OffsetYIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_OffsetYMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_OffsetYMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_POSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_PayloadSizeMinFGCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_PixelDataResolutionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_PixelFormatCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_PowerOnAtStartupCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

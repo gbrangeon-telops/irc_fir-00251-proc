@@ -5,4 +5,4 @@ asim -ses +access +r Top
 do "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\src\waveform.do"
 #transcript on
 
-run 100ms
+run 1ms

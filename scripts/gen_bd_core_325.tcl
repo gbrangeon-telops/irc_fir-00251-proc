@@ -20,7 +20,7 @@ set script_folder [_tcl::get_script_folder]
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2016.3
+set scripts_vivado_version 2018.3
 set current_vivado_version [version -short]
 
 if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
@@ -48,70 +48,124 @@ if { $list_projs eq "" } {
 
 
 # CHANGE DESIGN NAME HERE
+variable design_name
 set design_name core
 
-# This script was generated for a remote BD. To create a non-remote design,
-# change the variable <run_remote_bd_flow> to <0>.
+# If you do not already have an existing IP Integrator design open,
+# you can create a design using the following command:
+#    create_bd_design $design_name
 
-set run_remote_bd_flow 0
-if { $run_remote_bd_flow == 1 } {
-  # Set the reference directory for source file relative paths (by default 
-  # the value is script directory path)
-  set origin_dir ./bd
+# Creating design if needed
+set errMsg ""
+set nRet 0
 
-  # Use origin directory path location variable, if specified in the tcl shell
-  if { [info exists ::origin_dir_loc] } {
-     set origin_dir $::origin_dir_loc
-  }
+set cur_design [current_bd_design -quiet]
+set list_cells [get_bd_cells -quiet]
 
-  set str_bd_folder [file normalize ${origin_dir}]
-  set str_bd_filepath ${str_bd_folder}/${design_name}/${design_name}.bd
+if { ${design_name} eq "" } {
+   # USE CASES:
+   #    1) Design_name not set
 
-  # Check if remote design exists on disk
-  if { [file exists $str_bd_filepath ] == 1 } {
-     catch {common::send_msg_id "BD_TCL-110" "ERROR" "The remote BD file path <$str_bd_filepath> already exists!"}
-     common::send_msg_id "BD_TCL-008" "INFO" "To create a non-remote BD, change the variable <run_remote_bd_flow> to <0>."
-     common::send_msg_id "BD_TCL-009" "INFO" "Also make sure there is no design <$design_name> existing in your current project."
+   set errMsg "Please set the variable <design_name> to a non-empty value."
+   set nRet 1
 
-     return 1
-  }
+} elseif { ${cur_design} ne "" && ${list_cells} eq "" } {
+   # USE CASES:
+   #    2): Current design opened AND is empty AND names same.
+   #    3): Current design opened AND is empty AND names diff; design_name NOT in project.
+   #    4): Current design opened AND is empty AND names diff; design_name exists in project.
 
-  # Check if design exists in memory
-  set list_existing_designs [get_bd_designs -quiet $design_name]
-  if { $list_existing_designs ne "" } {
-     catch {common::send_msg_id "BD_TCL-111" "ERROR" "The design <$design_name> already exists in this project! Will not create the remote BD <$design_name> at the folder <$str_bd_folder>."}
+   if { $cur_design ne $design_name } {
+      common::send_msg_id "BD_TCL-001" "INFO" "Changing value of <design_name> from <$design_name> to <$cur_design> since current design is empty."
+      set design_name [get_property NAME $cur_design]
+   }
+   common::send_msg_id "BD_TCL-002" "INFO" "Constructing design in IPI design <$cur_design>..."
 
-     common::send_msg_id "BD_TCL-010" "INFO" "To create a non-remote BD, change the variable <run_remote_bd_flow> to <0> or please set a different value to variable <design_name>."
+} elseif { ${cur_design} ne "" && $list_cells ne "" && $cur_design eq $design_name } {
+   # USE CASES:
+   #    5) Current design opened AND has components AND same names.
 
-     return 1
-  }
+   set errMsg "Design <$design_name> already exists in your project, please set the variable <design_name> to another value."
+   set nRet 1
+} elseif { [get_files -quiet ${design_name}.bd] ne "" } {
+   # USE CASES: 
+   #    6) Current opened design, has components, but diff names, design_name exists in project.
+   #    7) No opened design, design_name exists in project.
 
-  # Check if design exists on disk within project
-  set list_existing_designs [get_files */${design_name}.bd]
-  if { $list_existing_designs ne "" } {
-     catch {common::send_msg_id "BD_TCL-112" "ERROR" "The design <$design_name> already exists in this project at location:
-    $list_existing_designs"}
-     catch {common::send_msg_id "BD_TCL-113" "ERROR" "Will not create the remote BD <$design_name> at the folder <$str_bd_folder>."}
+   set errMsg "Design <$design_name> already exists in your project, please set the variable <design_name> to another value."
+   set nRet 2
 
-     common::send_msg_id "BD_TCL-011" "INFO" "To create a non-remote BD, change the variable <run_remote_bd_flow> to <0> or please set a different value to variable <design_name>."
-
-     return 1
-  }
-
-  # Now can create the remote BD
-  # NOTE - usage of <-dir> will create <$str_bd_folder/$design_name/$design_name.bd>
-  create_bd_design -dir $str_bd_folder $design_name
 } else {
+   # USE CASES:
+   #    8) No opened design, design_name not in project.
+   #    9) Current opened design, has components, but diff names, design_name not in project.
 
-  # Create regular design
-  if { [catch {create_bd_design $design_name} errmsg] } {
-     common::send_msg_id "BD_TCL-012" "INFO" "Please set a different value to variable <design_name>."
+   common::send_msg_id "BD_TCL-003" "INFO" "Currently there is no design <$design_name> in project, so creating one..."
 
-     return 1
-  }
+   create_bd_design $design_name
+
+   common::send_msg_id "BD_TCL-004" "INFO" "Making design <$design_name> as current_bd_design."
+   current_bd_design $design_name
+
 }
 
-current_bd_design $design_name
+common::send_msg_id "BD_TCL-005" "INFO" "Currently the variable <design_name> is equal to \"$design_name\"."
+
+if { $nRet != 0 } {
+   catch {common::send_msg_id "BD_TCL-114" "ERROR" $errMsg}
+   return $nRet
+}
+
+set bCheckIPsPassed 1
+##################################################################
+# CHECK IPs
+##################################################################
+set bCheckIPs 1
+if { $bCheckIPs == 1 } {
+   set list_check_ips "\ 
+Telops:user:FlashReset:1.0\
+xilinx.com:ip:xlconstant:1.1\
+xilinx.com:ip:axi_gpio:2.0\
+xilinx.com:ip:axi_uart16550:2.0\
+xilinx.com:ip:axi_quad_spi:3.2\
+xilinx.com:ip:axi_timer:2.0\
+xilinx.com:ip:clk_wiz:6.0\
+xilinx.com:ip:xlconcat:2.1\
+xilinx.com:ip:proc_sys_reset:5.0\
+xilinx.com:ip:xadc_wiz:3.3\
+xilinx.com:ip:mdm:3.2\
+xilinx.com:ip:microblaze:11.0\
+xilinx.com:ip:axi_intc:4.1\
+xilinx.com:ip:mig_7series:4.2\
+xilinx.com:ip:axi_datamover:5.1\
+xilinx.com:ip:axis_clock_converter:1.1\
+xilinx.com:ip:axis_dwidth_converter:1.1\
+xilinx.com:ip:lmb_bram_if_cntlr:4.0\
+xilinx.com:ip:lmb_v10:3.0\
+xilinx.com:ip:blk_mem_gen:8.4\
+"
+
+   set list_ips_missing ""
+   common::send_msg_id "BD_TCL-006" "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
+
+   foreach ip_vlnv $list_check_ips {
+      set ip_obj [get_ipdefs -all $ip_vlnv]
+      if { $ip_obj eq "" } {
+         lappend list_ips_missing $ip_vlnv
+      }
+   }
+
+   if { $list_ips_missing ne "" } {
+      catch {common::send_msg_id "BD_TCL-115" "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
+      set bCheckIPsPassed 0
+   }
+
+}
+
+if { $bCheckIPsPassed != 1 } {
+  common::send_msg_id "BD_TCL-1003" "WARNING" "Will not continue with creation of design due to the error(s) above."
+  return 3
+}
 
 
 ##################################################################
@@ -120,6 +174,7 @@ current_bd_design $design_name
 
 proc write_mig_file_core_CAL_DDR_MIG_0 { str_mig_prj_filepath } {
 
+   file mkdir [ file dirname "$str_mig_prj_filepath" ]
    set mig_prj_file [open $str_mig_prj_filepath  w+]
 
    puts $mig_prj_file {<?xml version='1.0' encoding='UTF-8'?>}
@@ -290,6 +345,7 @@ proc write_mig_file_core_CAL_DDR_MIG_0 { str_mig_prj_filepath } {
 
 proc write_mig_file_core_mig_7series_0_0 { str_mig_prj_filepath } {
 
+   file mkdir [ file dirname "$str_mig_prj_filepath" ]
    set mig_prj_file [open $str_mig_prj_filepath  w+]
 
    puts $mig_prj_file {<?xml version='1.0' encoding='UTF-8'?>}
@@ -446,7 +502,7 @@ proc create_hier_cell_microblaze_1_local_memory { parentCell nameHier } {
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_msg_id "BD_TCL-102" "ERROR" create_hier_cell_microblaze_1_local_memory() - Empty argument(s)!"}
+     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_microblaze_1_local_memory() - Empty argument(s)!"}
      return
   }
 
@@ -485,7 +541,7 @@ proc create_hier_cell_microblaze_1_local_memory { parentCell nameHier } {
   # Create instance: dlmb_bram_if_cntlr, and set properties
   set dlmb_bram_if_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr:4.0 dlmb_bram_if_cntlr ]
   set_property -dict [ list \
-CONFIG.C_ECC {0} \
+   CONFIG.C_ECC {0} \
  ] $dlmb_bram_if_cntlr
 
   # Create instance: dlmb_v10, and set properties
@@ -494,17 +550,23 @@ CONFIG.C_ECC {0} \
   # Create instance: ilmb_bram_if_cntlr, and set properties
   set ilmb_bram_if_cntlr [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_bram_if_cntlr:4.0 ilmb_bram_if_cntlr ]
   set_property -dict [ list \
-CONFIG.C_ECC {0} \
+   CONFIG.C_ECC {0} \
  ] $ilmb_bram_if_cntlr
 
   # Create instance: ilmb_v10, and set properties
   set ilmb_v10 [ create_bd_cell -type ip -vlnv xilinx.com:ip:lmb_v10:3.0 ilmb_v10 ]
 
   # Create instance: lmb_bram, and set properties
-  set lmb_bram [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.3 lmb_bram ]
+  set lmb_bram [ create_bd_cell -type ip -vlnv xilinx.com:ip:blk_mem_gen:8.4 lmb_bram ]
   set_property -dict [ list \
-CONFIG.Memory_Type {True_Dual_Port_RAM} \
-CONFIG.use_bram_block {BRAM_Controller} \
+   CONFIG.EN_SAFETY_CKT {false} \
+   CONFIG.Enable_B {Use_ENB_Pin} \
+   CONFIG.Memory_Type {True_Dual_Port_RAM} \
+   CONFIG.Port_B_Clock {100} \
+   CONFIG.Port_B_Enable_Rate {100} \
+   CONFIG.Port_B_Write_Rate {50} \
+   CONFIG.Use_RSTB_Pin {true} \
+   CONFIG.use_bram_block {BRAM_Controller} \
  ] $lmb_bram
 
   # Create interface connections
@@ -529,7 +591,7 @@ proc create_hier_cell_axi_peripheral { parentCell nameHier } {
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_msg_id "BD_TCL-102" "ERROR" create_hier_cell_axi_peripheral() - Empty argument(s)!"}
+     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_axi_peripheral() - Empty argument(s)!"}
      return
   }
 
@@ -608,26 +670,29 @@ proc create_hier_cell_axi_peripheral { parentCell nameHier } {
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
   set_property -dict [ list \
-CONFIG.NUM_MI {16} \
-CONFIG.S00_HAS_DATA_FIFO {0} \
+   CONFIG.NUM_MI {16} \
+   CONFIG.S00_HAS_DATA_FIFO {0} \
+   CONFIG.SYNCHRONIZATION_STAGES {2} \
  ] $axi_interconnect_0
 
   # Create instance: axi_interconnect_1, and set properties
   set axi_interconnect_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_1 ]
   set_property -dict [ list \
-CONFIG.M00_HAS_DATA_FIFO {0} \
-CONFIG.M01_HAS_DATA_FIFO {0} \
-CONFIG.M11_HAS_DATA_FIFO {0} \
-CONFIG.M12_HAS_DATA_FIFO {0} \
-CONFIG.M15_HAS_DATA_FIFO {0} \
-CONFIG.NUM_MI {15} \
-CONFIG.S00_HAS_DATA_FIFO {0} \
+   CONFIG.M00_HAS_DATA_FIFO {0} \
+   CONFIG.M01_HAS_DATA_FIFO {0} \
+   CONFIG.M11_HAS_DATA_FIFO {0} \
+   CONFIG.M12_HAS_DATA_FIFO {0} \
+   CONFIG.M15_HAS_DATA_FIFO {0} \
+   CONFIG.NUM_MI {15} \
+   CONFIG.S00_HAS_DATA_FIFO {0} \
+   CONFIG.SYNCHRONIZATION_STAGES {2} \
  ] $axi_interconnect_1
 
   # Create instance: axi_interconnect_2, and set properties
   set axi_interconnect_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_2 ]
   set_property -dict [ list \
-CONFIG.NUM_MI {10} \
+   CONFIG.NUM_MI {10} \
+   CONFIG.SYNCHRONIZATION_STAGES {2} \
  ] $axi_interconnect_2
 
   # Create interface connections
@@ -690,7 +755,7 @@ proc create_hier_cell_MIG_Code { parentCell nameHier } {
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_msg_id "BD_TCL-102" "ERROR" create_hier_cell_MIG_Code() - Empty argument(s)!"}
+     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_MIG_Code() - Empty argument(s)!"}
      return
   }
 
@@ -739,12 +804,13 @@ proc create_hier_cell_MIG_Code { parentCell nameHier } {
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
-CONFIG.NUM_SI {2} \
+   CONFIG.NUM_MI {1} \
+   CONFIG.NUM_SI {2} \
+   CONFIG.SYNCHRONIZATION_STAGES {2} \
  ] $axi_interconnect_0
 
   # Create instance: mig_7series_0, and set properties
-  set mig_7series_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mig_7series:4.0 mig_7series_0 ]
+  set mig_7series_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mig_7series:4.2 mig_7series_0 ]
 
   # Generate the PRJ File for MIG
   set str_mig_folder [get_property IP_DIR [ get_ips [ get_property CONFIG.Component_Name $mig_7series_0 ] ] ]
@@ -754,10 +820,10 @@ CONFIG.NUM_SI {2} \
   write_mig_file_core_mig_7series_0_0 $str_mig_file_path
 
   set_property -dict [ list \
-CONFIG.BOARD_MIG_PARAM {Custom} \
-CONFIG.MIG_DONT_TOUCH_PARAM {Custom} \
-CONFIG.RESET_BOARD_INTERFACE {Custom} \
-CONFIG.XML_INPUT_FILE {mig_a.prj} \
+   CONFIG.BOARD_MIG_PARAM {Custom} \
+   CONFIG.MIG_DONT_TOUCH_PARAM {Custom} \
+   CONFIG.RESET_BOARD_INTERFACE {Custom} \
+   CONFIG.XML_INPUT_FILE {mig_a.prj} \
  ] $mig_7series_0
 
   # Create interface connections
@@ -789,7 +855,7 @@ proc create_hier_cell_MIG_Calibration { parentCell nameHier } {
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_msg_id "BD_TCL-102" "ERROR" create_hier_cell_MIG_Calibration() - Empty argument(s)!"}
+     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_MIG_Calibration() - Empty argument(s)!"}
      return
   }
 
@@ -841,7 +907,7 @@ proc create_hier_cell_MIG_Calibration { parentCell nameHier } {
   create_bd_pin -dir I -from 0 -to 0 -type rst sys_rst
 
   # Create instance: CAL_DDR_MIG, and set properties
-  set CAL_DDR_MIG [ create_bd_cell -type ip -vlnv xilinx.com:ip:mig_7series:4.0 CAL_DDR_MIG ]
+  set CAL_DDR_MIG [ create_bd_cell -type ip -vlnv xilinx.com:ip:mig_7series:4.2 CAL_DDR_MIG ]
 
   # Generate the PRJ File for MIG
   set str_mig_folder [get_property IP_DIR [ get_ips [ get_property CONFIG.Component_Name $CAL_DDR_MIG ] ] ]
@@ -851,45 +917,46 @@ proc create_hier_cell_MIG_Calibration { parentCell nameHier } {
   write_mig_file_core_CAL_DDR_MIG_0 $str_mig_file_path
 
   set_property -dict [ list \
-CONFIG.BOARD_MIG_PARAM {Custom} \
-CONFIG.RESET_BOARD_INTERFACE {Custom} \
-CONFIG.XML_INPUT_FILE {mig_a.prj} \
+   CONFIG.BOARD_MIG_PARAM {Custom} \
+   CONFIG.RESET_BOARD_INTERFACE {Custom} \
+   CONFIG.XML_INPUT_FILE {mig_a.prj} \
  ] $CAL_DDR_MIG
 
   # Create instance: axi_datamover_ddrcal, and set properties
   set axi_datamover_ddrcal [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_datamover:5.1 axi_datamover_ddrcal ]
   set_property -dict [ list \
-CONFIG.c_enable_mm2s {1} \
-CONFIG.c_enable_s2mm {0} \
-CONFIG.c_m_axi_mm2s_data_width {256} \
-CONFIG.c_m_axis_mm2s_tdata_width {256} \
-CONFIG.c_mm2s_burst_size {64} \
+  CONFIG.c_enable_mm2s {1} \
+  CONFIG.c_enable_s2mm {0} \
+  CONFIG.c_m_axi_mm2s_data_width {256} \
+  CONFIG.c_m_axis_mm2s_tdata_width {256} \
+  CONFIG.c_mm2s_burst_size {64} \
  ] $axi_datamover_ddrcal
 
   # Create instance: axi_dm_buffer, and set properties
   set axi_dm_buffer [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_datamover:5.1 axi_dm_buffer ]
   set_property -dict [ list \
-CONFIG.c_m_axi_mm2s_data_width {256} \
-CONFIG.c_m_axi_s2mm_data_width {256} \
-CONFIG.c_m_axis_mm2s_tdata_width {64} \
-CONFIG.c_mm2s_btt_used {23} \
-CONFIG.c_mm2s_burst_size {16} \
-CONFIG.c_s2mm_btt_used {23} \
-CONFIG.c_s2mm_burst_size {64} \
+   CONFIG.c_m_axi_mm2s_data_width {256} \
+   CONFIG.c_m_axi_s2mm_data_width {256} \
+   CONFIG.c_m_axis_mm2s_tdata_width {64} \
+   CONFIG.c_mm2s_btt_used {23} \
+   CONFIG.c_mm2s_burst_size {16} \
+   CONFIG.c_s2mm_btt_used {23} \
+   CONFIG.c_s2mm_burst_size {64} \
  ] $axi_dm_buffer
 
   # Create instance: axi_interconnect_ddrcal, and set properties
   set axi_interconnect_ddrcal [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_ddrcal ]
   set_property -dict [ list \
-CONFIG.M00_HAS_DATA_FIFO {0} \
-CONFIG.NUM_MI {1} \
-CONFIG.NUM_SI {4} \
-CONFIG.S00_HAS_DATA_FIFO {0} \
-CONFIG.S01_HAS_DATA_FIFO {0} \
-CONFIG.S02_HAS_DATA_FIFO {0} \
-CONFIG.S03_HAS_DATA_FIFO {0} \
-CONFIG.S04_HAS_DATA_FIFO {2} \
-CONFIG.STRATEGY {0} \
+   CONFIG.M00_HAS_DATA_FIFO {0} \
+   CONFIG.NUM_MI {1} \
+   CONFIG.NUM_SI {4} \
+   CONFIG.S00_HAS_DATA_FIFO {0} \
+   CONFIG.S01_HAS_DATA_FIFO {0} \
+   CONFIG.S02_HAS_DATA_FIFO {0} \
+   CONFIG.S03_HAS_DATA_FIFO {0} \
+   CONFIG.S04_HAS_DATA_FIFO {2} \
+   CONFIG.STRATEGY {0} \
+   CONFIG.SYNCHRONIZATION_STAGES {2} \
  ] $axi_interconnect_ddrcal
 
   # Create instance: axis_clock_converter_0, and set properties
@@ -910,7 +977,7 @@ CONFIG.STRATEGY {0} \
   # Create instance: axis_dwidth_converter_0, and set properties
   set axis_dwidth_converter_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_dwidth_converter:1.1 axis_dwidth_converter_0 ]
   set_property -dict [ list \
-CONFIG.M_TDATA_NUM_BYTES {16} \
+   CONFIG.M_TDATA_NUM_BYTES {16} \
  ] $axis_dwidth_converter_0
 
   # Create interface connections
@@ -957,7 +1024,7 @@ proc create_hier_cell_MCU { parentCell nameHier } {
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_msg_id "BD_TCL-102" "ERROR" create_hier_cell_MCU() - Empty argument(s)!"}
+     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_MCU() - Empty argument(s)!"}
      return
   }
 
@@ -1007,34 +1074,34 @@ proc create_hier_cell_MCU { parentCell nameHier } {
   # Create instance: mdm_1, and set properties
   set mdm_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mdm:3.2 mdm_1 ]
   set_property -dict [ list \
-CONFIG.C_USE_UART {1} \
+   CONFIG.C_USE_UART {1} \
  ] $mdm_1
 
   # Create instance: microblaze_1, and set properties
-  set microblaze_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:microblaze:10.0 microblaze_1 ]
+  set microblaze_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:microblaze:11.0 microblaze_1 ]
   set_property -dict [ list \
-CONFIG.C_CACHE_BYTE_SIZE {16384} \
-CONFIG.C_DCACHE_BYTE_SIZE {16384} \
-CONFIG.C_DEBUG_ENABLED {1} \
-CONFIG.C_D_AXI {1} \
-CONFIG.C_D_LMB {1} \
-CONFIG.C_FSL_LINKS {1} \
-CONFIG.C_I_LMB {1} \
-CONFIG.C_NUMBER_OF_PC_BRK {2} \
-CONFIG.C_NUMBER_OF_RD_ADDR_BRK {1} \
-CONFIG.C_NUMBER_OF_WR_ADDR_BRK {1} \
-CONFIG.C_USE_DCACHE {1} \
-CONFIG.C_USE_FPU {1} \
-CONFIG.C_USE_HW_MUL {1} \
-CONFIG.C_USE_ICACHE {1} \
-CONFIG.C_USE_STACK_PROTECTION {1} \
-CONFIG.G_USE_EXCEPTIONS {0} \
+   CONFIG.C_CACHE_BYTE_SIZE {16384} \
+   CONFIG.C_DCACHE_BYTE_SIZE {16384} \
+   CONFIG.C_DEBUG_ENABLED {1} \
+   CONFIG.C_D_AXI {1} \
+   CONFIG.C_D_LMB {1} \
+   CONFIG.C_FSL_LINKS {1} \
+   CONFIG.C_I_LMB {1} \
+   CONFIG.C_NUMBER_OF_PC_BRK {2} \
+   CONFIG.C_NUMBER_OF_RD_ADDR_BRK {1} \
+   CONFIG.C_NUMBER_OF_WR_ADDR_BRK {1} \
+   CONFIG.C_USE_DCACHE {1} \
+   CONFIG.C_USE_FPU {1} \
+   CONFIG.C_USE_HW_MUL {1} \
+   CONFIG.C_USE_ICACHE {1} \
+   CONFIG.C_USE_STACK_PROTECTION {1} \
+   CONFIG.G_USE_EXCEPTIONS {0} \
  ] $microblaze_1
 
   # Create instance: microblaze_1_axi_intc, and set properties
   set microblaze_1_axi_intc [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_intc:4.1 microblaze_1_axi_intc ]
   set_property -dict [ list \
-CONFIG.C_HAS_FAST {1} \
+   CONFIG.C_HAS_FAST {1} \
  ] $microblaze_1_axi_intc
 
   # Create instance: microblaze_1_local_memory
@@ -1073,6 +1140,7 @@ CONFIG.C_HAS_FAST {1} \
 proc create_root_design { parentCell } {
 
   variable script_folder
+  variable design_name
 
   if { $parentCell eq "" } {
      set parentCell [get_bd_cells /]
@@ -1102,67 +1170,67 @@ proc create_root_design { parentCell } {
   # Create interface ports
   set ADC_READOUT_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 ADC_READOUT_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $ADC_READOUT_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $ADC_READOUT_CTRL
   set AEC_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 AEC_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $AEC_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $AEC_CTRL
   set CALIBCONFIG_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 CALIBCONFIG_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $CALIBCONFIG_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $CALIBCONFIG_AXI
   set CALIB_RAM_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 CALIB_RAM_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $CALIB_RAM_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $CALIB_RAM_AXI
   set CAL_DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 CAL_DDR ]
   set CODE_DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 CODE_DDR ]
   set EXPTIME_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 EXPTIME_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $EXPTIME_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $EXPTIME_CTRL
   set FAN_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 FAN_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $FAN_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $FAN_CTRL
   set FPA_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 FPA_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $FPA_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $FPA_CTRL
   set HEADER_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 HEADER_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $HEADER_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $HEADER_CTRL
   set IRIG_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 IRIG_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $IRIG_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $IRIG_CTRL
   set LED_GPIO [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:gpio_rtl:1.0 LED_GPIO ]
   set MGT_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 MGT_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $MGT_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $MGT_CTRL
   set MUX_ADDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:gpio_rtl:1.0 MUX_ADDR ]
   set M_AXIS_CALDDR_MM2S [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:axis_rtl:1.0 M_AXIS_CALDDR_MM2S ]
   set M_AXIS_CALDDR_MM2S_STS [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:axis_rtl:1.0 M_AXIS_CALDDR_MM2S_STS ]
@@ -1172,159 +1240,159 @@ CONFIG.PROTOCOL {AXI4LITE} \
   set M_AXIS_USART [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:axis_rtl:1.0 M_AXIS_USART ]
   set M_BUFFERING_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_BUFFERING_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $M_BUFFERING_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $M_BUFFERING_CTRL
   set M_BUF_TABLE [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_BUF_TABLE ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $M_BUF_TABLE
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $M_BUF_TABLE
   set M_BULK_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_BULK_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $M_BULK_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $M_BULK_AXI
   set M_EHDRI_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_EHDRI_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4} \
- ] $M_EHDRI_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4} \
+   ] $M_EHDRI_CTRL
   set M_FLASHINTF_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_FLASHINTF_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4} \
- ] $M_FLASHINTF_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4} \
+   ] $M_FLASHINTF_AXI
   set M_FRAME_BUFFER_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_FRAME_BUFFER_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.HAS_BURST {0} \
-CONFIG.HAS_CACHE {0} \
-CONFIG.HAS_LOCK {0} \
-CONFIG.HAS_QOS {0} \
-CONFIG.HAS_REGION {0} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $M_FRAME_BUFFER_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.HAS_BURST {0} \
+   CONFIG.HAS_CACHE {0} \
+   CONFIG.HAS_LOCK {0} \
+   CONFIG.HAS_QOS {0} \
+   CONFIG.HAS_REGION {0} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $M_FRAME_BUFFER_CTRL
   set M_ICU_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_ICU_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $M_ICU_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $M_ICU_AXI
   set NLC_LUT_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 NLC_LUT_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.HAS_BURST {0} \
-CONFIG.HAS_CACHE {0} \
-CONFIG.HAS_LOCK {0} \
-CONFIG.HAS_QOS {0} \
-CONFIG.HAS_REGION {0} \
-CONFIG.NUM_READ_OUTSTANDING {2} \
-CONFIG.NUM_WRITE_OUTSTANDING {2} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $NLC_LUT_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.HAS_BURST {0} \
+   CONFIG.HAS_CACHE {0} \
+   CONFIG.HAS_LOCK {0} \
+   CONFIG.HAS_QOS {0} \
+   CONFIG.HAS_REGION {0} \
+   CONFIG.NUM_READ_OUTSTANDING {2} \
+   CONFIG.NUM_WRITE_OUTSTANDING {2} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $NLC_LUT_AXI
   set POWER_GPIO [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:gpio_rtl:1.0 POWER_GPIO ]
   set QSPI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:spi_rtl:1.0 QSPI ]
   set REV_GPIO [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:gpio_rtl:1.0 REV_GPIO ]
   set RQC_LUT_AXI [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 RQC_LUT_AXI ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $RQC_LUT_AXI
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $RQC_LUT_AXI
   set SFW_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 SFW_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $SFW_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $SFW_CTRL
   set SYS_CLK_0 [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:diff_clock_rtl:1.0 SYS_CLK_0 ]
   set_property -dict [ list \
-CONFIG.FREQ_HZ {200000000} \
- ] $SYS_CLK_0
+   CONFIG.FREQ_HZ {200000000} \
+   ] $SYS_CLK_0
   set SYS_CLK_1 [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:diff_clock_rtl:1.0 SYS_CLK_1 ]
   set_property -dict [ list \
-CONFIG.FREQ_HZ {200000000} \
- ] $SYS_CLK_1
+   CONFIG.FREQ_HZ {200000000} \
+   ] $SYS_CLK_1
   set S_AXIS_CALDDR_MM2S_CMD [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_CALDDR_MM2S_CMD ]
   set_property -dict [ list \
-CONFIG.HAS_TKEEP {0} \
-CONFIG.HAS_TLAST {0} \
-CONFIG.HAS_TREADY {1} \
-CONFIG.HAS_TSTRB {0} \
-CONFIG.LAYERED_METADATA {undef} \
-CONFIG.TDATA_NUM_BYTES {9} \
-CONFIG.TDEST_WIDTH {0} \
-CONFIG.TID_WIDTH {0} \
-CONFIG.TUSER_WIDTH {0} \
- ] $S_AXIS_CALDDR_MM2S_CMD
+   CONFIG.HAS_TKEEP {0} \
+   CONFIG.HAS_TLAST {0} \
+   CONFIG.HAS_TREADY {1} \
+   CONFIG.HAS_TSTRB {0} \
+   CONFIG.LAYERED_METADATA {undef} \
+   CONFIG.TDATA_NUM_BYTES {9} \
+   CONFIG.TDEST_WIDTH {0} \
+   CONFIG.TID_WIDTH {0} \
+   CONFIG.TUSER_WIDTH {0} \
+   ] $S_AXIS_CALDDR_MM2S_CMD
   set S_AXIS_MM2S_CMD_BUF [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_MM2S_CMD_BUF ]
   set_property -dict [ list \
-CONFIG.HAS_TKEEP {0} \
-CONFIG.HAS_TLAST {0} \
-CONFIG.HAS_TREADY {1} \
-CONFIG.HAS_TSTRB {0} \
-CONFIG.LAYERED_METADATA {undef} \
-CONFIG.TDATA_NUM_BYTES {9} \
-CONFIG.TDEST_WIDTH {0} \
-CONFIG.TID_WIDTH {0} \
-CONFIG.TUSER_WIDTH {0} \
- ] $S_AXIS_MM2S_CMD_BUF
+   CONFIG.HAS_TKEEP {0} \
+   CONFIG.HAS_TLAST {0} \
+   CONFIG.HAS_TREADY {1} \
+   CONFIG.HAS_TSTRB {0} \
+   CONFIG.LAYERED_METADATA {undef} \
+   CONFIG.TDATA_NUM_BYTES {9} \
+   CONFIG.TDEST_WIDTH {0} \
+   CONFIG.TID_WIDTH {0} \
+   CONFIG.TUSER_WIDTH {0} \
+   ] $S_AXIS_MM2S_CMD_BUF
   set S_AXIS_S2MM_BUF [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_S2MM_BUF ]
   set_property -dict [ list \
-CONFIG.HAS_TKEEP {1} \
-CONFIG.HAS_TLAST {1} \
-CONFIG.HAS_TREADY {1} \
-CONFIG.HAS_TSTRB {0} \
-CONFIG.LAYERED_METADATA {undef} \
-CONFIG.TDATA_NUM_BYTES {8} \
-CONFIG.TDEST_WIDTH {0} \
-CONFIG.TID_WIDTH {0} \
-CONFIG.TUSER_WIDTH {0} \
- ] $S_AXIS_S2MM_BUF
+   CONFIG.HAS_TKEEP {1} \
+   CONFIG.HAS_TLAST {1} \
+   CONFIG.HAS_TREADY {1} \
+   CONFIG.HAS_TSTRB {0} \
+   CONFIG.LAYERED_METADATA {undef} \
+   CONFIG.TDATA_NUM_BYTES {8} \
+   CONFIG.TDEST_WIDTH {0} \
+   CONFIG.TID_WIDTH {0} \
+   CONFIG.TUSER_WIDTH {0} \
+   ] $S_AXIS_S2MM_BUF
   set S_AXIS_S2MM_CMD_BUF [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_S2MM_CMD_BUF ]
   set_property -dict [ list \
-CONFIG.HAS_TKEEP {0} \
-CONFIG.HAS_TLAST {0} \
-CONFIG.HAS_TREADY {1} \
-CONFIG.HAS_TSTRB {0} \
-CONFIG.LAYERED_METADATA {undef} \
-CONFIG.TDATA_NUM_BYTES {9} \
-CONFIG.TDEST_WIDTH {0} \
-CONFIG.TID_WIDTH {0} \
-CONFIG.TUSER_WIDTH {0} \
- ] $S_AXIS_S2MM_CMD_BUF
+   CONFIG.HAS_TKEEP {0} \
+   CONFIG.HAS_TLAST {0} \
+   CONFIG.HAS_TREADY {1} \
+   CONFIG.HAS_TSTRB {0} \
+   CONFIG.LAYERED_METADATA {undef} \
+   CONFIG.TDATA_NUM_BYTES {9} \
+   CONFIG.TDEST_WIDTH {0} \
+   CONFIG.TID_WIDTH {0} \
+   CONFIG.TUSER_WIDTH {0} \
+   ] $S_AXIS_S2MM_CMD_BUF
   set S_AXIS_USART [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_USART ]
   set_property -dict [ list \
-CONFIG.HAS_TKEEP {0} \
-CONFIG.HAS_TLAST {1} \
-CONFIG.HAS_TREADY {1} \
-CONFIG.HAS_TSTRB {0} \
-CONFIG.LAYERED_METADATA {undef} \
-CONFIG.TDATA_NUM_BYTES {4} \
-CONFIG.TDEST_WIDTH {0} \
-CONFIG.TID_WIDTH {0} \
-CONFIG.TUSER_WIDTH {0} \
- ] $S_AXIS_USART
+   CONFIG.HAS_TKEEP {0} \
+   CONFIG.HAS_TLAST {1} \
+   CONFIG.HAS_TREADY {1} \
+   CONFIG.HAS_TSTRB {0} \
+   CONFIG.LAYERED_METADATA {undef} \
+   CONFIG.TDATA_NUM_BYTES {4} \
+   CONFIG.TDEST_WIDTH {0} \
+   CONFIG.TID_WIDTH {0} \
+   CONFIG.TUSER_WIDTH {0} \
+   ] $S_AXIS_USART
   set TRIGGER_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 TRIGGER_CTRL ]
   set_property -dict [ list \
-CONFIG.ADDR_WIDTH {32} \
-CONFIG.DATA_WIDTH {32} \
-CONFIG.PROTOCOL {AXI4LITE} \
- ] $TRIGGER_CTRL
+   CONFIG.ADDR_WIDTH {32} \
+   CONFIG.DATA_WIDTH {32} \
+   CONFIG.PROTOCOL {AXI4LITE} \
+   ] $TRIGGER_CTRL
   set USB_UART [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:uart_rtl:1.0 USB_UART ]
 
   # Create ports
   set AEC_INTC [ create_bd_port -dir I -type intr AEC_INTC ]
   set_property -dict [ list \
-CONFIG.SENSITIVITY {EDGE_RISING} \
+   CONFIG.SENSITIVITY {EDGE_RISING} \
  ] $AEC_INTC
   set ARESETN [ create_bd_port -dir O -from 0 -to 0 -type rst ARESETN ]
   set BUTTON [ create_bd_port -dir I BUTTON ]
@@ -1346,22 +1414,22 @@ CONFIG.SENSITIVITY {EDGE_RISING} \
   set PLEORA_UART_SOUT [ create_bd_port -dir O PLEORA_UART_SOUT ]
   set bulk_interrupt [ create_bd_port -dir I -from 0 -to 0 -type intr bulk_interrupt ]
   set_property -dict [ list \
-CONFIG.PortWidth {1} \
-CONFIG.SENSITIVITY {EDGE_RISING} \
+   CONFIG.PortWidth {1} \
+   CONFIG.SENSITIVITY {EDGE_RISING} \
  ] $bulk_interrupt
   set clk_200 [ create_bd_port -dir O -type clk clk_200 ]
   set clk_cal [ create_bd_port -dir O -type clk clk_cal ]
   set_property -dict [ list \
-CONFIG.ASSOCIATED_BUSIF {S_AXIS_CALDDR_MM2S_CMD:M_AXIS_CALDDR_MM2S_STS:M_AXIS_CALDDR_MM2S:NLC_LUT_AXI:RQC_LUT_AXI} \
+   CONFIG.ASSOCIATED_BUSIF {S_AXIS_CALDDR_MM2S_CMD:M_AXIS_CALDDR_MM2S_STS:M_AXIS_CALDDR_MM2S:NLC_LUT_AXI:RQC_LUT_AXI} \
  ] $clk_cal
   set clk_data [ create_bd_port -dir O -type clk clk_data ]
   set_property -dict [ list \
-CONFIG.ASSOCIATED_BUSIF {S_AXIS_MM2S_CMD_BUF:S_AXIS_S2MM_BUF:S_AXIS_S2MM_CMD_BUF:M_AXIS_S2MM_STS_BUF:M_AXIS_MM2S_STS_BUF:M_AXIS_MM2S_BUF} \
+   CONFIG.ASSOCIATED_BUSIF {S_AXIS_MM2S_CMD_BUF:S_AXIS_S2MM_BUF:S_AXIS_S2MM_CMD_BUF:M_AXIS_S2MM_STS_BUF:M_AXIS_MM2S_STS_BUF:M_AXIS_MM2S_BUF} \
  ] $clk_data
   set clk_irig [ create_bd_port -dir O -type clk clk_irig ]
   set clk_mb [ create_bd_port -dir O -type clk clk_mb ]
   set_property -dict [ list \
-CONFIG.ASSOCIATED_BUSIF {FPA_CTRL:HEADER_CTRL:EXPTIME_CTRL:TRIGGER_CTRL:CALIB_RAM_AXI:AEC_CTRL:SFW_CTRL:CALIBCONFIG_AXI:FAN_CTRL:MGT_CTRL:IRIG_CTRL:M_BULK_AXI:M_FLASHINTF_AXI:M_ICU_AXI:M_BUF_TABLE:M_BUFFERING_CTRL:M_EHDRI_CTRL:M_AXIS_USART:S_AXIS_USART:ADC_READOUT_CTRL:M_FRAME_BUFFER_CTRL} \
+   CONFIG.ASSOCIATED_BUSIF {FPA_CTRL:HEADER_CTRL:EXPTIME_CTRL:TRIGGER_CTRL:CALIB_RAM_AXI:AEC_CTRL:SFW_CTRL:CALIBCONFIG_AXI:FAN_CTRL:MGT_CTRL:IRIG_CTRL:M_BULK_AXI:M_FLASHINTF_AXI:M_ICU_AXI:M_BUF_TABLE:M_BUFFERING_CTRL:M_EHDRI_CTRL:M_AXIS_USART:S_AXIS_USART:ADC_READOUT_CTRL:M_FRAME_BUFFER_CTRL} \
  ] $clk_mb
   set clk_mgt_init [ create_bd_port -dir O -type clk clk_mgt_init ]
   set vn_in [ create_bd_port -dir I vn_in ]
@@ -1371,21 +1439,21 @@ CONFIG.ASSOCIATED_BUSIF {FPA_CTRL:HEADER_CTRL:EXPTIME_CTRL:TRIGGER_CTRL:CALIB_RA
   set FlashReset_0 [ create_bd_cell -type ip -vlnv Telops:user:FlashReset:1.0 FlashReset_0 ]
 
   set_property -dict [ list \
-CONFIG.SUPPORTS_NARROW_BURST {0} \
-CONFIG.NUM_READ_OUTSTANDING {1} \
-CONFIG.NUM_WRITE_OUTSTANDING {1} \
-CONFIG.MAX_BURST_LENGTH {1} \
+   CONFIG.SUPPORTS_NARROW_BURST {0} \
+   CONFIG.NUM_READ_OUTSTANDING {1} \
+   CONFIG.NUM_WRITE_OUTSTANDING {1} \
+   CONFIG.MAX_BURST_LENGTH {1} \
  ] [get_bd_intf_pins /FlashReset_0/m_axi]
 
   set_property -dict [ list \
-CONFIG.NUM_READ_OUTSTANDING {1} \
-CONFIG.NUM_WRITE_OUTSTANDING {1} \
+   CONFIG.NUM_READ_OUTSTANDING {1} \
+   CONFIG.NUM_WRITE_OUTSTANDING {1} \
  ] [get_bd_intf_pins /FlashReset_0/s_axi]
 
   # Create instance: GND, and set properties
   set GND [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 GND ]
   set_property -dict [ list \
-CONFIG.CONST_VAL {0} \
+   CONFIG.CONST_VAL {0} \
  ] $GND
 
   # Create instance: MCU
@@ -1400,31 +1468,26 @@ CONFIG.CONST_VAL {0} \
   # Create instance: axi_gpio_0, and set properties
   set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
   set_property -dict [ list \
-CONFIG.C_ALL_INPUTS_2 {1} \
-CONFIG.C_ALL_OUTPUTS {1} \
-CONFIG.C_GPIO2_WIDTH {8} \
-CONFIG.C_GPIO_WIDTH {4} \
-CONFIG.C_IS_DUAL {1} \
+   CONFIG.C_ALL_INPUTS_2 {1} \
+   CONFIG.C_ALL_OUTPUTS {1} \
+   CONFIG.C_GPIO2_WIDTH {8} \
+   CONFIG.C_GPIO_WIDTH {4} \
+   CONFIG.C_IS_DUAL {1} \
  ] $axi_gpio_0
 
   # Create instance: axi_gps_uart, and set properties
   set axi_gps_uart [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 axi_gps_uart ]
   set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
- ] $axi_gps_uart
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
+   CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
+   CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $axi_gps_uart
 
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
   set_property -dict [ list \
-CONFIG.NUM_MI {1} \
-CONFIG.NUM_SI {2} \
+   CONFIG.NUM_MI {1} \
+   CONFIG.NUM_SI {2} \
+   CONFIG.SYNCHRONIZATION_STAGES {2} \
  ] $axi_interconnect_0
 
   # Create instance: axi_lens_uart, and set properties
@@ -1434,23 +1497,11 @@ CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
 CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $axi_lens_uart
 
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
- ] $axi_lens_uart
-
   # Create instance: axi_ndf_uart, and set properties
   set axi_ndf_uart [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 axi_ndf_uart ]
   set_property -dict [ list \
 CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
 CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
- ] $axi_ndf_uart
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
  ] $axi_ndf_uart
 
   # Create instance: axi_peripheral
@@ -1459,8 +1510,8 @@ CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
   # Create instance: axi_quad_spi_0, and set properties
   set axi_quad_spi_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_quad_spi:3.2 axi_quad_spi_0 ]
   set_property -dict [ list \
-CONFIG.C_SPI_MEMORY {2} \
-CONFIG.C_SPI_MODE {2} \
+   CONFIG.C_SPI_MEMORY {2} \
+   CONFIG.C_SPI_MODE {2} \
  ] $axi_quad_spi_0
 
   # Create instance: axi_timer_0, and set properties
@@ -1473,12 +1524,6 @@ CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
 CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $axi_usb_uart
 
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
- ] $axi_usb_uart
-
   # Create instance: clink_uart, and set properties
   set clink_uart [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 clink_uart ]
   set_property -dict [ list \
@@ -1486,85 +1531,53 @@ CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
 CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $clink_uart
 
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
- ] $clink_uart
-
   # Create instance: clk_wiz_1, and set properties
-  set clk_wiz_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:5.3 clk_wiz_1 ]
-  set_property -dict [ list \
-CONFIG.CLKOUT1_JITTER {220.112} \
-CONFIG.CLKOUT1_PHASE_ERROR {300.046} \
-CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {170.000} \
-CONFIG.CLKOUT2_JITTER {242.325} \
-CONFIG.CLKOUT2_PHASE_ERROR {300.046} \
-CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {85.000} \
-CONFIG.CLKOUT2_USED {true} \
-CONFIG.MMCM_CLKFBOUT_MULT_F {51.000} \
-CONFIG.MMCM_CLKIN1_PERIOD {10.0} \
-CONFIG.MMCM_CLKIN2_PERIOD {10.0} \
-CONFIG.MMCM_CLKOUT0_DIVIDE_F {6.000} \
-CONFIG.MMCM_CLKOUT1_DIVIDE {12} \
-CONFIG.MMCM_COMPENSATION {ZHOLD} \
-CONFIG.MMCM_DIVCLK_DIVIDE {5} \
-CONFIG.NUM_OUT_CLKS {2} \
-CONFIG.PRIM_SOURCE {No_buffer} \
-CONFIG.RESET_PORT {resetn} \
-CONFIG.RESET_TYPE {ACTIVE_LOW} \
- ] $clk_wiz_1
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.MMCM_CLKIN1_PERIOD.VALUE_SRC {DEFAULT} \
-CONFIG.MMCM_CLKIN2_PERIOD.VALUE_SRC {DEFAULT} \
-CONFIG.MMCM_COMPENSATION.VALUE_SRC {DEFAULT} \
+  set clk_wiz_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_1 ]
+   set_property -dict [ list \
+   CONFIG.CLKOUT1_JITTER {220.112} \
+   CONFIG.CLKOUT1_PHASE_ERROR {300.046} \
+   CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {170.000} \
+   CONFIG.CLKOUT2_JITTER {242.325} \
+   CONFIG.CLKOUT2_PHASE_ERROR {300.046} \
+   CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {85.000} \
+   CONFIG.CLKOUT2_USED {true} \
+   CONFIG.MMCM_CLKFBOUT_MULT_F {51.000} \
+   CONFIG.MMCM_CLKIN1_PERIOD {10.000} \
+   CONFIG.MMCM_CLKIN2_PERIOD {10.000} \
+   CONFIG.MMCM_CLKOUT0_DIVIDE_F {6.000} \
+   CONFIG.MMCM_CLKOUT1_DIVIDE {12} \
+   CONFIG.MMCM_DIVCLK_DIVIDE {5} \
+   CONFIG.NUM_OUT_CLKS {2} \
+   CONFIG.PRIM_SOURCE {No_buffer} \
+   CONFIG.RESET_PORT {resetn} \
+   CONFIG.RESET_TYPE {ACTIVE_LOW} \
  ] $clk_wiz_1
 
   # Create instance: fpga_output_uart, and set properties
   set fpga_output_uart [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 fpga_output_uart ]
   set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
- ] $fpga_output_uart
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
+   CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
+   CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $fpga_output_uart
 
   # Create instance: fw_uart, and set properties
   set fw_uart [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 fw_uart ]
   set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
- ] $fw_uart
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
+   CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
+   CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $fw_uart
 
   # Create instance: intr_concact, and set properties
   set intr_concact [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 intr_concact ]
   set_property -dict [ list \
-CONFIG.NUM_PORTS {16} \
+   CONFIG.NUM_PORTS {16} \
  ] $intr_concact
 
   # Create instance: oem_uart, and set properties
   set oem_uart [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_uart16550:2.0 oem_uart ]
   set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
- ] $oem_uart
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
+   CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
+   CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $oem_uart
 
   # Create instance: pleora_uart, and set properties
@@ -1574,29 +1587,23 @@ CONFIG.C_EXTERNAL_XIN_CLK_HZ {25000000} \
 CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
  ] $pleora_uart
 
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
-CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
- ] $pleora_uart
-
   # Create instance: power_management, and set properties
   set power_management [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 power_management ]
   set_property -dict [ list \
-CONFIG.C_ALL_OUTPUTS {0} \
-CONFIG.C_ALL_OUTPUTS_2 {1} \
-CONFIG.C_GPIO2_WIDTH {5} \
-CONFIG.C_GPIO_WIDTH {8} \
-CONFIG.C_INTERRUPT_PRESENT {0} \
-CONFIG.C_IS_DUAL {1} \
-CONFIG.C_TRI_DEFAULT {0xFFFFF000} \
+   CONFIG.C_ALL_OUTPUTS {0} \
+   CONFIG.C_ALL_OUTPUTS_2 {1} \
+   CONFIG.C_GPIO2_WIDTH {5} \
+   CONFIG.C_GPIO_WIDTH {8} \
+   CONFIG.C_INTERRUPT_PRESENT {0} \
+   CONFIG.C_IS_DUAL {1} \
+   CONFIG.C_TRI_DEFAULT {0xFFFFF000} \
  ] $power_management
 
   # Create instance: proc_sys_reset_1, and set properties
   set proc_sys_reset_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_1 ]
   set_property -dict [ list \
-CONFIG.C_AUX_RESET_HIGH {1} \
-CONFIG.C_AUX_RST_WIDTH {1} \
+   CONFIG.C_AUX_RESET_HIGH {1} \
+   CONFIG.C_AUX_RST_WIDTH {1} \
  ] $proc_sys_reset_1
 
   # Create instance: vcc, and set properties
@@ -1605,38 +1612,28 @@ CONFIG.C_AUX_RST_WIDTH {1} \
   # Create instance: xadc_wiz_1, and set properties
   set xadc_wiz_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xadc_wiz:3.3 xadc_wiz_1 ]
   set_property -dict [ list \
-CONFIG.ADC_CONVERSION_RATE {1000} \
-CONFIG.CHANNEL_ENABLE_CALIBRATION {true} \
-CONFIG.CHANNEL_ENABLE_TEMPERATURE {true} \
-CONFIG.CHANNEL_ENABLE_VBRAM {true} \
-CONFIG.CHANNEL_ENABLE_VCCAUX {true} \
-CONFIG.CHANNEL_ENABLE_VCCINT {true} \
-CONFIG.CHANNEL_ENABLE_VP_VN {true} \
-CONFIG.CHANNEL_ENABLE_VREFN {true} \
-CONFIG.CHANNEL_ENABLE_VREFP {true} \
-CONFIG.DCLK_FREQUENCY {100} \
-CONFIG.ENABLE_EXTERNAL_MUX {true} \
-CONFIG.ENABLE_RESET {false} \
-CONFIG.ENABLE_TEMP_BUS {true} \
-CONFIG.INTERFACE_SELECTION {Enable_AXI} \
-CONFIG.SEQUENCER_MODE {Continuous} \
-CONFIG.XADC_STARUP_SELECTION {channel_sequencer} \
- ] $xadc_wiz_1
-
-  # Need to retain value_src of defaults
-  set_property -dict [ list \
-CONFIG.ADC_CONVERSION_RATE.VALUE_SRC {DEFAULT} \
-CONFIG.DCLK_FREQUENCY.VALUE_SRC {DEFAULT} \
-CONFIG.ENABLE_RESET.VALUE_SRC {DEFAULT} \
-CONFIG.INTERFACE_SELECTION.VALUE_SRC {DEFAULT} \
-CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
+   CONFIG.ADC_CONVERSION_RATE {1000} \
+   CONFIG.CHANNEL_ENABLE_CALIBRATION {true} \
+   CONFIG.CHANNEL_ENABLE_TEMPERATURE {true} \
+   CONFIG.CHANNEL_ENABLE_VBRAM {true} \
+   CONFIG.CHANNEL_ENABLE_VCCAUX {true} \
+   CONFIG.CHANNEL_ENABLE_VCCINT {true} \
+   CONFIG.CHANNEL_ENABLE_VP_VN {true} \
+   CONFIG.CHANNEL_ENABLE_VREFN {true} \
+   CONFIG.CHANNEL_ENABLE_VREFP {true} \
+   CONFIG.DCLK_FREQUENCY {100} \
+   CONFIG.ENABLE_EXTERNAL_MUX {true} \
+   CONFIG.ENABLE_RESET {false} \
+   CONFIG.ENABLE_TEMP_BUS {true} \
+   CONFIG.INTERFACE_SELECTION {Enable_AXI} \
+   CONFIG.SEQUENCER_MODE {Continuous} \
+   CONFIG.XADC_STARUP_SELECTION {channel_sequencer} \
  ] $xadc_wiz_1
 
   set_property -dict [ list \
 CONFIG.NUM_READ_OUTSTANDING {1} \
 CONFIG.NUM_WRITE_OUTSTANDING {1} \
  ] [get_bd_intf_pins /xadc_wiz_1/s_axi_lite]
-
   # Create interface connections
   connect_bd_intf_net -intf_net FlashReset_0_m_axi [get_bd_intf_pins FlashReset_0/m_axi] [get_bd_intf_pins axi_interconnect_0/S01_AXI]
   connect_bd_intf_net -intf_net MCU_M0_AXIS [get_bd_intf_ports M_AXIS_USART] [get_bd_intf_pins MCU/AXIS_USART_TX]
@@ -1808,270 +1805,11 @@ CONFIG.NUM_WRITE_OUTSTANDING {1} \
   create_bd_addr_seg -range 0x40000000 -offset 0x80000000 [get_bd_addr_spaces MIG_Calibration/axi_dm_buffer/Data_MM2S] [get_bd_addr_segs MIG_Calibration/CAL_DDR_MIG/memmap/memaddr] SEG_CAL_DDR_MIG_memaddr
   create_bd_addr_seg -range 0x40000000 -offset 0x80000000 [get_bd_addr_spaces MIG_Calibration/axi_dm_buffer/Data_S2MM] [get_bd_addr_segs MIG_Calibration/CAL_DDR_MIG/memmap/memaddr] SEG_CAL_DDR_MIG_memaddr
 
-  # Perform GUI Layout
-  regenerate_bd_layout -layout_string {
-   guistr: "# # String gsaved with Nlview 6.6.5b  2016-09-06 bk=1.3687 VDI=39 GEI=35 GUI=JA:1.6
-#  -string -flagsOSRD
-preplace port EXPTIME_CTRL -pg 1 -y 1160 -defaultsOSRD
-preplace port MUX_ADDR -pg 1 -y 1910 -defaultsOSRD
-preplace port clk_data -pg 1 -y 3060 -defaultsOSRD
-preplace port GPS_UART_txd -pg 1 -y 600 -defaultsOSRD
-preplace port vp_in -pg 1 -y 2910 -defaultsOSRD
-preplace port CLINK_UART_txd -pg 1 -y 960 -defaultsOSRD
-preplace port USB_UART -pg 1 -y 3130 -defaultsOSRD
-preplace port M_BUFFERING_CTRL -pg 1 -y 1140 -defaultsOSRD
-preplace port vn_in -pg 1 -y 2890 -defaultsOSRD
-preplace port BUTTON -pg 1 -y 1390 -defaultsOSRD
-preplace port CLINK_UART_rxd -pg 1 -y 940 -defaultsOSRD
-preplace port S_AXIS_S2MM_BUF -pg 1 -y 2250 -defaultsOSRD
-preplace port M_AXIS_CALDDR_MM2S -pg 1 -y 2280 -defaultsOSRD
-preplace port S_AXIS_USART -pg 1 -y 1980 -defaultsOSRD
-preplace port M_FRAME_BUFFER_CTRL -pg 1 -y 1870 -defaultsOSRD
-preplace port CALIBCONFIG_AXI -pg 1 -y 1370 -defaultsOSRD
-preplace port TRIGGER_CTRL -pg 1 -y 1960 -defaultsOSRD
-preplace port clk_mb -pg 1 -y 3220 -defaultsOSRD
-preplace port FPGA_UART_rxd -pg 1 -y 1080 -defaultsOSRD
-preplace port clk_irig -pg 1 -y 3450 -defaultsOSRD
-preplace port LENS_UART_SIN -pg 1 -y 20 -defaultsOSRD
-preplace port clk_cal -pg 1 -y 2710 -defaultsOSRD
-preplace port POWER_GPIO -pg 1 -y 1890 -defaultsOSRD
-preplace port AEC_CTRL -pg 1 -y 1100 -defaultsOSRD
-preplace port GPS_UART_rxd -pg 1 -y 510 -defaultsOSRD
-preplace port SYS_CLK_0 -pg 1 -y 2520 -defaultsOSRD
-preplace port clk_mgt_init -pg 1 -y 3430 -defaultsOSRD
-preplace port SYS_CLK_1 -pg 1 -y 2190 -defaultsOSRD
-preplace port S_AXIS_S2MM_CMD_BUF -pg 1 -y 2270 -defaultsOSRD
-preplace port M_BULK_AXI -pg 1 -y 1240 -defaultsOSRD
-preplace port REV_GPIO -pg 1 -y 240 -defaultsOSRD
-preplace port CODE_DDR -pg 1 -y 2570 -defaultsOSRD
-preplace port MGT_CTRL -pg 1 -y 1450 -defaultsOSRD
-preplace port M_AXIS_MM2S_BUF -pg 1 -y 2320 -defaultsOSRD
-preplace port FAN_CTRL -pg 1 -y 1200 -defaultsOSRD
-preplace port clk_200 -pg 1 -y 3410 -defaultsOSRD
-preplace port CALIB_RAM_AXI -pg 1 -y 510 -defaultsOSRD
-preplace port SFW_CTRL -pg 1 -y 2010 -defaultsOSRD
-preplace port CAL_DDR -pg 1 -y 2260 -defaultsOSRD
-preplace port OEM_UART_txd -pg 1 -y 1750 -defaultsOSRD
-preplace port PLEORA_UART_SOUT -pg 1 -y 1580 -defaultsOSRD
-preplace port RQC_LUT_AXI -pg 1 -y 2070 -defaultsOSRD
-preplace port NDF_UART_rxd -pg 1 -y 1510 -defaultsOSRD
-preplace port S_AXIS_CALDDR_MM2S_CMD -pg 1 -y 2210 -defaultsOSRD
-preplace port M_AXIS_S2MM_STS_BUF -pg 1 -y 2360 -defaultsOSRD
-preplace port AEC_INTC -pg 1 -y 1540 -defaultsOSRD
-preplace port OEM_UART_rxd -pg 1 -y 1930 -defaultsOSRD
-preplace port M_BUF_TABLE -pg 1 -y 1180 -defaultsOSRD
-preplace port FPGA_UART_txd -pg 1 -y 1120 -defaultsOSRD
-preplace port M_AXIS_MM2S_STS_BUF -pg 1 -y 2240 -defaultsOSRD
-preplace port M_AXIS_USART -pg 1 -y 2050 -defaultsOSRD
-preplace port S_AXIS_MM2S_CMD_BUF -pg 1 -y 2230 -defaultsOSRD
-preplace port NLC_LUT_AXI -pg 1 -y 2340 -defaultsOSRD
-preplace port M_ICU_AXI -pg 1 -y 1410 -defaultsOSRD
-preplace port FPA_CTRL -pg 1 -y 1220 -defaultsOSRD
-preplace port IRIG_CTRL -pg 1 -y 1430 -defaultsOSRD
-preplace port LED_GPIO -pg 1 -y 220 -defaultsOSRD
-preplace port LENS_UART_SOUT -pg 1 -y 110 -defaultsOSRD
-preplace port ADC_READOUT_CTRL -pg 1 -y 490 -defaultsOSRD
-preplace port M_AXIS_CALDDR_MM2S_STS -pg 1 -y 2300 -defaultsOSRD
-preplace port NDF_UART_txd -pg 1 -y 1540 -defaultsOSRD
-preplace port M_FLASHINTF_AXI -pg 1 -y 1280 -defaultsOSRD
-preplace port QSPI -pg 1 -y 3280 -defaultsOSRD
-preplace port M_EHDRI_CTRL -pg 1 -y 1260 -defaultsOSRD
-preplace port FW_UART_txd -pg 1 -y 1490 -defaultsOSRD
-preplace port FW_UART_rxd -pg 1 -y 1460 -defaultsOSRD
-preplace port HEADER_CTRL -pg 1 -y 1390 -defaultsOSRD
-preplace port PLEORA_UART_SIN -pg 1 -y 1870 -defaultsOSRD
-preplace portBus bulk_interrupt -pg 1 -y 1580 -defaultsOSRD
-preplace portBus ARESETN -pg 1 -y 470 -defaultsOSRD
-preplace inst MCU -pg 1 -lvl 3 -y 2062 -defaultsOSRD
-preplace inst FlashReset_0 -pg 1 -lvl 3 -y 1420 -defaultsOSRD
-preplace inst MIG_Calibration|axis_dwidth_converter_0 -pg 1 -lvl 4 -y 1532 -defaultsOSRD
-preplace inst vcc -pg 1 -lvl 1 -y 2340 -defaultsOSRD
-preplace inst intr_concact -pg 1 -lvl 2 -y 1610 -defaultsOSRD
-preplace inst MIG_Calibration|axi_datamover_ddrcal -pg 1 -lvl 2 -y 1622 -defaultsOSRD
-preplace inst axi_lens_uart -pg 1 -lvl 5 -y -488 -defaultsOSRD
-preplace inst MIG_Calibration -pg 1 -lvl 5 -y 1552 -defaultsOSRD
-preplace inst GND -pg 1 -lvl 1 -y 2430 -defaultsOSRD
-preplace inst MIG_Calibration|axi_interconnect_ddrcal -pg 1 -lvl 3 -y 1942 -defaultsOSRD
-preplace inst xadc_wiz_1 -pg 1 -lvl 5 -y 5404 -defaultsOSRD
-preplace inst axi_ndf_uart -pg 1 -lvl 5 -y 512 -defaultsOSRD
-preplace inst oem_uart -pg 1 -lvl 5 -y 792 -defaultsOSRD
-preplace inst axi_timer_0 -pg 1 -lvl 5 -y -208 -defaultsOSRD
-preplace inst axi_peripheral -pg 1 -lvl 4 -y 1404 -defaultsOSRD
-preplace inst axi_gpio_0 -pg 1 -lvl 5 -y -358 -defaultsOSRD
-preplace inst proc_sys_reset_1 -pg 1 -lvl 2 -y 2360 -defaultsOSRD
-preplace inst axi_gps_uart -pg 1 -lvl 5 -y -48 -defaultsOSRD
-preplace inst fw_uart -pg 1 -lvl 5 -y 372 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_0 -pg 1 -lvl 4 -y 1812 -defaultsOSRD
-preplace inst MIG_Calibration|axi_dm_buffer -pg 1 -lvl 2 -y 1872 -defaultsOSRD
-preplace inst fpga_output_uart -pg 1 -lvl 5 -y 232 -defaultsOSRD
-preplace inst axi_usb_uart -pg 1 -lvl 5 -y 5646 -defaultsOSRD
-preplace inst MIG_Code -pg 1 -lvl 5 -y 5118 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_1 -pg 1 -lvl 1 -y 1922 -defaultsOSRD
-preplace inst axi_interconnect_0 -pg 1 -lvl 3 -y 1150 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_2 -pg 1 -lvl 4 -y 1972 -defaultsOSRD
-preplace inst clink_uart -pg 1 -lvl 5 -y 92 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_3 -pg 1 -lvl 1 -y 1712 -defaultsOSRD
-preplace inst MIG_Calibration|CAL_DDR_MIG -pg 1 -lvl 4 -y 2272 -defaultsOSRD
-preplace inst pleora_uart -pg 1 -lvl 5 -y 652 -defaultsOSRD
-preplace inst clk_wiz_1 -pg 1 -lvl 4 -y 10516 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_4 -pg 1 -lvl 3 -y 1482 -defaultsOSRD
-preplace inst power_management -pg 1 -lvl 5 -y 922 -defaultsOSRD
-preplace inst axi_quad_spi_0 -pg 1 -lvl 5 -y 5806 -defaultsOSRD
-preplace netloc axi_peripheral_M04_AXI1 1 4 2 2830J 1120 10180J
-preplace netloc S_AXIS_MM2S_CMD_1 1 0 5 NJ 2210 NJ 2210 NJ 2210 NJ 2210 3150J
-preplace netloc S00_AXI_2 1 2 3 540 970 NJ 970 2690
-preplace netloc axi_ndf_uart_sout 1 5 1 10190
-preplace netloc mig_7series_0_DDR3 1 5 1 9930J
-preplace netloc S_AXIS_MM2S_CMD_2 1 0 5 NJ 2230 NJ 2230 NJ 2230 NJ 2230 3160J
-preplace netloc axi_quad_spi_0_ip2intc_irpt 1 1 5 0 5826 NJ 5826 NJ 5826 3130J 1310 9910
-preplace netloc microblaze_1_Clk 1 2 4 550 3220 1020 3220 2990 3220 9920J
-preplace netloc MIG_Calibration|axis_clock_converter_2_M_AXIS 1 4 1 9713
-preplace netloc mig_7series_0_DDR4 1 5 1 10010J
-preplace netloc axi_peripheral_M_LENS_UART_AXI 1 4 1 2780
-preplace netloc axi_peripheral_M14_AXI1 1 4 1 2800
-preplace netloc axi_timer_0_interrupt 1 1 5 40 -178 NJ -178 NJ -178 2910J 1130 10030
-preplace netloc MIG_Calibration|S_AXI_1 1 0 3 NJ 1822 8553J 1722 8953
-preplace netloc MIG_Calibration|ARESETN_1 1 0 3 NJ 2112 NJ 2112 9023
-preplace netloc axi_quad_spi_0_SPI_0 1 5 1 10280J
-preplace netloc axi_peripheral_M_COOLER_UART 1 4 1 2760
-preplace netloc MIG_Code_mmcm_locked 1 3 3 1030 4990 NJ 4990 9880
-preplace netloc clk_wiz_2_locked 1 1 4 120 3910 NJ 3910 NJ 3910 2690
-preplace netloc MIG_Code_clk20 1 5 1 10210
-preplace netloc cooler_uart_ip2intc_irpt 1 1 5 10 1920 NJ 1920 NJ 1920 3090J 1230 9930
-preplace netloc clink_uart_sout 1 5 1 10240
-preplace netloc OEM_UART_rxd_1 1 0 6 -260J 782 NJ 782 NJ 782 NJ 782 2980J 1300 9960
-preplace netloc MIG_Calibration|ACLK_1 1 0 3 NJ 2092 NJ 2092 8953
-preplace netloc power_management_GPIO2 1 5 1 10100J
-preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 70 1910 NJ 1910 NJ 1910 3100J 1290 10040
-preplace netloc axi_gpio_0_gpio 1 5 1 10270J
-preplace netloc axi_protocol_converter_8_m_axi 1 4 2 2910J 2410 10270J
-preplace netloc MIG_Calibration_M_AXIS_MM2S 1 5 1 9970J
-preplace netloc axi_protocol_converter_2_m_axi 1 4 2 2880J 1150 10160J
-preplace netloc MIG_Calibration|proc_sys_reset_1_interconnect_aresetn 1 0 4 8303 2312 8583 2312 8993 2312 9313
-preplace netloc axi_peripheral_m_pleora_axi 1 4 1 2890
-preplace netloc axi_peripheral_M09_AXI 1 4 2 2730J 1020 10110J
-preplace netloc axi_interconnect_0_M00_AXI1 1 3 2 990J 5776 NJ
-preplace netloc xadc_wiz_1_temp_out 1 4 2 3230 5240 9880
-preplace netloc vn_in_1 1 0 5 -270J 5394 NJ 5394 NJ 5394 NJ 5394 NJ
-preplace netloc vp_in_1 1 0 5 -280J 5414 NJ 5414 NJ 5414 NJ 5414 NJ
-preplace netloc MIG_Calibration|CAL_DDR_MIG_DDR3 1 4 1 N
-preplace netloc axi_peripheral_M06_AXI 1 4 2 3030J 1330 10090J
-preplace netloc axi_interconnect_1_m12_axi 1 4 1 2840
-preplace netloc MIG_Calibration|axi_dm_buffer_M_AXI_MM2S 1 2 1 8973
-preplace netloc axi_peripheral_M_BULK_AXI 1 4 2 2860J 1140 10150J
-preplace netloc axi_gpio_0_GPIO2 1 5 1 10260J
-preplace netloc S_AXIS_S2MM_CMD_2 1 0 5 NJ 2270 NJ 2270 NJ 2270 NJ 2270 3180J
-preplace netloc vcc_const 1 1 1 NJ
-preplace netloc S01_AXI_1 1 3 2 NJ 2072 2700J
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS1 1 5 1 9960J
-preplace netloc mcu_debug_sys_rst 1 1 3 120 2260 NJ 2260 950
-preplace netloc proc_sys_reset_1_bus_struct_reset 1 2 1 510
-preplace netloc MIG_Calibration|axis_clock_converter_0_M_AXIS 1 3 2 9343 1652 9703
-preplace netloc axi_peripheral_M05_AXI1 1 4 2 2930J 1260 NJ
-preplace netloc NDF_UART_rxd_1 1 0 6 -250J 1320 NJ 1320 NJ 1320 980J 1860 2970J 1070 9890
-preplace netloc axi_usb_uart_ip2intc_irpt 1 1 5 30 3900 NJ 3900 NJ 3900 NJ 3900 9900
-preplace netloc fw_uart_sout 1 5 1 10210
-preplace netloc axi_usb_uart_uart 1 5 1 10130J
-preplace netloc axi_peripheral_m_usbuart_axi 1 4 1 2740
-preplace netloc axi_peripheral_M_FLASHRESET_AXI 1 2 3 520 930 NJ 930 2720
-preplace netloc axi_peripheral_M_FLASHINTF_AXI 1 4 2 2960J 1280 NJ
-preplace netloc axi_interconnect_0_m00_axi 1 4 1 2870
-preplace netloc proc_sys_reset_1_mb_reset 1 2 1 530
-preplace netloc axi_ndf_uart1_ip2intc_irpt 1 1 5 20 -458 NJ -458 NJ -458 3090J 1050 10010
-preplace netloc AEC_INTC_1 1 0 2 NJ 1540 NJ
-preplace netloc MIG_Calibration|Conn10 1 2 3 8983 1702 NJ 1702 NJ
-preplace netloc axi_interconnect_1_m02_axi 1 4 1 2740
-preplace netloc MIG_Calibration|Conn11 1 2 3 8963 1722 NJ 1722 NJ
-preplace netloc axi_peripheral_M15_AXI 1 4 2 3040J 1360 10080J
-preplace netloc SYS_CLK_1 1 0 5 NJ 2190 NJ 2190 NJ 2190 NJ 2190 3140J
-preplace netloc MIG_Calibration_M_AXIS_MM2S1 1 5 1 9940J
-preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 3 NJ 2380 970 2380 3220
-preplace netloc oem_uart_sout 1 5 1 10140
-preplace netloc MIG_Calibration|S02_ACLK_1 1 0 4 8293 2162 8593 2162 NJ 2162 9333J
-preplace netloc axi_peripheral_M_CALIB_RAM_AXI 1 4 2 2860J 1180 10090J
-preplace netloc S_AXIS_S2MM_2 1 0 5 NJ 2250 NJ 2250 NJ 2250 NJ 2250 3170J
-preplace netloc sin_1 1 0 6 NJ 510 NJ 510 NJ 510 NJ 510 2880J 1010 9940
-preplace netloc MIG_Calibration|axis_clock_converter_1_M_AXIS 1 1 1 8573
-preplace netloc MIG_Calibration|axi_dm_buffer_M_AXI_S2MM 1 2 1 N
-preplace netloc MCU_Interrupt 1 1 3 100 2200 NJ 2200 940
-preplace netloc fpga_output_uart_sout 1 5 1 10230
-preplace netloc sin_2 1 0 6 NJ 1870 NJ 1870 NJ 1870 NJ 1870 3080J 1270 9970
-preplace netloc axi_peripheral_M_FW_UART_AXI 1 4 1 2850
-preplace netloc fw_uart_ip2intc_irpt 1 1 5 60 1850 NJ 1850 NJ 1850 3020J 1210 9950
-preplace netloc CLINK_UART_rxd_1 1 0 6 NJ 940 NJ 940 NJ 940 NJ 940 2790J 1110 9980
-preplace netloc MIG_Calibration|SYS_CLK_1 1 0 4 8273J 2252 NJ 2252 NJ 2252 N
-preplace netloc MIG_Calibration|m_axi_mm2s_aclk_1 1 0 4 8283 1522 NJ 1522 9023 1582 9333
-preplace netloc ext_reset_in_1 1 1 4 -10 5188 NJ 5188 NJ 5188 3210
-preplace netloc axi_lens_uart_sout 1 5 1 10280J
-preplace netloc axi_peripheral_M_AXI 1 4 2 2770 1080 10050J
-preplace netloc S0_AXIS_1 1 0 3 -270J 1982 NJ 1982 NJ
-preplace netloc LENS_UART_SIN_1 1 0 6 NJ 20 NJ 20 NJ 20 NJ 20 3020J 1000 9990
-preplace netloc MIG_Calibration|axi_datamover_0_M_AXI_MM2S 1 2 1 9003
-preplace netloc MIG_Calibration|S_AXIS_CAL_MM2S_CMD_1 1 0 1 N
-preplace netloc power_management_GPIO 1 5 1 10120J
-preplace netloc MCU_M0_AXIS 1 3 3 1000J 2010 3120J 1340 10000J
-preplace netloc clink_uart_ip2intc_irpt 1 1 5 50 122 NJ 122 NJ 122 3010J 1170 10000
-preplace netloc RQC_LUT_AXI 1 4 2 2930J 2390 10260J
-preplace netloc MIG_Calibration|axi_datamover_ddrcal_M_AXIS_MM2S 1 2 2 N 1632 9323J
-preplace netloc FlashReset_0_ip2intc_irpt 1 1 3 90 1310 NJ 1310 940
-preplace netloc axi_gps_uart_sout 1 5 1 10250J
-preplace netloc mcu_m_axi_dp 1 3 1 960
-preplace netloc axi_peripheral_M05_AXI 1 4 2 3060J 1350 10060J
-preplace netloc SYS_CLK_0_1 1 0 5 -250J 5048 NJ 5048 NJ 5048 NJ 5048 NJ
-preplace netloc axi_uart16550_0_ip2intc_irpt 1 1 5 90 1840 NJ 1840 NJ 1840 3010J 1190 10020
-preplace netloc axi_protocol_converter_4_m_axi 1 4 2 2850J 2400 10220J
-preplace netloc axi_peripheral_m_fpgaout_axi 1 4 1 2820
-preplace netloc FlashReset_0_m_axi 1 2 2 550 1000 950
-preplace netloc MIG_Calibration|axi_dm_buffer_M_AXIS_MM2S 1 2 2 8963 2152 9303J
-preplace netloc MIG_Calibration|axi_datamover_ddrcal_M_AXIS_MM2S_STS 1 2 1 8983
-preplace netloc s_axi1_1 1 2 3 530 960 NJ 960 2700
-preplace netloc axi_protocol_converter_3_m_axi 1 4 2 2830J 1090 10220J
-preplace netloc FW_UART_rxd_1 1 0 6 -270J 362 NJ 362 NJ 362 NJ 362 2860J 1060 9900
-preplace netloc pleora_uart_sout 1 5 1 10170J
-preplace netloc MIG_Calibration|axis_clock_converter_3_M_AXIS 1 1 1 8533
-preplace netloc MIG_Calibration_M_AXIS_S2MM_STS1 1 5 1 9920J
-preplace netloc oem_uart_ip2intc_irpt 1 1 5 120 1900 NJ 1900 NJ 1900 3070J 1240 9910
-preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 110 1880 NJ 1880 NJ 1880 3110J 1320 9890
-preplace netloc microblaze_1_xlconcat_dout 1 2 1 490
-preplace netloc axi_peripheral_M03_AXI 1 4 2 2770J 1100 10200J
-preplace netloc FPGA_UART_rxd_1 1 0 6 -280J 222 NJ 222 NJ 222 NJ 222 2970J 990 9880
-preplace netloc MIG_Calibration|S_AXIS_S2MM_BUF_1 1 0 1 8263
-preplace netloc clk_wiz_1_clk_out1 1 3 3 1030 2020 3190 10496 10070J
-preplace netloc MIG_Calibration|sys_rst_1 1 0 4 NJ 2292 NJ 2292 NJ 2292 N
-preplace netloc MIG_Calibration|CAL_DDR_MIG_ui_clk 1 0 5 8313 2032 8543 2032 9013 1732 9293 2062 9703
-preplace netloc axi_protocol_converter_1_m_axi 1 4 2 3050J 1370 10070J
-preplace netloc axi_peripheral_M04_AXI 1 4 2 2910J 1200 NJ
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS 1 5 1 9950J
-preplace netloc clk_wiz_1_clk_out2 1 4 2 3200 10536 10230J
-preplace netloc proc_sys_reset_1_peripheral_aresetn 1 2 4 500 2400 1010 2400 2810 1030 10050J
-preplace netloc MIG_Calibration|axis_dwidth_converter_0_M_AXIS 1 4 1 9703
-preplace netloc MIG_Calibration|axi_interconnect_ddrcal_M00_AXI 1 3 1 9283
-preplace netloc MIG_Calibration|axis_clock_converter_4_M_AXIS 1 3 2 9333J 1412 9713
-preplace netloc MIG_Calibration|device_temp_i_1 1 0 4 NJ 2272 NJ 2272 NJ 2272 N
-preplace netloc axi_peripheral_M08_AXI 1 4 1 2920
-preplace netloc axi_interconnect_1_m00_axi 1 4 1 2720
-preplace netloc MIG_Code_clk200 1 5 1 10170
-preplace netloc BUTTON_1 1 0 3 NJ 1390 NJ 1390 N
-preplace netloc MIG_Calibration|Conn7 1 0 2 8293J 1812 N
-preplace netloc axi_protocol_converter_0_m_axi 1 4 2 2940J 1220 NJ
-preplace netloc axi_peripheral_M_DDRMIG_AXI 1 4 1 2950
-preplace netloc clk_wiz_0_clk_out3 1 1 5 110 4980 NJ 4980 NJ 4980 2840 4980 10190J
-preplace netloc bulk_interrupt_1 1 0 2 NJ 1580 NJ
-preplace netloc pleora_uart_ip2intc_irpt 1 1 5 80 682 NJ 682 NJ 682 3000J 1250 9920
-preplace netloc MIG_Calibration|Conn8 1 0 2 NJ 1802 8563
-preplace netloc s_axi_1 1 2 3 510 950 NJ 950 2710
-preplace netloc axi_protocol_converter_7_m_axi 1 4 2 2860J 1160 10130J
-preplace netloc axi_peripheral_M_ADC_READOUT_AXI 1 4 2 2750J 1040 10060J
-preplace netloc axi_interconnect_1_m01_axi 1 4 1 2900
-preplace netloc S00_AXI_1 1 3 2 NJ 2032 2760J
-levelinfo -pg 1 -300 -70 330 800 2500 8553 10320 -top -560 -bot 11330
-levelinfo -hier MIG_Calibration * 8423 8773 9153 9533 *
-",
-}
 
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
 }
 # End of create_root_design()

@@ -27,26 +27,26 @@ use work.img_header_define.all;
 use work.tel2000.all;   
 
 entity mockfpa_data_gen is
-	port(
+   port(
       ARESET           : in std_logic;
       CLK100           : in std_logic;
       CLK200           : in std_logic;
-	  ACQ_INT          : in std_logic;
+      ACQ_TRIG          : in std_logic;
       FPA_INTF_CFG     : in fpa_intf_cfg_type;
       IMAGE_INFO       : out img_info_type;
-	  HDER_MISO 	   : in t_axi4_lite_miso;
-	  HDER_MOSI 	   : out t_axi4_lite_mosi;
-	  FPA_HDER_CLK     : out STD_LOGIC;
-	  DOUT_MISO        : in t_axi4_stream_miso;
-	  DOUT_MOSI        : out t_axi4_stream_mosi128;
-	  DOUT_CLK         : out STD_LOGIC
+      HDER_MISO 	   : in t_axi4_lite_miso;
+      HDER_MOSI 	   : out t_axi4_lite_mosi;
+      FPA_HDER_CLK     : out STD_LOGIC;
+      DOUT_MISO        : in t_axi4_stream_miso;
+      DOUT_MOSI        : out t_axi4_stream_mosi128;
+      DOUT_CLK         : out STD_LOGIC
      );     
 end mockfpa_data_gen;
 
 architecture rtl of mockfpa_data_gen is
 
-constant HDER_PAUSE : natural := 40;
-constant PIX_DELAY : natural := 40;
+constant EXP_DVAL_PAUSE : natural := 6;
+constant PIX_DELAY : natural := 16;
 constant DVAL_PAUSE : natural := 3; -- Debit moyen inter ligne ajusté a 16/19*340MP/s =  286 MP/s (plus grand que 280 pour être conservateur)
 constant LVAL_PAUSE : natural := 25; -- Debit moyen inter frame : 115/(115+480)*340 =  274 MP/s (conservateur pcq plus grand que 91*1920*1536/1E6=268MP/s), Pause par ligne = (1920/64)*3+25=115clks, Nb clk de transfert de pixel = 1920/4 = 480. 
 constant FISRT_TRANSACTION_VALUE : std_logic_vector := x"00080007000600050004000300020001";
@@ -69,14 +69,16 @@ constant FISRT_TRANSACTION_VALUE : std_logic_vector := x"00080007000600050004000
          );
    end component;
 
-type fast_hder_sm_type is (idle, delay_st, send_hder_st, wait_acq_hder_st);
+type fast_hder_sm_type is (idle, delay_st, exp_info_dval_st, send_hder_st, wait_acq_hder_st);
 type pix_sm_type is (idle, delay_st, int_st, send_pix_st );
 
 signal clk               :  std_logic;
 signal sreset            : std_logic;
 signal fpa_int_cfg_i     : fpa_intf_cfg_type;
-signal acq_int_sync      : std_logic;
-signal acq_int_sync_last : std_logic;
+signal acq_trig_sync     : std_logic;
+signal acq_int_i         : std_logic;
+signal acq_int_last      : std_logic;
+signal acq_trig_sync_last : std_logic;
 signal acq_hder          : std_logic;
 signal hder_link_rdy     : std_logic;
 signal frame_id          : unsigned(31 downto 0) := to_unsigned(0, 32);
@@ -84,7 +86,7 @@ signal fast_hder_sm      : fast_hder_sm_type;
 signal hder_mosi_i       : t_axi4_lite_mosi;
 signal hcnt              : unsigned(7 downto 0);
 signal hder_param        : hder_param_type;
-signal hpause_cnt        : unsigned(7 downto 0);
+signal exp_dval_pause_cnt        : unsigned(7 downto 0);
 signal image_info_i      : img_info_type;
 signal pix_sm            : pix_sm_type;
 signal dout_mosi_i       : t_axi4_stream_mosi128;
@@ -93,12 +95,13 @@ signal int_cnt           : unsigned(31 downto 0);
 signal rowpix_cnt        : unsigned(11 downto 0);
 signal line_cnt          : unsigned(11 downto 0);
 signal dval_pause_cnt    : unsigned(7 downto 0);
-signal lval_pause_cnt    : unsigned(7 downto 0);
+signal lval_pause_cnt    : unsigned(7 downto 0);  
+signal pause_cnt         : unsigned(7 downto 0); 
+
 signal dval              : std_logic;  
 signal pixel_index       : unsigned(15 downto 0);
 
 begin
-
     -- IO Mapping
     HDER_MOSI <= hder_mosi_i;
     IMAGE_INFO <= image_info_i;
@@ -106,6 +109,8 @@ begin
     fpa_int_cfg_i <= FPA_INTF_CFG;
     -- Handshake
     hder_link_rdy <= HDER_MISO.WREADY and HDER_MISO.AWREADY;
+
+    image_info_i.exp_feedbk <= acq_int_i;
 
     -- Clocks
     clk <= clk100;
@@ -126,8 +131,8 @@ begin
    U0B: double_sync
    port map(
       CLK => CLK,
-      D   => ACQ_INT,
-      Q   => acq_int_sync,
+      D   => ACQ_TRIG,
+      Q   => acq_trig_sync,
       RESET => sreset
       );
 
@@ -150,15 +155,15 @@ begin
             hder_mosi_i.bready <= '1';
             hder_mosi_i.rready <= '0';
             hder_mosi_i.arprot <= (others => '0');
-            acq_int_sync_last <= '0';
-            image_info_i.exp_feedbk <= '0';
+            
             image_info_i.exp_info.exp_dval <= '0';
 
+
+            acq_int_last <= '0';
          else
-            -- Integration signal
-            acq_int_sync_last <= acq_int_sync;
-            acq_hder <= not acq_int_sync_last and acq_int_sync;
-            
+
+            acq_int_last <= acq_int_i; 
+
             -- construction des données hder fast
 			hder_param.exp_time <= fpa_int_cfg_i.int_time; 
             hder_param.frame_id <= unsigned(frame_id);
@@ -180,25 +185,35 @@ begin
             case fast_hder_sm is
                 when idle =>
                     hcnt <= to_unsigned(1, hcnt'length);
-                    hpause_cnt <= (others => '0');
-                    image_info_i.exp_feedbk <= '0';
+                    exp_dval_pause_cnt <= (others => '0');	
                     image_info_i.exp_info.exp_dval <= '0';
                     
-                    if acq_hder = '1' then
+                    if acq_int_last = '0' and acq_int_i = '1' then
                        frame_id <= frame_id + 1;
                        fast_hder_sm <= delay_st;                     
                     end if;
 
                 when delay_st =>
-                    hpause_cnt <= hpause_cnt + 1;
-                    if hpause_cnt = HDER_PAUSE then
-                        fast_hder_sm <= send_hder_st;
+                    exp_dval_pause_cnt <= exp_dval_pause_cnt + 1;
+                    if exp_dval_pause_cnt = EXP_DVAL_PAUSE then
+                        pause_cnt <= (others => '0');
+                        fast_hder_sm <= exp_info_dval_st;
                     end if;
 
+                when exp_info_dval_st =>
+                  pause_cnt <= pause_cnt + 1;
+                  if pause_cnt = 4 then  
+                     image_info_i.exp_info.exp_dval <= '1';
+                  end if;
+                  if pause_cnt = 12 then                         -- ainsi dispatch_info_i.exp_info.exp_dval durera au moins 12-4 = 8 CLK
+                     image_info_i.exp_info.exp_dval <= '0';
+ 
+                     fast_hder_sm <= send_hder_st;
+                  end if;
+ 
                 when send_hder_st =>
-                    image_info_i.exp_feedbk <= '1';
-                    image_info_i.exp_info.exp_dval <= '1';
-    
+
+
                     if hder_link_rdy = '1' then                         
                         if hcnt = 1 then -- frame_id 
                             hder_mosi_i.awaddr <= x"0000" &  std_logic_vector(hder_param.frame_id(7 downto 0)) &  std_logic_vector(resize(FrameIDAdd32, 8));--
@@ -256,18 +271,24 @@ begin
    begin          
       if rising_edge(CLK) then         
          if sreset = '1' then
-			dout_mosi_i.TDATA  <= FISRT_TRANSACTION_VALUE; 
+            dout_mosi_i.TDATA  <= FISRT_TRANSACTION_VALUE; 
             pix_sm <= idle;
             dval <= '0';
             dout_mosi_i.TLAST <= '0';
-			pix_delay_cnt <= (others => '0'); 
-			int_cnt <= to_unsigned(1, int_cnt'length);	
-			line_cnt <= to_unsigned(1, line_cnt'length); 
-			rowpix_cnt     <= to_unsigned(8, rowpix_cnt'length); 
-			lval_pause_cnt <= (others => '0'); 
-			pixel_index    <= to_unsigned(8,pixel_index'length);
+            pix_delay_cnt <= (others => '0'); 
+            int_cnt <= to_unsigned(1, int_cnt'length);	
+            line_cnt <= to_unsigned(1, line_cnt'length); 
+            rowpix_cnt     <= to_unsigned(8, rowpix_cnt'length); 
+            lval_pause_cnt <= (others => '0'); 
+            pixel_index    <= to_unsigned(8,pixel_index'length); 
+            acq_trig_sync_last <= '0';	
+            acq_int_i <= '0';	
          else
          
+             -- Integration signal
+            acq_trig_sync_last <= acq_trig_sync;
+            acq_hder <= not acq_trig_sync_last and acq_trig_sync;
+ 
             case pix_sm is
               when idle =>
                 pix_delay_cnt  <= (others => '0');
@@ -276,37 +297,40 @@ begin
                 rowpix_cnt     <= to_unsigned(8, rowpix_cnt'length);
                 lval_pause_cnt <= (others => '0');
                 pixel_index    <= to_unsigned(8,pixel_index'length); 
-				dout_mosi_i.TDATA  <= FISRT_TRANSACTION_VALUE; 
+                dout_mosi_i.TDATA  <= FISRT_TRANSACTION_VALUE; 
+                acq_int_i <= '0';
+
                 if acq_hder = '1' then
                    pix_sm <= delay_st;                     
                 end if;
 
               when delay_st => 
-			  
+ 
                 pix_delay_cnt <= pix_delay_cnt + 1;
                 if pix_delay_cnt = PIX_DELAY then
                     pix_sm <= int_st;
                 end if;
                 
               when int_st =>
-                int_cnt <= int_cnt + 1;
-                --if int_cnt = (hder_param.exp_time sll 1) then
-					if int_cnt = hder_param.exp_time then
+                 acq_int_i <= '1';
+                 int_cnt <= int_cnt + 1;
+                 if int_cnt = hder_param.exp_time then
                     pix_sm <= send_pix_st;
+                    acq_int_i <= '0';
                     dval <= '1';
                 end if;
 
               when send_pix_st =>
-			  if DOUT_MISO.TREADY = '1' then
-			        dout_mosi_i.TDATA(15 downto 0)    <= std_logic_vector(pixel_index + 1);
+                 if DOUT_MISO.TREADY = '1' then
+                    dout_mosi_i.TDATA(15 downto 0)    <= std_logic_vector(pixel_index + 1);
                     dout_mosi_i.TDATA(31 downto 16)   <= std_logic_vector(pixel_index + 2);
                     dout_mosi_i.TDATA(47 downto 32)   <= std_logic_vector(pixel_index + 3);
                     dout_mosi_i.TDATA(63 downto 48)   <= std_logic_vector(pixel_index + 4);
-					dout_mosi_i.TDATA(79 downto 64)   <= std_logic_vector(pixel_index + 5);
+                    dout_mosi_i.TDATA(79 downto 64)   <= std_logic_vector(pixel_index + 5);
                     dout_mosi_i.TDATA(95 downto 80)   <= std_logic_vector(pixel_index + 6);
                     dout_mosi_i.TDATA(111 downto 96)  <= std_logic_vector(pixel_index + 7);
                     dout_mosi_i.TDATA(127 downto 112) <= std_logic_vector(pixel_index + 8);
-				    pixel_index <= pixel_index + 8;
+                    pixel_index <= pixel_index + 8;
                     -- EOF
                     if (line_cnt = image_info_i.height and rowpix_cnt = image_info_i.width) then
                         pix_sm <= idle;									  
@@ -317,8 +341,8 @@ begin
                     elsif rowpix_cnt = image_info_i.width then
                         rowpix_cnt <= to_unsigned(8, rowpix_cnt'length);
                         line_cnt <= line_cnt + 1;
-						dval <= '1'; 
-						
+                        dval <= '1'; 
+
 
                     else
                         rowpix_cnt <= rowpix_cnt + 8;

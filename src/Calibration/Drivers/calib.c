@@ -35,33 +35,33 @@
 
 
 // ADRESSES
-#define AW_BLOCK_SEL_MODE  0x20
-#define AW_BLOCK_IDX_ADDR  0x24
-#define AW_BLOCK_CFG_DONE  0x28
-#define AW_BLOCK_OFFSET    0x2C
+#define AW_BLOCK_SEL_MODE        0x20
+#define AW_BLOCK_IDX_ADDR        0x24
+#define AW_CAL_BLOCK_INFO_VALID  0x28
+#define AW_BLOCK_OFFSET          0x2C
+#define AW_DELTA_TEMP_FP32       0x48
 
-#define AW_FLUSHPIPE       0xD0
-#define AW_RESET_ERR       0xD4
+#define AW_FLUSHPIPE             0xD0
+#define AW_RESET_ERR             0xD4
 
-#define AR_DONE            0xE8
-#define AR_ERR_REG0        0xEC
-#define AR_ERR_REG1        0xF0
-#define AR_ERR_REG2        0xF4
-#define AR_ERR_REG3        0xF8
-#define AR_ERR_REG4        0xFC
+#define AR_DONE                  0xE8
+#define AR_ERR_REG0              0xEC
+#define AR_ERR_REG1              0xF0
+#define AR_ERR_REG2              0xF4
+#define AR_ERR_REG3              0xF8
+#define AR_ERR_REG4              0xFC
 
 
 // Adresse des  switchs et trous
-#define AW_INPUT_SW        0xA4
-#define AW_DATATYPE_SW     0xA8
-#define AW_OUTPUT_SW       0xAC
-#define AW_NLC_FALL        0xB0
-#define AW_RQC_FALL        0xB4
-#define AW_FCC_FALL        0xB8
+#define AW_INPUT_SW              0xA4
+#define AW_DATATYPE_SW           0xA8
+#define AW_OUTPUT_SW             0xAC
+#define AW_NLC_FALL              0xB0
+#define AW_RQC_FALL              0xB4
+#define AW_FCC_FALL              0xB8
 
 // Ctrl Video
 #define AW_VIDEO_BPR_MODE           0xCC
-#define AW_CALIB_BPR_MODE           0xD8
 
 // Lut switch control
 #define AW_CALIB_LUT_SWITCH         0xDC
@@ -121,6 +121,7 @@ void CAL_initCalBlockInfo(calibBlockHdrInfo_t* b, uint32_t n)
       b->actualizationPOSIXTime = 0;
       b->low_cut = 0;
       b->high_cut = 0;
+      b->delta_temp_fp32 = 0;
       b++;
    }
 }
@@ -145,25 +146,19 @@ void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs)
 
    AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_MODE);
 
-   CAL_UpdateCalibBprMode(pA, pGCRegs);
 }
 
 
-void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
+void CAL_CalculDeltaF(t_calib *pA, const gcRegistersData_t *pGCRegs)
 {
    float DeltaF;
-   uint32_t *p_DeltaF = (uint32_t *)(&DeltaF);
    uint32_t blockIndex;
-   uint32_t DeltaF_RamAddr;
    float FWReferenceTemperature;     //in Celsius
 
    FWReferenceTemperature = (flashSettings.FWReferenceTemperatureGain * (float)pGCRegs->FWSpeed) + flashSettings.FWReferenceTemperatureOffset;
 
    for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
    {
-      // param addr = ram base addr + block offset + param offset (inside the block)
-      DeltaF_RamAddr = XPAR_CALIB_RAM_AXI_BASEADDR + (blockIndex * pA->calib_ram_block_offset * sizeof(uint32_t)) + DELTA_TEMP_PARAM_OFFSET;
-
       if ((calibrationInfo.blocks[blockIndex].isValid) && (calibrationInfo.blocks[blockIndex].T0 != 0))
       {
          if (flashSettings.FWPresent && (pGCRegs->FWMode == FWM_SynchronouslyRotating) && (flashSettings.FWReferenceTemperatureGain != 0.0F))
@@ -185,9 +180,7 @@ void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
          DeltaF = 0.0F;
       }
       CAL_DBG("Block[%d] DeltaF x 1000 = %d", blockIndex, (uint32_t)(DeltaF * 1000.0F));
-
-      CAL_DBG("*p_DeltaF = 0x%08X", (*p_DeltaF));
-      AXI4L_write32(*p_DeltaF, DeltaF_RamAddr);
+      pA->calib_block[blockIndex].delta_temp_fp32 = DeltaF;
    }
 }
 
@@ -305,9 +298,10 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
          pA->calib_block[blockIndex].low_cut = calibrationInfo.blocks[blockIndex].LowCut;
          pA->calib_block[blockIndex].high_cut = calibrationInfo.blocks[blockIndex].HighCut;
       }
+      CAL_CalculDeltaF(pA, pGCRegs);
    }
 
-   WriteStruct(pA);
+   AXI4L_write32(0, pA->ADD + AW_CAL_BLOCK_INFO_VALID);
 
    // write all block configurations
    for (blockIndex = 0; blockIndex < CALIB_MAX_NUM_OF_BLOCKS; blockIndex++)
@@ -315,7 +309,9 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
       AXI4L_write32(blockIndex, pA->ADD + AW_BLOCK_IDX_ADDR);
       WriteStruct(&pA->calib_block[blockIndex]);
    }
-   AXI4L_write32(1, pA->ADD + AW_BLOCK_CFG_DONE);
+
+   WriteStruct(pA);
+   AXI4L_write32(1, pA->ADD + AW_CAL_BLOCK_INFO_VALID);
 
    // on reconfigure les switches
    CAL_configSwitchesAndHoles(pA, calib_mode, pGCRegs);
@@ -557,7 +553,6 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
       blockRam.pow2_range_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Range_Exp);
       blockRam.nlc_pow2_m_exp_fp32     = exp2f((float)p_blockInfo->lutNLData.M_Exp);
       blockRam.nlc_pow2_b_exp_fp32     = exp2f((float)p_blockInfo->lutNLData.B_Exp);
-      blockRam.delta_temp_fp32         = 0.0F;  // written in CAL_UpdateDeltaF
       blockRam.alpha_offset_fp32       = p_blockInfo->pixelData.Alpha_Off;
       blockRam.pow2_alpha_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Alpha_Exp);
       blockRam.pow2_beta0_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Beta0_Exp);
@@ -595,8 +590,6 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
       WriteStruct(&blockRam);
    }
 
-   // Make sure delta temp is valid
-   CAL_UpdateDeltaF(pA, pGCRegs);
 
    return IRC_SUCCESS;
 }
@@ -743,11 +736,6 @@ void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs)
    AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_MODE);
 }
 
-void CAL_UpdateCalibBprMode(const t_calib *pA, const gcRegistersData_t *pGCRegs)
-{
-   AXI4L_write32(pGCRegs->BadPixelReplacement, pA->ADD + AW_CALIB_BPR_MODE);
-}
-
 /*
  * Configure LUT switch for NLC calibration
  * LUT_SWITCH_TO_AXI_LITE = switch configure to read BRAM from axi-lite (register write to 1)
@@ -796,4 +784,26 @@ void CAL_ConfigureRqcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMod
 
    // write register
    AXI4L_write32(value, pA->ADD + AW_CALIB_LUT_SWITCH);
+}
+
+/*
+ * Send delta temp to vhdl
+ */
+void CAL_SendDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
+{
+   uint32_t blockIndex;
+   float DeltaF;
+   uint32_t *p_DeltaF = (uint32_t *)(&DeltaF);
+
+   AXI4L_write32(0, pA->ADD + AW_CAL_BLOCK_INFO_VALID);
+   for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
+   {
+      if ((calibrationInfo.blocks[blockIndex].isValid) && (calibrationInfo.blocks[blockIndex].T0 != 0))
+      {
+         AXI4L_write32(blockIndex, pA->ADD + AW_BLOCK_IDX_ADDR);
+         DeltaF = pA->calib_block[blockIndex].delta_temp_fp32;
+         AXI4L_write32(*p_DeltaF, pA->ADD + AW_DELTA_TEMP_FP32);
+      }
+   }
+   AXI4L_write32(1, pA->ADD + AW_CAL_BLOCK_INFO_VALID);
 }

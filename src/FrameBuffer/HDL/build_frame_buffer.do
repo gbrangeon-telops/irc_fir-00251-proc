@@ -9,17 +9,27 @@ setenv UTILITIES "D:\Telops\Common_HDL\Utilities"
 acom "$COMMON\VHDL\tel2000pkg.vhd"	 
 acom "$PROC\src\FrameBuffer\HDL\fbuffer_define.vhd"
 
+acom "D:\Telops\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd"
+
 #common_hdl
 do "D:\Telops\FIR-00251-Proc\src\compil_utilities.do"
 acom "D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd"
+
+
 
 #source 	  
 acom -nowarn DAGGEN_0523 -incr \
 "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr128_rd64_fifo.vhd" \
 "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr128_rd128_fifo.vhd" \
 "D:\Telops\FIR-00251-Common\VHDL\axis128_frame_rate.vhd" \
+"D:\Telops\FIR-00251-Common\VHDL\axis64_frame_rate.vhd" \
 "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_ctrl_intf.vhd" \
+"D:\Telops\FIR-00251-Common\VHDL\Utilities\axis128_img_boundaries.vhd" \
+"D:\Telops\FIR-00251-Common\VHDL\Utilities\axis128_tid_gen.vhd" \
+"D:\Telops\FIR-00251-Common\VHDL\Utilities\axis128_hole_sync.vhd" \
+"D:\Telops\FIR-00251-Common\VHDL\Utilities\axis128_reg.vhd" \
+"D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\ext_buff_switch.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\reader_fsm.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\writer_fsm.vhd"	   
 

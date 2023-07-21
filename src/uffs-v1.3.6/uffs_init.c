@@ -49,8 +49,10 @@
 
 static URET uffs_InitDeviceConfig(uffs_Device *dev)
 {
-    if (dev->cfg.dirty_groups == 0)
-        dev->cfg.dirty_groups = MAX_DIRTY_BUF_GROUPS;
+    if (dev->cfg.dirty_groups == 0) {
+       dev->cfg.dirty_groups = MAX_DIRTY_BUF_GROUPS;
+
+    }
 
 	if (!uffs_Assert(dev->cfg.dirty_groups >= 1 && dev->cfg.dirty_groups <= MAX_DIRTY_BUF_GROUPS,
 						"invalid config: dirty_groups = %d\n", dev->cfg.dirty_groups))

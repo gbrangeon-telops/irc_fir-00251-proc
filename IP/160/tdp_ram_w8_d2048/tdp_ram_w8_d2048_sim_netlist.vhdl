@@ -1,8 +1,8 @@
--- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Fri Feb 18 12:34:48 2022
--- Host        : TELOPS258 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Tue May 16 16:01:04 2023
+-- Host        : LAPTOP-J3K1KOB9 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/tdp_ram_w8_d2048/tdp_ram_w8_d2048_sim_netlist.vhdl
 -- Design      : tdp_ram_w8_d2048
@@ -42,8 +42,6 @@ architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_prim_wrapper is
   signal \NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM18.ram_DOBDO_UNCONNECTED\ : STD_LOGIC_VECTOR ( 15 downto 8 );
   signal \NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM18.ram_DOPADOP_UNCONNECTED\ : STD_LOGIC_VECTOR ( 1 to 1 );
   signal \NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM18.ram_DOPBDOP_UNCONNECTED\ : STD_LOGIC_VECTOR ( 1 to 1 );
-  attribute CLOCK_DOMAINS : string;
-  attribute CLOCK_DOMAINS of \DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM18.ram\ : label is "INDEPENDENT";
   attribute box_type : string;
   attribute box_type of \DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM18.ram\ : label is "PRIMITIVE";
 begin
@@ -324,7 +322,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth is
+entity tdp_ram_w8_d2048_blk_mem_gen_v8_4_2_synth is
   port (
     douta : out STD_LOGIC_VECTOR ( 7 downto 0 );
     doutb : out STD_LOGIC_VECTOR ( 7 downto 0 );
@@ -342,10 +340,10 @@ entity tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth is
     web : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
   attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth : entity is "blk_mem_gen_v8_3_4_synth";
-end tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2_synth : entity is "blk_mem_gen_v8_4_2_synth";
+end tdp_ram_w8_d2048_blk_mem_gen_v8_4_2_synth;
 
-architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth is
+architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2_synth is
 begin
 \gnbram.gnativebmg.native_blk_mem_gen\: entity work.tdp_ram_w8_d2048_blk_mem_gen_top
      port map (
@@ -369,7 +367,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 is
+entity tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 is
   port (
     clka : in STD_LOGIC;
     rsta : in STD_LOGIC;
@@ -436,158 +434,162 @@ entity tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 is
     s_axi_rdaddrecc : out STD_LOGIC_VECTOR ( 10 downto 0 )
   );
   attribute C_ADDRA_WIDTH : integer;
-  attribute C_ADDRA_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 11;
+  attribute C_ADDRA_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 11;
   attribute C_ADDRB_WIDTH : integer;
-  attribute C_ADDRB_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 11;
+  attribute C_ADDRB_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 11;
   attribute C_ALGORITHM : integer;
-  attribute C_ALGORITHM of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_ALGORITHM of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_AXI_ID_WIDTH : integer;
-  attribute C_AXI_ID_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 4;
+  attribute C_AXI_ID_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 4;
   attribute C_AXI_SLAVE_TYPE : integer;
-  attribute C_AXI_SLAVE_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_AXI_SLAVE_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_AXI_TYPE : integer;
-  attribute C_AXI_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_AXI_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_BYTE_SIZE : integer;
-  attribute C_BYTE_SIZE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 9;
+  attribute C_BYTE_SIZE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 9;
   attribute C_COMMON_CLK : integer;
-  attribute C_COMMON_CLK of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_COMMON_CLK of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_COUNT_18K_BRAM : string;
-  attribute C_COUNT_18K_BRAM of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "1";
+  attribute C_COUNT_18K_BRAM of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "1";
   attribute C_COUNT_36K_BRAM : string;
-  attribute C_COUNT_36K_BRAM of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "0";
+  attribute C_COUNT_36K_BRAM of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "0";
   attribute C_CTRL_ECC_ALGO : string;
-  attribute C_CTRL_ECC_ALGO of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "NONE";
+  attribute C_CTRL_ECC_ALGO of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "NONE";
   attribute C_DEFAULT_DATA : string;
-  attribute C_DEFAULT_DATA of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "0";
+  attribute C_DEFAULT_DATA of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "0";
   attribute C_DISABLE_WARN_BHV_COLL : integer;
-  attribute C_DISABLE_WARN_BHV_COLL of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_DISABLE_WARN_BHV_COLL of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_DISABLE_WARN_BHV_RANGE : integer;
-  attribute C_DISABLE_WARN_BHV_RANGE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_DISABLE_WARN_BHV_RANGE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_ELABORATION_DIR : string;
-  attribute C_ELABORATION_DIR of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "./";
+  attribute C_ELABORATION_DIR of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "./";
   attribute C_ENABLE_32BIT_ADDRESS : integer;
-  attribute C_ENABLE_32BIT_ADDRESS of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_ENABLE_32BIT_ADDRESS of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_DEEPSLEEP_PIN : integer;
-  attribute C_EN_DEEPSLEEP_PIN of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_DEEPSLEEP_PIN of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_ECC_PIPE : integer;
-  attribute C_EN_ECC_PIPE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_ECC_PIPE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_RDADDRA_CHG : integer;
-  attribute C_EN_RDADDRA_CHG of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_RDADDRA_CHG of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_RDADDRB_CHG : integer;
-  attribute C_EN_RDADDRB_CHG of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_RDADDRB_CHG of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_SAFETY_CKT : integer;
-  attribute C_EN_SAFETY_CKT of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_SAFETY_CKT of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_SHUTDOWN_PIN : integer;
-  attribute C_EN_SHUTDOWN_PIN of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_SHUTDOWN_PIN of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EN_SLEEP_PIN : integer;
-  attribute C_EN_SLEEP_PIN of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_EN_SLEEP_PIN of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_EST_POWER_SUMMARY : string;
-  attribute C_EST_POWER_SUMMARY of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "Estimated Power for IP     :     2.5457000000000001 mW";
+  attribute C_EST_POWER_SUMMARY of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "Estimated Power for IP     :     2.5457 mW";
   attribute C_FAMILY : string;
-  attribute C_FAMILY of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "kintex7";
+  attribute C_FAMILY of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "kintex7";
   attribute C_HAS_AXI_ID : integer;
-  attribute C_HAS_AXI_ID of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_AXI_ID of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_ENA : integer;
-  attribute C_HAS_ENA of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_HAS_ENA of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_HAS_ENB : integer;
-  attribute C_HAS_ENB of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_HAS_ENB of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_HAS_INJECTERR : integer;
-  attribute C_HAS_INJECTERR of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_INJECTERR of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_MEM_OUTPUT_REGS_A : integer;
-  attribute C_HAS_MEM_OUTPUT_REGS_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_HAS_MEM_OUTPUT_REGS_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_HAS_MEM_OUTPUT_REGS_B : integer;
-  attribute C_HAS_MEM_OUTPUT_REGS_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_HAS_MEM_OUTPUT_REGS_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_HAS_MUX_OUTPUT_REGS_A : integer;
-  attribute C_HAS_MUX_OUTPUT_REGS_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_MUX_OUTPUT_REGS_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_MUX_OUTPUT_REGS_B : integer;
-  attribute C_HAS_MUX_OUTPUT_REGS_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_MUX_OUTPUT_REGS_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_REGCEA : integer;
-  attribute C_HAS_REGCEA of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_REGCEA of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_REGCEB : integer;
-  attribute C_HAS_REGCEB of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_REGCEB of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_RSTA : integer;
-  attribute C_HAS_RSTA of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_HAS_RSTA of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_HAS_RSTB : integer;
-  attribute C_HAS_RSTB of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_HAS_RSTB of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_HAS_SOFTECC_INPUT_REGS_A : integer;
-  attribute C_HAS_SOFTECC_INPUT_REGS_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_SOFTECC_INPUT_REGS_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_HAS_SOFTECC_OUTPUT_REGS_B : integer;
-  attribute C_HAS_SOFTECC_OUTPUT_REGS_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_HAS_SOFTECC_OUTPUT_REGS_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_INITA_VAL : string;
-  attribute C_INITA_VAL of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "0";
+  attribute C_INITA_VAL of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "0";
   attribute C_INITB_VAL : string;
-  attribute C_INITB_VAL of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "0";
+  attribute C_INITB_VAL of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "0";
   attribute C_INIT_FILE : string;
-  attribute C_INIT_FILE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "tdp_ram_w8_d2048.mem";
+  attribute C_INIT_FILE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "tdp_ram_w8_d2048.mem";
   attribute C_INIT_FILE_NAME : string;
-  attribute C_INIT_FILE_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "no_coe_file_loaded";
+  attribute C_INIT_FILE_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "no_coe_file_loaded";
   attribute C_INTERFACE_TYPE : integer;
-  attribute C_INTERFACE_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_INTERFACE_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_LOAD_INIT_FILE : integer;
-  attribute C_LOAD_INIT_FILE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_LOAD_INIT_FILE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_MEM_TYPE : integer;
-  attribute C_MEM_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 2;
+  attribute C_MEM_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 2;
   attribute C_MUX_PIPELINE_STAGES : integer;
-  attribute C_MUX_PIPELINE_STAGES of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_MUX_PIPELINE_STAGES of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_PRIM_TYPE : integer;
-  attribute C_PRIM_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_PRIM_TYPE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_READ_DEPTH_A : integer;
-  attribute C_READ_DEPTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 2048;
+  attribute C_READ_DEPTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 2048;
   attribute C_READ_DEPTH_B : integer;
-  attribute C_READ_DEPTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 2048;
+  attribute C_READ_DEPTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 2048;
+  attribute C_READ_LATENCY_A : integer;
+  attribute C_READ_LATENCY_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
+  attribute C_READ_LATENCY_B : integer;
+  attribute C_READ_LATENCY_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_READ_WIDTH_A : integer;
-  attribute C_READ_WIDTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 8;
+  attribute C_READ_WIDTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 8;
   attribute C_READ_WIDTH_B : integer;
-  attribute C_READ_WIDTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 8;
+  attribute C_READ_WIDTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 8;
   attribute C_RSTRAM_A : integer;
-  attribute C_RSTRAM_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_RSTRAM_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_RSTRAM_B : integer;
-  attribute C_RSTRAM_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_RSTRAM_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_RST_PRIORITY_A : string;
-  attribute C_RST_PRIORITY_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "CE";
+  attribute C_RST_PRIORITY_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "CE";
   attribute C_RST_PRIORITY_B : string;
-  attribute C_RST_PRIORITY_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "CE";
+  attribute C_RST_PRIORITY_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "CE";
   attribute C_SIM_COLLISION_CHECK : string;
-  attribute C_SIM_COLLISION_CHECK of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "ALL";
+  attribute C_SIM_COLLISION_CHECK of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "ALL";
   attribute C_USE_BRAM_BLOCK : integer;
-  attribute C_USE_BRAM_BLOCK of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_BRAM_BLOCK of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_USE_BYTE_WEA : integer;
-  attribute C_USE_BYTE_WEA of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_BYTE_WEA of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_USE_BYTE_WEB : integer;
-  attribute C_USE_BYTE_WEB of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_BYTE_WEB of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_USE_DEFAULT_DATA : integer;
-  attribute C_USE_DEFAULT_DATA of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_DEFAULT_DATA of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_USE_ECC : integer;
-  attribute C_USE_ECC of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_ECC of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_USE_SOFTECC : integer;
-  attribute C_USE_SOFTECC of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_SOFTECC of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_USE_URAM : integer;
-  attribute C_USE_URAM of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 0;
+  attribute C_USE_URAM of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 0;
   attribute C_WEA_WIDTH : integer;
-  attribute C_WEA_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_WEA_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_WEB_WIDTH : integer;
-  attribute C_WEB_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 1;
+  attribute C_WEB_WIDTH of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 1;
   attribute C_WRITE_DEPTH_A : integer;
-  attribute C_WRITE_DEPTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 2048;
+  attribute C_WRITE_DEPTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 2048;
   attribute C_WRITE_DEPTH_B : integer;
-  attribute C_WRITE_DEPTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 2048;
+  attribute C_WRITE_DEPTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 2048;
   attribute C_WRITE_MODE_A : string;
-  attribute C_WRITE_MODE_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "NO_CHANGE";
+  attribute C_WRITE_MODE_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "NO_CHANGE";
   attribute C_WRITE_MODE_B : string;
-  attribute C_WRITE_MODE_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "WRITE_FIRST";
+  attribute C_WRITE_MODE_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "WRITE_FIRST";
   attribute C_WRITE_WIDTH_A : integer;
-  attribute C_WRITE_WIDTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 8;
+  attribute C_WRITE_WIDTH_A of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 8;
   attribute C_WRITE_WIDTH_B : integer;
-  attribute C_WRITE_WIDTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 8;
+  attribute C_WRITE_WIDTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is 8;
   attribute C_XDEVICEFAMILY : string;
-  attribute C_XDEVICEFAMILY of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "kintex7";
+  attribute C_XDEVICEFAMILY of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "kintex7";
   attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "blk_mem_gen_v8_3_4";
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "blk_mem_gen_v8_4_2";
   attribute downgradeipidentifiedwarnings : string;
-  attribute downgradeipidentifiedwarnings of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "yes";
-end tdp_ram_w8_d2048_blk_mem_gen_v8_3_4;
+  attribute downgradeipidentifiedwarnings of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 : entity is "yes";
+end tdp_ram_w8_d2048_blk_mem_gen_v8_4_2;
 
-architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 is
+architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_v8_4_2 is
   signal \<const0>\ : STD_LOGIC;
 begin
   dbiterr <= \<const0>\;
@@ -648,7 +650,7 @@ GND: unisim.vcomponents.GND
      port map (
       G => \<const0>\
     );
-inst_blk_mem_gen: entity work.tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth
+inst_blk_mem_gen: entity work.tdp_ram_w8_d2048_blk_mem_gen_v8_4_2_synth
      port map (
       addra(10 downto 0) => addra(10 downto 0),
       addrb(10 downto 0) => addrb(10 downto 0),
@@ -690,11 +692,11 @@ entity tdp_ram_w8_d2048 is
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of tdp_ram_w8_d2048 : entity is true;
   attribute CHECK_LICENSE_TYPE : string;
-  attribute CHECK_LICENSE_TYPE of tdp_ram_w8_d2048 : entity is "tdp_ram_w8_d2048,blk_mem_gen_v8_3_4,{}";
+  attribute CHECK_LICENSE_TYPE of tdp_ram_w8_d2048 : entity is "tdp_ram_w8_d2048,blk_mem_gen_v8_4_2,{}";
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of tdp_ram_w8_d2048 : entity is "yes";
   attribute x_core_info : string;
-  attribute x_core_info of tdp_ram_w8_d2048 : entity is "blk_mem_gen_v8_3_4,Vivado 2016.3";
+  attribute x_core_info of tdp_ram_w8_d2048 : entity is "blk_mem_gen_v8_4_2,Vivado 2018.3_AR71898";
 end tdp_ram_w8_d2048;
 
 architecture STRUCTURE of tdp_ram_w8_d2048 is
@@ -764,7 +766,7 @@ architecture STRUCTURE of tdp_ram_w8_d2048 is
   attribute C_EN_SLEEP_PIN : integer;
   attribute C_EN_SLEEP_PIN of U0 : label is 0;
   attribute C_EST_POWER_SUMMARY : string;
-  attribute C_EST_POWER_SUMMARY of U0 : label is "Estimated Power for IP     :     2.5457000000000001 mW";
+  attribute C_EST_POWER_SUMMARY of U0 : label is "Estimated Power for IP     :     2.5457 mW";
   attribute C_FAMILY : string;
   attribute C_FAMILY of U0 : label is "kintex7";
   attribute C_HAS_AXI_ID : integer;
@@ -817,6 +819,10 @@ architecture STRUCTURE of tdp_ram_w8_d2048 is
   attribute C_READ_DEPTH_A of U0 : label is 2048;
   attribute C_READ_DEPTH_B : integer;
   attribute C_READ_DEPTH_B of U0 : label is 2048;
+  attribute C_READ_LATENCY_A : integer;
+  attribute C_READ_LATENCY_A of U0 : label is 1;
+  attribute C_READ_LATENCY_B : integer;
+  attribute C_READ_LATENCY_B of U0 : label is 1;
   attribute C_READ_WIDTH_A : integer;
   attribute C_READ_WIDTH_A of U0 : label is 8;
   attribute C_READ_WIDTH_B : integer;
@@ -864,8 +870,26 @@ architecture STRUCTURE of tdp_ram_w8_d2048 is
   attribute C_XDEVICEFAMILY : string;
   attribute C_XDEVICEFAMILY of U0 : label is "kintex7";
   attribute downgradeipidentifiedwarnings of U0 : label is "yes";
+  attribute x_interface_info : string;
+  attribute x_interface_info of clka : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA CLK";
+  attribute x_interface_parameter : string;
+  attribute x_interface_parameter of clka : signal is "XIL_INTERFACENAME BRAM_PORTA, MEM_SIZE 8192, MEM_WIDTH 32, MEM_ECC NONE, MASTER_TYPE OTHER, READ_LATENCY 1";
+  attribute x_interface_info of clkb : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB CLK";
+  attribute x_interface_parameter of clkb : signal is "XIL_INTERFACENAME BRAM_PORTB, MEM_SIZE 8192, MEM_WIDTH 32, MEM_ECC NONE, MASTER_TYPE OTHER, READ_LATENCY 1";
+  attribute x_interface_info of ena : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA EN";
+  attribute x_interface_info of enb : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB EN";
+  attribute x_interface_info of rsta : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA RST";
+  attribute x_interface_info of rstb : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB RST";
+  attribute x_interface_info of addra : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA ADDR";
+  attribute x_interface_info of addrb : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB ADDR";
+  attribute x_interface_info of dina : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA DIN";
+  attribute x_interface_info of dinb : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB DIN";
+  attribute x_interface_info of douta : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA DOUT";
+  attribute x_interface_info of doutb : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB DOUT";
+  attribute x_interface_info of wea : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTA WE";
+  attribute x_interface_info of web : signal is "xilinx.com:interface:bram:1.0 BRAM_PORTB WE";
 begin
-U0: entity work.tdp_ram_w8_d2048_blk_mem_gen_v8_3_4
+U0: entity work.tdp_ram_w8_d2048_blk_mem_gen_v8_4_2
      port map (
       addra(10 downto 0) => addra(10 downto 0),
       addrb(10 downto 0) => addrb(10 downto 0),

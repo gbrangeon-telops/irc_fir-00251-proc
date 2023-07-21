@@ -2,13 +2,12 @@ SCHM0104
 
 HEADER
 {
- FREEID 1137
+ FREEID 1205
  VARIABLES
  {
   #ARCHITECTURE="moi_handler"
   #BLOCKTABLE_FILE="#table.bde"
   #BLOCKTABLE_INCLUDED="1"
-  #DEFAULT_RANGE0="<range<name=\"buffer_switch\"><left=\"3\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #ENTITY="moi_handler"
   #LANGUAGE="VHDL"
   AUTHOR="Unknown"
@@ -29,7 +28,7 @@ HEADER
 "library WORK,IEEE;\n"+
 "use work.TEL2000.all,work.BufferingDefine.all,ieee.std_logic_1164.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1605809490"
+    #MODIFIED="1677784211"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="15afaf6d-0724-48f5-818d-40561a5eb4f1"
    }
   }
@@ -126,7 +125,7 @@ HEADER
     TEXT  31, 0, 0
     {
      TEXT "$#NAME"
-     RECT (-115,-190,91,-166)
+     RECT (-115,-190,52,-166)
      ALIGN 4
      MARGINS (1,1)
      PARENT 30
@@ -275,7 +274,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="BUFFERING_FLAG"
       #NUMBER="0"
       #SIDE="right"
@@ -292,12 +291,12 @@ HEADER
      VARIABLES
      {
       #DIRECTION="IN"
-      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="BUFFER_SWITCH(3:0)"
+      #NAME="BUFFER_SWITCH"
       #NUMBER="0"
       #SIDE="left"
+      #VHDL_TYPE="EXTERNAL_BUFFER_SWITCH_TYPE"
      }
      LINE  2, 0, 0
      {
@@ -454,7 +453,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="MODE"
       #NUMBER="0"
       #VHDL_TYPE="T_MOI_MODE"
@@ -471,7 +470,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="EDGE"
       #NUMBER="0"
       #SIDE="left"
@@ -828,7 +827,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="15afaf6d-0724-48f5-818d-40561a5eb4f1"
    }
    COORD (1280,880)
-   VERTEXES ( (6,1074), (10,1015), (12,795), (14,797), (16,803), (18,801), (24,1077), (26,1087), (28,977), (30,1117) )
+   VERTEXES ( (6,1074), (10,1015), (12,795), (14,797), (16,803), (18,801), (24,1077), (26,1087), (28,977), (30,1151) )
   }
   TEXT  155, 0, 0
   {
@@ -1227,47 +1226,57 @@ PAGE ""
     #NAMED="1"
    }
   }
-  NET BUS  1111, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="1"
-    #NAME="BUFFER_SWITCH(3:0)"
-   }
-  }
-  INSTANCE  1112, 0, 0
+  INSTANCE  1137, 0, 0
   {
    VARIABLES
    {
     #COMPONENT="BusInput"
-    #DOWNTO="1"
+    #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="BUFFER_SWITCH(3:0)"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="BM_SW"
     #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="external_buffer_switch_type"
+    EXTERNAL_BUFFER_SWITCH_TYPE=""
+    RECORD=""
    }
    COORD (1080,700)
-   VERTEXES ( (2,1118) )
+   ORIENTATION 3
+   VERTEXES ( (2,1152) )
   }
-  TEXT  1113, 0, 0
+  TEXT  1138, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (718,683,1029,718)
+   RECT (911,683,1020,718)
    ALIGN 6
    MARGINS (1,1)
-   PARENT 1112
+   PARENT 1137
+   ORIENTATION 4
   }
-  VTX  1117, 0, 0
+  NET RECORD  1147, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BM_SW"
+    #VHDL_TYPE="external_buffer_switch_type"
+    EXTERNAL_BUFFER_SWITCH_TYPE=""
+    RECORD=""
+   }
+  }
+  VTX  1151, 0, 0
   {
    COORD (1140,700)
   }
-  VTX  1118, 0, 0
+  VTX  1152, 0, 0
   {
    COORD (1080,700)
   }
-  BUS  1119, 0, 0
+  RECORD  1153, 0, 0
   {
-   NET 1111
-   VTX 1117, 1118
+   NET 1147
+   VTX 1151, 1152
    VARIABLES
    {
     #NAMED="1"
@@ -1298,7 +1307,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  1120, 0, 0
+  TEXT  1188, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -1309,7 +1318,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1121, 0, 0
+  TEXT  1189, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -1320,7 +1329,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  1122, 0, 0
+  TEXT  1190, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -1330,7 +1339,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1123, 0, 0
+  TEXT  1191, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -1342,7 +1351,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  1124, 0, 0
+  TEXT  1192, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -1355,7 +1364,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  1125, 0, 0
+  TEXT  1193, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -1365,7 +1374,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1126, 0, 0
+  TEXT  1194, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -1377,7 +1386,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  1127, 0, 0
+  TEXT  1195, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -1387,7 +1396,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1128, 0, 0
+  TEXT  1196, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -1398,7 +1407,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  1129, 0, 0
+  GROUP  1197, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,1420,2001,1801)
@@ -1410,7 +1419,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1130, 0, 0
+  GROUP  1198, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,1620,2001,1621)
@@ -1422,7 +1431,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1131, 0, 0
+  GROUP  1199, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,1560,2001,1561)
@@ -1434,7 +1443,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1132, 0, 0
+  GROUP  1200, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,1680,2001,1681)
@@ -1446,7 +1455,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1133, 0, 0
+  GROUP  1201, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,1740,2001,1741)
@@ -1458,7 +1467,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1134, 0, 0
+  GROUP  1202, 0, 0
   {
    PAGEALIGN 10
    RECT (1300,1420,1301,1561)
@@ -1469,7 +1478,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  1135, 0, 0
+  GROUP  1203, 0, 0
   {
    PAGEALIGN 10
    RECT (1300,1560,1301,1801)
@@ -1480,7 +1489,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  1136, 0, 0
+  BMPPICT  1204, 0, 0
   {
    PAGEALIGN 10
    RECT (1140,1480,1279,1525)

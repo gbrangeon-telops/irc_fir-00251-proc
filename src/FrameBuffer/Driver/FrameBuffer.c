@@ -5,10 +5,7 @@
 #include "utils.h"
 #include "proc_init.h"
 #include <stdbool.h>
-
-// Internal function prototype
-
-
+#include "BufferManager.h"
 
 /* This function write the initial configuration to the frame buffer VHDL module.
  *
@@ -28,6 +25,7 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
       pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
       pFB_ctrl->fb_lval_pause_min        = CL_LVAL_PAUSE_FAST;
       pFB_ctrl->fb_fval_pause_min        = CL_FVAL_PAUSE_FAST;
+      pFB_ctrl->fb_bypass                = 0;
 
       WriteStruct(pFB_ctrl);
       return IRC_SUCCESS;
@@ -55,6 +53,7 @@ void FB_SendConfigGC(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
          pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2) * pGCRegs->Width * sizeof(uint16_t);
          pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
          pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
+         pFB_ctrl->fb_bypass                = BM_MemoryBufferRead; // Bypass activation (frames latency induced by frame buffer make waterlevel rise too late when downloading with gige)
 
          WriteStruct(pFB_ctrl);
       }

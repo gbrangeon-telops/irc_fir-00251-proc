@@ -49,6 +49,8 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MIG_
 
 # False Paths
 #set_false_path -from [get_cells *reset*_reg* -hierarchical -filter {NAME =~ *proc_sys_reset_1*}]
+# Since 2018.3, *reset*_reg* are replaced by : FDRE_BSR*,FDRE_PER*
+set_false_path -from [get_cells *FDRE_* -hierarchical -filter {NAME =~ *proc_sys_reset_1*}]
 
 ### Header False Path
 #set_false_path -from [get_pins -hier SEQ_STATUS_reg[*]/C] -to [get_clocks clk_mb]

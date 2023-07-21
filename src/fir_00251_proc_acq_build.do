@@ -26,6 +26,9 @@ acom  "$FIR251PROC\src\usb\hdl\USB_CTRL.bde"
 #IRIG
 do D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_compile.do
 
+#AEC
+do D:\Telops\FIR-00251-Proc\src\AEC\HDL\build_AEC_intf.do
+
 #calibration
 do D:\Telops\FIR-00251-Proc\src\Calibration\HDL\compil_calibration.do
 
@@ -39,8 +42,6 @@ D:\Telops\FIR-00251-Proc\src\Flash_Ctrl\HDL\Flash_intf.bde
 #USART
 do "$COMMON\VHDL\USART\build_usart.do"
 
-#AEC
-do D:\Telops\FIR-00251-Proc\src\AEC\HDL\build_AEC_intf.do
 
 #ICU
 do D:\Telops\FIR-00251-Proc\src\ICU\HDL\build_ICU.do

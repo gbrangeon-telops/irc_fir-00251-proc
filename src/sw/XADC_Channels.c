@@ -227,7 +227,8 @@ void XADC_ThUpdated(xadcChannel_t *xadcCh)
       {
          case XEC_INTERNAL_LENS:
             HDER_UpdateTemperaturesHeader(&gHderInserter, DTS_InternalLens);
-            CAL_UpdateDeltaF(&gCal, &gcRegsData);
+            CAL_CalculDeltaF(&gCal, &gcRegsData);
+            CAL_SendDeltaF(&gCal, &gcRegsData);
             break;
 
          case XEC_EXTERNAL_LENS:

@@ -558,7 +558,7 @@ IRC_Status_t FM_InitFileDB()
 
          if (fileCount < FM_MAX_NUM_FILE)
          {
-            sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, de->d_name);
+            snprintf(filelongname,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, de->d_name);
             if (uffs_stat(filelongname, &filestat) == 0)
             {
                // Add file in database

@@ -21,8 +21,8 @@ entity calib_config is
    
    port( 
       ARESETN                     : in std_logic;
-      CLK_CAL                         : in std_logic;
-      CLK_DATA                         : in std_logic;
+      CLK_CAL                     : in std_logic;
+      CLK_DATA                    : in std_logic;
       
       -- µBlaze Intf              
       MB_CLK                      : in std_logic;       
@@ -39,12 +39,12 @@ entity calib_config is
       -- Calib block selector
       CALIB_BLOCK_INFO_ARRAY      : out calib_block_array_type;
       CALIB_BLOCK_INFO_DVAL       : out std_logic;
-      CALIB_BLOCK_SEL_MODE        : out calib_block_sel_mode_type;
-      
-	  -- Calib LUT switch
-	  NLC_LUT_SWITCH              : out std_logic;
-	  RQC_LUT_SWITCH              : out std_logic;
-	  
+      CALIB_BLOCK_SEL_MODE        : out calib_block_sel_mode_type;    
+
+      -- Calib LUT switch
+      NLC_LUT_SWITCH              : out std_logic;
+      RQC_LUT_SWITCH              : out std_logic;
+
       -- Calib data flow config       
       CALIB_FLOW_CONFIG           : out calib_flow_config_type;
       
@@ -55,9 +55,6 @@ entity calib_config is
       -- Exposure time
       EXP_TIME_MULT_FP32          : out std_logic_vector(31 downto 0);  
       EXP_TIME_MULT_FP32_DVAL     : out std_logic;
-      
-      -- BPR mode for calib data
-      CALIB_BPR_MODE          	 : out bpr_mode_type;
       
       -- Video
       VIDEO_BPR_MODE          	 : out bpr_mode_type;
@@ -111,7 +108,9 @@ architecture rtl of calib_config is
    signal calib_ram_block_offset_i     : std_logic_vector(CALIB_RAM_BLOCK_OFFSET'range) := (others => '0');
    signal pixel_data_base_addr_i       : std_logic_vector(PIXEL_DATA_BASE_ADDR'range) := (others => '0');
    
-   signal config_dval_i                : std_logic := '0';
+   signal config_dval_i                : std_logic := '0';      
+   signal calib_block_info_dval_i      : std_logic := '0';
+   
    signal config_dval_sync             : std_logic := '0';
    signal aoi_param_i                  : aoi_param_type;
    signal exp_time_mult_fp32_i         : std_logic_vector(EXP_TIME_MULT_FP32'range);
@@ -124,37 +123,35 @@ architecture rtl of calib_config is
    signal video_config_i               : video_config_type := ("00", x"05", x"00", '0');
    signal video_bpr_mode_i             : bpr_mode_type := BPR_MODE_LAST_VALID;
    
-   signal calib_bpr_mode_i             : bpr_mode_type := BPR_MODE_NO_REPL;
-   
    signal lut_switch_reg               : std_logic_vector(1 downto 0) := (others => '0');
    
-   signal flush_pipe_i                 : std_logic := '1';
-   signal flush_pipe_sync              : std_logic;
-   signal reset_err_i                  : std_logic := '0';
-   signal done_i                       : std_logic := '0';
-   signal done_sync_clkMB                    : std_logic := '0';
-   signal done_sync_clkCal                    : std_logic := '0';
+   signal flush_pipe_i                  : std_logic := '1';
+   signal flush_pipe_sync               : std_logic;
+   signal reset_err_i                   : std_logic := '0';
+   signal done_i                        : std_logic := '0';
+   signal done_sync_clkMB               : std_logic := '0';
+   signal done_sync_clkCal              : std_logic := '0';
    
-   signal axi_awaddr	                  : std_logic_vector(31 downto 0);
-   signal axi_awready	               : std_logic;
-   signal axi_wready	                  : std_logic;
-   signal axi_bresp	                  : std_logic_vector(1 downto 0);
-   signal axi_bvalid	                  : std_logic;
-   signal axi_araddr	                  : std_logic_vector(31 downto 0);
-   signal axi_arready	               : std_logic;
-   signal axi_rdata	                  : std_logic_vector(31 downto 0);
-   signal axi_rresp	                  : std_logic_vector(1 downto 0);
-   signal axi_rvalid	                  : std_logic;
-   signal axi_wstrb                    : std_logic_vector(3 downto 0);
-   signal slv_reg_rden                 : std_logic;
-   signal slv_reg_wren                 : std_logic;
-   signal cfg_wr_data                  : std_logic_vector(31 downto 0);
-   signal mb_cfg_done                  : std_logic := '0';     -- to have a rising edge at start-up
-   signal mb_cfg_done_sync_clkCal             : std_logic;
-   signal mb_cfg_done_sync_last_clkCal        : std_logic;
-   signal mb_cfg_done_sync_clkData             : std_logic;
-   signal mb_cfg_done_sync_last_clkData        : std_logic;
-   signal calib_block_index            : std_logic_vector(2 downto 0);
+   signal axi_awaddr                    : std_logic_vector(31 downto 0);
+   signal axi_awready                   : std_logic;
+   signal axi_wready                    : std_logic;
+   signal axi_bresp                     : std_logic_vector(1 downto 0);
+   signal axi_bvalid                    : std_logic;
+   signal axi_araddr                    : std_logic_vector(31 downto 0);
+   signal axi_arready                   : std_logic;
+   signal axi_rdata                     : std_logic_vector(31 downto 0);
+   signal axi_rresp                     : std_logic_vector(1 downto 0);
+   signal axi_rvalid                    : std_logic;
+   signal axi_wstrb                     : std_logic_vector(3 downto 0);
+   signal slv_reg_rden                  : std_logic;
+   signal slv_reg_wren                  : std_logic;
+   signal cfg_wr_data                   : std_logic_vector(31 downto 0);
+   signal mb_cfg_done                   : std_logic := '0';     -- to have a rising edge at start-up
+   signal mb_cfg_done_sync_clkCal       : std_logic;
+   signal mb_cfg_done_sync_last_clkCal  : std_logic;
+   signal mb_cfg_done_sync_clkData      : std_logic;
+   signal mb_cfg_done_sync_last_clkData : std_logic;
+   signal calib_block_index             : std_logic_vector(2 downto 0);
    
 begin
    
@@ -228,7 +225,7 @@ begin
          if done_sync_clkMB = '1' then
             CAL_BLOCK_INDEX_MAX     <= cal_block_index_max_i;
             CALIB_BLOCK_INFO_ARRAY  <= calib_block_array;
-            CALIB_BLOCK_INFO_DVAL   <= config_dval_i;
+            CALIB_BLOCK_INFO_DVAL   <= calib_block_info_dval_i;
          end if;
       end if;
    end process;
@@ -256,7 +253,6 @@ begin
          
          -- These outputs are updated everytime (when clk domain crossing is done)
          if mb_cfg_done_sync_clkData = '1' and mb_cfg_done_sync_last_clkData = '0' then
-            CALIB_BPR_MODE    <= calib_bpr_mode_i;
             VIDEO_BPR_MODE    <= video_bpr_mode_i;
             RESET_ERR         <= reset_err_i;
          end if;
@@ -274,11 +270,11 @@ begin
    -- I/O Connections assignments
    MB_MISO.AWREADY     <= axi_awready;
    MB_MISO.WREADY      <= axi_wready;
-   MB_MISO.BRESP	     <= axi_bresp;
+   MB_MISO.BRESP       <= axi_bresp;
    MB_MISO.BVALID      <= axi_bvalid;
    MB_MISO.ARREADY     <= axi_arready;
-   MB_MISO.RDATA	     <= axi_rdata;
-   MB_MISO.RRESP	     <= axi_rresp;
+   MB_MISO.RDATA       <= axi_rdata;
+   MB_MISO.RRESP       <= axi_rresp;
    MB_MISO.RVALID      <= axi_rvalid;
    
    -------------------------------------------------  
@@ -305,10 +301,10 @@ begin
                when X"14" => aoi_param_i.offsety         <= unsigned(cfg_wr_data(aoi_param_i.offsety'range)); 
                when X"18" => exp_time_mult_fp32_i        <= cfg_wr_data(exp_time_mult_fp32_i'range);
                when X"1C" => cal_block_index_max_i       <= unsigned(cfg_wr_data(cal_block_index_max_i'range));
-               when X"20" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);
+               when X"20" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);config_dval_i <= '1';
                
-               when X"24" => calib_block_index <= cfg_wr_data(calib_block_index'range);
-               when X"28" => config_dval_i <= '1';
+               when X"24" => calib_block_index           <= cfg_wr_data(calib_block_index'range);
+               when X"28" => calib_block_info_dval_i     <=  cfg_wr_data(0);
                
                when X"2C" => calib_block_array(idx).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
                when X"30" => calib_block_array(idx).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);
@@ -317,7 +313,8 @@ begin
                when X"3C" => calib_block_array(idx).hder_info.block_act_posix   <= cfg_wr_data(calib_hder_type.block_act_posix'range);
                when X"40" => calib_block_array(idx).hder_info.low_cut           <= cfg_wr_data(calib_hder_type.low_cut'range);
                when X"44" => calib_block_array(idx).hder_info.high_cut          <= cfg_wr_data(calib_hder_type.high_cut'range);
-               
+               when X"48" => calib_block_array(idx).hder_info.delta_temp_fp32   <= cfg_wr_data(calib_hder_type.delta_temp_fp32'range);
+                             
                -- control du data flow
                when X"A4" => calib_flow_config_i.input_sw            <= cfg_wr_data(calib_flow_config_i.input_sw'range);
                when X"A8" => calib_flow_config_i.datatype_sw         <= cfg_wr_data(calib_flow_config_i.datatype_sw'range);
@@ -333,13 +330,9 @@ begin
                
                -- reset errors
                when X"D4" => reset_err_i           <= cfg_wr_data(0);
-               
-               -- BPR mode for calib data
-               when X"D8" => calib_bpr_mode_i      <= cfg_wr_data(calib_bpr_mode_i'range);
-			   
-			   -- configure calib LUT switch
-			   when X"DC" => lut_switch_reg <= cfg_wr_data(lut_switch_reg'range);
-			   
+   
+               -- configure calib LUT switch
+               when X"DC" => lut_switch_reg <= cfg_wr_data(lut_switch_reg'range);
                when others =>
                
             end case;

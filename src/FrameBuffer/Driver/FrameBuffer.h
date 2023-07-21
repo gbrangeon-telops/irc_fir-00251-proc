@@ -45,21 +45,25 @@
 #define FB_IMG_PIX_SIZE_OFFSET	         0x14
 #define FB_LVAL_PAUSE_MIN_OFFSET	         0x18
 #define FB_FVAL_PAUSE_MIN_OFFSET          0x1C
+#define FB_BYPASS_OFFSET                  0x20
 
 // Read only adresses
-#define FB_STATUS_OFFSET                  0x20
-#define FB_ERROR_OFFSET                   0x24
-#define FB_WR_FR_MIN_STAT_OFFSET          0x28
-#define FB_WR_FR_STAT_OFFSET              0x2C
-#define FB_WR_FR_MAX_STAT_OFFSET          0x30
-#define FB_RD_FR_MIN_STAT_OFFSET          0x34
-#define FB_RD_FR_STAT_OFFSET              0x38
-#define FB_RD_FR_MAX_STAT_OFFSET          0x3C
+#define FB_STATUS_OFFSET                  0x24
+#define FB_ERROR_OFFSET                   0x28
+#define FB_WR_FR_MIN_STAT_OFFSET          0x2C
+#define FB_WR_FR_STAT_OFFSET              0x30
+#define FB_WR_FR_MAX_STAT_OFFSET          0x34
+#define FB_RD_FR_MIN_STAT_OFFSET          0x38
+#define FB_RD_FR_STAT_OFFSET              0x3C
+#define FB_RD_FR_MAX_STAT_OFFSET          0x40
 
 // Status mask
 #define FB_INIT_CFG_DONE_MASK             0x01
 #define FB_CFG_UPDATE_DONE_MASK           0x02
-#define FB_READY                          (FB_INIT_CFG_DONE_MASK | FB_CFG_UPDATE_DONE_MASK)
+#define FB_READ_IN_PROGRESS_MASK          0x04
+#define FB_WRITE_IN_PROGRESS_MASK         0x08
+#define FB_FLUSH_IN_PROGRESS_MASK         0x010
+#define FB_READY                          (FB_INIT_CFG_DONE_MASK | FB_CFG_UPDATE_DONE_MASK | FB_READ_IN_PROGRESS_MASK | FB_WRITE_IN_PROGRESS_MASK | FB_FLUSH_IN_PROGRESS_MASK)
 
 
 // Errors mask
@@ -81,6 +85,7 @@ struct s_FB
    uint32_t fb_img_pix_size;          // image size in bytes
    uint32_t fb_lval_pause_min;        // minimum pause between line
    uint32_t fb_fval_pause_min;        // minimum pause between frames and between header end image.
+   uint32_t fb_bypass;                // Bypass mode activation.
   };
 typedef struct s_FB t_FB;
 
@@ -101,7 +106,7 @@ typedef struct s_FrameBufferStatus t_FrameBufferStatus;
 
 /***************** Macros (Inline Functions) Definitions ********************/
 
-#define FB_Intf_Ctor(add) {sizeof(t_FB)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0}
+#define FB_Intf_Ctor(add) {sizeof(t_FB)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 /************************** Function Prototypes *****************************/
 

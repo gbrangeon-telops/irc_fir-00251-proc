@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
+#define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
 
 // AEC+ is available when;
 //  - EHDRI is not active.
@@ -51,10 +52,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 13.2.0
+// Generated from XML camera definition file version 13.3.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 13) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 13) || (GC_XMLMINORVERSION != 3) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -254,6 +255,8 @@ struct gcRegistersDataStruct {
    uint32_t MemoryBufferNumberOfSequences;
    uint32_t MemoryBufferNumberOfSequencesMax;
    uint32_t MemoryBufferNumberOfSequencesMin;
+   uint32_t MemoryBufferSequenceBadPixelReplacement;
+   uint32_t MemoryBufferSequenceCalibrationMode;
    uint32_t MemoryBufferSequenceClear;
    uint32_t MemoryBufferSequenceClearAll;
    uint32_t MemoryBufferSequenceCount;
@@ -293,6 +296,7 @@ struct gcRegistersDataStruct {
    uint32_t OffsetYMax;
    uint32_t OffsetYMin;
    uint32_t POSIXTime;
+   uint32_t PayloadSizeMinFG;
    uint32_t PixelDataResolution;
    uint32_t PixelFormat;
    uint32_t PowerOnAtStartup;
@@ -541,6 +545,8 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetMemoryBufferSequenceOffsetY(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceOffsetYIdx], val)
 #define GC_SetMemoryBufferSequenceWidth(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceWidthIdx], val)
 #define GC_SetMemoryBufferSequenceHeight(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceHeightIdx], val)
+#define GC_SetMemoryBufferSequenceCalibrationMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceCalibrationModeIdx], val)
+#define GC_SetMemoryBufferSequenceBadPixelReplacement(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceBadPixelReplacementIdx], val)
 #define GC_SetMemoryBufferSequenceFirstFrameID(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx], val)
 #define GC_SetMemoryBufferSequenceMOIFrameID(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx], val)
 #define GC_SetMemoryBufferSequenceRecordedSize(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceRecordedSizeIdx], val)
@@ -677,7 +683,6 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_EHDRIIsImplemented TDCFlagsTst(EHDRIIsImplementedMask)
 #define GC_EHDRISimpleSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Advanced)
 #define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection || GC_AutofocusIsActive)
-#define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
 #define GC_FWAsynchronouslyRotatingModeIsActive (GC_FWAsynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_AsynchronouslyRotating))
 #define GC_FWAsynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWAsynchronouslyRotatingModeIsImplementedMask))
 #define GC_FWFixedModeIsActive (gcRegsData.FWMode == FWM_Fixed)

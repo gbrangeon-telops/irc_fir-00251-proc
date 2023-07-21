@@ -24,7 +24,6 @@ acom \
  "$COMMON\VHDL\Utilities\axis64_fanout2.vhd" \
  "$COMMON\VHDL\Utilities\axis64_reg.vhd" \
  "$COMMON\VHDL\Utilities\axis64_img_boundaries.vhd" \
- "$COMMON\VHDL\Utilities\axis64_sw_1_2.vhd" \
  "$COMMON\VHDL\Utilities\axis64_sw_2_1.vhd" \
  "$COMMON\VHDL\Utilities\axis64_hole_sync.vhd" \
  "$COMMON\VHDL\Utilities\axis64_tid_gen.vhd" \

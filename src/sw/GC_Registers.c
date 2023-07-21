@@ -54,7 +54,7 @@ extern float SFW_ExposureTimeMax;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 13.2.0
+// Generated from XML camera definition file version 13.3.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -253,6 +253,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferNumberOfSequences = */ 1,
    /* MemoryBufferNumberOfSequencesMax = */ 0,
    /* MemoryBufferNumberOfSequencesMin = */ 0,
+   /* MemoryBufferSequenceBadPixelReplacement = */ 0,
+   /* MemoryBufferSequenceCalibrationMode = */ MBSCM_Raw0,
    /* MemoryBufferSequenceClear = */ 0,
    /* MemoryBufferSequenceClearAll = */ 0,
    /* MemoryBufferSequenceCount = */ 0,
@@ -292,6 +294,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* OffsetYMax = */ 0,
    /* OffsetYMin = */ 0,
    /* POSIXTime = */ 0,
+   /* PayloadSizeMinFG = */ 0,
    /* PixelDataResolution = */ PDR_Bpp16,
    /* PixelFormat = */ PF_Mono16,
    /* PowerOnAtStartup = */ 0,
@@ -632,6 +635,8 @@ void GC_Registers_Init()
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequences;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequencesMax;
    gcRegsDef[MemoryBufferNumberOfSequencesMinIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequencesMin;
+   gcRegsDef[MemoryBufferSequenceBadPixelReplacementIdx].p_data = &gcRegsData.MemoryBufferSequenceBadPixelReplacement;
+   gcRegsDef[MemoryBufferSequenceCalibrationModeIdx].p_data = &gcRegsData.MemoryBufferSequenceCalibrationMode;
    gcRegsDef[MemoryBufferSequenceClearIdx].p_data = &gcRegsData.MemoryBufferSequenceClear;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].p_data = &gcRegsData.MemoryBufferSequenceClearAll;
    gcRegsDef[MemoryBufferSequenceCountIdx].p_data = &gcRegsData.MemoryBufferSequenceCount;
@@ -671,6 +676,7 @@ void GC_Registers_Init()
    gcRegsDef[OffsetYMaxIdx].p_data = &gcRegsData.OffsetYMax;
    gcRegsDef[OffsetYMinIdx].p_data = &gcRegsData.OffsetYMin;
    gcRegsDef[POSIXTimeIdx].p_data = &gcRegsData.POSIXTime;
+   gcRegsDef[PayloadSizeMinFGIdx].p_data = &gcRegsData.PayloadSizeMinFG;
    gcRegsDef[PixelDataResolutionIdx].p_data = &gcRegsData.PixelDataResolution;
    gcRegsDef[PixelFormatIdx].p_data = &gcRegsData.PixelFormat;
    gcRegsDef[PowerOnAtStartupIdx].p_data = &gcRegsData.PowerOnAtStartup;
@@ -792,13 +798,13 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence3Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence4Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[CalibrationModeIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || GC_WaitingForImageCorrection || GC_MemoryBufferNotEmpty) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForImageCorrection || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[ImageCorrectionModeIdx], GC_WaitingForImageCorrection);
    SetRegLocked(&gcRegsDef[ImageCorrectionBlockSelectorIdx], GC_WaitingForImageCorrection);
    SetRegLocked(&gcRegsDef[ImageCorrectionFWModeIdx], GC_WaitingForImageCorrection);
    SetRegLocked(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateIdx], GC_WaitingForImageCorrection);
-   SetRegLocked(&gcRegsDef[ImageCorrectionIdx], ((GC_WaitingForImageCorrection || (((GC_ExternalMemoryBufferIsImplemented == 0) || (gcRegsData.MemoryBufferLegacyMode == MBLM_On)) && GC_MemoryBufferNotEmpty) || GC_AECPlusIsActive || GC_FWRotatingModeIsActive) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[ImageCorrectionIdx], ((GC_WaitingForImageCorrection || GC_MemoryBufferNotEmpty || GC_AECPlusIsActive || GC_FWRotatingModeIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForImageCorrection || GC_AECPlusIsActive || GC_AutofocusIsActive));
    SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForImageCorrection || GC_AutofocusIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForImageCorrection || GC_AutofocusIsActive) || GC_AcquisitionStarted));
@@ -1390,6 +1396,8 @@ void GC_UpdateMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)
    gcRegsDef[MemoryBufferSequenceOffsetYIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceWidthIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceHeightIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceCalibrationModeIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceBadPixelReplacementIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceRecordedSizeIdx].owner = regOwner;

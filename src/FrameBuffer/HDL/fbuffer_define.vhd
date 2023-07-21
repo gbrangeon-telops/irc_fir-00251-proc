@@ -29,11 +29,11 @@ package fbuffer_define is
       
    constant STREAM_PIXEL_WIDTH   : integer := 4; -- Pixel stream width (TDATA = 64 bits)
    constant NB_PIPE_STAGE        : integer := 2; -- Writer_sm : number of input pipe stages
-   constant RD_NB_CMD_QUEUE      : integer := 2; -- Writer_sm : number of input pipe stages 
+   constant RD_NB_CMD_QUEUE      : integer := 2;  
+
    constant LVAL_PAUSE           : unsigned(31 downto 0) := to_unsigned(1,32);
    constant FVAL_PAUSE           : unsigned(31 downto 0) := to_unsigned(3,32);
-
-  
+     
    constant BUFFER_A_TAG         : unsigned(1 downto 0) := to_unsigned(1,2);
    constant BUFFER_B_TAG         : unsigned(1 downto 0) := to_unsigned(2,2);
    constant BUFFER_C_TAG         : unsigned(1 downto 0) := to_unsigned(3,2);
@@ -52,7 +52,8 @@ package fbuffer_define is
       hdr_pix_size              : unsigned(31 downto 0);                -- header size in bytes 
       img_pix_size              : unsigned(31 downto 0);                -- image size in bytes
       lval_pause_min            : unsigned(31 downto 0);                -- minimum pause between lines 
-      fval_pause_min            : unsigned(31 downto 0);                -- minimum pause between frames
+      fval_pause_min            : unsigned(31 downto 0);                -- minimum pause between frames	   
+      bypass                    : std_logic;                            -- bypass frame buffer
       dval                      : std_logic;                            -- config valid flag
    end record frame_buffer_cfg_type;
  
@@ -73,6 +74,7 @@ package fbuffer_define is
    to_unsigned(1920*1536,s_fb_cfg.img_pix_size'LENGTH),      
    LVAL_PAUSE,
    FVAL_PAUSE,
+   '0',
    '0'
    );  
    

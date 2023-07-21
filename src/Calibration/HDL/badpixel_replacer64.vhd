@@ -43,9 +43,11 @@ architecture RTL of badpixel_replacer64 is
          CLK    : in std_logic);
    end component;
    
-   signal sresetn          : std_logic;
-   signal last_valid_pix   : std_logic_vector(15 downto 0);
-
+   signal sresetn           : std_logic; 
+   signal frame_in_progress : std_logic; 
+   signal repl_mode_i       : bpr_mode_type;
+   signal last_valid_pix    : std_logic_vector(15 downto 0);
+   
 begin
    
    U0 : sync_resetn
@@ -62,6 +64,31 @@ begin
    TX_MOSI.TDEST  <= RX_MOSI.TDEST;  
    TX_MOSI.TUSER  <= RX_MOSI.TUSER;
    
+   
+     sync_cfg :process(CLK)
+     begin          
+        if rising_edge(CLK) then        
+            if sresetn = '0' then 
+               repl_mode_i        <= BPR_MODE_LAST_VALID;
+               frame_in_progress  <= '0';    
+            else   
+               
+               if(RX_MOSI.TVALID = '1' and RX_MOSI.TLAST = '1' and TX_MISO.TREADY = '1') then
+                  frame_in_progress <= '0'; 
+               elsif(RX_MOSI.TVALID = '1' and RX_MOSI.TLAST = '0' and TX_MISO.TREADY = '1') then
+                  frame_in_progress <= '1';
+               end if;
+               
+               if(frame_in_progress = '0') then
+                  repl_mode_i <= REPL_MODE;
+               else
+                  repl_mode_i <= repl_mode_i;
+               end if;
+               
+            end if;        
+        end if;
+    end process;
+    
     last_valid_value :process(CLK)
         begin          
         if rising_edge(CLK) then        

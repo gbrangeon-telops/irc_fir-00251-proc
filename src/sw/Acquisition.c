@@ -45,6 +45,7 @@ static DevicePowerState_t gAcquisitionPowerState = DPS_PowerStandby;
 
 bool actualisationAcqStartReady();
 void Acquisition_Arm();
+void Playback_Arm();
 void Acquisition_Start();
 void SCD_UpdatePostponedExposureTimeChange();
 void SCD_SetRelaxMode();
@@ -123,7 +124,6 @@ void Acquisition_Arm()
    EXP_SendConfigGC(&gExposureTime, &gcRegsData);
 
    CAL_SendConfigGC(&gCal, &gcRegsData);
-   CAL_UpdateCalibBprMode(&gCal, &gcRegsData);
 
    FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
 
@@ -144,6 +144,24 @@ void Acquisition_Arm()
    TDCStatusClr(WaitingForArmMask);
 
    PRINT("Arming...\n");
+}
+
+/**
+ * Arm detector.
+ */
+void Playback_Arm()
+{
+   extern t_calib gCal;
+   extern t_bufferManager gBufManager;
+   extern t_FB gFB_ctrl;
+
+   GC_SetCalibrationMode(gcRegsData.MemoryBufferSequenceCalibrationMode);
+   GC_SetExposureAuto(EA_Off);
+   CAL_SendConfigGC(&gCal, &gcRegsData);
+   BufferManager_HW_MoiHandlerConfig(&gBufManager, 0);
+   FB_SendConfigGC(&gFB_ctrl, &gcRegsData);
+
+   PRINT("Arming playback...\n");
 }
 
 /**
@@ -326,12 +344,19 @@ void Acquisition_SM()
             {
                GC_SetAcquisitionArm(0);
 
-               if (GC_DeviceRegistersVerification() == IRC_SUCCESS && !BM_MemoryBufferRead)
+               if (GC_DeviceRegistersVerification() == IRC_SUCCESS)
                {
-                  Acquisition_Arm();
-
-                  GETTIME(&tic_delay);
-                  TDCStatusSet(WaitingForSensorMask);
+                  if(BM_MemoryBufferRead)
+                  {
+                     Playback_Arm();
+                  }
+                  else
+                  {
+                     Acquisition_Arm();
+                     TDCStatusSet(WaitingForSensorMask);
+                     GETTIME(&tic_delay);
+                  }
+                  
                   acquisitionState = ACQ_WAITING_FOR_SENSOR_READY;
                }
                else if (gcRegsData.AcquisitionStart)
@@ -344,17 +369,22 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_SENSOR_READY:
-         if (elapsed_time_us(tic_delay) >= WAITING_FOR_SENSOR_DELAY_US)
+
+         if(BM_MemoryBufferRead) //Playback mode
+         {
+            GC_SetAcquisitionStart(0); //Download is start by this callback 
+            acquisitionState = ACQ_STOPPED;
+         }
+         else if (elapsed_time_us(tic_delay) >= WAITING_FOR_SENSOR_DELAY_US)//Live mode
          {
             TDCStatusClr(WaitingForSensorMask);
-
             PRINT("Sensor ready!\n");
             acquisitionState = ACQ_SENSOR_READY;
          }
          break;
 
       case ACQ_SENSOR_READY:
-         if (gcRegsData.AcquisitionStart && FB_isFrameBufferReady(&gFB_ctrl))
+         if (gcRegsData.AcquisitionStart)
          {
             GC_SetAcquisitionStart(0);
 

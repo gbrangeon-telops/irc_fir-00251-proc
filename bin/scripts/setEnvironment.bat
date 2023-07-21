@@ -19,19 +19,20 @@ set hwFile=%sdkDir%\%baseName%_%fpgaSize%.hdf
 set buildInfoFile=%srcDir%\BuildInfo\%sensorName%\BuildInfo.h
 set releaseFile=%binDir%\%baseName%_%fpgaSize%_release.bin
 set releaseLogFile=%binDir%\%baseName%_%fpgaSize%_release.txt
-set revFile=%binDir%\svnrevs_%fpgaSize%.pl
+set revFile=%binDir%\svnrevs_%fpgaSize%.tcl
 
 if "%fpgaSize%" == "160" (
    set outputFpgaSize=70
 ) else (
    set outputFpgaSize=160
 )
-set outputRevFile=%outputDir%\bin\svnrevs_%outputFpgaSize%.pl
+
+set outputRevFile=%outputDir%\bin\svnrevs_%outputFpgaSize%.tcl
 set outputBaseName=fir_00251_output_%outputFpgaSize%
 set outputBuildInfoFile=%outputDir%\src\BuildInfo\BuildInfo.h
 
-set storageRevFile1=%storageDir%\bin\svnrevs_16.pl
-set storageRevFile2=%storageDir%\bin\svnrevs_32.pl
+set storageRevFile1=%storageDir%\bin\svnrevs_16.tcl
+set storageRevFile2=%storageDir%\bin\svnrevs_32.tcl
 set storageBuildInfoFile=%storageDir%\src\BuildInfo\BuildInfo.h
 
 set versionFile=%binDir%\version.txt
@@ -52,18 +53,11 @@ set tortoiseSVNDir="C:\Program Files\TortoiseSVN"
 set svn_subwcrev=%tortoiseSVNDir%\bin\SubWCRev.exe
 
 set xDir=C:\Xilinx
-if exist D:\Xilinx\SDK\2016.3\*.* set xDir=D:\Xilinx
+if exist D:\Xilinx\SDK\2018.3\*.* set xDir=D:\Xilinx
 @echo Xilinx directory: %xDir%
 
-set x_mb-objcopy=%xDir%\SDK\2016.3\gnu\microblaze\nt\bin\mb-objcopy.exe
-set x_xsct=%xDir%\SDK\2016.3\bin\xsct.bat
-set x_xilperl=%xDir%\Vivado\2016.3\ids_lite\ISE\bin\nt64\xilperl.exe
-
-set xDir=C:\Xilinx
-if exist D:\Xilinx\14.7\*.* set xDir=D:\Xilinx
-@echo Xilinx directory: %xDir%
-
-set x_promgen=%xDir%\14.7\LabTools\LabTools\bin\nt64\promgen.exe
+set x_mb-objcopy=%xDir%\SDK\2018.3\gnu\microblaze\nt\bin\mb-objcopy.exe
+set x_xsct=%xDir%\SDK\2018.3\bin\xsct.bat
 
 copy %versionFile% %versionFile:.txt=.bat%
 call %versionFile:.txt=.bat%

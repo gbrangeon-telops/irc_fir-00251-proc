@@ -139,7 +139,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 13.2
+// Generated from the IRCam header definition XLS file version 13.3
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -152,6 +152,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + FrameIDHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + DataOffsetHdrAddr);
    AXI4L_write8((int8_t)(0), a->ADD + A_BASE_HEADER + DataExpHdrAddr);
+   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + DeltaTempHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + ExposureTimeHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->CalibrationMode), a->ADD + A_BASE_HEADER + CalibrationModeHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->BadPixelReplacement), a->ADD + A_BASE_HEADER + BPRAppliedHdrAddr);

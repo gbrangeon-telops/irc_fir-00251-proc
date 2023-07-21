@@ -32,14 +32,14 @@ entity mgt_stream_merger is
       RX_MISO_DATA  : out t_axi4_stream_miso; 
       RX_MOSI_VIDEO  : in  t_axi4_stream_mosi64;
       RX_MISO_VIDEO  : out t_axi4_stream_miso;
-      RX_MOSI_EXP  : in  t_axi4_stream_mosi64;
+      RX_MOSI_EXP  : in  t_axi4_stream_mosi128;
       RX_MISO_EXP  : out t_axi4_stream_miso; 
       
       TX_MOSI_DATA  : out  t_axi4_stream_mosi64;
       TX_MISO_DATA  : in t_axi4_stream_miso;
       TX_MOSI_VIDEO  : out  t_axi4_stream_mosi64;
       TX_MISO_VIDEO  : in t_axi4_stream_miso; 
-      TX_MOSI_EXP  : out  t_axi4_stream_mosi64;
+      TX_MOSI_EXP  : out  t_axi4_stream_mosi128;
       TX_MISO_EXP  : in t_axi4_stream_miso;
       
       ARESETN  : in  std_logic;
@@ -53,7 +53,8 @@ entity mgt_stream_merger is
       EXP_FIFO_OVFL : out  std_logic; 
       
       MBSDM : in STD_LOGIC_VECTOR(0 downto 0); -- Memory Buffer Sequence Download Mode
-      
+
+      DCLK      : in  std_logic;  
       TX_CLK      : in  std_logic;
       RX_CLK      : in  std_logic;  
       EXP_CLK      : in  std_logic
@@ -123,7 +124,22 @@ architecture rtl of mgt_stream_merger is
          );
    end component;
    
-   
+   component t_axi4_stream_wr128_rd128_fifo
+   generic( 
+   WR_FIFO_DEPTH : integer := 512;
+   ASYNC          : boolean := false 
+   );
+   Port (  
+      ARESETN  : in std_logic;
+      RX_CLK   : in std_logic;
+      RX_MOSI  : in t_axi4_stream_mosi128;
+      RX_MISO  : out t_axi4_stream_miso;
+      TX_CLK   : in std_logic;
+      TX_MOSI  : out t_axi4_stream_mosi128;
+      TX_MISO  : in t_axi4_stream_miso;
+      OVFL     : out std_logic
+         );
+   end component;
 ------------------------------------------------------------------------ 
 -- Axis stream combiner (32 -> 64)
    
@@ -306,12 +322,12 @@ begin
        EXP_FIFO_OVFL <= exp_overflow; 
     
            -- Fifo for exp     
-       EXP_FIFO : t_axi4_stream_wr64_rd64_fifo  
+       EXP_FIFO : t_axi4_stream_wr128_rd128_fifo  
        generic map (WR_FIFO_DEPTH => 512, ASYNC => true)
        port map(
             ARESETN  => aresetn_exp,
             -- slave side (write channel only)
-            RX_CLK   => RX_CLK,
+            RX_CLK   => DCLK,
             RX_MOSI  => RX_MOSI_EXP,
             RX_MISO  => RX_MISO_EXP,
             -- master side 

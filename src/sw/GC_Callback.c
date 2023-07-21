@@ -78,7 +78,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 13.2.0
+// Generated from XML camera definition file version 13.3.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -277,6 +277,8 @@ void GC_Callback_Init()
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].callback =                        &GC_MemoryBufferNumberOfSequencesCallback;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].callback =                     &GC_MemoryBufferNumberOfSequencesMaxCallback;
    gcRegsDef[MemoryBufferNumberOfSequencesMinIdx].callback =                     &GC_MemoryBufferNumberOfSequencesMinCallback;
+   gcRegsDef[MemoryBufferSequenceBadPixelReplacementIdx].callback =              &GC_MemoryBufferSequenceBadPixelReplacementCallback;
+   gcRegsDef[MemoryBufferSequenceCalibrationModeIdx].callback =                  &GC_MemoryBufferSequenceCalibrationModeCallback;
    gcRegsDef[MemoryBufferSequenceClearIdx].callback =                            &GC_MemoryBufferSequenceClearCallback;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].callback =                         &GC_MemoryBufferSequenceClearAllCallback;
    gcRegsDef[MemoryBufferSequenceCountIdx].callback =                            &GC_MemoryBufferSequenceCountCallback;
@@ -319,6 +321,7 @@ void GC_Callback_Init()
    gcRegsDef[OffsetYMaxIdx].callback =                                           &GC_OffsetYMaxCallback;
    gcRegsDef[OffsetYMinIdx].callback =                                           &GC_OffsetYMinCallback;
    gcRegsDef[POSIXTimeIdx].callback =                                            &GC_POSIXTimeCallback;
+   gcRegsDef[PayloadSizeMinFGIdx].callback =                                     &GC_PayloadSizeMinFGCallback;
    gcRegsDef[PixelDataResolutionIdx].callback =                                  &GC_PixelDataResolutionCallback;
    gcRegsDef[PixelFormatIdx].callback =                                          &GC_PixelFormatCallback;
    gcRegsDef[PowerOnAtStartupIdx].callback =                                     &GC_PowerOnAtStartupCallback;
@@ -590,10 +593,12 @@ void GC_AcquisitionStartCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (gcRegsData.AcquisitionStart && !GC_ExternalMemoryBufferIsImplemented)
-      {
+      if ((gcRegsData.AcquisitionStart && !BM_MemoryBufferRead && !GC_ExternalMemoryBufferIsImplemented) || 
+      (!gcRegsData.AcquisitionStart && BM_MemoryBufferRead && !GC_ExternalMemoryBufferIsImplemented))
+	  {
          BufferManager_OnAcquisitionStart(&gBufManager, &gcRegsData);
       }
+
    }
 }
 
@@ -738,9 +743,6 @@ void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
       {
          GC_ERR("Failed to update flash dynamic values.");
       }
-
-      // Update bad pixel replacement state
-      CAL_UpdateCalibBprMode(&gCal, &gcRegsData);
 
       // Update BadPixelReplacement image header field
       HDER_UpdateBadPixelReplacementHeader(&gHderInserter, &gcRegsData);
@@ -925,7 +927,7 @@ void GC_CalibrationCollectionLoadCallback(gcCallbackPhase_t phase, gcCallbackAcc
       {
          file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
 
-         if (((!calibrationInfo.isValid) || (file->posixTime != calibrationInfo.collection.POSIXTime)) && (!TDCStatusTst(AcquisitionStartedMask)))
+         if (((!calibrationInfo.isValid) || (file->posixTime != calibrationInfo.collection.POSIXTime)) && !TDCStatusTst(AcquisitionStartedMask) && !GC_MemoryBufferNotEmpty)
          {
             Calibration_LoadCalibrationFilePOSIXTime(file->posixTime);
          }
@@ -3434,6 +3436,28 @@ void GC_MemoryBufferNumberOfSequencesMinCallback(gcCallbackPhase_t phase, gcCall
 }
 
 /**
+ * MemoryBufferSequenceBadPixelReplacement GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceBadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+}
+
+/**
+ * MemoryBufferSequenceCalibrationMode GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceCalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+}
+
+/**
  * MemoryBufferSequenceClear GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -4045,6 +4069,17 @@ void GC_POSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    {
       TRIG_OverWritePOSIXNow(gcRegsData.POSIXTime, &gTrig);
    }
+}
+
+/**
+ * PayloadSizeMinFG GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_PayloadSizeMinFGCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
 }
 
 /**

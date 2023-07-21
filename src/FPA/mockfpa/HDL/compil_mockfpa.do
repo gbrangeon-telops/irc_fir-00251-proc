@@ -20,6 +20,8 @@ do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
  
  
 # ----------------- mockfpa files ------------------	
+acom "D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_wr132_rd66_d16\fwft_afifo_wr132_rd66_d16_sim_netlist.vhdl"
+acom "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr128_rd64_fifo.vhd"
 acom -nowarn DAGGEN_0523 -incr \
 D:\Telops\FIR-00251-Proc\src\FPA\mockfpa\Sim\src\mock_fpa_testbench_pkg.vhd \
 D:\Telops\FIR-00251-Common\VHDL\signal_stat\min_max_define.vhd \

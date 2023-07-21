@@ -33,6 +33,8 @@ entity calib_block_sel is
       FPA_IMG_INFO                : in img_info_type;
       FW_POSITION                 : in std_logic_vector(2 downto 0);
       NDF_POSITION                : in std_logic_vector(1 downto 0);
+                                    
+      HEADER_DONE                 : in std_logic;
       
       -- Header
       FRAME_ID                    : out std_logic_vector(7 downto 0);
@@ -64,7 +66,7 @@ architecture rtl of calib_block_sel is
    constant ERR_NDF_POS_NOT_FOUND   : integer := 3;
    constant ERR_INVALID_SEL_MODE    : integer := 4;
    
-   type sel_state_type is (STANDBY, SEL_INDEX, WRITE_HEADER);
+   type sel_state_type is (STANDBY, SEL_INDEX, WRITE_HEADER, HEADER_START, WAIT_HEADER_DONE);
    
    -- Signal declarations
    signal sresetn                   : std_logic;
@@ -136,8 +138,17 @@ begin
                   end if;
                   FRAME_ID <= frame_id_i;
                   HDER_SEND_START <= '1';
-                  sel_state <= STANDBY;
+                  sel_state <= HEADER_START;
                
+               when HEADER_START =>
+                  sel_state <= WAIT_HEADER_DONE;  
+
+               when WAIT_HEADER_DONE =>
+                  HDER_SEND_START <= '0';
+                  if HEADER_DONE = '1' then
+                     sel_state <= STANDBY;
+                  end if;
+
                when others =>
                   sel_state <= STANDBY;
                   

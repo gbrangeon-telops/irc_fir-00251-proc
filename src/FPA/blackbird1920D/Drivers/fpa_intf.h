@@ -95,10 +95,20 @@
 #define SCD_MIN_OPER_FPS               (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 
-#define SEND_CONFIG_DELAY             TIME_ONE_SECOND_US
+#define SEND_CONFIG_DELAY              TIME_ONE_SECOND_US
 
 #define FPA_PRINTF(fmt, ...)           FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
+#define ROIC_WRITE_CMD_ID              0x8500
+#define ROIC_READ_CMD_ID               0x8501
+#define PROXY_WRITE_CMD_ID             0x8502
+#define PROXY_READ_CMD_ID              0x8503
+
+#define OUTGOING_COM_HDER              0xAA
+#define INCOMING_COM_HDER              0x55
+#define INCOMING_COM_FAIL_ID           0xFFFF
+#define INCOMING_COM_OVH_LEN           6
+#define OUTGOING_COM_OVH_LEN           5
 
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet

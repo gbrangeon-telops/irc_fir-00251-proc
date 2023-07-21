@@ -250,11 +250,11 @@ IRC_Status_t startActualization()
       return IRC_FAILURE;
    }
 
-   // process is disabled if the external buffer memory is not present and the internal buffer is not empty
-   if (!GC_ExternalMemoryBufferIsImplemented && GC_MemoryBufferNotEmpty)
+   // process is disabled if the memory buffer is not empty
+   if (GC_MemoryBufferNotEmpty)
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
-      ACT_ERR("Could not perform image correction because there are recorded sequences in buffer memory.");
+      ACT_ERR("Could not perform image correction because there are recorded sequences in memory buffer.");
       return IRC_FAILURE;
    }
 
@@ -728,6 +728,10 @@ IRC_Status_t Actualization_SM()
          // Make sure AEC and EHDRI are stopped
          GC_SetExposureAuto(EA_Off);
          GC_SetEHDRINumberOfExposures(1);
+
+         // Configure external frame buffer switch
+         AXI4L_write32(BM_SWITCH_INTERNAL_LIVE, gBufManager.ADD + BM_SWITCH_CONFIG);
+         AXI4L_write32(BM_OFF, gBufManager.ADD + BM_BUFFER_MODE);
 
          if (usingICU)
          {
@@ -1984,9 +1988,9 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
                // the order of these 3 calls is important!
                // since select() modifies the input array
                memcpy(prctile_buffer, mu_buffer + imageDataOffset, numPixels * sizeof(uint32_t));
-               p75 = select(prctile_buffer, 0, numPixels-1, i75);
-               p50 = select(prctile_buffer, 0, i75, i50);
-               p25 = select(prctile_buffer, 0, i50, i25);
+               p75 = __select(prctile_buffer, 0, numPixels-1, i75);
+               p50 = __select(prctile_buffer, 0, i75, i50);
+               p25 = __select(prctile_buffer, 0, i50, i25);
             }
             else
             {
@@ -2259,6 +2263,7 @@ static void ACT_restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
    GC_SetMemoryBufferMOISource(p_GCRegsBackup->MemoryBufferMOISource);
    // IMPORTANT: Restore MemoryBufferMode AFTER clearing or downloading the buffer !!! (not before)
    GC_SetMemoryBufferMode(p_GCRegsBackup->MemoryBufferMode);
+
    BufferManager_HW_SetSwitchConfig(&gBufManager);
 
    GC_SetBadPixelReplacement(p_GCRegsBackup->BadPixelReplacement);
@@ -3774,7 +3779,7 @@ static float nth_element_f(const float* input, float minval, float* buffer, int 
       buffer[i] = input[i] - minval;
 
    // CR_TRICKY comparing *positive* floats type-casted as uint32_t is equivalent
-   p.i = select((uint32_t*)buffer, 0, N, r);
+   p.i = __select((uint32_t*)buffer, 0, N, r);
    p.f += minval;
 
    return p.f;
@@ -3789,7 +3794,7 @@ static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, in
    for (i=0; i<N; ++i)
       buffer[i] = input[i];
 
-   p = select(buffer, 0, N, r);
+   p = __select(buffer, 0, N, r);
 
    return p;
 }

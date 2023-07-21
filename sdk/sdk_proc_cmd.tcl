@@ -9,11 +9,17 @@ cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
 setws -switch "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/"
 
 if {$size_arg == "both" || $size_arg == "160"} {
-   #Create HW projects
-   createhw -name hw_platform_160 -hwspec fir_00251_proc_${detector}_160.hdf
+   #Create HW projects, In the case already exist, update HW 
+   if {[catch {createhw -name hw_platform_160 -hwspec "fir_00251_proc_${detector}_160.hdf"} errMsg]} {
+		updatehw -hw hw_platform_160 -newhwspec "fir_00251_proc_${detector}_160.hdf"
+	}
+   
 
-   #Create BSP projects
-   createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1
+   #Create BSP projects, if already exist do nothing
+   if {[catch {createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1} errMsg]} {
+			puts ""
+	}	
+   
 
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
@@ -31,11 +37,16 @@ if {$size_arg == "both" || $size_arg == "160"} {
    }
 }
 if {$size_arg == "both" || $size_arg == "325"} {
-   #Create HW projects
-   createhw -name hw_platform_325 -hwspec fir_00251_proc_${detector}_325.hdf
-
-   #Create BSP projects
-   createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1
+   #Create HW projects, In the case already exist, update HW 
+   if {[catch { createhw -name hw_platform_325 -hwspec "fir_00251_proc_${detector}_325.hdf"} errMsg]} {
+		updatehw -hw hw_platform_325 -newhwspec "fir_00251_proc_${detector}_325.hdf"
+	}
+  
+    #Create BSP projects, if already exist do nothing
+   if {[catch {createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1} errMsg]} {
+			puts ""
+	}	
+ 
 
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"

@@ -78,6 +78,14 @@ IRC_Status_t Calibration_LoadCalibrationFile(fileRecord_t *file)
       return IRC_FAILURE;
    }
 
+   // process is disabled if either external or internal memory buffer is not empty
+   if (GC_MemoryBufferNotEmpty)
+   {
+      CM_INF("Could not perform image correction because there are recorded sequences in buffer memory.");
+      return IRC_FAILURE;
+   }
+
+
    cmLoadCalibration = 1;
    cmCalibrationFile = file;
 

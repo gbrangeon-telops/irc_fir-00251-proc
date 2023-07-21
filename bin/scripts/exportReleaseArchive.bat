@@ -33,24 +33,19 @@ for /f "delims=" %%G in ('dir /b /a:d %binDir% ^| findstr "Release_"') do (
 )
 
 rem Verify encryption consistency
-set cfiFileLineFound=0
-for /f "delims=" %%G in ('findstr /c:"%baseName%_%fpgaSize%.bit" %cfiFile%') do (
-   set cfiFileLine=%%G
-   set cfiFileLineFound=1
+for /f %%i in ('%x_xsct% %scriptsDir%\getEncryptationStatus.tcl %binDir%\Prom\%baseName%_%fpgaSize%.mcs') do  set encrypt_key_status=%%i
+
+if not %encrypt_key_status%==NONE (
+ echo Bitstream encrypted 
+ rem todo what to do with encrypt_key_name
+ set encrypt_key_name=key_name
+ goto consistent
 )
-if %cfiFileLineFound%==1 (
-   if %cfiFileLine:~-9%==ENCRYPTED (
-      if not %encrypt_key_name%==NONE (
-         echo Bitstream encrypted with %encrypt_key_name% key
-         goto consistent
-      )
-   ) else (
-      if %encrypt_key_name%==NONE (
-         echo Bitstream unencrypted
-         goto consistent
-      )
-   )
+if %encrypt_key_status%==NONE (
+ echo Bitstream unencrypted
+ goto consistent
 )
+
 :inconsistent
 echo hwRevFile and cfiFile are not consistent!
 pause
@@ -80,9 +75,9 @@ if errorlevel 1 goto err
 copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini
 if errorlevel 1 goto err
 
-%x_xilperl% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.pl -sensor %sensorName% -key %encrypt_key_name% ^
+%x_xsct% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.tcl -sensor %sensorName% -key %encrypt_key_name% ^
    -v %firmwareVersion% -o %outputRevFile% -storage_revs1 %storageRevFile1% -storage_revs2 %storageRevFile2% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -cal %calibFilesVersion% -t %paperworkTemplateDir%
-
+   
 %zip% a -r -tzip %paperworkTemplateDir%.zip %paperworkTemplateDir%\*.*
 
 move %paperworkTemplateDir%.zip %releaseDir%\Release_%firmwareVersion:.=_%.xlsx

@@ -93,7 +93,6 @@ struct calibBlockRamInfoStruct
    float     nlc_pow2_m_exp_fp32;
    float     nlc_pow2_b_exp_fp32;
    // FSU
-   float     delta_temp_fp32;
    float     alpha_offset_fp32;
    float     pow2_alpha_exp_fp32;
    float     pow2_beta0_exp_fp32;
@@ -125,6 +124,7 @@ struct calibBlockHdrInfoStruct
    uint32_t actualizationPOSIXTime;
    float    low_cut;
    float    high_cut;
+   float    delta_temp_fp32;
 };
 typedef struct calibBlockHdrInfoStruct calibBlockHdrInfo_t;
 
@@ -163,7 +163,8 @@ typedef struct s_CalStatus t_CalStatus;
 
 /************************** Prototypes des fonctions *****************************/
 void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs);
-void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs);
+void CAL_CalculDeltaF(t_calib *pA, const gcRegistersData_t *pGCRegs);
+void CAL_SendDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs);
 void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs);
 void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs);

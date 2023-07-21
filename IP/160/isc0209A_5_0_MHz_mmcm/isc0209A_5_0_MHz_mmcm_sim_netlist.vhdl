@@ -1,11 +1,11 @@
--- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Mon Jun 13 22:47:20 2022
--- Host        : TELOPS228 running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim
---               d:/Telops/fir-00251-Proc/IP/160/isc0209A_5_0_MHz_mmcm/isc0209A_5_0_MHz_mmcm_sim_netlist.vhdl
--- Design      : isc0209A_5_0_MHz_mmcm
+-- Tool Version: Vivado v.2018.3_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Tue May 16 15:42:18 2023
+-- Host        : LAPTOP-J3K1KOB9 running 64-bit major release  (build 9200)
+-- Command     : write_vhdl -force -mode funcsim -rename_top isc0209A_5_0_MHz_mmcm -prefix
+--               isc0209A_5_0_MHz_mmcm_ hawkA_10MHz_mmcm_sim_netlist.vhdl
+-- Design      : hawkA_10MHz_mmcm
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xc7k160tfbg676-1
@@ -14,7 +14,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz is
+entity isc0209A_5_0_MHz_mmcm_hawkA_10MHz_mmcm_clk_wiz is
   port (
     mclk_source : out STD_LOGIC;
     adc_clk_source : out STD_LOGIC;
@@ -26,16 +26,14 @@ entity isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz is
     locked : out STD_LOGIC;
     clk_in : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz : entity is "isc0209A_5_0_MHz_mmcm_clk_wiz";
-end isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz;
+end isc0209A_5_0_MHz_mmcm_hawkA_10MHz_mmcm_clk_wiz;
 
-architecture STRUCTURE of isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz is
-  signal adc_clk_source_isc0209A_5_0_MHz_mmcm : STD_LOGIC;
-  signal clk_in_isc0209A_5_0_MHz_mmcm : STD_LOGIC;
-  signal clkfbout_buf_isc0209A_5_0_MHz_mmcm : STD_LOGIC;
-  signal clkfbout_isc0209A_5_0_MHz_mmcm : STD_LOGIC;
-  signal mclk_source_isc0209A_5_0_MHz_mmcm : STD_LOGIC;
+architecture STRUCTURE of isc0209A_5_0_MHz_mmcm_hawkA_10MHz_mmcm_clk_wiz is
+  signal adc_clk_source_hawkA_10MHz_mmcm : STD_LOGIC;
+  signal clk_in_hawkA_10MHz_mmcm : STD_LOGIC;
+  signal clkfbout_buf_hawkA_10MHz_mmcm : STD_LOGIC;
+  signal clkfbout_hawkA_10MHz_mmcm : STD_LOGIC;
+  signal mclk_source_hawkA_10MHz_mmcm : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED : STD_LOGIC;
@@ -59,22 +57,22 @@ architecture STRUCTURE of isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz is
 begin
 clkf_buf: unisim.vcomponents.BUFG
      port map (
-      I => clkfbout_isc0209A_5_0_MHz_mmcm,
-      O => clkfbout_buf_isc0209A_5_0_MHz_mmcm
+      I => clkfbout_hawkA_10MHz_mmcm,
+      O => clkfbout_buf_hawkA_10MHz_mmcm
     );
 clkin1_bufg: unisim.vcomponents.BUFG
      port map (
       I => clk_in,
-      O => clk_in_isc0209A_5_0_MHz_mmcm
+      O => clk_in_hawkA_10MHz_mmcm
     );
 clkout1_buf: unisim.vcomponents.BUFG
      port map (
-      I => mclk_source_isc0209A_5_0_MHz_mmcm,
+      I => mclk_source_hawkA_10MHz_mmcm,
       O => mclk_source
     );
 clkout2_buf: unisim.vcomponents.BUFG
      port map (
-      I => adc_clk_source_isc0209A_5_0_MHz_mmcm,
+      I => adc_clk_source_hawkA_10MHz_mmcm,
       O => adc_clk_source
     );
 mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
@@ -129,17 +127,17 @@ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
       STARTUP_WAIT => false
     )
         port map (
-      CLKFBIN => clkfbout_buf_isc0209A_5_0_MHz_mmcm,
-      CLKFBOUT => clkfbout_isc0209A_5_0_MHz_mmcm,
+      CLKFBIN => clkfbout_buf_hawkA_10MHz_mmcm,
+      CLKFBOUT => clkfbout_hawkA_10MHz_mmcm,
       CLKFBOUTB => NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED,
       CLKFBSTOPPED => NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED,
-      CLKIN1 => clk_in_isc0209A_5_0_MHz_mmcm,
+      CLKIN1 => clk_in_hawkA_10MHz_mmcm,
       CLKIN2 => '0',
       CLKINSEL => '1',
       CLKINSTOPPED => NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED,
-      CLKOUT0 => mclk_source_isc0209A_5_0_MHz_mmcm,
+      CLKOUT0 => mclk_source_hawkA_10MHz_mmcm,
       CLKOUT0B => NLW_mmcm_adv_inst_CLKOUT0B_UNCONNECTED,
-      CLKOUT1 => adc_clk_source_isc0209A_5_0_MHz_mmcm,
+      CLKOUT1 => adc_clk_source_hawkA_10MHz_mmcm,
       CLKOUT1B => NLW_mmcm_adv_inst_CLKOUT1B_UNCONNECTED,
       CLKOUT2 => NLW_mmcm_adv_inst_CLKOUT2_UNCONNECTED,
       CLKOUT2B => NLW_mmcm_adv_inst_CLKOUT2B_UNCONNECTED,
@@ -186,7 +184,7 @@ end isc0209A_5_0_MHz_mmcm;
 
 architecture STRUCTURE of isc0209A_5_0_MHz_mmcm is
 begin
-inst: entity work.isc0209A_5_0_MHz_mmcm_isc0209A_5_0_MHz_mmcm_clk_wiz
+inst: entity work.isc0209A_5_0_MHz_mmcm_hawkA_10MHz_mmcm_clk_wiz
      port map (
       adc_clk_source => adc_clk_source,
       clk_in => clk_in,

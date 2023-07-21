@@ -1,10 +1,10 @@
--- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Mon Aug 01 12:34:25 2022
--- Host        : TELOPS258 running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim -rename_top scorpiomwA_27MHz_mmcm -prefix
---               scorpiomwA_27MHz_mmcm_ scorpiomwA_27MHz_mmcm_sim_netlist.vhdl
+-- Tool Version: Vivado v.2018.3_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Tue May 16 15:48:03 2023
+-- Host        : LAPTOP-J3K1KOB9 running 64-bit major release  (build 9200)
+-- Command     : write_vhdl -force -mode funcsim
+--               D:/Telops/FIR-00251-Proc/IP/160/scorpiomwA_27MHz_mmcm/scorpiomwA_27MHz_mmcm_sim_netlist.vhdl
 -- Design      : scorpiomwA_27MHz_mmcm
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -26,6 +26,8 @@ entity scorpiomwA_27MHz_mmcm_scorpiomwA_27MHz_mmcm_clk_wiz is
     locked : out STD_LOGIC;
     clk_in : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of scorpiomwA_27MHz_mmcm_scorpiomwA_27MHz_mmcm_clk_wiz : entity is "scorpiomwA_27MHz_mmcm_clk_wiz";
 end scorpiomwA_27MHz_mmcm_scorpiomwA_27MHz_mmcm_clk_wiz;
 
 architecture STRUCTURE of scorpiomwA_27MHz_mmcm_scorpiomwA_27MHz_mmcm_clk_wiz is
