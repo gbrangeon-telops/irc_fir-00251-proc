@@ -9,14 +9,30 @@ if { $argc != 1 } {
 
 #generate CLI file using mcs
 set mcsFile [open ${mcsDir} r]
-
+set registerIsAfter 0
 while {[gets $mcsFile line] != -1} {
-    if {[string match "*3000A001*" $line]} {
-        set index [string first "3000A001" $line]
-        set variable [string range $line [expr {$index + 8}] [expr {$index + 15}]]
+    if {$registerIsAfter == 0} {
+        if {[string match "*3000A001*" $line]} {
+            set index [string first "3000A001" $line]
+            #get the 8 bits after 3000A001
+            set variable [string range $line [expr {$index + 8}] [expr {$index + 15}]]
+            #case register is in the other line
+            if {[string length $variable] != 8} {
+                #puts "Register est dans lautre ligne"
+                set registerIsAfter 1
+            } else {
+                #variable is correctly set 
+                #puts "Register est dans la meme ligne"
+                break
+            }
+        }
+    } else {
+        set variable [string range $line [expr {9}] [expr {16}]]
+        break
     }
+
 }
-#example : 80000040
+
 #puts "Les 32 bits apres'3000A001' sont : $variable"
 set binaryVariable [binary format H* $variable]
 set binaryValue [binary scan $binaryVariable B8 bits]
