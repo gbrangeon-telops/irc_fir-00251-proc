@@ -71,7 +71,7 @@ proc genCore {scriptEnvironment sensorName fpgaSize} {
     #%svn_subwcrev% %commonDir% %buildInfoFile% %buildInfoFile%
     puts $Vfo  " #define SVN_COMMON_REV      ${localModif}"
     close $Vfo
-    if {[ catch {[exec "C:/Program Files/TortoiseSVN/bin/SubWCRev.exe" ${commonDir} ${buildInfoFile}  ${buildInfoFile}]} ]} {
+    if {[ catch {[exec $svn_subwcrev ${commonDir} ${buildInfoFile}  ${buildInfoFile}]} ]} {
        set errorsvn 
        puts "SubWCRev.exe Common done"
     }

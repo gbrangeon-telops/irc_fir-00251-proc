@@ -62,8 +62,8 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     set storageBuildInfoFile "$storageDir/src/BuildInfo/BuildInfo.h"
     set versionFile "$binDir/version.txt"
     set sensorInfoFile "$projectDir/bin/SensorInformation.txt"
-    set zip "\"C:/Program Files/7-Zip/7z.exe\""
-    set tortoiseSVNDir "\"C:/Program Files/TortoiseSVN\""
+    set zip "C:/Program Files/7-Zip/7z.exe"
+    set tortoiseSVNDir "C:/Program Files/TortoiseSVN"
     set svn_subwcrev "$tortoiseSVNDir/bin/SubWCRev.exe"
     set xDir "C:/Xilinx"
     if {[file exists "D:/Xilinx/SDK/2018.3/*.*"]} {
