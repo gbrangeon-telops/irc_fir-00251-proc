@@ -34,9 +34,8 @@ while {[gets $mcsFile line] != -1} {
 }
 
 #puts "Les 32 bits apres'3000A001' sont : $variable"
-set binaryVariable [binary format H* $variable]
-set binaryValue [binary scan $binaryVariable B8 bits]
-set sixthBit [expr {($binaryValue & 0b00100000) >> 5}]
+binary scan [binary format H* $variable] B* bits
+set sixthBit [expr {($bits & 0b01000000) >> 6}]
 #puts "Le 6eme bit de $variable est $sixthBit"
 if {$sixthBit == 1} {
     puts "ENCRYPTED"
