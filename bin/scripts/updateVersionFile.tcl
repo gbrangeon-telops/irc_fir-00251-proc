@@ -64,7 +64,7 @@ puts $script "set firmwareVersionSubMinor=$sensorCode"
 puts -nonewline $script "set firmwareVersionBuild="
 set vfirmwareVersionBuild [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FirmwareVersionFile -f firmwareVersionBuild]
 puts $script "$vfirmwareVersionBuild"
-puts $script "set firmwareVersion=%%firmwareVersionMajor%%.%%firmwareVersionMinor%%.%%firmwareVersionSubMinor%%.%%firmwareVersionBuild%%"
+puts $script "set firmwareVersion=%firmwareVersionMajor%.%firmwareVersionMinor%.%firmwareVersionSubMinor%.%firmwareVersionBuild%"
 
 puts -nonewline $script "set xmlVersionMajor="
 set vxmlVersionMajor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $GenICam_h -f GC_XMLMAJORVERSION]
@@ -75,7 +75,7 @@ puts $script "$vxmlVersionMinor"
 puts -nonewline $script "set xmlVersionSubMinor="
 set vxmlVersionSubMinor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $GenICam_h -f GC_XMLSUBMINORVERSION]
 puts $script "$vxmlVersionSubMinor"
-puts $script "set xmlVersion=%%xmlVersionMajor%%.%%xmlVersionMinor%%.%%xmlVersionSubMinor%%"
+puts $script "set xmlVersion=%xmlVersionMajor%.%xmlVersionMinor%.%xmlVersionSubMinor%"
 
 puts -nonewline $script "set flashSettingsVersionMajor="
 set vflashSettingsVersionMajor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FlashSettingsFile_h -f "FLASHSETTINGS_FILEMAJORVERSION_V$fsMajorVersion"]
@@ -86,7 +86,7 @@ puts $script "$vflashSettingsVersionMinor"
 puts -nonewline $script "set flashSettingsVersionSubMinor="
 set vflashSettingsVersionSubMinor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FlashSettingsFile_h -f "FLASHSETTINGS_FILESUBMINORVERSION_V$fsMajorVersion"]
 puts $script "$vflashSettingsVersionSubMinor"
-puts $script "set xmlVersion=%%xmlVersionMajor%%.%%xmlVersionMinor%%.%%xmlVersionSubMinor%%"
+puts $script "set xmlVersion=%xmlVersionMajor%.%xmlVersionMinor%.%xmlVersionSubMinor%"
 
 puts -nonewline $script "set flashDynamicValuesVersionMajor="
 set vflashDynamicValuesVersionMajor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FlashDynamicValuesFile_h -f "FLASHDYNAMICVALUES_FILEMAJORVERSION_V$fdvMajorVersion"]
@@ -97,7 +97,7 @@ puts $script "$vflashDynamicValuesVersionMinor"
 puts -nonewline $script "set flashDynamicValuesVersionSubMinor="
 set vflashDynamicValuesVersionSubMinor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FlashDynamicValuesFile_h -f "FLASHDYNAMICVALUES_FILESUBMINORVERSION_V$fdvMajorVersion"]
 puts $script "$vflashDynamicValuesVersionSubMinor"
-puts $script "set flashDynamicValuesVersion=%%flashDynamicValuesVersionMajor%%.%%flashDynamicValuesVersionMinor%%.%%flashDynamicValuesVersionSubMinor%%"
+puts $script "set flashDynamicValuesVersion=%flashDynamicValuesVersionMajor%.%flashDynamicValuesVersionMinor%.%flashDynamicValuesVersionSubMinor%"
 
 puts -nonewline $script "set calibFilesVersionMajor="
 set vcalibFilesVersionMajor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $CalibCollectionFile_h -f "CALIBCOLLECTION_FILEMAJORVERSION_V$calMajorVersion"]
@@ -108,7 +108,7 @@ puts $script "$vcalibFilesVersionMinor"
 puts -nonewline  $script "set calibFilesVersionSubMinor="
 set vcalibFilesVersionSubMinor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $CalibCollectionFile_h -f "CALIBCOLLECTION_FILESUBMINORVERSION_V$calMajorVersion"]
 puts $script "$vcalibFilesVersionSubMinor"
-puts $script "set calibFilesVersion=%%calibFilesVersionMajor%%.%%calibFilesVersionMinor%%.%%calibFilesVersionSubMinor%%"
+puts $script "set calibFilesVersion=%calibFilesVersionMajor%.%calibFilesVersionMinor%.%calibFilesVersionSubMinor%"
 
 #set newVersionFile [string map {.txt .bat} $versionFile]
 close $script

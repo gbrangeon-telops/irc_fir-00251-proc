@@ -37,8 +37,6 @@ for /f %%i in ('%x_xsct% %scriptsDir%\getEncryptationStatus.tcl %binDir%\Prom\%b
 
 if not %encrypt_key_status%==NONE (
  echo Bitstream encrypted 
- rem todo what to do with encrypt_key_name
- set encrypt_key_name=key_name
  goto consistent
 )
 if %encrypt_key_status%==NONE (
