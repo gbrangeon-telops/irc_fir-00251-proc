@@ -40,3 +40,6 @@ source $script_dir/Base_project.tcl
 #Set top level design
 set_property top $top_lvl [current_fileset]
 update_compile_order -fileset sources_1
+
+# Cleanup of unused sources
+remove_files [get_files -filter {IS_AUTO_DISABLED}]

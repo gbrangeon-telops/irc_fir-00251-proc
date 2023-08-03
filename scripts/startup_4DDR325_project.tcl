@@ -45,3 +45,6 @@ set_property is_enabled false [get_files -of [get_filesets { constrs_1}] *encryp
 add_files $aldec_dir/fir_00251_proc_startup_4DDR_${FPGA_SIZE}.vhd
 set_property top $top_lvl [current_fileset]
 update_compile_order -fileset sources_1
+
+# Cleanup of unused sources
+remove_files [get_files -filter {IS_AUTO_DISABLED}]
