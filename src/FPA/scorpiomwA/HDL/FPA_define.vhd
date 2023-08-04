@@ -79,6 +79,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- pour le scorpioMW, on ne fait aucune correction électronique
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait pas la correctioon du gain
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
+   constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN   : std_logic := '0';      -- on ne permet pas la troncature de la plage dynamique du détecteur (fait sur le M2K-UD uniquement pour reduire le ghost oscillant)
    
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;        -- pour le scorpioMW, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
@@ -337,6 +338,9 @@ package FPA_define is
       -- pour imposer un echantillon par pixel
       single_samp_mode_en                 : std_logic;
       
+      -- FPA: clipping of the dynamic range 
+      dynrange_scaling_numerator          : unsigned(22 downto 0);
+      dynrange_clipping_level             : unsigned(13 downto 0);      
       
    end record;    
    

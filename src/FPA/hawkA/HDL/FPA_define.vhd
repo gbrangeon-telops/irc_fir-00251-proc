@@ -55,6 +55,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- on ne fait aucune correction électronique
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait aucune correction de gain
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
+   constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN   : std_logic := '0';      -- on ne permet pas la troncature de la plage dynamique du détecteur (fait sur le M2K-UD uniquement pour reduire le ghost oscillant)
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -129,7 +130,7 @@ package FPA_define is
    constant YSIZE_MAX                             : integer := DEFINE_YSIZE_MAX;  -- pour les modules utilisant YSIZE_MAX   
    constant ADC_SERDES_CLK_1X_PERIOD_NS           : real    := 1_000_000.0/real(DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    constant DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR  : unsigned(31 downto 0):= to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_INTCLK_RATE_KHZ)), 32);
-
+   
    ---------------------------------------------------------------------------------								
    -- Configuration
    ---------------------------------------------------------------------------------  
@@ -298,6 +299,10 @@ package FPA_define is
       aoi_data                       : line_area_cfg_type;
       aoi_flag1                      : line_area_cfg_type;
       aoi_flag2                      : line_area_cfg_type;
+      
+      -- FPA: clipping of the dynamic range 
+      dynrange_scaling_numerator          : unsigned(22 downto 0);
+      dynrange_clipping_level             : unsigned(13 downto 0);
       
    end record; 
    

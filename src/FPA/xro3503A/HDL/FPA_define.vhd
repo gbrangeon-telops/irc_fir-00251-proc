@@ -51,6 +51,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '0';      -- on ne fait aucune correction électronique
    constant DEFINE_GENERATE_ELCORR_GAIN               : std_logic := '0';      -- on ne fait aucune correction de gain
    constant DEFINE_GENERATE_CROPPING_CHAIN            : std_logic := '1';      -- on génère le module de cropping
+   constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN       : std_logic := '0';      -- on ne permet pas la troncature de la plage dynamique du détecteur (fait sur le M2K-UD uniquement pour reduire le ghost oscillant)
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -72,7 +73,7 @@ package FPA_define is
    constant DEFINE_FPA_TEMP_TRIG_PERIOD_US            : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
    constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 24786;      -- Minimum ADC value for power-on : 0.775 V, soit 35°C
    constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 26833;      -- Maximum ADC value for power-on : 0.838 V, soit -5°C		 
-      
+   
    constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ              : integer   := 100_000;    --  horloge de 100M en KHz
    
@@ -310,6 +311,10 @@ package FPA_define is
       aoi_data                       : line_area_cfg_type;
       aoi_flag1                      : line_area_cfg_type;
       aoi_flag2                      : line_area_cfg_type;
+      
+      -- FPA: clipping of the dynamic range 
+      dynrange_scaling_numerator          : unsigned(22 downto 0);
+      dynrange_clipping_level             : unsigned(13 downto 0);
       
    end record;
    

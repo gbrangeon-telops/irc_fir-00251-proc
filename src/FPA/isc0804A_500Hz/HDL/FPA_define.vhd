@@ -50,7 +50,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait pas que la correctioon de l'offset mais aussi du gain
    constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.
-   -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';
+   constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN   : std_logic := '0';      -- on ne permet pas la troncature de la plage dynamique du détecteur (fait sur le M2K-UD uniquement pour reduire le ghost oscillant)
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
    
@@ -135,7 +135,7 @@ package FPA_define is
    constant DEFINE_FPA_PROG_START_PAUSE_FACTOR    : integer := DEFINE_FPA_PROG_END_PAUSE_FACTOR;
    constant DEFINE_ELCORR_REF_DAC_SETUP_FACTOR    : integer := integer(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ*real(DEFINE_ELCORR_REF_DAC_SETUP_US/1000));
    constant DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR  : unsigned(31 downto 0):= to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_INTCLK_RATE_KHZ)), 32);
-
+   
    ---------------------------------------------------------------------------------								
    -- Type
    --------------------------------------------------------------------------------- 
@@ -351,6 +351,10 @@ package FPA_define is
       aoi_data                            : line_area_cfg_type;
       aoi_flag1                           : line_area_cfg_type;
       aoi_flag2                           : line_area_cfg_type;
+      
+      -- FPA: clipping of the dynamic range 
+      dynrange_scaling_numerator          : unsigned(22 downto 0);
+      dynrange_clipping_level             : unsigned(13 downto 0);
       
    end record;    
    

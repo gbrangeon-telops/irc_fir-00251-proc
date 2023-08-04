@@ -63,6 +63,8 @@ package FPA_define is
    
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- pour le M2K, on ne fait aucune correction de gain et d'offset
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait aucune correction de gain, mais juste l'offset au besoin
+   constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN   : std_logic := '0';      -- on ne permet la troncature de la plage dynamique du détecteur (fait uniquement sur le M2K-UD pour reduire le ghost oscillant)
+   
    
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le isc0207A, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;           -- not used
@@ -429,6 +431,10 @@ package FPA_define is
       aoi_data                            : line_area_cfg_type;
       aoi_flag1                           : line_area_cfg_type;
       aoi_flag2                           : line_area_cfg_type;
+      
+      -- FPA: clipping of the dynamic range 
+      dynrange_scaling_numerator          : unsigned(22 downto 0);
+      dynrange_clipping_level             : unsigned(13 downto 0);
       
    end record;     
    
