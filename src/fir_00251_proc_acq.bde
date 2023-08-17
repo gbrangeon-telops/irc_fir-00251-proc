@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 79379
+ FREEID 79431
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -8978,11 +8978,13 @@ HEADER
     #GENERIC0="CAL_2CH:boolean:=false"
     #GENERIC1="IMG_WIDTH_MAX:integer:=640"
     #GENERIC2="IMG_HEIGHT_MAX:integer:=512"
+    #GENERIC3="CAL_AOI_ALIGN:boolean:=false"
+    #GENERIC4="G_GEN_CAL_CROPPING:std_logic:='0'"
     #HDL_ENTRIES=
 "library STD,IEEE,WORK;\n"+
 "use STD.STANDARD.all,ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1677528629"
+    #MODIFIED="1690401873"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ea26efb5-2366-41c6-9fc0-fbd520da1cab"
    }
   }
@@ -9313,7 +9315,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="AXIL_AEC_CTRL_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9348,7 +9350,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="CAL_HDER_MOSI"
       #NUMBER="0"
       #VHDL_TYPE="T_AXI4_LITE_MOSI"
@@ -9382,7 +9384,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DDR_ADD_MOSI"
       #NUMBER="0"
       #SIDE="right"
@@ -9400,7 +9402,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="AXIL_AEC_CTRL_MOSI"
       #NUMBER="0"
       #VHDL_TYPE="t_axi4_lite_mosi"
@@ -9417,7 +9419,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DDR_DATA_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9435,7 +9437,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="CAL_HDER_MISO"
       #NUMBER="0"
       #SIDE="right"
@@ -9453,7 +9455,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DIN_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9471,7 +9473,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DDR_ADD_MISO"
       #NUMBER="0"
       #SIDE="right"
@@ -9489,7 +9491,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DDR_DATA_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -9507,7 +9509,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_CAL_CFG_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9525,7 +9527,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DIN_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -9543,7 +9545,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_CAL_RAM_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9561,7 +9563,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_NLC_LUT_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9579,7 +9581,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="FPA_IMG_INFO"
       #NUMBER="0"
       #SIDE="left"
@@ -9597,7 +9599,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_RQC_LUT_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9615,7 +9617,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_CAL_CFG_MOSI"
       #NUMBER="0"
       #VHDL_TYPE="T_AXI4_LITE_MOSI"
@@ -9632,7 +9634,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="VIDEO_MOSI"
       #NUMBER="0"
       #SIDE="right"
@@ -9650,7 +9652,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_CAL_RAM_MOSI"
       #NUMBER="0"
       #VHDL_TYPE="T_AXI4_LITE_MOSI"
@@ -9667,7 +9669,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_NLC_LUT_MOSI"
       #NUMBER="0"
       #VHDL_TYPE="t_axi4_lite_mosi"
@@ -9684,7 +9686,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="MB_RQC_LUT_MOSI"
       #NUMBER="0"
       #VHDL_TYPE="t_axi4_lite_mosi"
@@ -9701,7 +9703,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="VIDEO_MISO"
       #NUMBER="0"
       #SIDE="right"
@@ -9719,7 +9721,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DOUT1_MISO"
       #NUMBER="0"
       #SIDE="right"
@@ -9737,7 +9739,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DOUT2_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -9755,7 +9757,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DOUT1_MOSI"
       #NUMBER="0"
       #SIDE="right"
@@ -9773,7 +9775,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="DOUT2_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -23440,9 +23442,11 @@ PAGE ""
    {
     #COMPONENT="calibration"
     #CUSTOM_NAME=""
-    #GENERIC0="CAL_2CH : BOOLEAN := CAL_2CH"
-    #GENERIC1="IMG_HEIGHT_MAX : INTEGER := IMG_HEIGHT_MAX"
-    #GENERIC2="IMG_WIDTH_MAX : INTEGER := IMG_WIDTH_MAX"
+    #GENERIC0="G_GEN_CAL_CROPPING : std_logic := G_GEN_CAL_CROPPING"
+    #GENERIC1="CAL_2CH : boolean := CAL_2CH"
+    #GENERIC2="CAL_AOI_ALIGN : boolean := CAL_AOI_ALIGN"
+    #GENERIC3="IMG_WIDTH_MAX : integer := IMG_WIDTH_MAX"
+    #GENERIC4="IMG_HEIGHT_MAX : integer := IMG_HEIGHT_MAX"
     #IMPL="sch"
     #LIBRARY="work"
     #NO_CONF="1"
@@ -23452,7 +23456,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ea26efb5-2366-41c6-9fc0-fbd520da1cab"
    }
    COORD (6740,1660)
-   VERTEXES ( (2,78394), (4,78396), (6,78398), (8,78400), (10,78402), (12,78404), (14,78406), (16,78408), (18,78410), (20,78412), (22,78414), (26,78418), (30,78420), (32,78422), (34,78424), (36,78426), (40,78428), (42,78430), (44,78432), (46,78434), (48,78436), (50,78438), (52,78440), (54,78442), (56,78444), (66,78472), (62,78475), (68,78480), (24,78493), (64,78504) )
+   VERTEXES ( (2,78394), (4,78396), (6,78398), (8,78400), (10,78402), (12,78404), (14,78406), (16,78408), (18,78410), (20,78412), (22,78414), (24,78493), (26,78418), (30,78420), (32,78422), (34,78424), (36,78426), (40,78428), (42,78430), (44,78432), (46,78434), (48,78436), (50,78438), (52,78440), (54,78442), (56,78444), (62,78475), (64,78504), (66,78472), (68,78480) )
   }
   TEXT  65449, 0, 0
   {
@@ -23472,7 +23476,7 @@ PAGE ""
   TEXT  65451, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (6760,3100,7322,3199)
+   RECT (6760,3100,7498,3265)
    PARENT 65426
   }
   INSTANCE  66296, 0, 0
@@ -31163,6 +31167,24 @@ PAGE ""
     #NAMED="1"
    }
   }
+  GENERIC  79379, 0, 0
+  {
+   LABEL "Generic_5"
+   TEXT 
+"CAL_AOI_ALIGN : boolean := false;\n"+
+"G_GEN_CAL_CROPPING : std_logic := '0';\n"+
+""
+   RECT (6760,3340,7360,3500)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,219,179),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
  }
  
 }
@@ -31188,7 +31210,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  79362, 0, 0
+  TEXT  79414, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -31199,7 +31221,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79363, 0, 0
+  TEXT  79415, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -31210,7 +31232,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  79364, 0, 0
+  TEXT  79416, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -31220,7 +31242,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79365, 0, 0
+  TEXT  79417, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -31232,7 +31254,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  79366, 0, 0
+  TEXT  79418, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -31245,7 +31267,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  79367, 0, 0
+  TEXT  79419, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -31255,7 +31277,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79368, 0, 0
+  TEXT  79420, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -31267,7 +31289,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  79369, 0, 0
+  TEXT  79421, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -31277,7 +31299,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79370, 0, 0
+  TEXT  79422, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -31288,7 +31310,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  79371, 0, 0
+  GROUP  79423, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8220,9401,8601)
@@ -31300,7 +31322,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79372, 0, 0
+  GROUP  79424, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8420,9401,8421)
@@ -31312,7 +31334,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79373, 0, 0
+  GROUP  79425, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8360,9401,8361)
@@ -31324,7 +31346,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79374, 0, 0
+  GROUP  79426, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8480,9401,8481)
@@ -31336,7 +31358,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79375, 0, 0
+  GROUP  79427, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8540,9401,8541)
@@ -31348,7 +31370,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79376, 0, 0
+  GROUP  79428, 0, 0
   {
    PAGEALIGN 10
    RECT (8700,8220,8701,8361)
@@ -31359,7 +31381,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  79377, 0, 0
+  GROUP  79429, 0, 0
   {
    PAGEALIGN 10
    RECT (8700,8360,8701,8601)
@@ -31370,7 +31392,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  79378, 0, 0
+  BMPPICT  79430, 0, 0
   {
    PAGEALIGN 10
    RECT (8540,8280,8679,8325)

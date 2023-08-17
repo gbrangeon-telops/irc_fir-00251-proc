@@ -142,6 +142,13 @@ typedef struct
    uint32_t height;
    uint32_t offsetx;
    uint32_t offsety;
+   uint32_t width_aligned;
+   uint32_t offsetx_aligned;
+   uint32_t full_width;
+   uint32_t aoi_fli_pos;
+   uint32_t aoi_lli_pos;
+   uint32_t aoi_sol_pos;
+   uint32_t aoi_eol_pos;
    float    exposure_time_mult_fp32;
    uint32_t calib_block_index_max;
    calibBlockSelMode_t calib_block_sel_mode;
@@ -158,7 +165,7 @@ typedef struct s_CalStatus t_CalStatus;
 
 
 /***************** Macros (Inline Functions) Definitions ********************/
-#define CAL_Config_Ctor(add) {sizeof(t_calib)/4 - 3, add}//, 0, 0, 0, 0, 0, 0, 0.0F, 0, 0, 0} // CR_WARNING le pointeur à la fin n'est pas inclu
+#define CAL_Config_Ctor(add) {sizeof(t_calib)/4 - 3, add}//, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0F, 0, 0, 0} // CR_WARNING le pointeur à la fin n'est pas inclus
 #define CAL_Param_Ctor(add) {sizeof(calibBlockRamInfo_t)/4 - 2, add}//, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0, 0}
 
 /************************** Prototypes des fonctions *****************************/

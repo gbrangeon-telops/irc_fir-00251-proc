@@ -14,6 +14,7 @@
 #include <string.h>
 #include "exposure_time_ctrl.h"
 #include "GC_Registers.h"
+#include "fpa_intf.h"
 #include "hder_inserter.h"
 #include "Actualization.h"
 #include "FlashSettings.h"
@@ -35,11 +36,11 @@
 
 
 // ADRESSES
-#define AW_BLOCK_SEL_MODE        0x20
-#define AW_BLOCK_IDX_ADDR        0x24
-#define AW_CAL_BLOCK_INFO_VALID  0x28
-#define AW_BLOCK_OFFSET          0x2C
-#define AW_DELTA_TEMP_FP32       0x48
+#define AW_BLOCK_SEL_MODE        0x3C
+#define AW_BLOCK_IDX_ADDR        0x40
+#define AW_CAL_BLOCK_INFO_VALID  0x44
+#define AW_BLOCK_OFFSET          0x48
+#define AW_DELTA_TEMP_FP32       0x64
 
 #define AW_FLUSHPIPE             0xD0
 #define AW_RESET_ERR             0xD4
@@ -235,6 +236,41 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    pA->offsetx = pGCRegs->OffsetX;
    pA->offsety = pGCRegs->OffsetY;
    pA->exposure_time_mult_fp32 = (1.0F / EXPOSURE_TIME_FACTOR);  // facteur de multiplication pour avoir le temps d'exposition en µsec
+
+   // ELA (08-2023): alignement des transferts du datamover des données de calibration pour éviter
+   // une régression sur le HerculesD suite à l'expansion du bus du DM à 256 bits (Redmine #33634).
+   // Pour les détecteurs autres que HerculesD et PelicanD, ces champs sont ignorés et
+   // les modules HW agissent comme un simple pass-through.
+   if (pGCRegs->Width % 8 == 0)
+   {
+      // Config de cal_aoi_align
+      pA->width_aligned = pGCRegs->Width;
+      pA->offsetx_aligned = pGCRegs->OffsetX;
+
+      // Config du xcropper
+      pA->full_width = pGCRegs->Width;
+      pA->aoi_fli_pos = 1;
+      pA->aoi_lli_pos = pGCRegs->Height;
+      pA->aoi_sol_pos = 1;
+      pA->aoi_eol_pos = pGCRegs->Width;
+   }
+   else
+   {
+      uint32_t width_aligned = (pGCRegs->Width/8 + 1)*8;
+      uint32_t offsetx_aligned = (FPA_WIDTH_MAX - width_aligned)/2;
+      uint32_t extra_width = width_aligned - pGCRegs->Width;
+
+      // Config de cal_aoi_align
+      pA->width_aligned = width_aligned;
+      pA->offsetx_aligned = offsetx_aligned;
+
+      // Config du xcropper
+      pA->full_width = width_aligned;
+      pA->aoi_fli_pos = 1;
+      pA->aoi_lli_pos = pGCRegs->Height;
+      pA->aoi_sol_pos = 1 + extra_width/2;
+      pA->aoi_eol_pos = extra_width/2 + pGCRegs->Width;
+   }
 
    // Reset header info of all blocks
    CAL_initCalBlockInfo(pA->calib_block, CALIB_MAX_NUM_OF_BLOCKS);

@@ -53,6 +53,7 @@ add_files [concat \
    [glob -nocomplain $src_dir/Trig/HDL/*.vhd] \
    [glob -nocomplain $src_dir/FrameBuffer/HDL/*.vhd] \
 ]
+set_property FILE_TYPE {VHDL 2008} [get_files [glob -nocomplain $src_dir/Calibration/HDL/calib_aoi_align.vhd] ]
 
 # Add common project sources 
 add_files [concat \

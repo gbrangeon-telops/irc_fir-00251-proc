@@ -52,6 +52,10 @@ entity calib_config is
       AOI_PARAM                   : out aoi_param_type;
       AOI_PARAM_DVAL              : out std_logic;
       
+      -- XCROPPER
+      CAL_XCROPPING_PARAM         : out calib_xcropping_type;
+      CAL_XCROPPING_DVAL          : out std_logic;
+      
       -- Exposure time
       EXP_TIME_MULT_FP32          : out std_logic_vector(31 downto 0);  
       EXP_TIME_MULT_FP32_DVAL     : out std_logic;
@@ -113,6 +117,7 @@ architecture rtl of calib_config is
    
    signal config_dval_sync             : std_logic := '0';
    signal aoi_param_i                  : aoi_param_type;
+   signal cal_xcropping_cfg_i          : calib_xcropping_type;         
    signal exp_time_mult_fp32_i         : std_logic_vector(EXP_TIME_MULT_FP32'range);
    signal cal_block_index_max_i        : cal_block_index_type := CAL_BLOCK_INDEX_7;
    signal calib_block_sel_mode_i       : calib_block_sel_mode_type := CBSM_USER_SEL_0;
@@ -174,9 +179,11 @@ begin
             CALIB_RAM_BLOCK_OFFSET  <= calib_ram_block_offset_i;
             PIXEL_DATA_BASE_ADDR    <= pixel_data_base_addr_i;
             
-            
             AOI_PARAM               <= aoi_param_i;
             AOI_PARAM_DVAL          <= config_dval_sync;
+            
+            CAL_XCROPPING_PARAM     <= cal_xcropping_cfg_i;
+            CAL_XCROPPING_DVAL      <= config_dval_sync;
             
             EXP_TIME_MULT_FP32      <= exp_time_mult_fp32_i;
             EXP_TIME_MULT_FP32_DVAL <= config_dval_sync;
@@ -298,22 +305,28 @@ begin
                when X"08" => aoi_param_i.width           <= unsigned(cfg_wr_data(aoi_param_i.width'range));
                when X"0C" => aoi_param_i.height          <= unsigned(cfg_wr_data(aoi_param_i.height'range));
                when X"10" => aoi_param_i.offsetx         <= unsigned(cfg_wr_data(aoi_param_i.offsetx'range));
-               when X"14" => aoi_param_i.offsety         <= unsigned(cfg_wr_data(aoi_param_i.offsety'range)); 
-               when X"18" => exp_time_mult_fp32_i        <= cfg_wr_data(exp_time_mult_fp32_i'range);
-               when X"1C" => cal_block_index_max_i       <= unsigned(cfg_wr_data(cal_block_index_max_i'range));
-               when X"20" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);config_dval_i <= '1';
-               
-               when X"24" => calib_block_index           <= cfg_wr_data(calib_block_index'range);
-               when X"28" => calib_block_info_dval_i     <=  cfg_wr_data(0);
-               
-               when X"2C" => calib_block_array(idx).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"30" => calib_block_array(idx).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);
-               when X"34" => calib_block_array(idx).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range);
-               when X"38" => calib_block_array(idx).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               when X"3C" => calib_block_array(idx).hder_info.block_act_posix   <= cfg_wr_data(calib_hder_type.block_act_posix'range);
-               when X"40" => calib_block_array(idx).hder_info.low_cut           <= cfg_wr_data(calib_hder_type.low_cut'range);
-               when X"44" => calib_block_array(idx).hder_info.high_cut          <= cfg_wr_data(calib_hder_type.high_cut'range);
-               when X"48" => calib_block_array(idx).hder_info.delta_temp_fp32   <= cfg_wr_data(calib_hder_type.delta_temp_fp32'range);
+               when X"14" => aoi_param_i.offsety         <= unsigned(cfg_wr_data(aoi_param_i.offsety'range));
+               when X"18" => aoi_param_i.width_aligned   <= unsigned(cfg_wr_data(aoi_param_i.width_aligned'range));
+               when X"1C" => aoi_param_i.offsetx_aligned <= unsigned(cfg_wr_data(aoi_param_i.offsetx_aligned'range));
+               when X"20" => cal_xcropping_cfg_i.full_width <= cfg_wr_data(cal_xcropping_cfg_i.full_width'range);
+               when X"24" => cal_xcropping_cfg_i.aoi_fli_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_fli_pos'range);
+               when X"28" => cal_xcropping_cfg_i.aoi_lli_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_lli_pos'range);
+               when X"2C" => cal_xcropping_cfg_i.aoi_sol_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_sol_pos'range);
+               when X"30" => cal_xcropping_cfg_i.aoi_eol_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_eol_pos'range);
+               when X"34" => exp_time_mult_fp32_i        <= cfg_wr_data(exp_time_mult_fp32_i'range);               
+               when X"38" => cal_block_index_max_i       <= unsigned(cfg_wr_data(cal_block_index_max_i'range));               
+               when X"3C" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);config_dval_i <= '1';               
+               when X"40" => calib_block_index           <= cfg_wr_data(calib_block_index'range);
+               when X"44" => calib_block_info_dval_i     <= cfg_wr_data(0);
+
+               when X"48" => calib_block_array(idx).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);               
+               when X"4C" => calib_block_array(idx).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);
+               when X"50" => calib_block_array(idx).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range);
+               when X"54" => calib_block_array(idx).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
+               when X"58" => calib_block_array(idx).hder_info.block_act_posix   <= cfg_wr_data(calib_hder_type.block_act_posix'range);
+               when X"5C" => calib_block_array(idx).hder_info.low_cut           <= cfg_wr_data(calib_hder_type.low_cut'range);               
+               when X"60" => calib_block_array(idx).hder_info.high_cut          <= cfg_wr_data(calib_hder_type.high_cut'range);
+               when X"64" => calib_block_array(idx).hder_info.delta_temp_fp32   <= cfg_wr_data(calib_hder_type.delta_temp_fp32'range);
                              
                -- control du data flow
                when X"A4" => calib_flow_config_i.input_sw            <= cfg_wr_data(calib_flow_config_i.input_sw'range);

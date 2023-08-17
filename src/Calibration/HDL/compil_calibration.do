@@ -32,8 +32,9 @@ acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Common\VHDL\Utilities\pixel_bad_repl.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Math\axis_fi32tou32.vhd  
  
-
-
+acom -nowarn DAGGEN_0523 -2008 \
+ d:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_aoi_align.vhd
+ 
 acom -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\Calibration\HDL\ddr_aoi_add_gen.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\ddr_data_decoder_core.vhd \
