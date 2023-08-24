@@ -340,7 +340,9 @@ package FPA_define is
       
       -- FPA: clipping of the dynamic range 
       dynrange_scaling_numerator          : unsigned(22 downto 0);
-      dynrange_clipping_level             : unsigned(13 downto 0);      
+      dynrange_clipping_level             : unsigned(13 downto 0);
+      dynrange_global_offset              : signed(17 downto 0); 
+      dynrange_op_sel                     : std_logic_vector(1 downto 0);
       
    end record;    
    
