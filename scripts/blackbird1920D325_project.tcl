@@ -40,3 +40,16 @@ update_compile_order -fileset sources_1
 
 # Cleanup of unused sources
 remove_files [get_files -filter {IS_AUTO_DISABLED}]
+
+# Cleanup of leftover unused IPs that cause critical warnings during implementation
+synth_design -rtl -name rtl_1
+set iplist [get_ips -filter {NAME =~ "*serdes*mmcm" || NAME =~ "*fifo*"}]
+foreach ip $iplist {
+	set name [get_property NAME $ip]
+	set cells [get_cells -hierarchical -filter "REF_NAME == $name"]
+	if {[llength $cells] == 0} {
+		set file [get_property IP_FILE $ip]
+		remove_files $file
+	}
+}
+close_design
