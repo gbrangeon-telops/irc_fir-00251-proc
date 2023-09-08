@@ -34,7 +34,6 @@ do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do
 
 --acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\TestBench\scorpiomwA_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\scorpiomwa_hw_ctrl_tb.bde
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\TestBench\scorpiomwa_hw_ctrl_tb_TB.vhd
 

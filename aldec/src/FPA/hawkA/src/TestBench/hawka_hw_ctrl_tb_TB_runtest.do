@@ -29,8 +29,6 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_funcsim
 
 --acom d:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd
 --acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\TestBench\hawkA_dummy.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawka_hw_ctrl_tb.bde
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\TestBench\hawka_hw_ctrl_tb_TB.vhd
 
 
