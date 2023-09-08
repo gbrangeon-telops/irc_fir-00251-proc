@@ -107,10 +107,10 @@ architecture rtl of bb1920_data_gen is
          ARESET             : in std_logic;
          LINE_SIZE          : in std_logic_vector(15 downto 0);
          START_PULSE        : in std_logic;
-         FIRST_VALUE        : in std_logic_vector(15 downto 0); 
-         INCR_VALUE         : in std_logic_vector(15 downto 0);
+         FIRST_VALUE        : in std_logic_vector(23 downto 0); 
+         INCR_VALUE         : in std_logic_vector(23 downto 0);
          PIX_SAMP_TRIG      : in std_logic;
-         DIAG_DATA          : out std_logic_vector(15 downto 0);
+         DIAG_DATA          : out std_logic_vector(23 downto 0);
          DIAG_DVAL          : out std_logic; 
          DIAG_SOL           : out std_logic;
          DIAG_EOL           : out std_logic;
@@ -124,7 +124,7 @@ architecture rtl of bb1920_data_gen is
    
    type diag_fsm_type is (idle, wait_int_fe_st, int_st, junk_data_st, tir_dly_st, get_line_data_st, cfg_line_gen_st, lovh_dly_st, fovh_dly_st, check_end_st);
    type img_change_sm_type is (idle, change_st); 
-   type data_type is array (0 to C_DIAG_TAP_NUMBER_M1) of std_logic_vector(15 downto 0);
+   type data_type is array (0 to C_DIAG_TAP_NUMBER_M1) of std_logic_vector(23 downto 0);
    
    signal diag_fsm          : diag_fsm_type;
    signal img_change_sm     : img_change_sm_type;
@@ -135,7 +135,7 @@ architecture rtl of bb1920_data_gen is
    signal line_size         : std_logic_vector(15 downto 0);
    signal diag_line_gen_en  : std_logic;
    signal first_value       : data_type;
-   signal incr_value        : std_logic_vector(15 downto 0);
+   signal incr_value        : std_logic_vector(23 downto 0);
    signal fpa_2xmclk_dummy  : std_logic;
    
    signal diag_data_i       : data_type;
@@ -194,7 +194,7 @@ architecture rtl of bb1920_data_gen is
    DIAG_DATA(66)           <= aoi_fval_i;       -- fval
    DIAG_DATA(65)           <= aoi_lval_i;       -- pix_lval
    DIAG_DATA(64)           <= aoi_dval_i;       -- pix_dval
-   DIAG_DATA(63 downto 0)  <= data(3)  & data(2)  & data(1)  & data(0);
+   DIAG_DATA(63 downto 0)  <= data(3)(15 downto 0)  & data(2)(15 downto 0)  & data(1)(15 downto 0)  & data(0)(15 downto 0);
    DIAG_DVAL               <= aoi_dval_i or addtional_dval_i;
    
    --------------------------------------------------
@@ -377,7 +377,7 @@ architecture rtl of bb1920_data_gen is
             else                                                       
                for ii in 0 to C_DIAG_TAP_NUMBER_M1 loop                  -- degradé lineaire constant et dégradé linéaire dynamique
                   first_value(ii) <= std_logic_vector(to_unsigned(C_DIAG_BASE_OFFSET + ii*DEFINE_DIAG_DATA_INC, first_value(0)'length));
-                  incr_value <= std_logic_vector(to_unsigned(G_FPA_TAP_NUMBER*DEFINE_DIAG_DATA_INC, first_value(0)'length));
+                  incr_value <= std_logic_vector(to_unsigned(G_FPA_TAP_NUMBER*DEFINE_DIAG_DATA_INC, incr_value'length));
                end loop;                        
             end if;
             

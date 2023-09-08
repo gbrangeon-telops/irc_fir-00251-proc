@@ -77,13 +77,14 @@ architecture rtl of scd_diag_data_gen is
          ARESET             : in std_logic;
          LINE_SIZE          : in std_logic_vector(15 downto 0);
          START_PULSE        : in std_logic;
-         FIRST_VALUE        : in std_logic_vector(15 downto 0); 
-         INCR_VALUE         : in std_logic_vector(15 downto 0);
+         FIRST_VALUE        : in std_logic_vector(23 downto 0); 
+         INCR_VALUE         : in std_logic_vector(23 downto 0);
          PIX_SAMP_TRIG      : in std_logic;
-         DIAG_DATA          : out std_logic_vector(15 downto 0);
+         DIAG_DATA          : out std_logic_vector(23 downto 0);
          DIAG_DVAL          : out std_logic; 
          DIAG_SOL           : out std_logic;
-         DIAG_EOL           : out std_logic;   
+         DIAG_EOL           : out std_logic;
+         DIAG_LVAL          : out std_logic;
          DIAG_DONE          : out std_logic
          );
    end component;
@@ -105,15 +106,15 @@ architecture rtl of scd_diag_data_gen is
    signal sreset            : std_logic;
    signal line_size_i       : std_logic_vector(15 downto 0);
    signal diag_line_gen_en  : std_logic;
-   signal pix0_first_value  : std_logic_vector(15 downto 0);
-   signal pix1_first_value  : std_logic_vector(15 downto 0);   
-   signal pix2_first_value  : std_logic_vector(15 downto 0);
-   signal pix3_first_value  : std_logic_vector(15 downto 0);
-   signal incr_value        : std_logic_vector(15 downto 0);
-   signal pix0_diag_data    : std_logic_vector(15 downto 0);
-   signal pix1_diag_data    : std_logic_vector(15 downto 0);  
-   signal pix2_diag_data    : std_logic_vector(15 downto 0);
-   signal pix3_diag_data    : std_logic_vector(15 downto 0);
+   signal pix0_first_value  : std_logic_vector(23 downto 0);
+   signal pix1_first_value  : std_logic_vector(23 downto 0);   
+   signal pix2_first_value  : std_logic_vector(23 downto 0);
+   signal pix3_first_value  : std_logic_vector(23 downto 0);
+   signal incr_value        : std_logic_vector(23 downto 0);
+   signal pix0_diag_data    : std_logic_vector(23 downto 0);
+   signal pix1_diag_data    : std_logic_vector(23 downto 0);  
+   signal pix2_diag_data    : std_logic_vector(23 downto 0);
+   signal pix3_diag_data    : std_logic_vector(23 downto 0);
    signal pix0_diag_dval    : std_logic;
    signal pix1_diag_dval    : std_logic;
    signal pix2_diag_dval    : std_logic;
@@ -292,6 +293,7 @@ begin
       DIAG_DVAL => pix0_diag_dval,
       DIAG_SOL => open,
       DIAG_EOL => open,    
+      DIAG_LVAL => open,
       DIAG_DONE => diag_done_i
       );
    
@@ -314,6 +316,7 @@ begin
       DIAG_DVAL => pix1_diag_dval,
       DIAG_SOL => open,
       DIAG_EOL => open,   
+      DIAG_LVAL => open,
       DIAG_DONE => open
       ); 
       
@@ -346,6 +349,7 @@ begin
          DIAG_DVAL => pix2_diag_dval,
          DIAG_SOL => open,
          DIAG_EOL => open,    
+         DIAG_LVAL => open,
          DIAG_DONE => open
          );
       
@@ -368,6 +372,7 @@ begin
          DIAG_DVAL => pix3_diag_dval,
          DIAG_SOL => open,
          DIAG_EOL => open,   
+         DIAG_LVAL => open,
          DIAG_DONE => open
          );
    end generate;   
@@ -485,15 +490,15 @@ begin
                   lval_i <= '1';   
                   dval_i <= pix0_diag_dval; -- on se branche sur le module generateur de données diag
                   if revert_img = '1' then 
-                     pix0_data_i <= not pix0_diag_data; -- dégradé vers la gauche 
-                     pix1_data_i <= not pix1_diag_data;     
-                     pix2_data_i <= not pix2_diag_data;     
-                     pix3_data_i <= not pix3_diag_data;     
+                     pix0_data_i <= not pix0_diag_data(pix0_data_i'range); -- dégradé vers la gauche 
+                     pix1_data_i <= not pix1_diag_data(pix1_data_i'range);     
+                     pix2_data_i <= not pix2_diag_data(pix2_data_i'range);     
+                     pix3_data_i <= not pix3_diag_data(pix3_data_i'range);     
                   else
-                     pix0_data_i <= pix0_diag_data; -- dégradé vers la droite 
-                     pix1_data_i <= pix1_diag_data;  
-                     pix2_data_i <= pix2_diag_data;  
-                     pix3_data_i <= pix3_diag_data; 
+                     pix0_data_i <= pix0_diag_data(pix0_data_i'range); -- dégradé vers la droite 
+                     pix1_data_i <= pix1_diag_data(pix1_data_i'range);  
+                     pix2_data_i <= pix2_diag_data(pix2_data_i'range);  
+                     pix3_data_i <= pix3_diag_data(pix3_data_i'range); 
                   end if;
                   if diag_done_i = '1' then  
                      diag_fsm <=  line_pause_st;

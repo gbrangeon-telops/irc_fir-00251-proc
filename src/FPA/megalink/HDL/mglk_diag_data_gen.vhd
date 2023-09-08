@@ -79,13 +79,14 @@ architecture rtl of mglk_diag_data_gen is
          ARESET             : in std_logic;
          LINE_SIZE          : in std_logic_vector(15 downto 0);
          START_PULSE        : in std_logic;
-         FIRST_VALUE        : in std_logic_vector(15 downto 0); 
-         INCR_VALUE         : in std_logic_vector(15 downto 0);
+         FIRST_VALUE        : in std_logic_vector(23 downto 0); 
+         INCR_VALUE         : in std_logic_vector(23 downto 0);
          PIX_SAMP_TRIG      : in std_logic;
-         DIAG_DATA          : out std_logic_vector(15 downto 0);
+         DIAG_DATA          : out std_logic_vector(23 downto 0);
          DIAG_DVAL          : out std_logic; 
          DIAG_SOL           : out std_logic;
-         DIAG_EOL           : out std_logic;   
+         DIAG_EOL           : out std_logic;
+         DIAG_LVAL          : out std_logic;
          DIAG_DONE          : out std_logic
          );
    end component;
@@ -104,12 +105,12 @@ architecture rtl of mglk_diag_data_gen is
    signal sreset            : std_logic;
    signal line_size_i       : std_logic_vector(15 downto 0);
    signal diag_line_gen_en  : std_logic;
-   signal ch1_first_value   : std_logic_vector(15 downto 0);
-   signal ch2_first_value   : std_logic_vector(15 downto 0);
-   signal ch1_incr_value    : std_logic_vector(15 downto 0);
-   signal ch2_incr_value    : std_logic_vector(15 downto 0);
-   signal ch1_diag_data     : std_logic_vector(15 downto 0);
-   signal ch2_diag_data     : std_logic_vector(15 downto 0);
+   signal ch1_first_value   : std_logic_vector(23 downto 0);
+   signal ch2_first_value   : std_logic_vector(23 downto 0);
+   signal ch1_incr_value    : std_logic_vector(23 downto 0);
+   signal ch2_incr_value    : std_logic_vector(23 downto 0);
+   signal ch1_diag_data     : std_logic_vector(23 downto 0);
+   signal ch2_diag_data     : std_logic_vector(23 downto 0);
    signal ch1_diag_dval     : std_logic;
    signal ch2_diag_dval     : std_logic;
    signal diag_done_i       : std_logic;
@@ -254,6 +255,7 @@ begin
       DIAG_DVAL => ch1_diag_dval,
       DIAG_SOL => open,
       DIAG_EOL => open,    
+      DIAG_LVAL => open,
       DIAG_DONE => diag_done_i
       );
    
@@ -276,6 +278,7 @@ begin
       DIAG_DVAL => ch2_diag_dval,
       DIAG_SOL => open,
       DIAG_EOL => open, 
+      DIAG_LVAL => open,
       DIAG_DONE => open
       );   
    
@@ -370,11 +373,11 @@ begin
                   lval_i <= '1';   -- on se branche sur le module generateur de données diag
                   dval_i <= ch1_diag_dval;
                   if revert_img = '1' then 
-                     ch1_data_i <= not ch1_diag_data;     -- dégradé vers la gauche 
-                     ch2_data_i <= not ch2_diag_data;     -- dégradé vers la gauche 
+                     ch1_data_i <= not ch1_diag_data(ch1_data_i'range);     -- dégradé vers la gauche 
+                     ch2_data_i <= not ch2_diag_data(ch2_data_i'range);     -- dégradé vers la gauche 
                   else
-                     ch1_data_i <= ch1_diag_data; -- dégradé vers la droite 
-                     ch2_data_i <= ch2_diag_data; -- dégradé vers la droite
+                     ch1_data_i <= ch1_diag_data(ch1_data_i'range); -- dégradé vers la droite 
+                     ch2_data_i <= ch2_diag_data(ch2_data_i'range); -- dégradé vers la droite
                   end if;
                   if diag_done_i = '1' then  
                      diag_fsm <=  line_pause_st;
