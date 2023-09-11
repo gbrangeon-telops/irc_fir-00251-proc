@@ -882,25 +882,25 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
                 
    // readout time
    // readout part 1 (zone usager)
-   ptrH->readout_mclk  = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*pGCRegs->Height;
+   ptrH->readout_mclk = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*pGCRegs->Height;
 
    // readout part 2 (fovh: ligne de test et autres)
-   ptrH->readout_mclk  = ptrH->readout_mclk + (ptrH->roic_xsize/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number))/ptrH->sample_row_clock_factor;
+   ptrH->readout_mclk += (ptrH->roic_xsize/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number))/ptrH->sample_row_clock_factor;
 
    // readout part 3a (lovh lsync)
-   ptrH->readout_mclk  = ptrH->readout_mclk + ptrH->roic_ysize*(1.0F/ptrH->lsync_clock_factor);
+   ptrH->readout_mclk += ptrH->roic_ysize*(1.0F/ptrH->lsync_clock_factor);
    
    // readout part 3b (remaining lovh)
-   ptrH->readout_mclk  = ptrH->readout_mclk + ptrH->roic_ysize*(ptrH->lovh_mclk - 1.0F)/ptrH->remaining_lovh_clock_factor;  // on lance cet  accélerateur au besoin avec l'horologe rapide LSYNC
+   ptrH->readout_mclk += ptrH->roic_ysize*(ptrH->lovh_mclk - 1.0F)/ptrH->remaining_lovh_clock_factor;  // on lance cet  accélerateur au besoin avec l'horologe rapide LSYNC
 
    // readout part 4 (zone à rejeter)
-   ptrH->readout_mclk  = ptrH->readout_mclk + (1.0F/ptrH->unused_area_clock_factor)*((ptrH->roic_xsize - pGCRegs->Width)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(ptrH->roic_ysize);
+   ptrH->readout_mclk += (1.0F/ptrH->unused_area_clock_factor)*((ptrH->roic_xsize - pGCRegs->Width)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(ptrH->roic_ysize);
 
    // readout part 5 (coût du synchronisateur)
-   ptrH->readout_mclk  =  ptrH->readout_mclk + ptrH->adc_sync_dly_mclk*pGCRegs->Height;
+   ptrH->readout_mclk += ptrH->adc_sync_dly_mclk*pGCRegs->Height;
    
    
-   ptrH->readout_usec   = ptrH->readout_mclk * ptrH->mclk_period_usec;
+   ptrH->readout_usec = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
    ptrH->lsydel_usec         = (ptrH->lsydel_mclk/ptrH->lsydel_clock_factor) * ptrH->mclk_period_usec;   //
