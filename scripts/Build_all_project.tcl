@@ -36,6 +36,9 @@ lappend detector_list {isc0804A325}
 #lappend detector_list {isc0804A_500Hz160}
 lappend detector_list {isc0804A_500Hz325}
 
+#lappend detector_list {isc0804A_2k160}
+lappend detector_list {isc0804A_2k325}
+
 lappend detector_list {marsD160}
 #lappend detector_list {marsD325}
 

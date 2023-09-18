@@ -19,6 +19,7 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #do  "$FIR251PROC\src\fir_00251_top_isc0209A_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0804A_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0804A_500Hz_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_isc0804A_2k_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_marsD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_pelicanD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_230Hz_build.do"
@@ -76,6 +77,9 @@ acom  "$FIR251PROC\src\fir_00251_proc_isc0804A.bde"
 #FPA isc0804A_500Hz
 do  "$FIR251PROC\src\FPA\isc0804A_500Hz\HDL\compil_isc0804A_500Hz.do"
 acom  "$FIR251PROC\src\fir_00251_proc_isc0804A_500Hz.bde"
+#FPA isc0804A_2k
+do  "$FIR251PROC\src\FPA\isc0804A_2k\HDL\compil_isc0804A_2k.do"
+acom  "$FIR251PROC\src\fir_00251_proc_isc0804A_2k.bde"
 #FPA marsD
 do "$FIR251PROC\src\FPA\marsD\HDL\compil_marsD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_marsD.bde"
