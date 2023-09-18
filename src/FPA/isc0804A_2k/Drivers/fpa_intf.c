@@ -203,7 +203,7 @@
 #define DEFINE_DEFINE_FPA_MCLK2_RATE_HZ      (8.0/7.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
 #define DEFINE_DEFINE_FPA_MCLK3_RATE_HZ      (1.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
 
-#define LINE_PAUSE                13.0F
+#define LINE_PAUSE                1.0F
 
 #define DYNAMIC_RANGE_DIV_BIT_POS                  21     // précision fractionnaire
 #define DYNAMIC_RANGE_SCALER_SATURATION_LEVEL      16000  // niveau de restauration des données et sur le modèle M2K-UD
