@@ -18,7 +18,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0804A_2k__17.5MHz M2kVGA38_BITSTREAM_322131831"
+#define FPA_DEVICE_MODEL_NAME    "ISC0804A_2k__17.5MHz SVN_TRUNK"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
