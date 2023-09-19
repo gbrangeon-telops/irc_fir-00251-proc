@@ -135,7 +135,7 @@ package FPA_define is
    -- increment des données en mode diag compteur
    constant DEFINE_DIAG_DATA_INC                  : integer    := 2*integer((2**14 - 1 - DEFINE_XSIZE_MAX)/(2*DEFINE_XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
    constant DEFINE_DIAG_PIX_SAMPLE_NUM_PER_CH     : natural    := 1; -- forçage à 1 sample par pixel em mode diag
-   constant DEFINE_DIAG_LOVH_MCLK                 : natural    := 13; -- pause de ligne
+   constant DEFINE_DIAG_LOVH_MCLK                 : natural    := 1; -- pause de ligne
    
    
    ----------------------------------------------
