@@ -1,2 +1,7 @@
+@echo off
+
 call D:\Telops\FIR-00251-Proc\bin\scripts\setEnvironment.bat isc0804A_2k 325
-call %scriptsDir%\generatePromFile.bat
+
+%xDir%\Vivado\2018.3\bin\vivado -mode batch -source generatePromFile325.tcl
+
+cmd /k
