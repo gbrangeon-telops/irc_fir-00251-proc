@@ -20,14 +20,14 @@ architecture TB_ARCHITECTURE of isc0804A_2k_intf_testbench_tb is
          ARESET : in STD_LOGIC;
          CLK_100M : in STD_LOGIC;
          DOUT_CLK : out STD_LOGIC;
-         --DOUT_MISO : in t_axi4_stream_miso;
+         DOUT_MISO : in t_axi4_stream_miso;
          FPA_EXP_INFO : in exp_info_type;
          HDER_MISO : in t_axi4_lite_miso;
          MB_CLK : in STD_LOGIC;
          MB_MOSI : in t_axi4_lite_mosi;
          XTRA_TRIG : in STD_LOGIC;
          ADC_SYNC_FLAG : out STD_LOGIC;
-         --DOUT_MOSI : out t_axi4_stream_mosi64;
+         DOUT_MOSI : out t_axi4_stream_mosi128;
          ERR_FOUND : out STD_LOGIC;
          FPA_DIGIO1 : out STD_LOGIC;
          FPA_DIGIO10 : out STD_LOGIC;
@@ -97,7 +97,7 @@ architecture TB_ARCHITECTURE of isc0804A_2k_intf_testbench_tb is
    signal CLK_100M : STD_LOGIC := '0';
    signal CLK_85M : STD_LOGIC  := '0';
    signal DOUT_CLK : STD_LOGIC := '0';
-   --signal DOUT_MISO : t_axi4_stream_miso;
+   signal DOUT_MISO : t_axi4_stream_miso;
    signal FPA_EXP_INFO : exp_info_type;
    signal HDER_MISO : t_axi4_lite_miso;
    signal MB_CLK : STD_LOGIC;
@@ -105,7 +105,7 @@ architecture TB_ARCHITECTURE of isc0804A_2k_intf_testbench_tb is
    signal XTRA_TRIG : STD_LOGIC;
    -- Observed signals - signals mapped to the output ports of tested entity
    signal ADC_SYNC_FLAG : STD_LOGIC;
-   --signal DOUT_MOSI : t_axi4_stream_mosi64;
+   signal DOUT_MOSI : t_axi4_stream_mosi128;
    signal ERR_FOUND : STD_LOGIC;
    signal FPA_DIGIO1 : STD_LOGIC;
    signal FPA_DIGIO10 : STD_LOGIC;
@@ -264,7 +264,7 @@ begin
    end process;
    XTRA_TRIG <= '0';
    
-   -- DOUT_MISO.TREADY <= '1';
+   DOUT_MISO.TREADY <= '1';
    
    
    process
@@ -423,7 +423,7 @@ begin
       ARESET => ARESET,
       CLK_100M => CLK_100M,
       DOUT_CLK => DOUT_CLK,
-      --DOUT_MISO => DOUT_MISO,
+      DOUT_MISO => DOUT_MISO,
       FPA_EXP_INFO => FPA_EXP_INFO,
       HDER_MISO => HDER_MISO,
       MB_CLK => MB_CLK,
@@ -431,7 +431,7 @@ begin
       XTRA_TRIG => XTRA_TRIG,
       ADC_SYNC_FLAG => ADC_SYNC_FLAG,
       ADC_CLK_INT => ADC_CLK_INT,
-      --DOUT_MOSI => DOUT_MOSI,
+      DOUT_MOSI => DOUT_MOSI,
       ERR_FOUND => ERR_FOUND,
       FPA_DIGIO1 => FPA_DIGIO1,
       FPA_DIGIO10 => FPA_DIGIO10,
