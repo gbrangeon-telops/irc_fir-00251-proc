@@ -55,7 +55,7 @@ proc build_tsir_project {{release 0}} {
 	report_power -file $base_dir/Reports/${sensor}/${proj_name}_power.rpt
 	report_clock_utilization -file $base_dir/Reports/${sensor}/${proj_name}_clock_utilization_placed.rpt
 	report_utilization -file $base_dir/Reports/${sensor}/${proj_name}_utilization_placed.rpt
-	report_utilization -file $base_dir/Reports/${sensor}/${proj_name}_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
+	report_utilization -file $base_dir/Reports/${sensor}/${proj_name}_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 10
 	
 	if {$release != 0} {
       #Change back target constraints file
