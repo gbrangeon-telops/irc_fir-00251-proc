@@ -33,9 +33,36 @@ entity ehdri_SM is
 end ehdri_SM;
 
 architecture implementation of ehdri_SM is
+
+   component sync_reset is
+      port(
+         ARESET : in STD_LOGIC;
+         SRESET : out STD_LOGIC := '1';
+         CLK    : in STD_LOGIC
+         );
+   end component sync_reset;    
+   
+	component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+
+   constant INDEX_EXPTIME0 : unsigned(1 downto 0) := "00";
+   constant INDEX_EXPTIME1 : unsigned(1 downto 0) := "01";
+   constant INDEX_EXPTIME2 : unsigned(1 downto 0) := "10";
+   constant INDEX_EXPTIME3 : unsigned(1 downto 0) := "11";
+
    attribute keep: string;
    signal fpa_img_info_i : img_info_type;
-   attribute keep of fpa_img_info_i : signal is "TRUE";  
+   attribute keep of fpa_img_info_i : signal is "TRUE";
+   signal fpa_img_info_exp_dval_i : std_logic := '0';
    
    -------------------------------------------------------------------------------
    -- Signal Declarations
@@ -62,20 +89,17 @@ architecture implementation of ehdri_SM is
    type hder_write_state_t is (write_standby, write_info, wait_write_ready, wait_write_completed, wait_next_feedfbk );
    signal write_state : hder_write_state_t := write_standby;
    
-   component sync_reset is
-      port(
-         ARESET : in STD_LOGIC;
-         SRESET : out STD_LOGIC := '1';
-         CLK    : in STD_LOGIC
-         );
-   end component sync_reset;
-   
-   constant INDEX_EXPTIME0 : unsigned(1 downto 0) := "00";
-   constant INDEX_EXPTIME1 : unsigned(1 downto 0) := "01";
-   constant INDEX_EXPTIME2 : unsigned(1 downto 0) := "10";
-   constant INDEX_EXPTIME3 : unsigned(1 downto 0) := "11";
-   
 begin
+
+   --------------------------------------------------
+   -- mapping des entrees
+   -------------------------------------------------- 
+   fpa_img_info_i <= FPA_Img_Info;
+   
+
+   --------------------------------------------------
+   -- Sync reset
+   -------------------------------------------------- 
    U1: sync_reset
    port map(
       ARESET => AReset,
@@ -83,7 +107,11 @@ begin
       CLK => Clk_Data
       );
    
-   fpa_img_info_i <= FPA_Img_Info;
+   --------------------------------------------------
+   -- Double sync du dval du temps d'exposition
+   --------------------------------------------------
+   U2: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => fpa_img_info_i.exp_info.exp_dval, CLK => Clk_Data, Q => fpa_img_info_exp_dval_i);
+
    
    Mem_Address <= std_logic_vector(mem_address_i);
    FPA_Exp_Info <= fpa_exp_info_i;
@@ -144,8 +172,8 @@ begin
             case write_state is
                when write_standby =>
                   --if FPA_Img_Info.exp_feedbk = '1' and exp_feedbk_last = '0' then
-                  if FPA_Img_Info.exp_info.exp_dval = '1' then 
-                     axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(FPA_Img_Info.frame_id(7 downto 0)) &  std_logic_vector(resize(EHDRIExposureIndexAdd32, 8));
+                  if fpa_img_info_exp_dval_i = '1' then 
+                     axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(fpa_img_info_i.frame_id(7 downto 0)) &  std_logic_vector(resize(EHDRIExposureIndexAdd32, 8));
                     -- exp_feedbk_last <= '1';
                      write_state <= write_info;
                   end if;
@@ -177,7 +205,7 @@ begin
                   end if;
                
                when wait_next_feedfbk =>
-                  if FPA_Img_Info.exp_info.exp_dval = '0' then
+                  if fpa_img_info_exp_dval_i = '0' then    
                      write_state <= write_standby;
                      --exp_feedbk_last <= '0';
                      exp_info_dval_last <= '0';
