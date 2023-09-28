@@ -35,6 +35,7 @@ acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream32_afifo_d512\t_axi4_stream32_
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w43_d512\fwft_sfifo_w43_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_wr66_rd132_d32\fwft_afifo_wr66_rd132_d32_sim_netlist.vhdl
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
@@ -49,6 +50,7 @@ acom d:\Telops\Common_HDL\SPI\ads1118_driver.vhd
 acom d:\Telops\Common_HDL\SPI\spi_rx.vhd
 acom d:\Telops\Common_HDL\SPI\spi_tx.vhd
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
 
 acom d:\Telops\FIR-00251-Common\VHDL\signal_stat\period_duration.vhd
@@ -103,7 +105,7 @@ asim -ses isc0804A_intf_testbench_TB
 --wave UUT/U1/U21/U5/U2/* 
 
 -- mb_interface
-wave UUT/U1/U4/*  
+--wave UUT/U1/U4/*  
 
 
 --
@@ -114,11 +116,14 @@ wave UUT/U1/U4/*
 -- fpa_prog_controller
 --wave UUT/U1/U5/U2/* 
 
+-- status
+wave UUT/U1/U6/* 
+
 
 -- clocks_gen
 #wave UUT/U1/U26/U1/* 
 #wave UUT/U1/U26/U2/* 
-#wave UUT/U1/U26/*
+wave UUT/U1/U26/*
 
 --wave UUT/U1/U5/U4/* 
 --wave UUT/U14/U11/*
@@ -196,9 +201,10 @@ wave UUT/U1/U5/U5/U5/*
 #wave UUT/U1/U9/U19/*
 #wave UUT/U1/U9/U10/*
 -- wave UUT/U1/U27/*
-wave UUT/U1/U9/*
+--wave UUT/U1/U9/*
 
 wave UUT/U1/*
+
 run 100 ms
 --run 30 ms  
 --9.1 ms
