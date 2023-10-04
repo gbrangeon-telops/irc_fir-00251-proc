@@ -74,11 +74,24 @@ architecture rtl of isc0804A_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
+	component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
    type digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, check_mclk_st, fpa_pwr_pause_st, fpa_pwred_st, fpa_cst_output_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st);
    signal digio_fsm        : digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
    signal sreset           : std_logic;
+   signal readout_i        : std_logic := '0';
    signal fpa_on_i         : std_logic;
    signal fpa_digio2_i     : std_logic;
    signal fpa_digio5_i     : std_logic;
@@ -149,9 +162,13 @@ begin
    --------------------------------------------------------
    -- Sync reset
    -------------------------------------------------------- 
-   U0 : sync_reset
+   U0A : sync_reset
    port map(ARESET => ARESET, CLK => MCLK_SOURCE, SRESET => sreset); 
-   
+
+   --------------------------------------------------
+   -- Sync du readout
+   -------------------------------------------------- 
+   U0B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => READOUT, CLK => MCLK_SOURCE, Q => readout_i);
    
    --------------------------------------------------------- 
    -- gestion de l'allumage du proxy (process indépendant)
@@ -276,7 +293,7 @@ begin
                   fpa_digio5_i <= lsync_reg and not PROXIM_IS_FLEGX;      -- pour Flex 264 uniquement
                   fpa_digio6_i <= not FPA_INT and PROG_CSN;
                   fpa_digio7_i <= mclk_reg; 
-                  if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
+                  if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
                      digio_fsm <= fpa_cst_output_st;
                   end if;
                
@@ -285,7 +302,7 @@ begin
                   fpa_digio4_i <= '0';       -- aucun lsync
                   fpa_digio6_i <= '1';       -- aucune integratiom
                   fpa_digio3_i <= '0';
-                  if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
+                  if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
                      digio_fsm <= fpa_pwred_st;
                   end if;                  
                
