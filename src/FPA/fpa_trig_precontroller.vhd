@@ -166,6 +166,7 @@ begin
       );
 
    U1E : double_sync
+   generic map (INIT_VALUE => '1')
    port map(
       CLK => CLK,
       D   => FPA_INTF_CFG.COMN.FPA_DIAG_MODE,
