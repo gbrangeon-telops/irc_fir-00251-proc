@@ -12,8 +12,8 @@ create_clock -period 28.571 -name CH3_CLK [get_ports CH3_CLK_P]
 # Clock Groups
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH0_CLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH3_CLK]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks mclk_source_isc0804A_17_5_MHz_mmcm_v2]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks adc_clk_source_isc0804A_17_5_MHz_mmcm_v2]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks mclk_source_*]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks adc_clk_source_*]
 
 # Input and output delay constraints
 

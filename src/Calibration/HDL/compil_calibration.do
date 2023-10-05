@@ -6,15 +6,7 @@
 acom -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd \
  d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd \
- d:\Telops\FIR-00251-Common\VHDL\Calibration\calib_define.vhd
-
-#calibration
-acom -nowarn DAGGEN_0523 \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\NLC.bde \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\FSU.bde \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\RQC.bde \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\FCC.bde \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\CFF.bde 
+ d:\Telops\FIR-00251-Common\VHDL\Calibration\calib_define.vhd 
 
 acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\axil_channels_ctrl.vhd \
@@ -22,6 +14,7 @@ acom -nowarn DAGGEN_0523 \
  -relax D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_block_sel.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_param_sequencer.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\param_fifo_block.bde \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\param_sync_to_axis32.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\param16_fifo.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_status_gen.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_fast_hder_gen.vhd \
@@ -40,6 +33,11 @@ acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\ddr_data_decoder_core.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\ddr_data_decoder.bde \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\badpixel_replacer64.vhd \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\NLC.bde \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\FSU.bde \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\RQC.bde \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\FCC.bde \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\CFF.bde \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calibration_common.bde \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calibration_core.bde \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calibration.bde
