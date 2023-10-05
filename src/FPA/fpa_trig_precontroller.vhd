@@ -95,7 +95,8 @@ architecture RTL of fpa_trig_precontroller is
    signal fpa_readout_last             : std_logic;
    signal xtra_img_cnt                 : unsigned(7 downto 0);
    signal acq_trig_last                : std_logic;
-   signal xtra_trig_last               : std_logic; 
+   signal xtra_trig_last               : std_logic;
+   signal diag_mode_i                  : std_logic := '1'; 
    
    ---- attribute dont_touch                : string;
    ---- attribute dont_touch of acq_trig_temp  : signal is "true";
@@ -163,7 +164,16 @@ begin
       Q   => xtra_trig_in_i,
       RESET => sreset
       );
-   
+
+   U1E : double_sync
+   port map(
+      CLK => CLK,
+      D   => FPA_INTF_CFG.COMN.FPA_DIAG_MODE,
+      Q   => diag_mode_i,
+      RESET => sreset
+      );
+      
+      
    --------------------------------------------------
    -- fsm de contrôle/filtrage des trigs 
    -------------------------------------------------- 
@@ -203,7 +213,7 @@ begin
                when init_st =>
                   acq_trig_temp <= acq_trig_in_i;
                   xtra_trig_temp <= xtra_trig_in_i;
-                  if fpa_readout_i = '1' and FPA_INTF_CFG.COMN.FPA_DIAG_MODE = '0' and PRIM_XTRA_TRIG_ACTIVE = '0' then -- donc l'IDDCA est actif et on veut se synchroniser sur le prochain PRIM_XTRA_TRIG_ACTIVE = '1'
+                  if fpa_readout_i = '1' and diag_mode_i = '0' and PRIM_XTRA_TRIG_ACTIVE = '0' then -- donc l'IDDCA est actif et on veut se synchroniser sur le prochain PRIM_XTRA_TRIG_ACTIVE = '1'
                      trig_prectrl_sm <= idle;
                   end if;                   
                   
