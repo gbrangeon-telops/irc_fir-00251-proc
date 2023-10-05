@@ -59,6 +59,18 @@ architecture rtl of isc0804A_elcorr_refs_ctrl is
          );
    end component;
    
+	component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
    component Clk_Divider is
       Generic(	
          Factor : integer := 2);		
@@ -88,6 +100,7 @@ architecture rtl of isc0804A_elcorr_refs_ctrl is
    signal prog_trig_i               : std_logic;
    signal areset_i                  : std_logic;
    signal ref_feedbk_i              : std_logic_vector(1 downto 0);
+   signal cfg0_ref_enabled_i        : std_logic := '0';
    -- signal elcorr_init_done_i        : std_logic;
    
 begin
@@ -115,6 +128,17 @@ begin
       CLK => CLK,
       D   => REF_FEEDBK,
       Q   => ref_feedbk_i
+      );
+      
+   --------------------------------------------------
+   -- synchro ref0_enable 
+   --------------------------------------------------    
+   U1C : double_sync
+   port map(
+      CLK => CLK,
+      RESET => sreset,
+      D   => USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED,
+      Q   => cfg0_ref_enabled_i
       );
    
    --------------------------------------------------------
@@ -199,7 +223,7 @@ begin
                
                when idle =>
                   prog_trig_i <= '0';
-                  if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then  
+                  if (prog_timer_pulse = '1' or prog_event_pulse = '1') and cfg0_ref_enabled_i = '1' then  
                      ctrl_fsm <= slct_ref_st;
                   end if;
                
