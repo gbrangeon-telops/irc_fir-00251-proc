@@ -1,8 +1,8 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Tue May 16 15:53:23 2023
--- Host        : LAPTOP-J3K1KOB9 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Fri Oct  6 15:39:23 2023
+-- Host        : Telops330 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/sfifo_w8_d64_no_output_reg/sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
 -- Design      : sfifo_w8_d64_no_output_reg
@@ -3040,7 +3040,7 @@ entity sfifo_w8_d64_no_output_reg is
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of sfifo_w8_d64_no_output_reg : entity is "yes";
   attribute x_core_info : string;
-  attribute x_core_info of sfifo_w8_d64_no_output_reg : entity is "fifo_generator_v13_2_3,Vivado 2018.3_AR71898";
+  attribute x_core_info of sfifo_w8_d64_no_output_reg : entity is "fifo_generator_v13_2_3,Vivado 2018.3_AR71948_AR71898";
 end sfifo_w8_d64_no_output_reg;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg is

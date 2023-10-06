@@ -1,8 +1,8 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Wed May 17 12:08:58 2023
--- Host        : LAPTOP-J3K1KOB9 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Fri Oct  6 11:17:39 2023
+-- Host        : Telops330 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/325/ip_axis128_fanout2/ip_axis128_fanout2_sim_netlist.vhdl
 -- Design      : ip_axis128_fanout2
@@ -291,7 +291,7 @@ entity ip_axis128_fanout2 is
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of ip_axis128_fanout2 : entity is "yes";
   attribute X_CORE_INFO : string;
-  attribute X_CORE_INFO of ip_axis128_fanout2 : entity is "top_ip_axis128_fanout2,Vivado 2018.3_AR71898";
+  attribute X_CORE_INFO of ip_axis128_fanout2 : entity is "top_ip_axis128_fanout2,Vivado 2018.3_AR71948_AR71898";
 end ip_axis128_fanout2;
 
 architecture STRUCTURE of ip_axis128_fanout2 is
