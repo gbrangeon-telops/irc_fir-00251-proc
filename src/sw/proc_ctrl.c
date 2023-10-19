@@ -219,10 +219,8 @@ void disable_caches()
          // Update Device Running Time
          gFlashDynamicValues.DeviceRunningTime += DEVICE_RUNNING_TIME_REFRESH_PERIOD_US / 1000000;
 
-         // Update DeviceCoolerRunningTime according to measured cooler current
-         FPA_GetStatus(&fpaStatus, &gFpaIntf);
-         if ((extAdcChannels[XEC_COOLER_CUR].isValid) &&
-               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) >= (float)fpaStatus.cooler_on_curr_min_mA / 1000.0F))
+         // Update DeviceCoolerRunningTime according to the power State
+         if (Power_GetChannelPowerState(PC_COOLER) == CPS_ON)
          {
             gFlashDynamicValues.DeviceCoolerRunningTime += DEVICE_RUNNING_TIME_REFRESH_PERIOD_US / 1000000;
          }
