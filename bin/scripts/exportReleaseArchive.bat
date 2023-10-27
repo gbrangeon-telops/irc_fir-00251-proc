@@ -127,17 +127,17 @@ echo @echo off> %fubatchJtag%
 echo.>> %fubatchJtag%
 echo :start_fu>> %fubatchJtag%
 echo.>> %fubatchJtag%
-echo cd FIR-00251-NTx-Mini>> %fubatchJtag%
-echo call %ntxminiFile%>> %fubatchJtag%
-echo if not %%errorlevel%% == 0 goto err>> %fubatchJtag%
-echo cd ..>> %fubatchJtag%
-echo.>> %fubatchJtag%
 echo cd FIR-00251-Proc>> %fubatchJtag%
 echo call jtag_prom_prog.bat>> %fubatchJtag%
 echo cd ..\FIR-00251-Output>> %fubatchJtag%
 echo call jtag_prom_prog.bat>> %fubatchJtag%
 echo cd ..\FIR-00257-Storage>> %fubatchJtag%
 echo call jtag_prom_prog.bat>> %fubatchJtag%
+echo cd ..>> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo cd FIR-00251-NTx-Mini>> %fubatchJtag%
+echo call %ntxminiFile%>> %fubatchJtag%
+echo if not %%errorlevel%% == 0 goto err>> %fubatchJtag%
 echo cd ..>> %fubatchJtag%
 echo.>> %fubatchJtag%
 echo :end>> %fubatchJtag%
