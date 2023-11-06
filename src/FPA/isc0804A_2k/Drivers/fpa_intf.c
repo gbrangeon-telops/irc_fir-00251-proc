@@ -187,7 +187,7 @@
 #define ISC0804_DEFAULT_REGC             0
 #define ISC0804_DEFAULT_REGD             148
 #define ISC0804_LN2_DEFAULT_REGD         148
-#define ISC0804_DEFAULT_REGF             17
+#define ISC0804_DEFAULT_REGF             18
 
 #define ISC0804_BITSTREAM_FG   53696343  // bitstream ROIC standard de ForrestGump pour M1k
 #define ISC0804_BITSTREAM_FAST 322131831 // bitstream ROIC avec meilleur slew rate (M2k UD)
