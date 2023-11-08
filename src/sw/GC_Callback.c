@@ -2632,7 +2632,7 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
                GC_SetCenterImage(1);
             }
 
-            GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), true);
+            GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), false);
             FW_CalculateSpeedSetpoint(&gcRegsData);
             SFW_AllChanged(&gcRegsData);
             ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint); // TODO should we set something always valid?
