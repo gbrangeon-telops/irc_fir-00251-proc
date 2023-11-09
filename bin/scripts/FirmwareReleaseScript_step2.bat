@@ -25,7 +25,7 @@ call %scriptsDir%\verifyRelease.bat
 echo verifyRelease done>> %logFile%
 
 REM Generate prom files
-call %scriptsDir%\generatePromFile.bat
+call %scriptsDir%\generatePromFile.bat %sensorName% %fpgaSize%
 echo generatePromFile done>> %logFile%
 
 echo END Release compile %sensorName% %fpgaSize%>> %logFile%

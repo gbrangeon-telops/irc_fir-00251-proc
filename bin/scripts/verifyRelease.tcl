@@ -139,8 +139,8 @@ if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $outputBuildInfoFileSubstr match ou
 }
 
 if {$error == 1} {
-    puts "Cannot parse proc build info file"
-    exit 1
+    error "Cannot parse proc build info file"
+     
 }
 
 # Parse storage build info file
@@ -174,8 +174,7 @@ if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr1 match 
 }
 
 if {$error == 1} {
-    puts "Cannot parse storage build info file"
-    exit 1
+    error "Cannot parse storage build info file"
 }
 
 set storageBuildInfoFileSubstr2 [string range $storageBuildInfoFileStr \
@@ -207,8 +206,7 @@ if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr2 match 
 }
 
 if {$error == 1} {
-    puts "Cannot parse storage build info file"
-    exit 1
+    error "Cannot parse storage build info file"
 }
 
 # Parse output release info file
@@ -240,8 +238,7 @@ if {[regexp {rel_out_common_rev[^\n\r0-9]+(\d+)} $outputReleaseInfoFileStr match
 }
 
 if {$error == 1} {
-    puts "Cannot  parse output release info file"
-    exit 1
+    error "Cannot  parse output release info file"
 }
 
 # Parse storage release info file
@@ -300,8 +297,7 @@ if {[regexp {rel_storage_common_rev2[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr
 }
 
 if {$error == 1} {
-    puts "Cannot parse storage build info file"
-    exit 1
+    error "Cannot parse storage build info file"
 }
 
 # Parse proc release info file
@@ -333,8 +329,7 @@ if {[regexp {rel_proc_common_rev[^\n\r0-9]+(\d+)} $procReleaseInfoFileStr match 
 }
 
 if {$error == 1} {
-    puts "Cannot  parse proc release info file"
-    exit 1
+    error "Cannot  parse proc release info file"
 }
 
 # Parse release log file
@@ -446,8 +441,7 @@ if {[regexp {Storage FPGA common repository 32GB[^\n\r0-9]+(\d+)} $releaseLogFil
 }
 
 if {$error == 1} {
-    puts "Cannot parse release log file"
-    exit 1
+    error "Cannot parse release log file"
 }
 
 puts $procReleaseInfoHardware
@@ -463,8 +457,7 @@ if {($procReleaseInfoHardware != $procBuildInfoHardware) ||
 ($procReleaseInfoSoftware != $procBuildInfoSoftware) ||
 ($procReleaseInfoBootLoader != $procBuildInfoBootLoader) ||
 ($procReleaseInfoCommon != $procBuildInfoCommon)} {
-    puts "Processing FPGA release info does not match build info"
-    exit 1
+    error "Processing FPGA release info does not match build info"
 }
 
 # Verify proc release log file
@@ -472,8 +465,7 @@ if {($procReleaseInfoHardware != $releaseLogProcHardware) ||
 ($procReleaseInfoSoftware != $releaseLogProcSoftware) ||
 ($procReleaseInfoBootLoader != $releaseLogProcBootLoader) ||
 ($procReleaseInfoCommon != $releaseLogProcCommon)} {
-    puts "Processing FPGA release info does not match release log file"
-    exit 1
+    error "Processing FPGA release info does not match release log file"
 }
 
 # Verify output build info file
@@ -481,8 +473,7 @@ if {($outputReleaseInfoHardware != $outputBuildInfoHardware) ||
 ($outputReleaseInfoSoftware != $outputBuildInfoSoftware) ||
 ($outputReleaseInfoBootLoader != $outputBuildInfoBootLoader) ||
 ($outputReleaseInfoCommon != $outputBuildInfoCommon)} {
-    puts "Output FPGA release info does not match build info"
-    exit 1
+   error "Output FPGA release info does not match build info"
 }
 
 # Verify output release log file
@@ -490,8 +481,7 @@ if {($outputReleaseInfoHardware != $releaseLogOutputHardware) ||
 ($outputReleaseInfoSoftware != $releaseLogOutputSoftware) ||
 ($outputReleaseInfoBootLoader != $releaseLogOutputBootLoader) ||
 ($outputReleaseInfoCommon != $releaseLogOutputCommon)} {
-    puts "Output FPGA release info does not match release log file"
-    exit 1
+    error "Output FPGA release info does not match release log file"
 }
 
 # Verify storage build info file
@@ -503,8 +493,7 @@ if {($storageReleaseInfoHardware1 != $storageBuildInfoHardware1) ||
 ($storageReleaseInfoSoftware2 != $storageBuildInfoSoftware2) ||
 ($storageReleaseInfoBootLoader2 != $storageBuildInfoBootLoader2) ||
 ($storageReleaseInfoCommon2 != $storageBuildInfoCommon2)} {
-    puts "Storage FPGA release info does not match build info"
-    exit 1
+   error "Storage FPGA release info does not match build info"
 }
 
 # Verify storage release log file
@@ -516,8 +505,7 @@ if {($storageReleaseInfoHardware1 != $releaseLogStorageHardware1) ||
 ($storageReleaseInfoSoftware2 != $releaseLogStorageSoftware2) ||
 ($storageReleaseInfoBootLoader2 != $releaseLogStorageBootLoader2) ||
 ($storageReleaseInfoCommon2 != $releaseLogStorageCommon2)} {
-    puts "Storage FPGA release info does not match release log file"
-    exit 1
+    error "Storage FPGA release info does not match release log file"
 }
 
 puts "$releaseLogVersion (Passed)"

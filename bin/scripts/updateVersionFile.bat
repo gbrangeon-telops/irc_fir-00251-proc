@@ -1,1 +1,1 @@
-%x_xsct% %scriptsDir%\updateVersionFile.tcl  %scriptsDir% %fpgaSize% %sensorName%
+call %x_xsct% %scriptsDir%\updateVersionFile.tcl  %scriptsDir% %fpgaSize% %sensorName%
