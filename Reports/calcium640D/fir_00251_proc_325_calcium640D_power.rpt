@@ -1,0 +1,367 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date             : Thu Nov  9 10:24:18 2023
+| Host             : Telops332 running 64-bit major release  (build 9200)
+| Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/calcium640D/fir_00251_proc_325_calcium640D_power.rpt
+| Design           : fir_00251_proc_calcium640D
+| Device           : xc7k325tfbg676-1
+| Design State     : routed
+| Grade            : industrial
+| Process          : typical
+| Characterization : Production
+--------------------------------------------------------------------------------------------------------------------------------------
+
+Power Report
+
+Table of Contents
+-----------------
+1. Summary
+1.1 On-Chip Components
+1.2 Power Supply Summary
+1.3 Confidence Level
+2. Settings
+2.1 Environment
+2.2 Clock Constraints
+3. Detailed Reports
+3.1 By Hierarchy
+
+1. Summary
+----------
+
++--------------------------+--------------+
+| Total On-Chip Power (W)  | 5.907        |
+| Design Power Budget (W)  | Unspecified* |
+| Power Budget Margin (W)  | NA           |
+| Dynamic (W)              | 5.672        |
+| Device Static (W)        | 0.236        |
+| Effective TJA (C/W)      | 1.9          |
+| Max Ambient (C)          | 89.0         |
+| Junction Temperature (C) | 36.0         |
+| Confidence Level         | Low          |
+| Setting File             | ---          |
+| Simulation Activity File | ---          |
+| Design Nets Matched      | NA           |
++--------------------------+--------------+
+* Specify Design Power Budget using, set_operating_conditions -design_power_budget <value in Watts>
+
+
+1.1 On-Chip Components
+----------------------
+
++--------------------------+-----------+----------+-----------+-----------------+
+| On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
++--------------------------+-----------+----------+-----------+-----------------+
+| Clocks                   |     0.838 |       81 |       --- |             --- |
+| Slice Logic              |     0.294 |   319839 |       --- |             --- |
+|   LUT as Logic           |     0.224 |    91853 |    203800 |           45.07 |
+|   Register               |     0.031 |   159148 |    407600 |           39.05 |
+|   CARRY4                 |     0.029 |     7370 |     50950 |           14.47 |
+|   LUT as Shift Register  |     0.006 |     6714 |     64000 |           10.49 |
+|   LUT as Distributed RAM |     0.002 |     2424 |     64000 |            3.79 |
+|   F7/F8 Muxes            |    <0.001 |      648 |    203800 |            0.32 |
+|   Others                 |    <0.001 |    24924 |       --- |             --- |
+| Signals                  |     0.405 |   232188 |       --- |             --- |
+| Block RAM                |     0.299 |    356.5 |       445 |           80.11 |
+| MMCM                     |     0.726 |        7 |        10 |           70.00 |
+| PLL                      |     0.185 |        2 |        10 |           20.00 |
+| DSPs                     |     0.139 |      173 |       840 |           20.60 |
+| I/O                      |     1.188 |      321 |       400 |           80.25 |
+| GTX                      |     1.212 |        4 |         8 |           50.00 |
+| PHASER                   |     0.385 |       40 |       --- |             --- |
+| XADC                     |     0.002 |        1 |       --- |             --- |
+| Static Power             |     0.236 |          |           |                 |
+| Total                    |     5.907 |          |           |                 |
++--------------------------+-----------+----------+-----------+-----------------+
+
+
+1.2 Power Supply Summary
+------------------------
+
++-----------+-------------+-----------+-------------+------------+
+| Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
++-----------+-------------+-----------+-------------+------------+
+| Vccint    |       1.000 |     2.326 |       2.211 |      0.115 |
+| Vccaux    |       1.800 |     0.953 |       0.923 |      0.030 |
+| Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
+| Vcco25    |       2.500 |     0.028 |       0.027 |      0.001 |
+| Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |
+| Vcco15    |       1.500 |     0.406 |       0.405 |      0.001 |
+| Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |
+| Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |
+| Vccaux_io |       1.800 |     0.000 |       0.000 |      0.000 |
+| Vccbram   |       1.000 |     0.025 |       0.014 |      0.011 |
+| MGTAVcc   |       1.000 |     0.685 |       0.678 |      0.007 |
+| MGTAVtt   |       1.200 |     0.355 |       0.350 |      0.005 |
+| MGTVccaux |       1.800 |     0.000 |       0.000 |      0.000 |
+| Vccadc    |       1.800 |     0.021 |       0.001 |      0.020 |
++-----------+-------------+-----------+-------------+------------+
+
+
+1.3 Confidence Level
+--------------------
+
++-----------------------------+------------+--------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+| User Input Data             | Confidence | Details                                                | Action                                                                                                     |
++-----------------------------+------------+--------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+| Design implementation state | High       | Design is routed                                       |                                                                                                            |
+| Clock nodes activity        | High       | User specified more than 95% of clocks                 |                                                                                                            |
+| I/O nodes activity          | Low        | More than 75% of inputs are missing user specification | Provide missing input activity with simulation results or by editing the "By Resource Type -> I/Os" view   |
+| Internal nodes activity     | Medium     | User specified less than 25% of internal nodes         | Provide missing internal nodes activity with simulation results or by editing the "By Resource Type" views |
+| Device models               | High       | Device models are Production                           |                                                                                                            |
+|                             |            |                                                        |                                                                                                            |
+| Overall confidence level    | Low        |                                                        |                                                                                                            |
++-----------------------------+------------+--------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+
+
+2. Settings
+-----------
+
+2.1 Environment
+---------------
+
++-----------------------+--------------------------+
+| Ambient Temp (C)      | 25.0                     |
+| ThetaJA (C/W)         | 1.9                      |
+| Airflow (LFM)         | 250                      |
+| Heat Sink             | medium (Medium Profile)  |
+| ThetaSA (C/W)         | 3.4                      |
+| Board Selection       | medium (10"x10")         |
+| # of Board Layers     | 12to15 (12 to 15 Layers) |
+| Board Temperature (C) | 25.0                     |
++-----------------------+--------------------------+
+
+
+2.2 Clock Constraints
+---------------------
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------+
+| Clock                                                                                                                                                       | Domain                                                                                                                                                                                                                                                        | Constraint (ns) |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------+
+| ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MCU/mdm_1/U0/Use_E2.BSCAN_I/Use_E2.BSCANE2_I/DRCK                                                                     | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MCU/mdm_1/U0/Use_E2.BSCAN_I/DRCK                                                                                                                                                                                        |            33.3 |
+| ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MCU/mdm_1/U0/Use_E2.BSCAN_I/Use_E2.BSCANE2_I/UPDATE                                                                   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MCU/mdm_1/U0/Use_E2.BSCAN_I/Ext_JTAG_UPDATE                                                                                                                                                                             |            33.3 |
+| ACQ/MGT/MGTS/DATA/inst/data_mgt_wrapper_i/data_mgt_multi_gt_i/data_mgt_gtx_inst/gtxe2_i/RXOUTCLK                                                            | ACQ/MGT/MGTS/DATA/inst/data_mgt_wrapper_i/data_mgt_multi_gt_i/data_mgt_gtx_inst/rxrecclk_from_gtx_i                                                                                                                                                           |             5.1 |
+| ACQ/MGT/MGTS/DATA/inst/data_mgt_wrapper_i/data_mgt_multi_gt_i/data_mgt_gtx_inst/gtxe2_i/TXOUTCLK                                                            | ACQ/MGT/MGTS/DATA/inst/data_mgt_wrapper_i/data_mgt_multi_gt_i/data_mgt_gtx_inst/tx_out_clk                                                                                                                                                                    |             5.1 |
+| ACQ/MGT/MGTS/EXP/inst/exp_mgt_wrapper_i/exp_mgt_multi_gt_i/exp_mgt_gtx_inst/gtxe2_i/RXOUTCLK                                                                | ACQ/MGT/MGTS/EXP/inst/exp_mgt_wrapper_i/exp_mgt_multi_gt_i/exp_mgt_gtx_inst/rxrecclk_from_gtx_i                                                                                                                                                               |             5.1 |
+| ACQ/MGT/MGTS/gen_mgt_2ch.VIDEO/inst/video_mgt_wrapper_i/video_mgt_multi_gt_i/video_mgt_gtx_inst/gtxe2_i/RXOUTCLK                                            | ACQ/MGT/MGTS/gen_mgt_2ch.VIDEO/inst/video_mgt_wrapper_i/video_mgt_multi_gt_i/video_mgt_gtx_inst/rxrecclk_from_gtx_i                                                                                                                                           |             5.1 |
+| CH0_CLK_P                                                                                                                                                   | CH0_CLK_P                                                                                                                                                                                                                                                     |            14.3 |
+| MGT_CLK_0                                                                                                                                                   | AURORA_CLK_P0                                                                                                                                                                                                                                                 |             8.0 |
+| MIG_CAL_UI_CLK                                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/clk_pll_i                                                                                                                                    |            10.0 |
+| PROXY_DCLK_OUT_MULT8_clink_serdes_clk_wrapper                                                                                                               | CLINK/CH0/g0.U18/PROXY_DCLK_OUT_MULT8_clink_serdes_clk_wrapper                                                                                                                                                                                                |             1.8 |
+| PROXY_DCLK_OUT_clink_serdes_clk_wrapper                                                                                                                     | CLINK/CH0/g0.U18/PROXY_DCLK_OUT_clink_serdes_clk_wrapper                                                                                                                                                                                                      |            14.3 |
+| SYS_CLK_P0                                                                                                                                                  | SYS_CLK_P0                                                                                                                                                                                                                                                    |             5.0 |
+| SYS_CLK_P1                                                                                                                                                  | SYS_CLK_P1                                                                                                                                                                                                                                                    |             5.0 |
+| clk_100_bb1920D_clks_mmcm                                                                                                                                   | FPA/U24/Gen_BB1920_8CHN.U1/inst/clk_100_bb1920D_clks_mmcm                                                                                                                                                                                                     |            10.0 |
+| clk_140_bb1920D_clks_mmcm                                                                                                                                   | FPA/U24/Gen_BB1920_8CHN.U1/inst/clk_140_bb1920D_clks_mmcm                                                                                                                                                                                                     |             7.1 |
+| clk_200                                                                                                                                                     | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mmcm_clkout0                                                                                                                                    |             5.0 |
+| clk_70_bb1920D_clks_mmcm                                                                                                                                    | FPA/U24/Gen_BB1920_8CHN.U1/inst/clk_70_bb1920D_clks_mmcm                                                                                                                                                                                                      |            14.3 |
+| clk_cal                                                                                                                                                     | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1_core_clk_wiz_1_0                                                                                                                                                                                |             5.9 |
+| clk_data                                                                                                                                                    | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2_core_clk_wiz_1_0                                                                                                                                                                                |            11.8 |
+| clk_irig                                                                                                                                                    | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mmcm_clkout2                                                                                                                                    |            50.0 |
+| clk_mb                                                                                                                                                      | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/clk_pll_i                                                                                                                                       |            10.0 |
+| clk_mgt_init                                                                                                                                                | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mmcm_clkout1                                                                                                                                    |            20.0 |
+| clkfbout                                                                                                                                                    | ACQ/MGT/MGTS/DATA_CLOCK/U1/clkfbout                                                                                                                                                                                                                           |             5.1 |
+| clkfbout_bb1920D_clks_mmcm                                                                                                                                  | FPA/U24/Gen_BB1920_8CHN.U1/inst/clkfbout_bb1920D_clks_mmcm                                                                                                                                                                                                    |            10.0 |
+| clkfbout_clink_serdes_clk_wrapper                                                                                                                           | CLINK/CH0/g0.U18/clkfbout_clink_serdes_clk_wrapper                                                                                                                                                                                                            |            14.3 |
+| clkfbout_core_clk_wiz_1_0                                                                                                                                   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clkfbout_core_clk_wiz_1_0                                                                                                                                                                                |            50.0 |
+| clkfbout_usart_mmcm                                                                                                                                         | ACQ/BULK_USART/U11/inst/clkfbout_usart_mmcm                                                                                                                                                                                                                   |            60.0 |
+| freq_refclk                                                                                                                                                 | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/freq_refclk                                                                                                                                  |             1.2 |
+| freq_refclk_1                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/freq_refclk                                                                                                                                     |             1.3 |
+| iserdes_clkdiv                                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/iserdes_clkdiv       |            10.0 |
+| iserdes_clkdiv_1                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/iserdes_clkdiv       |            10.0 |
+| iserdes_clkdiv_2                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/iserdes_clkdiv       |            10.0 |
+| iserdes_clkdiv_3                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/iserdes_clkdiv       |            10.0 |
+| iserdes_clkdiv_4                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/iserdes_clkdiv          |            10.0 |
+| iserdes_clkdiv_5                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/iserdes_clkdiv          |            10.0 |
+| mem_refclk                                                                                                                                                  | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/mem_refclk                                                                                                                                   |             2.5 |
+| mem_refclk_1                                                                                                                                                | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mem_refclk                                                                                                                                      |             2.5 |
+| oserdes_clk                                                                                                                                                 | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/oserdes_clk          |             2.5 |
+| oserdes_clk_1                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/oserdes_clk          |             2.5 |
+| oserdes_clk_10                                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clk             |             2.5 |
+| oserdes_clk_2                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/oserdes_clk          |             2.5 |
+| oserdes_clk_3                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clk          |             2.5 |
+| oserdes_clk_4                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/oserdes_clk          |             2.5 |
+| oserdes_clk_5                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/oserdes_clk          |             2.5 |
+| oserdes_clk_6                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clk          |             2.5 |
+| oserdes_clk_7                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/oserdes_clk             |             2.5 |
+| oserdes_clk_8                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/oserdes_clk             |             2.5 |
+| oserdes_clk_9                                                                                                                                               | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/oserdes_clk             |             2.5 |
+| oserdes_clkdiv                                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/oserdes_clkdiv       |             5.0 |
+| oserdes_clkdiv_1                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/oserdes_clkdiv       |             5.0 |
+| oserdes_clkdiv_10                                                                                                                                           | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clkdiv          |             5.0 |
+| oserdes_clkdiv_2                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/oserdes_clkdiv       |             5.0 |
+| oserdes_clkdiv_3                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clkdiv       |             5.0 |
+| oserdes_clkdiv_4                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/oserdes_clkdiv       |            10.0 |
+| oserdes_clkdiv_5                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/oserdes_clkdiv       |            10.0 |
+| oserdes_clkdiv_6                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_1.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clkdiv       |            10.0 |
+| oserdes_clkdiv_7                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/oserdes_clkdiv          |             5.0 |
+| oserdes_clkdiv_8                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/oserdes_clkdiv          |            10.0 |
+| oserdes_clkdiv_9                                                                                                                                            | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/oserdes_clkdiv          |            10.0 |
+| pll_clk3_out                                                                                                                                                | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/pll_clk3_out                                                                                                                                 |            10.0 |
+| pll_clk3_out_1                                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/pll_clk3_out                                                                                                                                    |            10.0 |
+| pll_clkfbout                                                                                                                                                | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/pll_clkfbout                                                                                                                                 |             5.0 |
+| pll_clkfbout_1                                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/pll_clkfbout                                                                                                                                    |             5.0 |
+| sync_clk_i                                                                                                                                                  | ACQ/MGT/MGTS/DATA_CLOCK/U1/sync_clk_i                                                                                                                                                                                                                         |             5.1 |
+| sync_pulse                                                                                                                                                  | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/sync_pulse                                                                                                                                   |            40.0 |
+| sync_pulse_1                                                                                                                                                | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/sync_pulse                                                                                                                                      |            40.0 |
+| u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/iserdes_clk   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/A_rst_primitives_reg |             2.5 |
+| u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/iserdes_clk_1 | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/A_rst_primitives_reg    |             2.5 |
+| u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/iserdes_clk   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_B.ddr_byte_lane_B/A_rst_primitives_reg |             2.5 |
+| u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/iserdes_clk   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_C.ddr_byte_lane_C/A_rst_primitives_reg |             2.5 |
+| u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/iserdes_clk   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/A_rst_primitives_reg |             2.5 |
+| u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/iserdes_clk_1 | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/A_rst_primitives_reg    |             2.5 |
+| usart_clk                                                                                                                                                   | ACQ/BULK_USART/U11/inst/CLK0_usart_mmcm                                                                                                                                                                                                                       |            60.0 |
+| usart_clk_in                                                                                                                                                | R_GIGE_BULK_CLK0                                                                                                                                                                                                                                              |            60.0 |
+| user_clk_i                                                                                                                                                  | ACQ/MGT/MGTS/DATA_CLOCK/U1/user_clk_i                                                                                                                                                                                                                         |            10.2 |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------+
+
+
+3. Detailed Reports
+-------------------
+
+3.1 By Hierarchy
+----------------
+
++------------------------------------------------------------+-----------+
+| Name                                                       | Power (W) |
++------------------------------------------------------------+-----------+
+| fir_00251_proc_calcium640D                                 |     5.672 |
+|   ACQ                                                      |     4.978 |
+|     BD                                                     |     2.033 |
+|       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_4                    |     0.002 |
+|       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_5                    |     0.002 |
+|       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_6                    |     0.002 |
+|       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_7                    |     0.002 |
+|       MIG_2DDR.core_wrapper_i                              |     2.024 |
+|     BULK_USART                                             |     0.111 |
+|       U11                                                  |     0.108 |
+|     CALIB                                                  |     1.299 |
+|       U11                                                  |     0.002 |
+|       U14                                                  |     0.002 |
+|       U15                                                  |     0.002 |
+|       U17                                                  |     0.038 |
+|       U19                                                  |     0.019 |
+|       U30                                                  |     0.025 |
+|       U31                                                  |     0.027 |
+|       gen_cal_2ch.CORE_0                                   |     0.596 |
+|       gen_cal_2ch.CORE_1                                   |     0.579 |
+|       gen_cal_2ch.U20                                      |     0.002 |
+|       gen_cal_2ch.U4                                       |     0.003 |
+|       gen_cal_2ch.U9                                       |     0.004 |
+|     EHDRI                                                  |     0.002 |
+|     EXP_CTRL                                               |     0.001 |
+|     FLASH                                                  |     0.014 |
+|       U2                                                   |     0.001 |
+|       U4                                                   |     0.008 |
+|       U5                                                   |     0.004 |
+|     HEADER                                                 |     0.036 |
+|       U1                                                   |     0.001 |
+|       U2                                                   |     0.006 |
+|       U20                                                  |     0.002 |
+|       U22                                                  |     0.002 |
+|       U24                                                  |     0.002 |
+|       U26                                                  |     0.002 |
+|       U28                                                  |     0.002 |
+|       U3                                                   |     0.002 |
+|       U4                                                   |     0.003 |
+|       U5                                                   |     0.009 |
+|       U6                                                   |     0.002 |
+|       U7                                                   |     0.002 |
+|     ICU                                                    |     0.002 |
+|       U2                                                   |     0.001 |
+|     IRIG                                                   |     0.002 |
+|     MGT                                                    |     1.413 |
+|       MGTS                                                 |     1.402 |
+|       U3                                                   |     0.009 |
+|       U4                                                   |     0.002 |
+|     SFW_INTF                                               |     0.006 |
+|       U2                                                   |     0.001 |
+|       U3                                                   |     0.001 |
+|       U7                                                   |     0.002 |
+|     TRIG                                                   |     0.009 |
+|       U1                                                   |     0.002 |
+|       U3                                                   |     0.002 |
+|       U4                                                   |     0.001 |
+|       g0.U11                                               |     0.003 |
+|     U2                                                     |     0.029 |
+|       U2                                                   |     0.002 |
+|       U3                                                   |     0.002 |
+|       U4                                                   |     0.018 |
+|       U5                                                   |     0.003 |
+|       U6                                                   |     0.003 |
+|     U4                                                     |     0.008 |
+|       U7                                                   |     0.002 |
+|       U8                                                   |     0.001 |
+|       g1.U3                                                |     0.004 |
+|     U7                                                     |     0.004 |
+|       U2                                                   |     0.003 |
+|     USB                                                    |     0.006 |
+|       U1                                                   |     0.001 |
+|       U6                                                   |     0.001 |
+|       U7                                                   |     0.001 |
+|       U8                                                   |     0.001 |
+|   CLINK                                                    |     0.388 |
+|     CH0                                                    |     0.186 |
+|       U3                                                   |     0.008 |
+|       U4                                                   |     0.008 |
+|       U74                                                  |     0.001 |
+|       U75                                                  |     0.007 |
+|       U8                                                   |     0.008 |
+|       U9                                                   |     0.008 |
+|       g0.U18                                               |     0.116 |
+|     CH1                                                    |     0.065 |
+|       U3                                                   |     0.008 |
+|       U4                                                   |     0.008 |
+|       U74                                                  |     0.001 |
+|       U75                                                  |     0.007 |
+|       U8                                                   |     0.008 |
+|       U9                                                   |     0.008 |
+|     U2                                                     |     0.002 |
+|       U2                                                   |     0.001 |
+|     U5                                                     |     0.065 |
+|       U3                                                   |     0.008 |
+|       U4                                                   |     0.008 |
+|       U74                                                  |     0.001 |
+|       U75                                                  |     0.007 |
+|       U8                                                   |     0.008 |
+|       U9                                                   |     0.008 |
+|     U6                                                     |     0.065 |
+|       U3                                                   |     0.008 |
+|       U4                                                   |     0.008 |
+|       U74                                                  |     0.001 |
+|       U75                                                  |     0.007 |
+|       U8                                                   |     0.008 |
+|       U9                                                   |     0.008 |
+|     U8                                                     |     0.002 |
+|       U2                                                   |     0.001 |
+|   FPA                                                      |     0.204 |
+|     U1                                                     |     0.001 |
+|     U19                                                    |     0.015 |
+|     U24                                                    |     0.092 |
+|       Gen_BB1920_8CHN.U1                                   |     0.092 |
+|     U26                                                    |     0.005 |
+|       U4                                                   |     0.002 |
+|       U7                                                   |     0.001 |
+|       U8                                                   |     0.001 |
+|     U33                                                    |     0.003 |
+|       agen_wr64_rd128_d512.fwft_afifo_wr66_rd132_d512_inst |     0.003 |
+|     U4                                                     |     0.018 |
+|     U5                                                     |     0.013 |
+|       U1                                                   |     0.007 |
+|       U2                                                   |     0.001 |
+|       U3                                                   |     0.001 |
+|       U6                                                   |     0.002 |
+|       U9                                                   |     0.002 |
+|     U6                                                     |     0.002 |
+|     U7                                                     |     0.003 |
+|       U2                                                   |     0.002 |
+|     U9                                                     |     0.051 |
+|       U1                                                   |     0.010 |
+|       U17                                                  |     0.006 |
+|       U18                                                  |     0.010 |
+|       U2                                                   |     0.010 |
+|       U5                                                   |     0.003 |
+|       U8                                                   |     0.012 |
++------------------------------------------------------------+-----------+
+
+

@@ -12,6 +12,7 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #do  "$FIR251PROC\src\fir_00251_top_blackbird1280D_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_blackbird1520D_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_blackbird1920D_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_calcium640D_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_hawkA_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_herculesD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0207A_build.do"
@@ -52,6 +53,9 @@ acom  "$FIR251PROC\src\fir_00251_proc_blackbird1520D.bde"
 #FPA blackbird1920D
 do "$FIR251PROC\src\FPA\blackbird1920D\hdl\compil_blackbird1920D.do"
 acom  "$FIR251PROC\src\fir_00251_proc_blackbird1920D.bde"
+#FPA calcium640D
+# do "$FIR251PROC\src\FPA\calcium640D\hdl\compil_calcium640D.do"
+# acom  "$FIR251PROC\src\fir_00251_proc_calcium640D.bde"
 #FPA hawkA
 do "$FIR251PROC\src\FPA\hawkA\HDL\compil_hawkA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_hawkA.bde"

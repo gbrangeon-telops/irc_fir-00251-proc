@@ -15,6 +15,9 @@ lappend detector_list {blackbird1520D325}
 #lappend detector_list {blackbird1920D160}
 lappend detector_list {blackbird1920D325}
 
+# #lappend detector_list {calcium640D160}
+# lappend detector_list {calcium640D325}
+
 lappend detector_list {hawkA160}
 #lappend detector_list {hawkA325}
 

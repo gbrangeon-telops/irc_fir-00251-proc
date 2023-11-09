@@ -13,6 +13,10 @@ create_proc_sw blackbird1920D
 build_proc_sw blackbird1920D 325
 #build_proc_sw blackbird1920D 160
 
+# create_proc_sw calcium640D
+# build_proc_sw calcium640D 325
+# #build_proc_sw calcium640D 160
+
 create_proc_sw hawkA
 build_proc_sw hawkA 160
 #build_proc_sw hawkA 325
