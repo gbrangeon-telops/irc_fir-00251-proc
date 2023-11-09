@@ -123,11 +123,9 @@ void disable_caches()
    extern slCtrl_t theSlCtrl;
    extern autofocusCtrl_t theAutoCtrl;
    extern qspiFlash_t gQSPIFlash;
-   extern t_FpaIntf gFpaIntf;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
-   t_FpaStatus fpaStatus;
 
    Stack_ConfigStackViolationException();
 
