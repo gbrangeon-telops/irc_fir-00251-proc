@@ -10,6 +10,7 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     upvar 1 storageDir storageDir
     upvar 1 ntxminiDir ntxminiDir
     upvar 1 elfFile elfFile
+    upvar 1 bootFile bootFile
     upvar 1 hwFile hwFile
     upvar 1 buildInfoFile buildInfoFile
     upvar 1 releaseFile releaseFile
@@ -28,7 +29,7 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     upvar 1 tortoiseSVNDir tortoiseSVNDir
     upvar 1 svn_subwcrev svn_subwcrev
     upvar 1 xDir xDir
-    upvar 1 objcopy objcopy
+    upvar 1 x_mb-objcopy x_mb-objcopy
     upvar 1 x_xsct x_xsct
     upvar 1 x_promgen x_promgen
 

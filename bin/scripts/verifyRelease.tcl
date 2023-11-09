@@ -444,14 +444,7 @@ if {$error == 1} {
     error "Cannot parse release log file"
 }
 
-puts $procReleaseInfoHardware
-puts $procBuildInfoHardware
-puts $procReleaseInfoSoftware
-puts $procBuildInfoSoftware
-puts $procReleaseInfoBootLoader
-puts $procBuildInfoBootLoader
-puts $procReleaseInfoCommon
-puts $procBuildInfoCommon
+
 # Verify proc build info file
 if {($procReleaseInfoHardware != $procBuildInfoHardware) ||
 ($procReleaseInfoSoftware != $procBuildInfoSoftware) ||
@@ -471,7 +464,6 @@ if {($procReleaseInfoHardware != $releaseLogProcHardware) ||
 # Verify output build info file
 if {($outputReleaseInfoHardware != $outputBuildInfoHardware) ||
 ($outputReleaseInfoSoftware != $outputBuildInfoSoftware) ||
-($outputReleaseInfoBootLoader != $outputBuildInfoBootLoader) ||
 ($outputReleaseInfoCommon != $outputBuildInfoCommon)} {
    error "Output FPGA release info does not match build info"
 }
@@ -479,7 +471,6 @@ if {($outputReleaseInfoHardware != $outputBuildInfoHardware) ||
 # Verify output release log file
 if {($outputReleaseInfoHardware != $releaseLogOutputHardware) ||
 ($outputReleaseInfoSoftware != $releaseLogOutputSoftware) ||
-($outputReleaseInfoBootLoader != $releaseLogOutputBootLoader) ||
 ($outputReleaseInfoCommon != $releaseLogOutputCommon)} {
     error "Output FPGA release info does not match release log file"
 }
@@ -487,11 +478,9 @@ if {($outputReleaseInfoHardware != $releaseLogOutputHardware) ||
 # Verify storage build info file
 if {($storageReleaseInfoHardware1 != $storageBuildInfoHardware1) ||
 ($storageReleaseInfoSoftware1 != $storageBuildInfoSoftware1) ||
-($storageReleaseInfoBootLoader1 != $storageBuildInfoBootLoader1) ||
 ($storageReleaseInfoCommon1 != $storageBuildInfoCommon1) ||
 ($storageReleaseInfoHardware2 != $storageBuildInfoHardware2) ||
 ($storageReleaseInfoSoftware2 != $storageBuildInfoSoftware2) ||
-($storageReleaseInfoBootLoader2 != $storageBuildInfoBootLoader2) ||
 ($storageReleaseInfoCommon2 != $storageBuildInfoCommon2)} {
    error "Storage FPGA release info does not match build info"
 }
@@ -499,11 +488,9 @@ if {($storageReleaseInfoHardware1 != $storageBuildInfoHardware1) ||
 # Verify storage release log file
 if {($storageReleaseInfoHardware1 != $releaseLogStorageHardware1) ||
 ($storageReleaseInfoSoftware1 != $releaseLogStorageSoftware1) ||
-($storageReleaseInfoBootLoader1 != $releaseLogStorageBootLoader1) ||
 ($storageReleaseInfoCommon1 != $releaseLogStorageCommon1) ||
 ($storageReleaseInfoHardware2 != $releaseLogStorageHardware2) ||
 ($storageReleaseInfoSoftware2 != $releaseLogStorageSoftware2) ||
-($storageReleaseInfoBootLoader2 != $releaseLogStorageBootLoader2) ||
 ($storageReleaseInfoCommon2 != $releaseLogStorageCommon2)} {
     error "Storage FPGA release info does not match release log file"
 }
