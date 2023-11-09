@@ -31,7 +31,7 @@ IRC_Status_t DeviceKey_Validate(flashSettings_t *p_flashSettings, flashDynamicVa
 {
    extern uint8_t gPowerOnIsAllowed;
    extern uint8_t gFuPromIsWriteProtected;
-   uint64_t deviceKey;
+   uint64_t deviceKey = 0;
    uint32_t *p_deviceKey32 = (uint32_t *) &deviceKey;
    uint64_t deviceKeyValidation;
    uint32_t *p_deviceKeyValidation32 = (uint32_t *) &deviceKeyValidation;
