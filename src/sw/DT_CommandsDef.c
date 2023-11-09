@@ -1205,6 +1205,7 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
    long spaceTotal, spaceUsed, spaceFree;
    char filename[FM_LONG_FILENAME_SIZE];
    uint32_t i;
+   int retlen;
 
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
@@ -1263,7 +1264,11 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
          i = 0;
          while ((ep = uffs_readdir(dp)) != NULL)
          {
-            snprintf(filename,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
+            retlen = snprintf(filename,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
+            /* ensure generated "filename" string is valid */
+            if (retlen <= 0 || FM_LONG_FILENAME_SIZE <= retlen)
+                continue;
+
             uffs_stat(filename, &filestat);
             DT_PRINTF("%3d: %s (%d)", i++, ep->d_name, filestat.st_size);
          }

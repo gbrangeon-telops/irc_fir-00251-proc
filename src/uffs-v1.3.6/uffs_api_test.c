@@ -190,6 +190,7 @@ static int cmd_TestPopulateFiles(int argc, char *argv[])
 	struct uffs_dirent *ent;
 	unsigned long bitmap[50] = {0};	// one bit per file, maximu 32*50 = 1600 files
 	UBOOL succ = U_TRUE;
+   int retlen;
 
 #define SBIT(n) bitmap[(n)/(sizeof(bitmap[0]) * 8)] |= (1 << ((n) % (sizeof(bitmap[0]) * 8)))
 #define GBIT(n) (bitmap[(n)/(sizeof(bitmap[0]) * 8)] & (1 << ((n) % (sizeof(bitmap[0]) * 8))))
@@ -258,7 +259,11 @@ static int cmd_TestPopulateFiles(int argc, char *argv[])
 			SBIT(num);
 
 			// check file content
-			sprintf(name, "%s%s", start, ent->d_name);
+			retlen = snprintf(name, sizeof(name), "%s%s", start, ent->d_name);
+         /* ensure generated "filename" string is valid */
+         if (retlen <= 0 || sizeof(name) <= retlen)
+             continue;
+
 			fd = uffs_open(name, UO_RDONLY);
 			if (fd < 0) {
 				MSGLN("Open file %d for read failed !", name);

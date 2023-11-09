@@ -544,6 +544,7 @@ IRC_Status_t FM_InitFileDB()
    IRC_Status_t status;
    uint32_t fileCount;
    uint32_t i;
+   int retlen;
 
    FM_ClearFileDB();
 
@@ -558,7 +559,12 @@ IRC_Status_t FM_InitFileDB()
 
          if (fileCount < FM_MAX_NUM_FILE)
          {
-            snprintf(filelongname,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, de->d_name);
+            retlen = snprintf(filelongname,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, de->d_name);
+            /* ensure generated "filename" string is valid */
+            if (retlen <= 0 || FM_LONG_FILENAME_SIZE <= retlen)
+                continue;
+
+
             if (uffs_stat(filelongname, &filestat) == 0)
             {
                // Add file in database
