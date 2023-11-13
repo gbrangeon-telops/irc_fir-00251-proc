@@ -1,8 +1,8 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
-| Date             : Fri Oct 20 09:09:59 2023
-| Host             : TELOPS258 running 64-bit major release  (build 9200)
+| Date             : Thu Nov  9 16:25:06 2023
+| Host             : Telops330 running 64-bit major release  (build 9200)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/mockfpa/fir_00251_proc_325_mockfpa_power.rpt
 | Design           : fir_00251_proc_mockfpa
 | Device           : xc7k325tfbg676-1
@@ -52,16 +52,16 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.800 |       98 |       --- |             --- |
-| Slice Logic              |     0.298 |   320357 |       --- |             --- |
-|   LUT as Logic           |     0.228 |    98295 |    203800 |           48.23 |
-|   Register               |     0.031 |   156825 |    407600 |           38.48 |
+| Clocks                   |     0.803 |       98 |       --- |             --- |
+| Slice Logic              |     0.297 |   320358 |       --- |             --- |
+|   LUT as Logic           |     0.227 |    91175 |    203800 |           44.74 |
+|   Register               |     0.031 |   156821 |    407600 |           38.47 |
 |   CARRY4                 |     0.028 |     6281 |     50950 |           12.33 |
-|   LUT as Shift Register  |     0.007 |    11462 |     64000 |           17.91 |
+|   LUT as Shift Register  |     0.007 |     7311 |     64000 |           11.42 |
 |   LUT as Distributed RAM |     0.004 |     3780 |     64000 |            5.91 |
 |   F7/F8 Muxes            |    <0.001 |      962 |    203800 |            0.47 |
-|   Others                 |    <0.001 |    24588 |       --- |             --- |
-| Signals                  |     0.392 |   235881 |       --- |             --- |
+|   Others                 |    <0.001 |    24594 |       --- |             --- |
+| Signals                  |     0.390 |   235897 |       --- |             --- |
 | Block RAM                |     0.280 |    371.5 |       445 |           83.48 |
 | MMCM                     |     0.522 |        5 |        10 |           50.00 |
 | PLL                      |     0.388 |        4 |        10 |           40.00 |
@@ -81,7 +81,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     2.309 |       2.190 |      0.119 |
+| Vccint    |       1.000 |     2.310 |       2.191 |      0.119 |
 | Vccaux    |       1.800 |     1.103 |       1.073 |      0.030 |
 | Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
 | Vcco25    |       2.500 |     0.024 |       0.023 |      0.001 |
@@ -244,25 +244,25 @@ Table of Contents
 | Name                                             | Power (W) |
 +--------------------------------------------------+-----------+
 | fir_00251_proc_mockfpa                           |     6.103 |
-|   ACQ                                            |     5.634 |
-|     BD                                           |     2.716 |
-|       MIG_4DDR.core_wrapper_i                    |     2.716 |
+|   ACQ                                            |     5.635 |
+|     BD                                           |     2.717 |
+|       MIG_4DDR.core_wrapper_i                    |     2.717 |
 |     BULK_USART                                   |     0.111 |
 |       U11                                        |     0.108 |
-|     CALIB                                        |     1.276 |
+|     CALIB                                        |     1.268 |
 |       U11                                        |     0.002 |
 |       U14                                        |     0.002 |
 |       U15                                        |     0.002 |
 |       U17                                        |     0.035 |
-|       U19                                        |     0.020 |
+|       U19                                        |     0.019 |
 |       U30                                        |     0.025 |
 |       U31                                        |     0.026 |
-|       gen_cal_2ch.CORE_0                         |     0.584 |
-|       gen_cal_2ch.CORE_1                         |     0.570 |
+|       gen_cal_2ch.CORE_0                         |     0.581 |
+|       gen_cal_2ch.CORE_1                         |     0.565 |
 |       gen_cal_2ch.U20                            |     0.002 |
 |       gen_cal_2ch.U4                             |     0.003 |
 |       gen_cal_2ch.U9                             |     0.004 |
-|     EHDRI                                        |     0.001 |
+|     EHDRI                                        |     0.002 |
 |     EXP_CTRL                                     |     0.001 |
 |     FLAGGING                                     |     0.001 |
 |     FLASH                                        |     0.013 |
@@ -270,7 +270,7 @@ Table of Contents
 |       U4                                         |     0.008 |
 |       U5                                         |     0.003 |
 |     GATING                                       |     0.001 |
-|     HEADER                                       |     0.034 |
+|     HEADER                                       |     0.035 |
 |       U1                                         |     0.001 |
 |       U2                                         |     0.003 |
 |       U20                                        |     0.002 |
@@ -286,8 +286,8 @@ Table of Contents
 |     ICU                                          |     0.002 |
 |       U2                                         |     0.001 |
 |     IRIG                                         |     0.002 |
-|     MGT                                          |     1.406 |
-|       MGTS                                       |     1.395 |
+|     MGT                                          |     1.412 |
+|       MGTS                                       |     1.401 |
 |       U3                                         |     0.009 |
 |       U4                                         |     0.002 |
 |     SFW_INTF                                     |     0.006 |
@@ -299,13 +299,13 @@ Table of Contents
 |       U3                                         |     0.002 |
 |       U4                                         |     0.001 |
 |       g0.U11                                     |     0.003 |
-|     U2                                           |     0.025 |
+|     U2                                           |     0.026 |
 |       U2                                         |     0.002 |
 |       U3                                         |     0.002 |
 |       U4                                         |     0.015 |
 |       U5                                         |     0.003 |
 |       U6                                         |     0.003 |
-|     U4                                           |     0.018 |
+|     U4                                           |     0.019 |
 |       U1                                         |     0.001 |
 |       U7                                         |     0.002 |
 |       g0.U10                                     |     0.004 |
