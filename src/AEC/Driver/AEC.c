@@ -306,7 +306,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       ProposedExposureTimeLast = *((float*)pGcRegsDefExposureTimeX[AEC_Int_FWPosition]->p_data);
    }
 
-   AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
+   AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / EXPOSURE_TIME_FACTOR; // in us
    if ((AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION) || (fabsf(ProposedExposureTimeLast - AEC_Int_expTime) >= AEC_EXPTIME_THRESHOLD))
    {
       // On reset l'histogramme lorsqu'on est à l'extérieur d'une plage valide ou si le PET précédent n'a pas encore été appliqué.

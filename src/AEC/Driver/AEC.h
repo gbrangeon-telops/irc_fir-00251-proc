@@ -20,6 +20,7 @@
 #include "irc_status.h"
 #include "tel2000_param.h"
 #include "verbose.h"
+#include "fpa_intf.h"
 
 #include <math.h>
 
@@ -60,7 +61,16 @@
 #define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR // TO CONFIRM
 #define AEC_NB_BIN		                  128
 #define AEC_EXPOSURE_TIME_RESOLUTION      0.1f // in us.
-#define AEC_EXPTIME_THRESHOLD             2.2f // in us. Must be greater than one 5MHz clock period to support all detectors.
+
+/* Explication sur l'ajustement du AEC_EXPTIME_THRESHOLD
+1. On veut un seuil qui représente le pire écart entre le PET et la valeur qui sera écrite dans le header.
+2. Un premier tronquage est fait par l'AEC en fonction du AEC_EXPOSURE_TIME_RESOLUTION.
+2. On envoi ensuite le ET au vhdl en clks de EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ.
+3. Le fpa_mblaze_intf arrondi le ET en clks de FPA_MCLK_RATE_HZ
+4. Le data_dispatcher arrondi le ET en clks de EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ et l'envoi au header inserter.
+*/
+#define AEC_EXPTIME_THRESHOLD             (float)(AEC_EXPOSURE_TIME_RESOLUTION + (1E6F/FPA_MCLK_RATE_HZ) + (1E6F/EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ))//in us
+
 #define CORRECTION_FACTOR_MIN             0.1f
 #define CORRECTION_FACTOR_MAX             10.0f
 #define AEC_BASE_CLOCK_FREQ_HZ     CLK_DATA_FREQ_HZ
