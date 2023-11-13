@@ -23,7 +23,7 @@ entity isc0804A_2k_clks_mmcm is
       ARESET           : in std_logic;
       CLK_100M_IN      : in std_logic;
       
-      FPA_INT_CFG      : fpa_intf_cfg_type;
+      FPA_INT_CFG      : in fpa_intf_cfg_type;
       
       MCLK_SOURCE      : out std_logic;
       ADC_CLK_SOURCE   : out std_logic;
