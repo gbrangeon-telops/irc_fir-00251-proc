@@ -51,9 +51,12 @@ if {[ catch {[file copy "${sdkDir}/${baseName}_${fpga_size}/Release/${baseName}_
 
     }
     #Clean up
-    file delete -force {*}[glob *.backup.log] 
-    file delete -force {*}[glob *.backup.jou] 
-
+    if {[ catch {[file delete -force {*}[glob *.backup.log] ]} err]} {
+        puts $err
+    }
+    if {[ catch {[file delete -force {*}[glob *.backup.jou]  ]} err]} {
+        puts $err
+    }
 
 } 
 
