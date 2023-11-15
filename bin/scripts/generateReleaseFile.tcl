@@ -111,68 +111,60 @@ incr relInfolength 4
 seek $fh $relInfolength start
 
 # Write release information version fields
-#binary format I $relInfoVersionMajor | puts -nonewline $fh
-#incr relInfolength 4
-#binary format I $relInfoVersionMinor | puts -nonewline $fh
-#incr relInfolength 4
-#binary format I $relInfoVersionSubMinor | puts -nonewline $fh
-#incr relInfolength 4
-
-# Write release information version fields
-puts -nonewline $fh [binary format I $relInfoVersionMajor]
+puts -nonewline $fh [binary format i $relInfoVersionMajor]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $relInfoVersionMinor]
+puts -nonewline $fh [binary format i $relInfoVersionMinor]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $relInfoVersionSubMinor]
+puts -nonewline $fh [binary format i $relInfoVersionSubMinor]
 incr relInfolength 4
 
 # Write release firmware version fields
-puts -nonewline $fh [binary format I $firmwareVersionMajor]
+puts -nonewline $fh [binary format i $firmwareVersionMajor]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $firmwareVersionMinor]
+puts -nonewline $fh [binary format i $firmwareVersionMinor]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $firmwareVersionSubMinor]
+puts -nonewline $fh [binary format i $firmwareVersionSubMinor]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $firmwareVersionBuild]
+puts -nonewline $fh [binary format i $firmwareVersionBuild]
 incr relInfolength 4
 
 # Write release revision numbers fields
-puts -nonewline $fh [binary format I $rel_proc_hw_rev]
+puts -nonewline $fh [binary format i $rel_proc_hw_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_proc_sw_rev]
+puts -nonewline $fh [binary format i $rel_proc_sw_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_proc_boot_rev]
+puts -nonewline $fh [binary format i $rel_proc_boot_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_proc_common_rev]
+puts -nonewline $fh [binary format i $rel_proc_common_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_out_hw_rev]
+puts -nonewline $fh [binary format i $rel_out_hw_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_out_sw_rev]
+puts -nonewline $fh [binary format i $rel_out_sw_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_out_boot_rev]
+puts -nonewline $fh [binary format i $rel_out_boot_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_out_common_rev]
+puts -nonewline $fh [binary format i $rel_out_common_rev]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_hw_rev1]
+puts -nonewline $fh [binary format i $rel_storage_hw_rev1]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_sw_rev1]
+puts -nonewline $fh [binary format i $rel_storage_sw_rev1]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_boot_rev1]
+puts -nonewline $fh [binary format i $rel_storage_boot_rev1]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_common_rev1]
+puts -nonewline $fh [binary format i $rel_storage_common_rev1]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_hw_rev2]
+puts -nonewline $fh [binary format i $rel_storage_hw_rev2]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_sw_rev2]
+puts -nonewline $fh [binary format i $rel_storage_sw_rev2]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_boot_rev2]
+puts -nonewline $fh [binary format i $rel_storage_boot_rev2]
 incr relInfolength 4
-puts -nonewline $fh [binary format I $rel_storage_common_rev2]
+puts -nonewline $fh [binary format i $rel_storage_common_rev2]
 incr relInfolength 4
 
 # Write release information length field
 seek $fh 0 start
-puts -nonewline $fh [binary format I $relInfolength]
+puts -nonewline $fh [binary format i $relInfolength]
 close $fh
 
 set lfh [open $releaseLogfile "w"]
