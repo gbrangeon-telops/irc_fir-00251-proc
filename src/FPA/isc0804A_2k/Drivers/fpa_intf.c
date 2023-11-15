@@ -184,9 +184,9 @@
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19
 
 // Déphasage des ADC
-#define ISC0804_DEFAULT_REGC             0
-#define ISC0804_DEFAULT_REGD             148
-#define ISC0804_LN2_DEFAULT_REGD         148
+#define ISC0804_DEFAULT_REGC             3
+#define ISC0804_DEFAULT_REGD             28
+#define ISC0804_LN2_DEFAULT_REGD         28
 #define ISC0804_DEFAULT_REGF             18
 
 #define ISC0804_BITSTREAM_FG   53696343  // bitstream ROIC standard de ForrestGump pour M1k
