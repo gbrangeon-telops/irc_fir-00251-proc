@@ -73,8 +73,14 @@ if errorlevel 1 goto err
 copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini
 if errorlevel 1 goto err
 
-%x_xsct% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.tcl -sensor %sensorName% -key %encrypt_key_name% ^
+
+call %x_xsct% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.tcl -sensor %sensorName% -key %encrypt_key_name% ^
    -v %firmwareVersion% -o %outputRevFile% -storage_revs1 %storageRevFile1% -storage_revs2 %storageRevFile2% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -cal %calibFilesVersion% -t %paperworkTemplateDir%
+if errorlevel 1 (
+	echo generate paperwork failed for %sensorName% %fpgaSize%
+	pause
+	exit
+)
    
 %zip% a -r -tzip %paperworkTemplateDir%.zip %paperworkTemplateDir%\*.*
 

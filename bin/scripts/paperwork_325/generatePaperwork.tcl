@@ -94,7 +94,7 @@ while {[llength $argv] > 0} {
     }
 }
 
-set sharedStringsFile = "$template_dir\\xl\\sharedStrings.xml";
+set sharedStringsFile "$template_dir\\xl\\sharedStrings.xml"
 puts "proc_versions = $proc_versions"
 puts "output_versions = $output_versions"
 puts "storage_versions1 = $storage_versions1"

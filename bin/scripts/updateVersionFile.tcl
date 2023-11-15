@@ -86,7 +86,7 @@ puts $script "$vflashSettingsVersionMinor"
 puts -nonewline $script "set flashSettingsVersionSubMinor="
 set vflashSettingsVersionSubMinor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FlashSettingsFile_h -f "FLASHSETTINGS_FILESUBMINORVERSION_V$fsMajorVersion"]
 puts $script "$vflashSettingsVersionSubMinor"
-puts $script "set xmlVersion=%xmlVersionMajor%.%xmlVersionMinor%.%xmlVersionSubMinor%"
+puts $script "set flashSettingsVersion=%flashSettingsVersionMajor%.%flashSettingsVersionMinor%.%flashSettingsVersionSubMinor%"
 
 puts -nonewline $script "set flashDynamicValuesVersionMajor="
 set vflashDynamicValuesVersionMajor [exec $x_xsct "$scriptsDir/fetchNumericValue.tcl" -if $FlashDynamicValuesFile_h -f "FLASHDYNAMICVALUES_FILEMAJORVERSION_V$fdvMajorVersion"]
