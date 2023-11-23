@@ -206,9 +206,9 @@
 #define LINE_PAUSE                1.0F
 
 #define DYNAMIC_RANGE_DIV_BIT_POS                  21     // précision fractionnaire
-#define DYNAMIC_RANGE_SCALER_SATURATION_LEVEL      16000  // 15200 // niveau de restauration des données et sur le modèle M2K-UD
-#define DYNAMIC_RANGE_CLIPPING_LEVEL               8000   // 8500  // niveau d'ecretage des donnnées du modèle M2K-UD
-#define DYNAMIC_RANGE_GLOBAL_OFFSET                1675   // offset de base
+#define DYNAMIC_RANGE_SCALER_SATURATION_LEVEL      16000  // niveau de restauration des données sur le modèle M2K-UD
+#define DYNAMIC_RANGE_CLIPPING_LEVEL               8191   //8000  // niveau d'ecretage des donnnées du modèle M2K-UD
+#define DYNAMIC_RANGE_GLOBAL_OFFSET                0      //1675   // offset de base
 
 struct s_ProximCfgConfig 
 {   
@@ -837,12 +837,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // clipper configuration
    if (sw_init_done == 0)
       gFpaDebugRegG = (int32_t)DYNAMIC_RANGE_CLIPPING_LEVEL;
-   dynrange_factor = (float)DYNAMIC_RANGE_SCALER_SATURATION_LEVEL / (float)ptrA->dynrange_clipping_level;
-   ptrA->dynrange_clipping_level       = (uint32_t)gFpaDebugRegG;
-   ptrA->dynrange_scaling_numerator    = (uint32_t)(dynrange_factor * powf(2.0F, (float)DYNAMIC_RANGE_DIV_BIT_POS));
-   ptrA->dynrange_global_offset        = -(float)DYNAMIC_RANGE_GLOBAL_OFFSET * (dynrange_factor-1.0);
-   ptrA->dynrange_op_sel               = (uint32_t)ELCORR_SW_TO_NORMAL_OP;
-
+   //dynrange_factor = (float)DYNAMIC_RANGE_SCALER_SATURATION_LEVEL / (float)ptrA->dynrange_clipping_level;
+   dynrange_factor                   = 1.0F;  /* on ne fait pas de rescaling */
+   ptrA->dynrange_clipping_level     = (uint32_t)gFpaDebugRegG;
+   ptrA->dynrange_scaling_numerator  = (uint32_t)(dynrange_factor * powf(2.0F, (float)DYNAMIC_RANGE_DIV_BIT_POS));
+   //ptrA->dynrange_global_offset      = -(float)DYNAMIC_RANGE_GLOBAL_OFFSET * (dynrange_factor-1.0);
+   ptrA->dynrange_global_offset      = 0; /* on ne corrige pas l'offset */
+   ptrA->dynrange_op_sel             = (uint32_t)ELCORR_SW_TO_NORMAL_OP;
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
