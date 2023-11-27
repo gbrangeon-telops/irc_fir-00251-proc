@@ -32,6 +32,9 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     upvar 1 x_mb-objcopy x_mb-objcopy
     upvar 1 x_xsct x_xsct
     upvar 1 x_promgen x_promgen
+    upvar 1  sensorCode sensorCode
+    upvar 1  sensorWidth sensorWidth
+    upvar 1  sensorHeight sensorHeight
 
     set baseName "fir_00251_proc_$sensorName"
     set commonDir "D:/Telops/FIR-00251-Common"
@@ -50,10 +53,11 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     set releaseFile "$binDir/${baseName}_${fpgaSize}_release.bin"
     set releaseLogFile "$binDir/${baseName}_${fpgaSize}_release.txt"
     set revFile "$binDir/svnrevs_$fpgaSize.tcl"
+
     if {$fpgaSize == "160"} {
-    set outputFpgaSize 70
+        set outputFpgaSize 70
     } else {
-    set outputFpgaSize 160
+        set outputFpgaSize 160
     }
     set outputRevFile "$outputDir/bin/svnrevs_$outputFpgaSize.tcl"
     set outputBaseName "fir_00251_output_$outputFpgaSize"
@@ -63,19 +67,40 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     set storageBuildInfoFile "$storageDir/src/BuildInfo/BuildInfo.h"
     set versionFile "$binDir/version.txt"
     set sensorInfoFile "$projectDir/bin/SensorInformation.txt"
+    #get sensorcode information
+    set sensorCode "0"
+    set sensorWidth ""
+    set sensorHeight ""
+
+    set inputFile [open "$sensorInfoFile" r]
+    while {[gets $inputFile line] != -1} {
+        set tokens [split $line ","]
+        set sensorNameToken [lindex $tokens 0]
+        set sensorCodeToken [lindex $tokens 1]
+        set sensorWidthToken [lindex $tokens 2]
+        set sensorHeightToken [lindex $tokens 3]
+
+        if {$sensorNameToken eq $sensorName} {
+            set sensorCode $sensorCodeToken
+            set sensorWidth $sensorWidthToken
+            set sensorHeight $sensorHeightToken
+            break
+        }
+    }
+    close $inputFile
     set zip "C:/Program Files/7-Zip/7z.exe"
     set tortoiseSVNDir "C:/Program Files/TortoiseSVN"
     set svn_subwcrev "$tortoiseSVNDir/bin/SubWCRev.exe"
     set xDir "C:/Xilinx"
     if {[file exists "D:/Xilinx/SDK/2018.3/*.*"]} {
-    set xDir "D:/Xilinx"
+        set xDir "D:/Xilinx"
     }
     puts "Xilinx directory: $xDir"
     set x_mb-objcopy "$xDir/SDK/2018.3/gnu/microblaze/nt/bin/mb-objcopy.exe"
     set x_xsct "$xDir/SDK/2018.3/bin/xsct.bat"
     set xDir "C:/Xilinx"
     if {[file exists "D:/Xilinx/14.7/*.*"]} {
-    set xDir "D:/Xilinx"
+        set xDir "D:/Xilinx"
     }
     puts "Xilinx directory: $xDir"
     set x_promgen "$xDir/14.7/LabTools/LabTools/bin/nt64/promgen.exe"

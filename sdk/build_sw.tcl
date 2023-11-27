@@ -14,14 +14,6 @@ if {$create_project == 1} {
    create_proc_sw $detector $size
 }
 
-#prebuild
-if {[ catch {[source "D:/Telops/FIR-00251-Proc/bin/scripts/generateBuildInfoFile.tcl"]} ]} {
-   puts "Catch the error because no input"
-}
-
-set scriptEnvironment "D:/Telops/FIR-00251-Proc/bin/scripts/setEnvironment.tcl"
-genCore $scriptEnvironment $detector "160"
-genCore $scriptEnvironment $detector "325"
 
 #Build project
 build_proc_sw $detector $size $compile_arg
