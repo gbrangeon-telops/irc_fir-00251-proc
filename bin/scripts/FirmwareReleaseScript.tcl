@@ -1049,11 +1049,11 @@ set releaseDate [clock format [clock seconds] -format "%Y-%m-%d"]
 puts $releaseDate
 set tagPath "/tags/$releaseDate - $releaseMessage"
 set svnDir "http://einstein/svn/firmware/"
-# exec "$tortoiseSvnBin copy D:/Telops/FIR-00251-Common \"$svnDir/FIR-00251-Common$tagPath\" -m \"$releaseMessage\""
-# exec "$tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini \"$svnDir/FIR-00251-NTx-Mini$tagPath\" -m \"$releaseMessage\""
-# exec "$tortoiseSvnBin copy $projectDir "$svnDir/FIR-00251-Proc$tagPath" -m \"$releaseMessage\""
-# exec "$tortoiseSvnBin copy D:/Telops/FIR-00251-Output \"$svnDir/FIR-00251-Output$tagPath\" -m \"$releaseMessage\""
-# exec "$tortoiseSvnBin copy D:/Telops/FIR-00257-Storage \"$svnDir/FIR-00257-Storage$tagPath\" -m \"$releaseMessage\""
+exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Common $svnDir/FIR-00251-Common$tagPath -m \"$releaseMessage\"
+exec $tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini $svnDir/FIR-00251-NTx-Mini$tagPath -m \"$releaseMessage\"
+exec $tortoiseSvnBin copy $projectDir $svnDir/FIR-00251-Proc$tagPath -m \"$releaseMessage\"
+exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Output $svnDir/FIR-00251-Output$tagPath -m \"$releaseMessage\"
+exec $tortoiseSvnBin copy D:/Telops/FIR-00257-Storage $svnDir/FIR-00257-Storage$tagPath -m \"$releaseMessage\"
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "Release tags done"
