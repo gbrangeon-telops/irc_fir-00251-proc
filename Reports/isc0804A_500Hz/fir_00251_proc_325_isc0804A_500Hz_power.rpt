@@ -1,7 +1,7 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
-| Date             : Tue Oct 10 11:05:40 2023
+| Date             : Thu Dec  7 21:17:22 2023
 | Host             : Telops330 running 64-bit major release  (build 9200)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/isc0804A_500Hz/fir_00251_proc_325_isc0804A_500Hz_power.rpt
 | Design           : fir_00251_proc_isc0804A_500Hz
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 5.911        |
+| Total On-Chip Power (W)  | 6.199        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 5.677        |
-| Device Static (W)        | 0.233        |
+| Dynamic (W)              | 5.958        |
+| Device Static (W)        | 0.241        |
 | Effective TJA (C/W)      | 1.9          |
-| Max Ambient (C)          | 89.0         |
-| Junction Temperature (C) | 36.0         |
+| Max Ambient (C)          | 88.4         |
+| Junction Temperature (C) | 36.6         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,27 +52,27 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.792 |       85 |       --- |             --- |
-| Slice Logic              |     0.346 |   361277 |       --- |             --- |
-|   LUT as Logic           |     0.273 |   110126 |    203800 |           54.04 |
-|   Register               |     0.033 |   175212 |    407600 |           42.99 |
-|   CARRY4                 |     0.030 |     9484 |     50950 |           18.61 |
-|   LUT as Shift Register  |     0.008 |     7407 |     64000 |           11.57 |
+| Clocks                   |     0.846 |       85 |       --- |             --- |
+| Slice Logic              |     0.370 |   371948 |       --- |             --- |
+|   LUT as Logic           |     0.289 |   112907 |    203800 |           55.40 |
+|   Register               |     0.036 |   179726 |    407600 |           44.09 |
+|   CARRY4                 |     0.033 |     9538 |     50950 |           18.72 |
+|   LUT as Shift Register  |     0.009 |     7954 |     64000 |           12.43 |
 |   LUT as Distributed RAM |     0.003 |     2424 |     64000 |            3.79 |
 |   F7/F8 Muxes            |    <0.001 |      845 |    203800 |            0.41 |
-|   Others                 |    <0.001 |    25437 |       --- |             --- |
+|   Others                 |    <0.001 |    26883 |       --- |             --- |
 |   BUFR                   |     0.000 |        1 |       208 |            0.48 |
-| Signals                  |     0.464 |   268355 |       --- |             --- |
-| Block RAM                |     0.227 |      307 |       445 |           68.99 |
+| Signals                  |     0.530 |   279251 |       --- |             --- |
+| Block RAM                |     0.332 |      403 |       445 |           90.56 |
 | MMCM                     |     0.522 |        7 |        10 |           70.00 |
 | PLL                      |     0.283 |        3 |        10 |           30.00 |
-| DSPs                     |     0.273 |      439 |       840 |           52.26 |
-| I/O                      |     1.172 |      333 |       400 |           83.25 |
+| DSPs                     |     0.307 |      439 |       840 |           52.26 |
+| I/O                      |     1.171 |      333 |       400 |           83.25 |
 | GTX                      |     1.212 |        4 |         8 |           50.00 |
 | PHASER                   |     0.385 |       40 |       --- |             --- |
 | XADC                     |     0.002 |        1 |       --- |             --- |
-| Static Power             |     0.233 |          |           |                 |
-| Total                    |     5.911 |          |           |                 |
+| Static Power             |     0.241 |          |           |                 |
+| Total                    |     6.199 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -82,16 +82,16 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     2.450 |       2.336 |      0.114 |
-| Vccaux    |       1.800 |     0.891 |       0.861 |      0.030 |
+| Vccint    |       1.000 |     2.734 |       2.615 |      0.119 |
+| Vccaux    |       1.800 |     0.890 |       0.860 |      0.030 |
 | Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
 | Vcco25    |       2.500 |     0.026 |       0.025 |      0.001 |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |
-| Vcco15    |       1.500 |     0.407 |       0.406 |      0.001 |
+| Vcco15    |       1.500 |     0.406 |       0.405 |      0.001 |
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |
 | Vccaux_io |       1.800 |     0.000 |       0.000 |      0.000 |
-| Vccbram   |       1.000 |     0.023 |       0.013 |      0.009 |
+| Vccbram   |       1.000 |     0.028 |       0.016 |      0.012 |
 | MGTAVcc   |       1.000 |     0.685 |       0.678 |      0.007 |
 | MGTAVtt   |       1.200 |     0.355 |       0.350 |      0.005 |
 | MGTVccaux |       1.800 |     0.000 |       0.000 |      0.000 |
@@ -154,8 +154,8 @@ Table of Contents
 | SYS_CLK_P0                                                                                                                                                  | SYS_CLK_P0                                                                                                                                                                                                                                                    |             5.0 |
 | SYS_CLK_P1                                                                                                                                                  | SYS_CLK_P1                                                                                                                                                                                                                                                    |             5.0 |
 | clk_200                                                                                                                                                     | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mmcm_clkout0                                                                                                                                    |             5.0 |
-| clk_cal                                                                                                                                                     | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1_core_clk_wiz_1_0                                                                                                                                                                                |             5.9 |
-| clk_data                                                                                                                                                    | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2_core_clk_wiz_1_0                                                                                                                                                                                |            11.8 |
+| clk_cal                                                                                                                                                     | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1_core_4DDR_clk_wiz_1_0                                                                                                                                                                           |             5.9 |
+| clk_data                                                                                                                                                    | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2_core_4DDR_clk_wiz_1_0                                                                                                                                                                           |            11.8 |
 | clk_irig                                                                                                                                                    | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mmcm_clkout2                                                                                                                                    |            50.0 |
 | clk_mb                                                                                                                                                      | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/clk_pll_i                                                                                                                                       |            10.0 |
 | clk_mgt_init                                                                                                                                                | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mmcm_clkout1                                                                                                                                    |            20.0 |
@@ -164,7 +164,7 @@ Table of Contents
 | clk_out_serdes_clkin_11_0_MHz_mmcm                                                                                                                          | U1/CH0/master_gen.U14/Gen_11_0M.Ux/inst/clk_out_serdes_clkin_11_0_MHz_mmcm                                                                                                                                                                                    |            90.9 |
 | clk_out_serdes_clkin_11_0_MHz_mmcm_1                                                                                                                        | U1/CH3/master_gen.U14/Gen_11_0M.Ux/inst/clk_out_serdes_clkin_11_0_MHz_mmcm                                                                                                                                                                                    |            90.9 |
 | clkfbout                                                                                                                                                    | ACQ/MGT/MGTS/DATA_CLOCK/U1/clkfbout                                                                                                                                                                                                                           |             5.1 |
-| clkfbout_core_clk_wiz_1_0                                                                                                                                   | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clkfbout_core_clk_wiz_1_0                                                                                                                                                                                |            50.0 |
+| clkfbout_core_4DDR_clk_wiz_1_0                                                                                                                              | ACQ/BD/MIG_2DDR.core_wrapper_i/core_i/clk_wiz_1/inst/clkfbout_core_4DDR_clk_wiz_1_0                                                                                                                                                                           |            50.0 |
 | clkfbout_isc0804A_500Hz_5_5_MHz_mmcm                                                                                                                        | U3/U26/U2/U11M/inst/CLK_CORE_DRP_I/clk_inst/clkfbout_isc0804A_500Hz_5_5_MHz_mmcm                                                                                                                                                                              |            50.0 |
 | clkfbout_serdes_clkin_11_0_MHz_mmcm                                                                                                                         | U1/CH0/master_gen.U14/Gen_11_0M.Ux/inst/clkfbout_serdes_clkin_11_0_MHz_mmcm                                                                                                                                                                                   |            90.9 |
 | clkfbout_serdes_clkin_11_0_MHz_mmcm_1                                                                                                                       | U1/CH3/master_gen.U14/Gen_11_0M.Ux/inst/clkfbout_serdes_clkin_11_0_MHz_mmcm                                                                                                                                                                                   |            90.9 |
@@ -231,52 +231,53 @@ Table of Contents
 +----------------------------------------------------------+-----------+
 | Name                                                     | Power (W) |
 +----------------------------------------------------------+-----------+
-| fir_00251_proc_isc0804A_500Hz                            |     5.677 |
-|   ACQ                                                    |     4.656 |
-|     BD                                                   |     2.020 |
+| fir_00251_proc_isc0804A_500Hz                            |     5.958 |
+|   ACQ                                                    |     4.930 |
+|     BD                                                   |     2.027 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_4                  |     0.002 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_5                  |     0.002 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_6                  |     0.002 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_7                  |     0.002 |
-|       MIG_2DDR.core_wrapper_i                            |     2.011 |
-|     BULK_USART                                           |     0.110 |
+|       MIG_2DDR.core_wrapper_i                            |     2.017 |
+|     BULK_USART                                           |     0.111 |
 |       U11                                                |     0.108 |
-|     CALIB                                                |     1.009 |
+|     CALIB                                                |     1.269 |
 |       U11                                                |     0.002 |
 |       U14                                                |     0.002 |
 |       U15                                                |     0.002 |
-|       U17                                                |     0.042 |
-|       U19                                                |     0.018 |
+|       U17                                                |     0.035 |
+|       U19                                                |     0.020 |
 |       U30                                                |     0.025 |
-|       U31                                                |     0.029 |
-|       gen_cal_2ch.CORE_0                                 |     0.463 |
-|       gen_cal_2ch.CORE_1                                 |     0.419 |
+|       U31                                                |     0.027 |
+|       gen_cal_2ch.CORE_0                                 |     0.579 |
+|       gen_cal_2ch.CORE_1                                 |     0.568 |
 |       gen_cal_2ch.U20                                    |     0.002 |
 |       gen_cal_2ch.U4                                     |     0.003 |
-|     EHDRI                                                |     0.002 |
+|       gen_cal_2ch.U9                                     |     0.004 |
+|     EHDRI                                                |     0.001 |
 |     EXP_CTRL                                             |     0.001 |
 |     FLASH                                                |     0.013 |
 |       U2                                                 |     0.001 |
 |       U4                                                 |     0.008 |
 |       U5                                                 |     0.003 |
-|     HEADER                                               |     0.031 |
+|     HEADER                                               |     0.035 |
 |       U1                                                 |     0.001 |
-|       U2                                                 |     0.002 |
+|       U2                                                 |     0.004 |
 |       U20                                                |     0.002 |
 |       U22                                                |     0.002 |
 |       U24                                                |     0.002 |
 |       U26                                                |     0.002 |
-|       U28                                                |     0.002 |
+|       U28                                                |     0.003 |
 |       U3                                                 |     0.002 |
 |       U4                                                 |     0.003 |
-|       U5                                                 |     0.010 |
+|       U5                                                 |     0.009 |
 |       U6                                                 |     0.002 |
 |       U7                                                 |     0.002 |
 |     ICU                                                  |     0.002 |
-|       U2                                                 |     0.002 |
-|     IRIG                                                 |     0.001 |
-|     MGT                                                  |     1.401 |
-|       MGTS                                               |     1.391 |
+|       U2                                                 |     0.001 |
+|     IRIG                                                 |     0.002 |
+|     MGT                                                  |     1.408 |
+|       MGTS                                               |     1.398 |
 |       U3                                                 |     0.009 |
 |       U4                                                 |     0.001 |
 |     SFW_INTF                                             |     0.006 |
@@ -285,21 +286,21 @@ Table of Contents
 |       U7                                                 |     0.002 |
 |     TRIG                                                 |     0.009 |
 |       U1                                                 |     0.002 |
-|       U3                                                 |     0.003 |
+|       U3                                                 |     0.002 |
 |       U4                                                 |     0.001 |
 |       g0.U11                                             |     0.003 |
-|     U2                                                   |     0.028 |
+|     U2                                                   |     0.026 |
 |       U2                                                 |     0.002 |
 |       U3                                                 |     0.002 |
-|       U4                                                 |     0.018 |
+|       U4                                                 |     0.015 |
 |       U5                                                 |     0.003 |
 |       U6                                                 |     0.003 |
 |     U4                                                   |     0.008 |
 |       U7                                                 |     0.002 |
 |       U8                                                 |     0.001 |
-|       g1.U3                                              |     0.005 |
-|     U7                                                   |     0.005 |
-|       U2                                                 |     0.004 |
+|       g1.U3                                              |     0.004 |
+|     U7                                                   |     0.004 |
+|       U2                                                 |     0.003 |
 |     USB                                                  |     0.005 |
 |       U1                                                 |     0.001 |
 |       U6                                                 |     0.001 |
@@ -326,44 +327,44 @@ Table of Contents
 |       U18                                                |     0.008 |
 |       U21                                                |     0.008 |
 |       U24                                                |     0.008 |
-|   U3                                                     |     0.693 |
-|     U1                                                   |     0.001 |
+|   U3                                                     |     0.699 |
 |     U21                                                  |     0.010 |
 |       U2                                                 |     0.003 |
 |       U3                                                 |     0.002 |
 |       U4                                                 |     0.001 |
+|       U5                                                 |     0.001 |
 |       U6                                                 |     0.002 |
 |     U23                                                  |     0.002 |
-|     U26                                                  |     0.169 |
+|     U26                                                  |     0.187 |
 |       U1                                                 |     0.001 |
-|       U2                                                 |     0.167 |
+|       U2                                                 |     0.185 |
 |     U27                                                  |     0.002 |
-|     U33                                                  |     0.001 |
-|       agen_wr64_rd128_d32.fwft_afifo_wr66_rd132_d32_inst |     0.001 |
+|     U33                                                  |     0.002 |
+|       agen_wr64_rd128_d32.fwft_afifo_wr66_rd132_d32_inst |     0.002 |
 |     U4                                                   |     0.010 |
-|     U5                                                   |     0.019 |
+|     U5                                                   |     0.016 |
 |       U2                                                 |     0.002 |
 |       U21                                                |     0.002 |
 |       U3                                                 |     0.001 |
-|       U4                                                 |     0.006 |
+|       U4                                                 |     0.002 |
 |       U5                                                 |     0.008 |
 |     U6                                                   |     0.002 |
-|     U9                                                   |     0.477 |
+|     U9                                                   |     0.467 |
 |       ID_A                                               |     0.002 |
 |       ID_B                                               |     0.002 |
 |       ID_C                                               |     0.002 |
 |       ID_D                                               |     0.002 |
-|       U1                                                 |     0.109 |
-|       U11                                                |     0.106 |
-|       U12                                                |     0.108 |
+|       U1                                                 |     0.107 |
+|       U11                                                |     0.104 |
+|       U12                                                |     0.103 |
 |       U13                                                |     0.002 |
 |       U14                                                |     0.002 |
-|       U17                                                |     0.006 |
+|       U17                                                |     0.007 |
 |       U18                                                |     0.011 |
-|       U19                                                |     0.006 |
-|       U2                                                 |     0.108 |
+|       U19                                                |     0.007 |
+|       U2                                                 |     0.106 |
 |       U25                                                |     0.002 |
-|       U6                                                 |     0.006 |
+|       U6                                                 |     0.008 |
 +----------------------------------------------------------+-----------+
 
 
