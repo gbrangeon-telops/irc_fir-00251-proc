@@ -1058,29 +1058,35 @@ set releaseDate [clock format [clock seconds] -format "%Y-%m-%d"]
 puts $releaseDate
 set tagPath "/tags/$releaseDate - $releaseMessage"
 set svnDir "http://einstein/svn/firmware/"
+set tagDone "Done"
 if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Common $svnDir/FIR-00251-Common$tagPath -m \"$releaseMessage\"} errMsg]} {
 		puts "Error can't create FIR-00251-Common tags (details follow):"
         puts "$errMsg"
+        set tagDone "Failed"
 }
 if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini $svnDir/FIR-00251-NTx-Mini$tagPath -m \"$releaseMessage\"} errMsg]} {
 		puts "Error can't create FIR-00251-NTx-Mini tags (details follow):"
         puts "$errMsg"
+        set tagDone "Failed"
 }
 if {[catch {exec $tortoiseSvnBin copy $projectDir $svnDir/FIR-00251-Proc$tagPath -m \"$releaseMessage\"} errMsg]} {
 		puts "Error can't create FIR-00251-Proc tags (details follow):"
         puts "$errMsg"
+        set tagDone "Failed"
 }
 if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Output $svnDir/FIR-00251-Output$tagPath -m \"$releaseMessage\"} errMsg]} {
 		puts "Error can't create FIR-00251-Output tags (details follow):"
         puts "$errMsg"
+        set tagDone "Failed"
 }
 if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00257-Storage $svnDir/FIR-00257-Storage$tagPath -m \"$releaseMessage\"} errMsg]} {
 		puts "Error can't create FIR-00257-Storage tags (details follow):"
         puts "$errMsg"
+        set tagDone "Failed"
 }
 
 set fid [open $FirmwareReleaseLogFile a]
-puts $fid "Release tags done"
+puts $fid "Release tags $tagDone"
 puts $fid "*****************************************"
 puts $fid ""
 close $fid
