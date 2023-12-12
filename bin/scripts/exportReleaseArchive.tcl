@@ -331,7 +331,8 @@ proc convertScript {sensorName fpgaSize scriptsDir} {
         } else {
             puts "Bitstream unencrypted"
     }
-    # Prepare firmware package
+    # Delete previous (if present) and Prepare firmware package 
+    catch {file delete -force $releaseDir}
     file mkdir $releaseDir/FIR-00251-Proc/
     foreach f [glob -directory "$binDir/prom/" fir_00251_proc_${sensorName}_$fpgaSize.*] {
         file copy -force $f "$releaseDir/FIR-00251-Proc/"

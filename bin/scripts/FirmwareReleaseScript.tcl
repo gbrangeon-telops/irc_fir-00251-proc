@@ -882,9 +882,14 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
 
 proc FirmwareReleaseScript_step3 {sensorName fpgaSize logFile} {
     global scriptsDir
+    global vfirmwareVersionMajor
+    global vfirmwareVersionMinor
+    global vfirmwareVersionBuild
+    global sensorCode
+    
     set releaseDir ""
     set projectDir ""
-
+    set releaseNameDir ""
     append logContent "BEGIN Export release files $sensorName $fpgaSize\n"
     puts "BEGIN Export release files $sensorName $fpgaSize"
     # Set environment variables
@@ -894,12 +899,16 @@ proc FirmwareReleaseScript_step3 {sensorName fpgaSize logFile} {
     source $scriptsDir/exportReleaseArchive.tcl
     set releaseDir [convertScript $sensorName $fpgaSize $scriptsDir]
 
-    #exec "move $releaseDir $projectDir/bin/ReleasedFirmwares"
+    set firmwareVersion "$vfirmwareVersionMajor.$vfirmwareVersionMinor.$sensorCode.$vfirmwareVersionBuild"
+    set encrypt_key_name [parseHWRevFile $sensorName $fpgaSize $sdkDir]
+    #delete previous and copy new one
+    if {$sensorName eq "startup"} {
+        set releaseNameDir [format "%s/Release_%s (%s_%s, %s key)" "$projectDir/bin/ReleasedFirmwares/" [string map {"." "_" $sensorName $fpgaSize} $firmwareVersion] $sensorName $fpgaSize $encrypt_key_name]
+    } else {
+        set releaseNameDir [format "%s/Release_%s (%s, %s key)" "$projectDir/bin/ReleasedFirmwares/" [string map {"." "_" $sensorName $fpgaSize} $firmwareVersion] $sensorName $encrypt_key_name]
+    }
+    catch {file delete -force -- $releaseNameDir}
     file copy -force $releaseDir "$projectDir/bin/ReleasedFirmwares/"
-    #foreach f [glob -directory "$releaseDir" * ] {
-   #     puts "copy $f"
-   #     file copy -force $f "$projectDir/bin/ReleasedFirmwares/$releaseDir"
-   # }
     file delete -force -- $releaseDir
 
     append logContent "END Export release files $sensorName $fpgaSize\n"
@@ -1049,11 +1058,26 @@ set releaseDate [clock format [clock seconds] -format "%Y-%m-%d"]
 puts $releaseDate
 set tagPath "/tags/$releaseDate - $releaseMessage"
 set svnDir "http://einstein/svn/firmware/"
-exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Common $svnDir/FIR-00251-Common$tagPath -m \"$releaseMessage\"
-exec $tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini $svnDir/FIR-00251-NTx-Mini$tagPath -m \"$releaseMessage\"
-exec $tortoiseSvnBin copy $projectDir $svnDir/FIR-00251-Proc$tagPath -m \"$releaseMessage\"
-exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Output $svnDir/FIR-00251-Output$tagPath -m \"$releaseMessage\"
-exec $tortoiseSvnBin copy D:/Telops/FIR-00257-Storage $svnDir/FIR-00257-Storage$tagPath -m \"$releaseMessage\"
+if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Common $svnDir/FIR-00251-Common$tagPath -m \"$releaseMessage\"} errMsg]} {
+		puts "Error can't create FIR-00251-Common tags (details follow):"
+        puts "$errMsg"
+}
+if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini $svnDir/FIR-00251-NTx-Mini$tagPath -m \"$releaseMessage\"} errMsg]} {
+		puts "Error can't create FIR-00251-NTx-Mini tags (details follow):"
+        puts "$errMsg"
+}
+if {[catch {exec $tortoiseSvnBin copy $projectDir $svnDir/FIR-00251-Proc$tagPath -m \"$releaseMessage\"} errMsg]} {
+		puts "Error can't create FIR-00251-Proc tags (details follow):"
+        puts "$errMsg"
+}
+if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Output $svnDir/FIR-00251-Output$tagPath -m \"$releaseMessage\"} errMsg]} {
+		puts "Error can't create FIR-00251-Output tags (details follow):"
+        puts "$errMsg"
+}
+if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00257-Storage $svnDir/FIR-00257-Storage$tagPath -m \"$releaseMessage\"} errMsg]} {
+		puts "Error can't create FIR-00257-Storage tags (details follow):"
+        puts "$errMsg"
+}
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "Release tags done"
