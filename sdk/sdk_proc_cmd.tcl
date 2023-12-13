@@ -86,6 +86,7 @@ if {$compile_arg == "both" || $compile_arg == "boot_only"} {
    projects -clean -type app -name fir_00251_proc_${detector}_boot_$size
    file delete -force fir_00251_proc_${detector}_boot_$size/Release/
 }
+after 1000
 if {$compile_arg == "both" || $compile_arg == "main_only"} {
    configapp -app fir_00251_proc_${detector}_$size build-config release
    projects -clean -type app -name fir_00251_proc_${detector}_$size
