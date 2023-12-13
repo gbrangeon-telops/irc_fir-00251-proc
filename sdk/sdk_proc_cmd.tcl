@@ -13,13 +13,13 @@ if {$size_arg == "both" || $size_arg == "160"} {
    if {[catch {createhw -name hw_platform_160 -hwspec "fir_00251_proc_${detector}_160.hdf"} errMsg]} {
 		updatehw -hw hw_platform_160 -newhwspec "fir_00251_proc_${detector}_160.hdf"
 	}
-   
+   after 1000
 
    #Create BSP projects, if already exist do nothing
    if {[catch {createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1} errMsg]} {
 			puts ""
 	}	
-   
+   after 1000
 
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
@@ -32,6 +32,7 @@ if {$size_arg == "both" || $size_arg == "160"} {
    if {[catch {configapp -app fir_00251_proc_${detector}_boot_160 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
+   after 1000
    if {[catch {configapp -app fir_00251_proc_${detector}_160 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
@@ -41,12 +42,13 @@ if {$size_arg == "both" || $size_arg == "325"} {
    if {[catch { createhw -name hw_platform_325 -hwspec "fir_00251_proc_${detector}_325.hdf"} errMsg]} {
 		updatehw -hw hw_platform_325 -newhwspec "fir_00251_proc_${detector}_325.hdf"
 	}
+   after 1000
   
     #Create BSP projects, if already exist do nothing
    if {[catch {createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1} errMsg]} {
 			puts ""
 	}	
- 
+   after 1000
 
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
@@ -59,6 +61,7 @@ if {$size_arg == "both" || $size_arg == "325"} {
    if {[catch {configapp -app fir_00251_proc_${detector}_boot_325 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
+   after 1000
    if {[catch {configapp -app fir_00251_proc_${detector}_325 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
