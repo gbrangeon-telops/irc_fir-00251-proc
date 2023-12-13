@@ -76,6 +76,7 @@
 #define FPA_MCLK_RATE_HZ               27E+6F    // le master clock du FPA
 //#define FPA_MCLK_RATE_HZ               40E+6F    // le master clock du FPA
 #define FPA_MCLK_SOURCE_RATE_HZ        (4.0F * FPA_MCLK_RATE_HZ)    // le master clock source
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
 

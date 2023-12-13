@@ -69,7 +69,7 @@
 3. Le fpa_mblaze_intf arrondi le ET en clks de FPA_MCLK_RATE_HZ
 4. Le data_dispatcher arrondi le ET en clks de EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ et l'envoi au header inserter.
 */
-#define AEC_EXPTIME_THRESHOLD             (float)(AEC_EXPOSURE_TIME_RESOLUTION + (1E6F/FPA_MCLK_RATE_HZ) + (1E6F/EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ))//in us
+#define AEC_EXPTIME_THRESHOLD             (float)(AEC_EXPOSURE_TIME_RESOLUTION + FPA_EXPOSURE_TIME_RESOLUTION + (1E6F/EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ))//in us
 
 #define CORRECTION_FACTOR_MIN             0.1f
 #define CORRECTION_FACTOR_MAX             10.0f

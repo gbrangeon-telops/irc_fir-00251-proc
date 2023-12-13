@@ -84,6 +84,7 @@
 
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 #define FPA_MCLK_RATE_HZ               20E+6F   // fréquence de l'horloge du FPA
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_DATA_RESOLUTION            14
 #define FPA_PIXEL_PITCH                15E-6F

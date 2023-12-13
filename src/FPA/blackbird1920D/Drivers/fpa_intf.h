@@ -82,6 +82,7 @@
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
 #define FPA_MCLK_RATE_HZ               70E+6F   // fréquence de l'horloge d'integration
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_DATA_RESOLUTION            13
 #define FPA_PIXEL_PITCH                10E-6F

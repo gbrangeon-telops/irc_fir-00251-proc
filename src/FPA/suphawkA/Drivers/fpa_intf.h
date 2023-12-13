@@ -66,6 +66,7 @@
 #define FPA_EHDRI_EXP_3    11000.0F 
 
 #define FPA_MCLK_RATE_HZ               10E+6F    // le master clock du FPA
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_MIN_EXPOSURE               0.2F    // [us] 2 coups d'horloge en µsec. ENO 27 juillet 2019: Penser à l'envoyer dans un registre car doit tenir compte de gFpaExposureTimeOffset.
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 

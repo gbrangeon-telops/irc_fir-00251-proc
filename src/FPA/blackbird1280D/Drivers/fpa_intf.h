@@ -90,6 +90,8 @@
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 #define FPA_FPP_CLK_RATE_HZ            70E+6F   // fréquence de l'horloge du SCD Proxy
 #define FPA_CLINK_CLK_RATE_HZ          80E+6F   // fréquence de l'horloge du ROIC (specific to BB1280)
+#define SCD_FRAME_RESOLUTION           7.0F
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/(FPA_FPP_CLK_RATE_HZ/SCD_FRAME_RESOLUTION))
 
 #define FPA_DATA_RESOLUTION            13
 #define FPA_PIXEL_PITCH                10E-6F

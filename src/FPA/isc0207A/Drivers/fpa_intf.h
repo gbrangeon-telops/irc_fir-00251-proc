@@ -75,6 +75,7 @@
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define FPA_MCLK_RATE_HZ               5E+6F          // le master clock du FPA
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #ifdef STARTUP
    #define FPA_PIX_THROUGHPUT_PEAK        340E+6F // force camera link full @ 85MHz for startup 4DDR only

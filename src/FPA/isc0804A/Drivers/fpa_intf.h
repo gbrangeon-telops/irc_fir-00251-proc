@@ -74,6 +74,7 @@
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define FPA_MCLK_RATE_HZ            11100000            // le master clock du FPA
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec] , one pixel per mclk edges (DDR) 
 
