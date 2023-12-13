@@ -1,8 +1,8 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------
-| Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
-| Date             : Tue Oct 10 18:11:31 2023
-| Host             : Telops330 running 64-bit major release  (build 9200)
+| Tool Version     : Vivado v.2018.3_(AR71898_AR71948) (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date             : Tue Dec 12 15:17:23 2023
+| Host             : TELOPS336 running 64-bit major release  (build 9200)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/startup/fir_00251_proc_325_startup_power.rpt
 | Design           : fir_00251_proc_startup
 | Device           : xc7k325tfbg676-1
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 4.912        |
+| Total On-Chip Power (W)  | 5.092        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 4.693        |
-| Device Static (W)        | 0.220        |
+| Dynamic (W)              | 4.869        |
+| Device Static (W)        | 0.223        |
 | Effective TJA (C/W)      | 1.9          |
-| Max Ambient (C)          | 90.8         |
-| Junction Temperature (C) | 34.2         |
+| Max Ambient (C)          | 90.5         |
+| Junction Temperature (C) | 34.5         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,27 +52,27 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.524 |       85 |       --- |             --- |
-| Slice Logic              |     0.159 |   226559 |       --- |             --- |
-|   LUT as Logic           |     0.126 |    68489 |    203800 |           33.61 |
-|   Register               |     0.015 |   112057 |    407600 |           27.49 |
-|   CARRY4                 |     0.013 |     4641 |     50950 |            9.11 |
-|   LUT as Shift Register  |     0.003 |     3906 |     64000 |            6.10 |
-|   LUT as Distributed RAM |     0.003 |     2428 |     64000 |            3.79 |
+| Clocks                   |     0.543 |       85 |       --- |             --- |
+| Slice Logic              |     0.197 |   232014 |       --- |             --- |
+|   LUT as Logic           |     0.153 |    69860 |    203800 |           34.28 |
+|   Register               |     0.020 |   114410 |    407600 |           28.07 |
+|   CARRY4                 |     0.017 |     4668 |     50950 |            9.16 |
+|   LUT as Shift Register  |     0.005 |     4169 |     64000 |            6.51 |
+|   LUT as Distributed RAM |     0.002 |     2428 |     64000 |            3.79 |
 |   F7/F8 Muxes            |    <0.001 |      472 |    203800 |            0.23 |
-|   Others                 |    <0.001 |    14883 |       --- |             --- |
+|   Others                 |    <0.001 |    15610 |       --- |             --- |
 |   BUFR                   |     0.000 |        1 |       208 |            0.48 |
-| Signals                  |     0.201 |   168201 |       --- |             --- |
-| Block RAM                |     0.173 |    221.5 |       445 |           49.78 |
+| Signals                  |     0.250 |   173768 |       --- |             --- |
+| Block RAM                |     0.218 |      270 |       445 |           60.67 |
 | MMCM                     |     0.628 |        8 |        10 |           80.00 |
 | PLL                      |     0.185 |        2 |        10 |           20.00 |
-| DSPs                     |     0.050 |      101 |       840 |           12.02 |
+| DSPs                     |     0.075 |      101 |       840 |           12.02 |
 | I/O                      |     1.174 |      333 |       400 |           83.25 |
 | GTX                      |     1.212 |        4 |         8 |           50.00 |
 | PHASER                   |     0.385 |       40 |       --- |             --- |
 | XADC                     |     0.002 |        1 |       --- |             --- |
-| Static Power             |     0.220 |          |           |                 |
-| Total                    |     4.912 |          |           |                 |
+| Static Power             |     0.223 |          |           |                 |
+| Total                    |     5.092 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -82,7 +82,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     1.442 |       1.339 |      0.104 |
+| Vccint    |       1.000 |     1.620 |       1.514 |      0.106 |
 | Vccaux    |       1.800 |     0.899 |       0.869 |      0.030 |
 | Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
 | Vcco25    |       2.500 |     0.026 |       0.025 |      0.001 |
@@ -91,7 +91,7 @@ Table of Contents
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |
 | Vccaux_io |       1.800 |     0.000 |       0.000 |      0.000 |
-| Vccbram   |       1.000 |     0.016 |       0.009 |      0.007 |
+| Vccbram   |       1.000 |     0.019 |       0.010 |      0.008 |
 | MGTAVcc   |       1.000 |     0.685 |       0.678 |      0.006 |
 | MGTAVtt   |       1.200 |     0.355 |       0.350 |      0.005 |
 | MGTVccaux |       1.800 |     0.000 |       0.000 |      0.000 |
@@ -231,22 +231,22 @@ Table of Contents
 +------------------------+-----------+
 | Name                   | Power (W) |
 +------------------------+-----------+
-| fir_00251_proc_startup |     4.693 |
-|   U1                   |     4.587 |
-|     ACQ                |     4.179 |
-|       BD               |     2.024 |
+| fir_00251_proc_startup |     4.869 |
+|   U1                   |     4.763 |
+|     ACQ                |     4.356 |
+|       BD               |     2.022 |
 |       BULK_USART       |     0.110 |
-|       CALIB            |     0.533 |
+|       CALIB            |     0.703 |
 |       EHDRI            |     0.002 |
 |       EXP_CTRL         |     0.001 |
-|       FLASH            |     0.014 |
-|       HEADER           |     0.031 |
+|       FLASH            |     0.015 |
+|       HEADER           |     0.030 |
 |       ICU              |     0.002 |
-|       IRIG             |     0.001 |
-|       MGT              |     1.397 |
+|       IRIG             |     0.002 |
+|       MGT              |     1.402 |
 |       SFW_INTF         |     0.006 |
 |       TRIG             |     0.009 |
-|       U2               |     0.025 |
+|       U2               |     0.029 |
 |       U4               |     0.007 |
 |       U7               |     0.005 |
 |       USB              |     0.007 |
@@ -255,14 +255,14 @@ Table of Contents
 |       CH1              |     0.052 |
 |       CH2              |     0.052 |
 |       CH3              |     0.058 |
-|     U3                 |     0.187 |
-|       U25              |     0.002 |
+|     U3                 |     0.185 |
+|       U25              |     0.001 |
 |       U26              |     0.109 |
 |       U33              |     0.002 |
 |       U4               |     0.010 |
 |       U5               |     0.004 |
-|       U6               |     0.003 |
-|       U9               |     0.046 |
+|       U6               |     0.002 |
+|       U9               |     0.045 |
 |       g0.U21           |     0.010 |
 +------------------------+-----------+
 

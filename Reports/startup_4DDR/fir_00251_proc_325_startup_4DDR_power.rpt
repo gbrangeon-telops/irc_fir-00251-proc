@@ -1,8 +1,8 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------
-| Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
-| Date             : Tue Oct 10 19:00:25 2023
-| Host             : Telops330 running 64-bit major release  (build 9200)
+| Tool Version     : Vivado v.2018.3_(AR71898_AR71948) (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date             : Tue Dec 12 15:53:52 2023
+| Host             : TELOPS336 running 64-bit major release  (build 9200)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/startup_4DDR/fir_00251_proc_325_startup_4DDR_power.rpt
 | Design           : fir_00251_proc_startup_4DDR
 | Device           : xc7k325tfbg676-1
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 6.034        |
+| Total On-Chip Power (W)  | 6.327        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 5.800        |
-| Device Static (W)        | 0.234        |
+| Dynamic (W)              | 6.085        |
+| Device Static (W)        | 0.242        |
 | Effective TJA (C/W)      | 1.9          |
-| Max Ambient (C)          | 88.8         |
-| Junction Temperature (C) | 36.2         |
+| Max Ambient (C)          | 88.2         |
+| Junction Temperature (C) | 36.8         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,27 +52,27 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.777 |      101 |       --- |             --- |
-| Slice Logic              |     0.267 |   327218 |       --- |             --- |
-|   LUT as Logic           |     0.206 |    94519 |    203800 |           46.38 |
-|   Register               |     0.027 |   161258 |    407600 |           39.56 |
-|   CARRY4                 |     0.026 |     6818 |     50950 |           13.38 |
-|   LUT as Shift Register  |     0.006 |     6790 |     64000 |           10.61 |
-|   LUT as Distributed RAM |     0.003 |     3780 |     64000 |            5.91 |
+| Clocks                   |     0.822 |      101 |       --- |             --- |
+| Slice Logic              |     0.298 |   337879 |       --- |             --- |
+|   LUT as Logic           |     0.227 |    97297 |    203800 |           47.74 |
+|   Register               |     0.031 |   165763 |    407600 |           40.67 |
+|   CARRY4                 |     0.029 |     6872 |     50950 |           13.49 |
+|   LUT as Shift Register  |     0.007 |     7340 |     64000 |           11.47 |
+|   LUT as Distributed RAM |     0.004 |     3780 |     64000 |            5.91 |
 |   F7/F8 Muxes            |    <0.001 |      967 |    203800 |            0.47 |
-|   Others                 |    <0.001 |    23813 |       --- |             --- |
+|   Others                 |    <0.001 |    25259 |       --- |             --- |
 |   BUFR                   |     0.000 |        1 |       208 |            0.48 |
-| Signals                  |     0.339 |   238933 |       --- |             --- |
-| Block RAM                |     0.219 |      299 |       445 |           67.19 |
+| Signals                  |     0.407 |   249887 |       --- |             --- |
+| Block RAM                |     0.316 |      395 |       445 |           88.76 |
 | MMCM                     |     0.628 |        8 |        10 |           80.00 |
 | PLL                      |     0.185 |        2 |        10 |           20.00 |
-| DSPs                     |     0.088 |      173 |       840 |           20.60 |
-| I/O                      |     1.557 |      333 |       400 |           83.25 |
+| DSPs                     |     0.134 |      173 |       840 |           20.60 |
+| I/O                      |     1.556 |      333 |       400 |           83.25 |
 | GTX                      |     1.212 |        4 |         8 |           50.00 |
 | PHASER                   |     0.527 |       58 |       --- |             --- |
 | XADC                     |     0.002 |        1 |       --- |             --- |
-| Static Power             |     0.234 |          |           |                 |
-| Total                    |     6.034 |          |           |                 |
+| Static Power             |     0.242 |          |           |                 |
+| Total                    |     6.327 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -82,7 +82,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     2.078 |       1.963 |      0.115 |
+| Vccint    |       1.000 |     2.367 |       2.247 |      0.119 |
 | Vccaux    |       1.800 |     1.058 |       1.028 |      0.030 |
 | Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
 | Vcco25    |       2.500 |     0.026 |       0.025 |      0.001 |
@@ -91,7 +91,7 @@ Table of Contents
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |
 | Vccaux_io |       1.800 |     0.000 |       0.000 |      0.000 |
-| Vccbram   |       1.000 |     0.022 |       0.012 |      0.009 |
+| Vccbram   |       1.000 |     0.027 |       0.015 |      0.012 |
 | MGTAVcc   |       1.000 |     0.685 |       0.678 |      0.007 |
 | MGTAVtt   |       1.200 |     0.355 |       0.350 |      0.005 |
 | MGTVccaux |       1.800 |     0.000 |       0.000 |      0.000 |
@@ -247,36 +247,36 @@ Table of Contents
 +-----------------------------+-----------+
 | Name                        | Power (W) |
 +-----------------------------+-----------+
-| fir_00251_proc_startup_4DDR |     5.800 |
-|   U1                        |     5.766 |
-|     ACQ                     |     5.359 |
-|       BD                    |     2.699 |
-|       BULK_USART            |     0.110 |
-|       CALIB                 |     1.017 |
-|       EHDRI                 |     0.002 |
+| fir_00251_proc_startup_4DDR |     6.085 |
+|   U1                        |     6.052 |
+|     ACQ                     |     5.643 |
+|       BD                    |     2.713 |
+|       BULK_USART            |     0.111 |
+|       CALIB                 |     1.278 |
+|       EHDRI                 |     0.001 |
 |       EXP_CTRL              |     0.001 |
-|       FLASH                 |     0.015 |
-|       HEADER                |     0.032 |
+|       FLASH                 |     0.014 |
+|       HEADER                |     0.034 |
 |       ICU                   |     0.002 |
-|       IRIG                  |     0.001 |
-|       MGT                   |     1.399 |
+|       IRIG                  |     0.002 |
+|       MGT                   |     1.415 |
 |       SFW_INTF              |     0.006 |
 |       TRIG                  |     0.009 |
-|       U2                    |     0.031 |
-|       U4                    |     0.019 |
-|       U7                    |     0.005 |
+|       U2                    |     0.025 |
+|       U4                    |     0.018 |
+|       U7                    |     0.004 |
 |       USB                   |     0.006 |
-|     U1                      |     0.221 |
+|     U1                      |     0.222 |
 |       CH0                   |     0.057 |
 |       CH1                   |     0.052 |
 |       CH2                   |     0.052 |
 |       CH3                   |     0.058 |
-|     U3                      |     0.186 |
+|     U3                      |     0.187 |
 |       U25                   |     0.002 |
 |       U26                   |     0.109 |
 |       U33                   |     0.002 |
-|       U4                    |     0.010 |
-|       U5                    |     0.005 |
+|       U4                    |     0.009 |
+|       U5                    |     0.004 |
 |       U6                    |     0.002 |
 |       U9                    |     0.046 |
 |       g0.U21                |     0.010 |
