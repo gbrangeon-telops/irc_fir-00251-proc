@@ -796,8 +796,15 @@ proc FirmwareReleaseScript_step1 {sensorName fpgaSize logFile} {
 
     # Create and build main project $sensorName $fpgaSize 1 "main_only"
     source  "$projectDir/sdk/sdk_proc_cmd.tcl" 
+    after 1000
+    puts "Start create_proc_sw"
     create_proc_sw $sensorName $fpgaSize
+    after 3000
+    puts "Start build_proc_sw"
     build_proc_sw $sensorName $fpgaSize "main_only"
+    after 3000
+    puts "Start clean_proc_sw"
+    clean_proc_sw $sensorName $fpgaSize 
 
     if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
         append logContent "Create and build project failed!\n"
@@ -838,8 +845,15 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
     # Build main project
     # build main project $sensorName $fpgaSize 0 "main_only"
     source  "$projectDir/sdk/sdk_proc_cmd.tcl" 
+    after 1000
+    puts "Start create_proc_sw"
+    create_proc_sw $sensorName $fpgaSize
+    after 3000
+    puts "Start build_proc_sw"
     build_proc_sw $sensorName $fpgaSize "main_only"
-
+    after 3000
+    puts "Start clean_proc_sw"
+    clean_proc_sw $sensorName $fpgaSize 
     if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
         append logContent "Create and build project failed!\n"
         set logFileHandle [open $logFile a]
@@ -866,15 +880,31 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
     puts "verifyRelease done"
 
     # Note: Because generatePromFile uses the vivado bin, we have to call the .bat
-    exec $scriptsDir/generatePromFile.bat $sensorName $fpgaSize
+    #exec $scriptsDir/generatePromFile.bat $sensorName $fpgaSize
 
-    append logContent "generatePromFile done\n"
-    puts "generatePromFile done"
+    #append logContent "generatePromFile done\n"
+    #puts "generatePromFile done"
 
     append logContent "END Release compile $sensorName $fpgaSize\n.\n"
 
     puts "END Release compile $sensorName $fpgaSize"
     # Append log content to the log file
+    set logFileHandle [open $logFile a]
+    puts -nonewline $logFileHandle $logContent
+    close $logFileHandle
+}
+
+proc FirmwareReleaseScript_step2_5 {sensorName fpgaSize logFile} {
+    global scriptsDir
+
+    append logContent "BEGIN Generate PROM file $sensorName $fpgaSize\n"
+
+    # Note: Because generatePromFile uses the vivado bin, we have to call the .bat
+    exec $scriptsDir/generatePromFile.bat $sensorName $fpgaSize
+
+    append logContent "generatePromFile done\n"
+    puts "generatePromFile done"
+
     set logFileHandle [open $logFile a]
     puts -nonewline $logFileHandle $logContent
     close $logFileHandle
@@ -989,7 +1019,7 @@ set lines [split $contents "\n"]
 close $fid
 set lineToSkip 3
 set errorFlag ""
-cd "d:/Telops/fir-00251-Proc/sdk/"
+
 foreach line $lines {
     if {$lineToSkip == 0} {
         set tokens [split $line ","]
@@ -999,6 +1029,7 @@ foreach line $lines {
         if {[string first $substring $sensorName] == -1} {
             set fpgaSize [lindex $tokens 1]
             puts "Sensor in list: $sensorName $fpgaSize"
+            cd "$projectDir/sdk"
             if {[catch {FirmwareReleaseScript_step1 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
                 puts $errMsg
                 set errorFlag "step 1 failed"
@@ -1039,7 +1070,6 @@ puts "*****************************************"
 puts ""
 
 set lineToSkip 3
-cd "d:/Telops/fir-00251-Proc/sdk/"
 foreach line $lines {
     if {$lineToSkip == 0} {
         set tokens [split $line ","]
@@ -1049,9 +1079,33 @@ foreach line $lines {
         if {[string first $substring $sensorName] == -1} {
             set fpgaSize [lindex $tokens 1]
             puts "Sensor in list: $sensorName $fpgaSize"
+            cd "$projectDir/sdk/"
             if {[catch {FirmwareReleaseScript_step2 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
                 puts $errMsg
                 set errorFlag "step 2 failed"
+            }       
+            after 3000
+        }
+
+    } else {
+        set lineToSkip [expr $lineToSkip-1]
+    }
+}
+
+set lineToSkip 3
+foreach line $lines {
+    if {$lineToSkip == 0} {
+        set tokens [split $line ","]
+        set sensorName [lindex $tokens 0]
+        set substring "#"
+        # Dont read line with #
+        if {[string first $substring $sensorName] == -1} {
+            set fpgaSize [lindex $tokens 1]
+            puts "Sensor in list: $sensorName $fpgaSize"
+            cd "$projectDir/bin/fir_00251_proc_$sensorName/scripts/$fpgaSize"
+            if {[catch {FirmwareReleaseScript_step2_5 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
+                puts $errMsg
+                set errorFlag "step 2.5 failed"
             }       
             after 3000
         }
@@ -1069,7 +1123,7 @@ if {$errorFlag != ""} {
     exec {*}[auto_execok start] "" [file nativename [file normalize $FirmwareReleaseLogFile]]
     error "Error: $errorFlag"
 }
-cd "d:/Telops/fir-00251-Proc/"
+cd "$projectDir"
 set releaseMessage "Release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$releaseMessage\"
 exec $tortoiseSvnBin update $projectDir
@@ -1119,7 +1173,7 @@ puts $fid "*****************************************"
 puts $fid ""
 close $fid
 
-cd "d:/Telops/fir-00251-Proc/bin/"
+cd "$projectDir/bin/"
 set lineToSkip 3
 foreach line $lines {
     if {$lineToSkip == 0} {
