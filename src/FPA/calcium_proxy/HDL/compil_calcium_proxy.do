@@ -5,18 +5,13 @@
 #packages
 acom -nowarn DAGGEN_0523 -incr \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\proxy_define.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_define.vhd \
  d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
- 
-
+ d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
-
-#uarts
-acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\Common_HDL\RS232\uarts.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
 
 #signal stat
 acom \
@@ -24,60 +19,59 @@ acom \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\min_max_define.vhd" \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\min_max_ctrl.vhd" \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\delay_measurement.vhd" \
+ "D:\Telops\FIR-00251-Common\VHDL\signal_stat\high_duration.vhd" \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\trig_delay.bde" \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\period_duration.vhd" \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\trig_period.bde" \
  "D:\Telops\FIR-00251-Common\VHDL\signal_stat\trig_period_8ch.bde"
 
-# sources FPa common 
+# sources FPA common
+acom -relax d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ad5648_driver.vhd
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd \
+ #d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ddc_brd_id_reader.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx_v2.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_switch_ctrl.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\monitoring_adc_ctrl.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler_sadc.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_trig_controller.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hw_driver_ctrler.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_prog_ctler_kernel.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_dac_spi_feeder.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_intf_sequencer.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_status_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_map.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_min_max_ctrl.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\edge_counter.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_mux.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_progr_clk_div.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_dispatcher.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_diag_data_gen.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_flow_mux.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_cfg_dpram_writer.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt_min_max.bde \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde
 
-# sources scd_proxy2_data_ctrl 
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_real_data.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_dummy_dispatcher.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_bridge.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_line_mux.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_pos.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_sel.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_cropping_core.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_cropping.bde \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_dval_gen.bde \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_data_ctrl.bde
+ D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd
 
-# sources scd_proxy2_hw_driver
+# sources Calcium
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\FPA\dfpa_cfg_dpram.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_prog_ctrler.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_serial_com.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_hw_driver.bde
-
-# top level intf
-acom -incr \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mblaze_intf.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_clocks.vhd \
- D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_io_intf.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_intf.bde
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_clks_gen.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_io_intf.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_mblaze_intf.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services_ctrl.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services.bde \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_int_signal_gen.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_spi_feeder.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler_core.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler.bde \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_hw_driver.bde \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_rx_data_fifo.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_diag_data_gen.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_flow_mux.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_data_dispatcher.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_quad_to_axis32.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_data_ctrl.bde \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_intf.bde
