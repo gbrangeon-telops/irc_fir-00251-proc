@@ -836,7 +836,7 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
     setEnvironmentVariable $sensorName $fpgaSize
 
     # Build main project
-    # Create and build main project $sensorName $fpgaSize 0 "main_only"
+    # build main project $sensorName $fpgaSize 0 "main_only"
     source  "$projectDir/sdk/sdk_proc_cmd.tcl" 
     build_proc_sw $sensorName $fpgaSize "main_only"
 
@@ -890,6 +890,7 @@ proc FirmwareReleaseScript_step3 {sensorName fpgaSize logFile} {
     set releaseDir ""
     set projectDir ""
     set releaseNameDir ""
+    set endText "END"
     append logContent "BEGIN Export release files $sensorName $fpgaSize\n"
     puts "BEGIN Export release files $sensorName $fpgaSize"
     # Set environment variables
@@ -897,22 +898,25 @@ proc FirmwareReleaseScript_step3 {sensorName fpgaSize logFile} {
     setEnvironmentVariable $sensorName $fpgaSize
 
     source $scriptsDir/exportReleaseArchive.tcl
-    set releaseDir [convertScript $sensorName $fpgaSize $scriptsDir]
-
-    set firmwareVersion "$vfirmwareVersionMajor.$vfirmwareVersionMinor.$sensorCode.$vfirmwareVersionBuild"
-    set encrypt_key_name [parseHWRevFile $sensorName $fpgaSize $sdkDir]
-    #delete previous and copy new one
-    if {$sensorName eq "startup"} {
-        set releaseNameDir [format "%s/Release_%s (%s_%s, %s key)" "$projectDir/bin/ReleasedFirmwares/" [string map {"." "_" $sensorName $fpgaSize} $firmwareVersion] $sensorName $fpgaSize $encrypt_key_name]
+    if {[catch {set releaseDir [convertScript $sensorName $fpgaSize $scriptsDir]} errMsg]} {
+        puts $errMsg
+        set endText "FAILED" 
     } else {
-        set releaseNameDir [format "%s/Release_%s (%s, %s key)" "$projectDir/bin/ReleasedFirmwares/" [string map {"." "_" $sensorName $fpgaSize} $firmwareVersion] $sensorName $encrypt_key_name]
-    }
-    catch {file delete -force -- $releaseNameDir}
-    file copy -force $releaseDir "$projectDir/bin/ReleasedFirmwares/"
-    file delete -force -- $releaseDir
 
-    append logContent "END Export release files $sensorName $fpgaSize\n"
-    puts "END Export release files $sensorName $fpgaSize"
+        set firmwareVersion "$vfirmwareVersionMajor.$vfirmwareVersionMinor.$sensorCode.$vfirmwareVersionBuild"
+        set encrypt_key_name [parseHWRevFile $sensorName $fpgaSize $sdkDir]
+        #delete previous and copy new one
+        if {$sensorName eq "startup"} {
+            set releaseNameDir [format "%s/Release_%s (%s_%s, %s key)" "$projectDir/bin/ReleasedFirmwares/" [string map {"." "_" $sensorName $fpgaSize} $firmwareVersion] $sensorName $fpgaSize $encrypt_key_name]
+        } else {
+            set releaseNameDir [format "%s/Release_%s (%s, %s key)" "$projectDir/bin/ReleasedFirmwares/" [string map {"." "_" $sensorName $fpgaSize} $firmwareVersion] $sensorName $encrypt_key_name]
+        }
+        catch {file delete -force -- $releaseNameDir}
+        file copy -force $releaseDir "$projectDir/bin/ReleasedFirmwares/"
+        file delete -force -- $releaseDir
+    }
+    append logContent "$endText Export release files $sensorName $fpgaSize\n"
+    puts "$endText Export release files $sensorName $fpgaSize"
     append logContent "\n"
 
     # Append log content to the log file
@@ -984,6 +988,8 @@ set contents [read $fid]
 set lines [split $contents "\n"]
 close $fid
 set lineToSkip 3
+set errorFlag ""
+cd "d:/Telops/fir-00251-Proc/sdk/"
 foreach line $lines {
     if {$lineToSkip == 0} {
         set tokens [split $line ","]
@@ -993,7 +999,11 @@ foreach line $lines {
         if {[string first $substring $sensorName] == -1} {
             set fpgaSize [lindex $tokens 1]
             puts "Sensor in list: $sensorName $fpgaSize"
-            FirmwareReleaseScript_step1 $sensorName $fpgaSize $FirmwareReleaseLogFile
+            if {[catch {FirmwareReleaseScript_step1 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
+                puts $errMsg
+                set errorFlag "step 1 failed"
+            }
+            after 3000
         }
 
     } else {
@@ -1004,10 +1014,17 @@ foreach line $lines {
 if {$TestMode == "Debug"} {
     DebugPause
 }
+if {$errorFlag != ""} {
+    #Open release file
+    exec {*}[auto_execok start] "" [file nativename [file normalize $FirmwareReleaseLogFile]]
+    error "Error: $errorFlag"
+}
 
+cd "d:/Telops/fir-00251-Proc/"
 set preReleaseMessage "Pre-release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$preReleaseMessage\"
 exec $tortoiseSvnBin update $projectDir
+after 5000
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "*****************************************"
@@ -1022,6 +1039,7 @@ puts "*****************************************"
 puts ""
 
 set lineToSkip 3
+cd "d:/Telops/fir-00251-Proc/sdk/"
 foreach line $lines {
     if {$lineToSkip == 0} {
         set tokens [split $line ","]
@@ -1031,7 +1049,11 @@ foreach line $lines {
         if {[string first $substring $sensorName] == -1} {
             set fpgaSize [lindex $tokens 1]
             puts "Sensor in list: $sensorName $fpgaSize"
-           FirmwareReleaseScript_step2 $sensorName $fpgaSize $FirmwareReleaseLogFile
+            if {[catch {FirmwareReleaseScript_step2 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
+                puts $errMsg
+                set errorFlag "step 2 failed"
+            }       
+            after 3000
         }
 
     } else {
@@ -1042,10 +1064,16 @@ foreach line $lines {
 if {$TestMode == "Debug"} {
     DebugPause
 }
-
+if {$errorFlag != ""} {
+    #Open release file
+    exec {*}[auto_execok start] "" [file nativename [file normalize $FirmwareReleaseLogFile]]
+    error "Error: $errorFlag"
+}
+cd "d:/Telops/fir-00251-Proc/"
 set releaseMessage "Release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$releaseMessage\"
 exec $tortoiseSvnBin update $projectDir
+after 5000
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "*****************************************"
@@ -1091,6 +1119,7 @@ puts $fid "*****************************************"
 puts $fid ""
 close $fid
 
+cd "d:/Telops/fir-00251-Proc/bin/"
 set lineToSkip 3
 foreach line $lines {
     if {$lineToSkip == 0} {
