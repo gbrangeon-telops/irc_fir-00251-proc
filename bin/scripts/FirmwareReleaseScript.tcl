@@ -1054,6 +1054,7 @@ if {$errorFlag != ""} {
 cd "d:/Telops/fir-00251-Proc/"
 set preReleaseMessage "Pre-release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$preReleaseMessage\"
+after 1000
 exec $tortoiseSvnBin update $projectDir
 after 5000
 
@@ -1126,6 +1127,7 @@ if {$errorFlag != ""} {
 cd "$projectDir"
 set releaseMessage "Release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$releaseMessage\"
+after 1000
 exec $tortoiseSvnBin update $projectDir
 after 5000
 
