@@ -24,6 +24,11 @@ use work.fpa_common_pkg.all;
 use work.fpa_define.all;  
 
 package Proxy_define is
+
+   -- Pixel fields range. Used to index pixel bits vector.
+   subtype pix_data_range_type    is natural range 22 downto  0;
+   subtype pix_coarse_range_type  is natural range 22 downto 15;
+   subtype pix_residue_range_type is natural range 14 downto  0;
    
    -- Quad pixel data array. Each pixel is on 23 bits.
    type pix_data_array_type is array (1 to 4) of std_logic_vector(22 downto 0);
