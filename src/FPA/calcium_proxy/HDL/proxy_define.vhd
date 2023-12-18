@@ -31,7 +31,7 @@ package Proxy_define is
    subtype pix_residue_range_type is natural range 14 downto  0;
    
    -- Quad pixel data array. Each pixel is on 23 bits.
-   type pix_data_array_type is array (1 to 4) of std_logic_vector(22 downto 0);
+   type pix_data_array_type is array (1 to 4) of std_logic_vector(pix_data_range_type);
    
    -- Quad data type. Quad pixel data array with some control signals.
    type calcium_quad_data_type is

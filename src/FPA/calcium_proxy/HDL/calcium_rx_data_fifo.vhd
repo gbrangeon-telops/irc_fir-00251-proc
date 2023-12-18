@@ -1,24 +1,15 @@
--------------------------------------------------------------------------------
---
--- Title       : calcium_rx_data_fifo
--- Author      : 
--- Company     : 
---
--------------------------------------------------------------------------------
---
--- File        : D:\telops\FIR-00251-Proc\src\quad_serdes\HDL\quad_data_sync_v2.vhd
--- Generated   : Wed May 27 09:14:02 2015
--- From        : interface description file
--- By          : Itf2Vhdl ver. 1.22
---
--------------------------------------------------------------------------------
---
--- Description :
+------------------------------------------------------------------
+--!   @file : calcium_rx_data_fifo
+--!   @brief
+--!   @details
+--!
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
+------------------------------------------------------------------
 
-
-
---
--------------------------------------------------------------------------------
 
 library ieee;
 use IEEE.STD_LOGIC_1164.all;
@@ -27,7 +18,7 @@ use work.FPA_define.all;
 use work.proxy_define.all;
 
 entity calcium_rx_data_fifo is
-   port(
+   port (
       CLK            : in std_logic;
       
       -- RX_CLK domain
@@ -39,7 +30,7 @@ entity calcium_rx_data_fifo is
       FPA_INTF_CFG   : in fpa_intf_cfg_type;
       TX_QUAD_DATA   : out calcium_quad_data_type;
       ERROR          : out std_logic_vector(2 downto 0)
-      );
+   );
 end calcium_rx_data_fifo;
 
 architecture rtl of calcium_rx_data_fifo is
@@ -59,8 +50,8 @@ architecture rtl of calcium_rx_data_fifo is
    component sync_reset
       port (
          ARESET : in std_logic;
-         SRESET : out std_logic;
-         CLK    : in std_logic
+         CLK    : in std_logic;
+         SRESET : out std_logic := '1'
       );
    end component;
    
@@ -91,14 +82,6 @@ architecture rtl of calcium_rx_data_fifo is
          valid       : out std_logic;
          wr_rst_busy : out std_logic;
          rd_rst_busy : out std_logic
-      );
-   end component;
-   
-   component sync_reset
-      port (
-         ARESET : in std_logic;
-         SRESET : out std_logic;
-         CLK    : in std_logic
       );
    end component;
    
