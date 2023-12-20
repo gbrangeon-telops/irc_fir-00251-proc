@@ -53,7 +53,10 @@ entity kpix_bramwrapper is
 end kpix_bramwrapper;
 
 architecture Behavioral of kpix_bramwrapper is
+   signal wena_i : std_logic_vector(0 downto 0);
 begin
+   wena_i(0) <= wena;
+   
    -- xpm_memory_sdpram: Simple Dual Port RAM
    -- Xilinx Parameterized Macro, version 2018.3
 
@@ -122,7 +125,7 @@ begin
                                         -- by parameter READ_RESET_VALUE_B.
 
       sleep => '0',                     -- 1-bit input: sleep signal to enable the dynamic power saving feature.
-      wea => (others => wena)           -- WRITE_DATA_WIDTH_A-bit input: Write enable vector for port A input
+      wea => wena_i                     -- WRITE_DATA_WIDTH_A-bit input: Write enable vector for port A input
                                         -- data port dina. 1 bit wide when word-wide writes are used. In
                                         -- byte-wide write configurations, each bit controls the writing one
                                         -- byte of dina to address addra. For example, to synchronously write
