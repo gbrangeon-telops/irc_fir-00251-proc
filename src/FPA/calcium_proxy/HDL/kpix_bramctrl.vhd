@@ -85,7 +85,7 @@ begin
                 end if;
                 
                 if bram_addr_i = 0 or error_i = '0' then
-                    error_i <= or(kpix_even_sign) and nand(kpix_even_sign) or or(kpix_odd_sign) and nand(kpix_odd_sign);
+                    error_i <= (or(kpix_even_sign) and nand(kpix_even_sign)) or (or(kpix_odd_sign) and nand(kpix_odd_sign));
                 end if;
             end if;
         end if;
