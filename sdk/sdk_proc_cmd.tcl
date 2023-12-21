@@ -13,15 +13,13 @@ if {$size_arg == "both" || $size_arg == "160"} {
    if {[catch {createhw -name hw_platform_160 -hwspec "fir_00251_proc_${detector}_160.hdf"} errMsg]} {
 		updatehw -hw hw_platform_160 -newhwspec "fir_00251_proc_${detector}_160.hdf"
 	}
-   #Delay to avoid Missing hardware project
-   after 1000
+   
 
    #Create BSP projects, if already exist do nothing
    if {[catch {createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1} errMsg]} {
 			puts ""
 	}	
-   #Delay to avoid Missing bsp project
-   after 1000
+   
 
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
@@ -34,7 +32,6 @@ if {$size_arg == "both" || $size_arg == "160"} {
    if {[catch {configapp -app fir_00251_proc_${detector}_boot_160 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
-   after 1000
    if {[catch {configapp -app fir_00251_proc_${detector}_160 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
@@ -44,16 +41,12 @@ if {$size_arg == "both" || $size_arg == "325"} {
    if {[catch { createhw -name hw_platform_325 -hwspec "fir_00251_proc_${detector}_325.hdf"} errMsg]} {
 		updatehw -hw hw_platform_325 -newhwspec "fir_00251_proc_${detector}_325.hdf"
 	}
-   #Delay to avoid Missing hardware project
-   after 1000
-
+  
     #Create BSP projects, if already exist do nothing
    if {[catch {createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1} errMsg]} {
 			puts ""
 	}	
-    #Delay to avoid Missing bsp project
-   after 1000
-
+ 
 
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
@@ -66,7 +59,6 @@ if {$size_arg == "both" || $size_arg == "325"} {
    if {[catch {configapp -app fir_00251_proc_${detector}_boot_325 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
-   after 1000
    if {[catch {configapp -app fir_00251_proc_${detector}_325 build-config release} errMsg]} {
       puts "Warning: Could not set release configuration."
    }
@@ -91,7 +83,6 @@ if {$compile_arg == "both" || $compile_arg == "boot_only"} {
    projects -clean -type app -name fir_00251_proc_${detector}_boot_$size
    file delete -force fir_00251_proc_${detector}_boot_$size/Release/
 }
-after 1000
 if {$compile_arg == "both" || $compile_arg == "main_only"} {
    configapp -app fir_00251_proc_${detector}_$size build-config release
    projects -clean -type app -name fir_00251_proc_${detector}_$size
@@ -120,31 +111,4 @@ if {$compile_arg == "both" || $compile_arg == "main_only"} {
 
 #Return to initial path
 cd $current_path
-}
-
-proc clean_proc_sw {detector {size_arg "both"}} {
-   set current_path [exec pwd]
-   #Switch directory
-   cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
-
-   #Set workspace
-   setws -switch "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/"
-
-   if {$size_arg == "both" || $size_arg == "160"} {
-
-      #closehw hw_platform_160
-     # closebsp standalone_bsp_160
-      after 1000
-      deleteprojects -name standalone_bsp_160
-      deleteprojects -name hw_platform_160
-   }
-   if {$size_arg == "both" || $size_arg == "325"} {
-
-     # closehw hw_platform_325
-     # closebsp standalone_bsp_325
-      after 1000
-      deleteprojects -name standalone_bsp_325
-      deleteprojects -name hw_platform_325
-   }
-
 }

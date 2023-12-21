@@ -794,17 +794,12 @@ proc FirmwareReleaseScript_step1 {sensorName fpgaSize logFile} {
     source "${scriptsDir}/setEnvironment.tcl"
     setEnvironmentVariable $sensorName $fpgaSize
 
-    # Create and build main project $sensorName $fpgaSize 1 "main_only"
-    source  "$projectDir/sdk/sdk_proc_cmd.tcl" 
+    # Note:Call the sdk procedure in the bat file because it s the only way to avoid the "CLI already connected" issue 
+    # This issue occured during the build of many detectors
+    if {[catch {exec $scriptsDir/createAndBuildMainProject.bat $sensorName $fpgaSize 1} errMsg]} {
+        puts $errMsg
+    }
     after 1000
-    puts "Start create_proc_sw"
-    create_proc_sw $sensorName $fpgaSize
-    after 3000
-    puts "Start build_proc_sw"
-    build_proc_sw $sensorName $fpgaSize "main_only"
-    after 3000
-    puts "Start clean_proc_sw"
-    clean_proc_sw $sensorName $fpgaSize 
 
     if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
         append logContent "Create and build project failed!\n"
@@ -843,17 +838,13 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
     setEnvironmentVariable $sensorName $fpgaSize
 
     # Build main project
-    # build main project $sensorName $fpgaSize 0 "main_only"
-    source  "$projectDir/sdk/sdk_proc_cmd.tcl" 
+    # Note:Call the sdk procedure in the bat file because it s the only way to avoid the "CLI already connected" issue 
+    # This issue occured during the build of many detectors
+    if {[catch {exec $scriptsDir/createAndBuildMainProject.bat $sensorName $fpgaSize 0} errMsg]} {
+        puts $errMsg
+    }   
     after 1000
-    puts "Start create_proc_sw"
-    create_proc_sw $sensorName $fpgaSize
-    after 3000
-    puts "Start build_proc_sw"
-    build_proc_sw $sensorName $fpgaSize "main_only"
-    after 3000
-    puts "Start clean_proc_sw"
-    clean_proc_sw $sensorName $fpgaSize 
+
     if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
         append logContent "Create and build project failed!\n"
         set logFileHandle [open $logFile a]
@@ -878,12 +869,6 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
     verifyRelease $sensorName $fpgaSize
     append logContent "verifyRelease done\n"
     puts "verifyRelease done"
-
-    # Note: Because generatePromFile uses the vivado bin, we have to call the .bat
-    #exec $scriptsDir/generatePromFile.bat $sensorName $fpgaSize
-
-    #append logContent "generatePromFile done\n"
-    #puts "generatePromFile done"
 
     append logContent "END Release compile $sensorName $fpgaSize\n.\n"
 
@@ -1031,10 +1016,13 @@ foreach line $lines {
             puts "Sensor in list: $sensorName $fpgaSize"
             cd "$projectDir/sdk"
             if {[catch {FirmwareReleaseScript_step1 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
-                puts $errMsg
-                set errorFlag "step 1 failed"
+                puts "$sensorName release failed"
+                set fid [open $FirmwareReleaseLogFile a]
+                puts $fid "$sensorName release failed"
+                close $fid
+                set errorFlag " step 1 failed"
             }
-            after 3000
+            after 1000
         }
 
     } else {
@@ -1056,7 +1044,6 @@ set preReleaseMessage "Pre-release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$preReleaseMessage\"
 after 1000
 exec $tortoiseSvnBin update $projectDir
-after 5000
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "*****************************************"
@@ -1083,9 +1070,12 @@ foreach line $lines {
             cd "$projectDir/sdk/"
             if {[catch {FirmwareReleaseScript_step2 $sensorName $fpgaSize $FirmwareReleaseLogFile} errMsg]} {
                 puts $errMsg
+                set fid [open $FirmwareReleaseLogFile a]
+                puts $fid "$sensorName release failed: $errMsg"
+                close $fid
                 set errorFlag "step 2 failed"
             }       
-            after 3000
+            after 1000
         }
 
     } else {
@@ -1129,7 +1119,6 @@ set releaseMessage "Release $firmwareReleaseVersion"
 exec $tortoiseSvnBin commit $projectDir -m \"$releaseMessage\"
 after 1000
 exec $tortoiseSvnBin update $projectDir
-after 5000
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "*****************************************"
