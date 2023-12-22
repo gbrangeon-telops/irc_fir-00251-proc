@@ -62,7 +62,7 @@ architecture Behavioral of kpix_bramaddr is
     
     type fsm_type is (IDLE, RUN);
     
-    signal frame_done : std_logic := '0';
+    signal frame_done : std_logic := '1';
 begin
     addr <= std_logic_vector(to_unsigned(cur_address, addr'LENGTH));
     
@@ -82,7 +82,7 @@ begin
                 cnt_address <= 0;
                 jmp_address <= 0;
                 state       := IDLE;
-                frame_done  <= '0';
+                frame_done  <= '1';
             else
                 tmp_address <= to_integer(current_offsety_d1)*DETECTOR_WIDTH_D4;
                 
