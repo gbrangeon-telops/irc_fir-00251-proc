@@ -70,14 +70,14 @@ architecture rtl of calcium_data_dispatcher is
       );
    end component;
    
-   component fwft_sfifo_w73_d16
+   component fwft_sfifo_w76_d16
       port (
          clk       : in std_logic;
          srst      : in std_logic;
-         din       : in std_logic_vector(72 downto 0);
+         din       : in std_logic_vector(75 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
-         dout      : out std_logic_vector(72 downto 0);
+         dout      : out std_logic_vector(75 downto 0);
          valid     : out std_logic;
          full      : out std_logic;
          overflow  : out std_logic;
@@ -94,10 +94,10 @@ architecture rtl of calcium_data_dispatcher is
    signal fast_hder_sm                 : fast_hder_sm_type;
    signal frame_fsm                    : frame_fsm_type;
    signal sreset                       : std_logic;
-   signal acq_hder_fifo_din            : std_logic_vector(72 downto 0);
+   signal acq_hder_fifo_din            : std_logic_vector(75 downto 0);
    signal acq_hder_fifo_wr             : std_logic;
    signal acq_hder_fifo_rd             : std_logic;
-   signal acq_hder_fifo_dout           : std_logic_vector(72 downto 0);
+   signal acq_hder_fifo_dout           : std_logic_vector(75 downto 0);
    signal acq_hder_fifo_dval           : std_logic;
    signal acq_hder_fifo_ovfl           : std_logic;
    signal readout_i                    : std_logic;
@@ -140,7 +140,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour acq header info
    --------------------------------------------------
-   U2 : fwft_sfifo_w73_d16  
+   U2 : fwft_sfifo_w76_d16  
    port map (
       srst => sreset,
       clk => CLK,
@@ -175,7 +175,7 @@ begin
             
             -- On écrit dans le fifo les infos du header et le genre d'intégration (acq ou non).
             -- Donc toutes les images ont une valeur associée dans le fifo.
-            acq_hder_fifo_din <= ACQ_INT & INT_INDX & INT_TIME & FRAME_ID;
+            acq_hder_fifo_din <= resize(ACQ_INT & INT_INDX & INT_TIME & FRAME_ID, acq_hder_fifo_din'length);
             acq_hder_fifo_wr <= not fpa_int_last and FPA_INT;
             
             -- generation de acq_hder et readout_i
