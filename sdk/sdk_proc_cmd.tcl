@@ -98,6 +98,8 @@ set scriptEnvironment "D:/Telops/FIR-00251-Proc/bin/scripts/setEnvironment.tcl"
 genCore $scriptEnvironment $detector "160"
 genCore $scriptEnvironment $detector "325"
 
+after 1000
+
 #Build standalone_bsp
 projects -build -type bsp -name standalone_bsp_$size
 

@@ -797,10 +797,20 @@ proc FirmwareReleaseScript_step1 {sensorName fpgaSize logFile} {
     # Note:Call the sdk procedure in the bat file because it s the only way to avoid the "CLI already connected" issue 
     # This issue occured during the build of many detectors
     if {[catch {exec $scriptsDir/createAndBuildMainProject.bat $sensorName $fpgaSize 1} errMsg]} {
+        puts "Build message:"
         puts $errMsg
     }
     after 1000
-
+    #retry once because error can occure due to the prebuild process
+    if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
+        puts "Missing elf, retry once"
+        #retry once
+        if {[catch {exec $scriptsDir/createAndBuildMainProject.bat $sensorName $fpgaSize 0} errMsg]} {
+            puts "Build message:"
+            puts $errMsg
+        }
+    }
+    after 1000
     if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
         append logContent "Create and build project failed!\n"
         # Append log content to the log file
@@ -841,8 +851,20 @@ proc FirmwareReleaseScript_step2 {sensorName fpgaSize logFile} {
     # Note:Call the sdk procedure in the bat file because it s the only way to avoid the "CLI already connected" issue 
     # This issue occured during the build of many detectors
     if {[catch {exec $scriptsDir/createAndBuildMainProject.bat $sensorName $fpgaSize 0} errMsg]} {
+        puts "Build message:"
         puts $errMsg
-    }   
+    }
+    
+    after 1000
+    #retry once because error can occure due to the prebuild process
+    if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
+        puts "Missing elf, retry once"
+        #retry once
+        if {[catch {exec $scriptsDir/createAndBuildMainProject.bat $sensorName $fpgaSize 0} errMsg]} {
+            puts "Build message:"
+            puts $errMsg
+        }
+    }
     after 1000
 
     if {![file exists $sdkDir/${baseName}_${fpgaSize}/Release/${baseName}_${fpgaSize}.elf]} {
