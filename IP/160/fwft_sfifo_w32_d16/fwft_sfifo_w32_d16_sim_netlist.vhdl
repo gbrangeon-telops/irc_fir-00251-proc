@@ -1,8 +1,8 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_(AR71898_AR71948) (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Mon Jan  8 11:06:42 2024
--- Host        : TELOPS336 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Fri Oct  6 15:31:42 2023
+-- Host        : Telops330 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/fwft_sfifo_w32_d16/fwft_sfifo_w32_d16_sim_netlist.vhdl
 -- Design      : fwft_sfifo_w32_d16
@@ -2812,7 +2812,7 @@ entity fwft_sfifo_w32_d16 is
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of fwft_sfifo_w32_d16 : entity is "yes";
   attribute x_core_info : string;
-  attribute x_core_info of fwft_sfifo_w32_d16 : entity is "fifo_generator_v13_2_3,Vivado 2018.3_(AR71898_AR71948)";
+  attribute x_core_info of fwft_sfifo_w32_d16 : entity is "fifo_generator_v13_2_3,Vivado 2018.3_AR71948_AR71898";
 end fwft_sfifo_w32_d16;
 
 architecture STRUCTURE of fwft_sfifo_w32_d16 is

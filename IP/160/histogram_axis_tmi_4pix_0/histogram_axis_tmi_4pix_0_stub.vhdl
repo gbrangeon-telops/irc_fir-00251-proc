@@ -1,8 +1,8 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_(AR71898_AR71948) (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Mon Jan  8 11:11:24 2024
--- Host        : TELOPS336 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+-- Date        : Fri Oct  6 15:35:24 2023
+-- Host        : Telops330 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
 --               D:/Telops/FIR-00251-Proc/IP/160/histogram_axis_tmi_4pix_0/histogram_axis_tmi_4pix_0_stub.vhdl
 -- Design      : histogram_axis_tmi_4pix_0
@@ -46,6 +46,6 @@ attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
 attribute black_box_pad_pin of stub : architecture is "areset,clear_mem,ext_data_in[31:0],ext_data_in2[31:0],msb_pos[1:0],rx_tdata[63:0],rx_tlast,rx_tready,rx_tvalid,tmi_mosi_add[6:0],tmi_mosi_dval,tmi_mosi_rnw,clk,ext_data_out[31:0],ext_data_out2[31:0],histogram_rdy,timestamp[31:0],tmi_miso_busy,tmi_miso_error,tmi_miso_idle,tmi_miso_rd_data[20:0],tmi_miso_rd_dval";
 attribute x_core_info : string;
-attribute x_core_info of stub : architecture is "histogram_axis_tmi_4pix,Vivado 2018.3_(AR71898_AR71948)";
+attribute x_core_info of stub : architecture is "histogram_axis_tmi_4pix,Vivado 2018.3_AR71948_AR71898";
 begin
 end;
