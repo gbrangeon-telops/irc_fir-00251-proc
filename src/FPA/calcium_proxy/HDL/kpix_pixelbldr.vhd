@@ -37,6 +37,7 @@ entity kpix_pixelbldr is
     Port (
         clk  : in std_logic;
         rst  : in std_logic;
+        cfg  : in fpa_intf_cfg_type;
         kpix : in std_logic_vector;
         pix_in  : in  calcium_quad_data_type;
         pix_out : out calcium_quad_data_type
@@ -48,10 +49,10 @@ architecture Behavioral of kpix_pixelbldr is
     type kpix_data_array_type is array (1 to 4) of signed(pix_data_range_type);
     signal kpix_data : kpix_data_array_type;
     
-    signal pgen_en   : std_logic;
-    signal pgen_kpix : std_logic_vector(15 downto 0);
+    alias pgen_en   is cfg.comn.fpa_diag_mode;
+    alias pgen_kpix is cfg.kpix_pgen_value;
     
-    signal kpix_mean : std_logic_vector(15 downto 0);
+    alias kpix_mean is cfg.kpix_mean_value;
     
     type compute_pipeline_type is array (0 to 2, 1 to 4) of unsigned(pix_data_range_type);
     constant COMPUTE_PIPELINE_RESET : compute_pipeline_type := (others => (others => (others => '0')));

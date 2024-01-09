@@ -135,6 +135,10 @@ package Proxy_define is
       width                          : unsigned(9 downto 0);
       height                         : unsigned(9 downto 0);
       
+      -- kpix
+      kpix_pgen_value                : std_logic_vector(15 downto 0); 
+      kpix_mean_value                : std_logic_vector(15 downto 0);
+      
       cfg_num                        : unsigned(7 downto 0);
       
    end record;
