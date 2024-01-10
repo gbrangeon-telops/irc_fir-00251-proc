@@ -1,6 +1,6 @@
 ﻿Pour un build à neuf :
 
-1. Vivado => "source D:/Telops/FIR-00251-Proc/scripts/gen_managed_projet_FPGA_SIZE.tcl" (génère le projet des IP).
+1. Vivado => "source D:/Telops/FIR-00251-Proc/scripts/gen_managed_project_FPGA_SIZE.tcl" (génère le projet des IP).
 
 2. Dans la fenêtre Sources, sélectionner tous les IP et faire Generate Output Products (génère les sources pour les IP).
 
@@ -11,6 +11,8 @@
 4. Aldec => compilation des sources en exécutant le .do (génère les .vhd à partir des .bde).
 
 5. Vivado => "source D:/Telops/FIR-00251-Proc/scripts/DETECTEUR_project.tcl" (génère le projet DETECTEUR).
+**5.1 Cliquer sur Generate Bitstream pour lancer la compilation.
+**5.2 Valider que les timings sont rencontrés.
 
 6. Dans le menu File > Export > Export Hardware faire Export to D:/Telops/FIR-00251-Proc/sdk/fir_00251_proc_DETECTEUR en laissant Include bitstream décoché.
    Renommer le .hdf généré en ajoutant le suffixe _FPGA_SIZE.

@@ -115,6 +115,8 @@ architecture rtl of calib_config is
    signal config_dval_i                : std_logic := '0';      
    signal calib_block_info_dval_i      : std_logic := '0';
    
+   signal expTimeMult_dval_i           : std_logic := '0';
+   signal expTimeMult_dval_sync        : std_logic := '0';
    signal config_dval_sync             : std_logic := '0';
    signal aoi_param_i                  : aoi_param_type;
    signal cal_xcropping_cfg_i          : calib_xcropping_type;         
@@ -186,7 +188,7 @@ begin
             CAL_XCROPPING_DVAL      <= config_dval_sync;
             
             EXP_TIME_MULT_FP32      <= exp_time_mult_fp32_i;
-            EXP_TIME_MULT_FP32_DVAL <= config_dval_sync;
+            EXP_TIME_MULT_FP32_DVAL <= expTimeMult_dval_sync;
          end if;
          
          mb_cfg_done_sync_last_clkCal <= mb_cfg_done_sync_clkCal;
@@ -204,7 +206,7 @@ begin
    
    sync_done_clkMB   : double_sync port map(D => done_i, Q => done_sync_clkMB, RESET => '0', CLK => MB_CLK);
    sync_done_clkCal   : double_sync port map(D => done_i, Q => done_sync_clkCal, RESET => '0', CLK => CLK_CAL);  
-
+   sync_expDval_clkCal   : double_sync port map(D => expTimeMult_dval_i, Q => expTimeMult_dval_sync, RESET => '0', CLK => CLK_CAL);  
    
    sync_mb_cfg_clkCal : double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync_clkCal, RESET => '0', CLK => CLK_CAL); 
    
@@ -313,7 +315,7 @@ begin
                when X"28" => cal_xcropping_cfg_i.aoi_lli_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_lli_pos'range);
                when X"2C" => cal_xcropping_cfg_i.aoi_sol_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_sol_pos'range);
                when X"30" => cal_xcropping_cfg_i.aoi_eol_pos <= cfg_wr_data(cal_xcropping_cfg_i.aoi_eol_pos'range);
-               when X"34" => exp_time_mult_fp32_i        <= cfg_wr_data(exp_time_mult_fp32_i'range);               
+               when X"34" => exp_time_mult_fp32_i        <= cfg_wr_data(exp_time_mult_fp32_i'range); expTimeMult_dval_i <= '1';
                when X"38" => cal_block_index_max_i       <= unsigned(cfg_wr_data(cal_block_index_max_i'range));               
                when X"3C" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);config_dval_i <= '1';               
                when X"40" => calib_block_index           <= cfg_wr_data(calib_block_index'range);

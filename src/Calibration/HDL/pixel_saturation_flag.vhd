@@ -16,7 +16,9 @@ use IEEE.numeric_std.all;
 use work.tel2000.all;
 
 entity pixel_saturation_flag is   
-   
+   generic (
+	  enable_internal_sync : boolean := true -- enable axis_sync_flow module to synchronize input flows. If false, flow must be synchronized externally
+   );
    port(
       ARESETN         : in std_logic;
       CLK             : in std_logic;
@@ -74,15 +76,23 @@ begin
       SRESET => sreset
       );
       
-   U1: axis_sync_flow
-   port map(         
-      RX0_TVALID    => RX_MOSI.TVALID,
-      RX0_TREADY    => RX_MISO.TREADY,
-      RX1_TVALID    => THRESHOLD_MOSI.TVALID,
-      RX1_TREADY    => THRESHOLD_MISO.TREADY,
-      SYNC_TVALID   => sync_valid,
-      SYNC_TREADY   => TX_MISO.TREADY
-   );    
+   gen_syncFlow : if enable_internal_sync = true generate
+	   U1: axis_sync_flow
+	   port map(         
+	      RX0_TVALID    => RX_MOSI.TVALID,
+	      RX0_TREADY    => RX_MISO.TREADY,
+	      RX1_TVALID    => THRESHOLD_MOSI.TVALID,
+	      RX1_TREADY    => THRESHOLD_MISO.TREADY,
+	      SYNC_TVALID   => sync_valid,
+	      SYNC_TREADY   => TX_MISO.TREADY
+	   );    
+   end generate gen_syncFlow;
+
+   gen_noSyncFlow : if enable_internal_sync = false generate
+	   RX_MISO.TREADY        <= TX_MISO.TREADY;
+	   THRESHOLD_MISO.TREADY <= TX_MISO.TREADY;
+	   sync_valid            <= RX_MOSI.TVALID;
+   end generate gen_noSyncFlow;
        
   -- flag des pixels staurés vui TUSER(1)  
    SAT_FLAGGING: process(CLK)
