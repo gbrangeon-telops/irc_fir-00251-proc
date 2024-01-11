@@ -15,6 +15,7 @@ acom -2008 -d d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\kpix -incr -now
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_dlypipeline.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_bramaddr.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_bramwrapper.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_bramctrl.vhd
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_bramctrl.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_recombine.bde
 
 #__END BUILD KPIX
