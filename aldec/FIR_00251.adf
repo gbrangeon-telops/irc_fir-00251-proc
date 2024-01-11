@@ -41,8 +41,8 @@ REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
 fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL
-fileopenfolder=D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src
-fileopenfolder=D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -276,6 +276,9 @@ FPA=1
 FPA\Common=1
 FPA\blackbird1280D=1
 FPA\blackbird1920D=1
+FPA\calcium_proxy=1
+FPA\calcium_proxy\KPIX=1
+FPA\calcium640D=1
 FPA\HawkA=1
 FPA\HerculesD=1
 FPA\isc0207A=1
@@ -298,8 +301,6 @@ FPA\ScorpiomwD=1
 FPA\suphawkA=1
 FPA\xro3503A=1
 FPA\Mockfpa=1
-FPA\calcium_proxy=1
-FPA\calcium_proxy\KPIX=1
 FrameBuffer=1
 Gating=1
 HeaderInserter=1
@@ -568,6 +569,35 @@ FPA\blackbird1280D/..\..\..\..\src\FPA\blackbird1280D\HDL\FPA_define.vhd=-1
 FPA\blackbird1280D/..\..\..\..\src\FPA\blackbird1280D\HDL\compil_blackbird1280D.do=-1
 FPA\blackbird1920D/..\..\..\..\src\FPA\blackbird1920D\HDL\compil_blackbird1920D.do=-1
 FPA\blackbird1920D/..\..\..\..\src\FPA\blackbird1920D\HDL\FPA_define.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_clks_gen.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_data_compression.bde=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_data_ctrl.bde=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_data_dispatcher.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_diag_data_gen.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_flow_mux.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_hw_driver.bde=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_int_signal_gen.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_intf.bde=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_io_intf.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_mblaze_intf.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler.bde=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler_core.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_prog_spi_feeder.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_quad_to_axis32.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_rx_data_fifo.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_services.bde=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_services_ctrl.vhd=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\compil_calcium_proxy.do=-1
+FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\proxy_define.vhd=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\compil_kpix_recombine.do=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_bramaddr.vhd=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_bramctrl.vhd=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_bramwrapper.vhd=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_dlypipeline.vhd=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_pixelbldr.vhd=-1
+FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_recombine.bde=-1
+FPA\calcium640D/..\..\..\..\src\FPA\calcium640D\HDL\compil_calcium640D.do=-1
+FPA\calcium640D/..\..\..\..\src\FPA\calcium640D\HDL\FPA_define.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\compil_hawkA.do=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\FPA_define.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde=-1
@@ -816,13 +846,6 @@ FPA\Mockfpa/..\..\..\..\src\FPA\mockfpa\HDL\mockfpa_intf.bde=-1
 FPA\Mockfpa/..\..\..\..\src\FPA\mockfpa\HDL\mockfpa_mblaze_intf.vhd=-1
 FPA\Mockfpa/..\..\..\..\src\FPA\mockfpa\HDL\mockfpa_status_gen.vhd=-1
 FPA\Mockfpa/..\..\..\..\src\FPA\mockfpa\HDL\proxy_define.vhd=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\compil_kpix_recombine.do=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_bramaddr.vhd=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_bramctrl.vhd=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_bramwrapper.vhd=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_dlypipeline.vhd=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_pixelbldr.vhd=-1
-FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_recombine.bde=-1
 FrameBuffer/..\..\..\src\FrameBuffer\HDL\build_frame_buffer.do=-1
 FrameBuffer/..\..\..\src\FrameBuffer\HDL\fb_ctrl_intf.vhd=-1
 FrameBuffer/..\..\..\src\FrameBuffer\HDL\FrameBuffer.bde=-1
@@ -1206,6 +1229,35 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\blackbird1280D\HDL\compil_blackbird1280D.do=Macro
 .\..\src\FPA\blackbird1920D\HDL\compil_blackbird1920D.do=Macro
 .\..\src\FPA\blackbird1920D\HDL\FPA_define.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_clks_gen.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_data_compression.bde=Block Diagram
+.\..\src\FPA\calcium_proxy\HDL\calcium_data_ctrl.bde=Block Diagram
+.\..\src\FPA\calcium_proxy\HDL\calcium_data_dispatcher.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_diag_data_gen.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_flow_mux.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_hw_driver.bde=Block Diagram
+.\..\src\FPA\calcium_proxy\HDL\calcium_int_signal_gen.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_intf.bde=Block Diagram
+.\..\src\FPA\calcium_proxy\HDL\calcium_io_intf.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_mblaze_intf.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler.bde=Block Diagram
+.\..\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler_core.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_prog_spi_feeder.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_quad_to_axis32.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_rx_data_fifo.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\calcium_services.bde=Block Diagram
+.\..\src\FPA\calcium_proxy\HDL\calcium_services_ctrl.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\compil_calcium_proxy.do=Macro
+.\..\src\FPA\calcium_proxy\HDL\proxy_define.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\compil_kpix_recombine.do=Macro
+.\..\src\FPA\calcium_proxy\HDL\kpix_bramaddr.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\kpix_bramctrl.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\kpix_bramwrapper.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\kpix_dlypipeline.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\kpix_pixelbldr.vhd=VHDL Source Code
+.\..\src\FPA\calcium_proxy\HDL\kpix_recombine.bde=Block Diagram
+.\..\src\FPA\calcium640D\HDL\compil_calcium640D.do=Macro
+.\..\src\FPA\calcium640D\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\compil_hawkA.do=Macro
 .\..\src\FPA\hawkA\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde=Block Diagram
@@ -1453,13 +1505,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\mockfpa\HDL\mockfpa_mblaze_intf.vhd=VHDL Source Code
 .\..\src\FPA\mockfpa\HDL\mockfpa_status_gen.vhd=VHDL Source Code
 .\..\src\FPA\mockfpa\HDL\proxy_define.vhd=VHDL Source Code
-.\..\src\FPA\calcium_proxy\HDL\compil_kpix_recombine.do=Macro
-.\..\src\FPA\calcium_proxy\HDL\kpix_bramaddr.vhd=VHDL Source Code
-.\..\src\FPA\calcium_proxy\HDL\kpix_bramctrl.vhd=VHDL Source Code
-.\..\src\FPA\calcium_proxy\HDL\kpix_bramwrapper.vhd=VHDL Source Code
-.\..\src\FPA\calcium_proxy\HDL\kpix_dlypipeline.vhd=VHDL Source Code
-.\..\src\FPA\calcium_proxy\HDL\kpix_pixelbldr.vhd=VHDL Source Code
-.\..\src\FPA\calcium_proxy\HDL\kpix_recombine.bde=Block Diagram
 .\..\src\FrameBuffer\HDL\build_frame_buffer.do=Macro
 .\..\src\FrameBuffer\HDL\fb_ctrl_intf.vhd=VHDL Source Code
 .\..\src\FrameBuffer\HDL\FrameBuffer.bde=Block Diagram
@@ -1829,6 +1874,27 @@ FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde]
 FPA\Common/..\..\..\compile\fpa_watchdog_module.vhd=-1
+
+[file_out:FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_data_compression.bde]
+FPA\calcium_proxy/..\..\..\compile\calcium_data_compression.vhd=-1
+
+[file_out:FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_data_ctrl.bde]
+FPA\calcium_proxy/..\..\..\compile\calcium_data_ctrl.vhd=-1
+
+[file_out:FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_hw_driver.bde]
+FPA\calcium_proxy/..\..\..\compile\calcium_hw_driver.vhd=-1
+
+[file_out:FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_intf.bde]
+FPA\calcium_proxy/..\..\..\compile\calcium_intf.vhd=-1
+
+[file_out:FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler.bde]
+FPA\calcium_proxy/..\..\..\compile\calcium_prog_ctrler.vhd=-1
+
+[file_out:FPA\calcium_proxy/..\..\..\..\src\FPA\calcium_proxy\HDL\calcium_services.bde]
+FPA\calcium_proxy/..\..\..\compile\calcium_services.vhd=-1
+
+[file_out:FPA\calcium_proxy\KPIX/..\..\..\..\..\src\FPA\calcium_proxy\HDL\kpix_recombine.bde]
+FPA\calcium_proxy\KPIX/..\..\..\..\compile\kpix_recombine.vhd=-1
 
 [file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde]
 FPA\HawkA/..\..\..\compile\hawkA_clks_gen.vhd=-1
