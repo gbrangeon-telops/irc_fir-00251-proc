@@ -1,9 +1,6 @@
 
 adel -all
 
-# utilities
-do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
-
 # IP
 --acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl

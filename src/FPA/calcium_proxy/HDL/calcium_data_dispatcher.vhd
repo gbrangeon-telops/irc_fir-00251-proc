@@ -252,7 +252,6 @@ begin
             hder_mosi_i.rready <= '0';
             hder_mosi_i.arprot <= (others => '0');
             
-            dispatch_info_i.exp_feedbk <= '0';
             dispatch_info_i.exp_info.exp_dval <= '0';
             
             acq_hder_last <= '0';
@@ -270,7 +269,7 @@ begin
             
             --  generation des données de l'image info (exp_feedbk et frame_id proviennent de hw_driver pour eviter d'ajouter un clk supplementaire dans le présent module)
             dispatch_info_i.exp_info.exp_time <= hder_param.exp_time;
-            dispatch_info_i.exp_info.exp_indx <= int_indx_i;
+            dispatch_info_i.exp_info.exp_indx <= hder_param.exp_index;
             
             -- sortie de la partie header fast provenant du module
             case fast_hder_sm is

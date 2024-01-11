@@ -151,7 +151,7 @@ begin
    --------------------------------------------------
    -- Double sync 
    --------------------------------------------------   
-   U2A: double_sync
+   U2A : double_sync
    generic map (
       INIT_VALUE => '0'
    )
