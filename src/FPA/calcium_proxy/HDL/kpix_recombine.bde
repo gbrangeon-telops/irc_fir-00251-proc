@@ -2379,6 +2379,15 @@ PAGE ""
    SHOWTEXT
    CORNER 10
   }
+  NET BUS  64603, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="waddr(integer(ceil(log2(real(DETECTOR_WIDTH*DETECTOR_HEIGHT/2))))-1:0)"
+   }
+  }
   NET BUS  54796, 0, 0
   {
    VARIABLES
@@ -2403,15 +2412,6 @@ PAGE ""
    VARIABLES
    {
     #NAMED="1"
-   }
-  }
-  NET BUS  64603, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="1"
-    #MDA_RECORD_TOKEN="OTHER"
-    #NAME="waddr(integer(ceil(log2(real(DETECTOR_WIDTH*DETECTOR_HEIGHT/2))))-1:0)"
    }
   }
   VTX  64608, 0, 0
