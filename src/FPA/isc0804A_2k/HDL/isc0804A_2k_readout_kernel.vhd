@@ -35,6 +35,7 @@ entity isc0804A_2k_readout_kernel is
       
       -- horloge brute non contrôlée
       NOMINAL_MCLK_RAW   : in std_logic;
+      FAST_MCLK_RAW      : in std_logic; 
       
       -- horloge adc    
       ADC_REF_CLK        : in std_logic;
@@ -65,7 +66,6 @@ end isc0804A_2k_readout_kernel;
 architecture rtl of isc0804A_2k_readout_kernel is
    
    constant C_FLAG_PIPE_LEN  : integer := 16;
-   constant C_LSYNC_PIPE_LEN : integer := 16;
    
    component sync_reset
       port(
@@ -73,8 +73,8 @@ architecture rtl of isc0804A_2k_readout_kernel is
          SRESET : out std_logic;
          CLK : in std_logic);
    end component;
-   
-   type ctrl_fsm_type is (idle, wait_int_fe_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, active_flow_st, sync_flow_st, adc_sync_st, raw_clk_en_st, rst_gen_st);   
+      
+   type ctrl_fsm_type is (idle, chck_lsydel_speed_st, speedup_lsydel_clk_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, active_flow_st, sync_flow_st, adc_sync_st, raw_clk_en_st, rst_gen_st);   
    type adc_time_stamp_type is
    record
       naoi_stop  : std_logic;
@@ -84,9 +84,10 @@ architecture rtl of isc0804A_2k_readout_kernel is
       aoi_sol    : std_logic;     
    end record;
    
-   signal nominal_mclk_raw_last   : std_logic;
+   signal nominal_mclk_raw_last   : std_logic;  
    signal fpa_mclk_i          : std_logic;
-   signal mclk_raw_en_i       : std_logic;
+   signal nominal_mclk_raw_en_i    : std_logic;
+   signal fast_mclk_raw_en_i       : std_logic;
    signal adc_frame_flag_i    : std_logic;
    signal adc_line_flag_i     : std_logic;
    signal readout_info_i      : readout_info_type;
@@ -105,15 +106,12 @@ architecture rtl of isc0804A_2k_readout_kernel is
    signal pause_cnt           : unsigned(FPA_INTF_CFG.LSYDEL_MCLK'LENGTH-1 downto 0);
    signal fpa_mclk_re         : std_logic;
    signal fpa_mclk_last       : std_logic;
-   signal imminent_well_rst_i : std_logic;
-   signal last_lsync_i        : std_logic;
    signal user_area_err       : std_logic;
    signal data_sync_err       : std_logic;
    signal line_pclk_cnt_last  : unsigned(AREA_FIFO_DATA.RAW.LINE_PCLK_CNT'length-1 downto 0);
    signal raw_fval_i          : std_logic := '0';
    signal raw_fval_last       : std_logic := '0';
    signal fpa_lsync_i         : std_logic;
-   signal last_lsync_pipe     : std_logic_vector(63 downto 0) := (others => '0');
    signal readout_info_valid  : std_logic;
    signal elcorr_ref_start_pipe : std_logic_vector(15 downto 0);
    signal elcorr_ref_end_pipe   : std_logic_vector(15 downto 0);
@@ -193,7 +191,8 @@ begin
             gen_start_i <= '0';
             readout_info_valid <= '0';
             gen_rst_i <= '1';
-            mclk_raw_en_i <= '1';     -- 21 mars 2021: on active mclk_raw par defaut en vue d'eviter des bugs
+            nominal_mclk_raw_en_i <= '1';     -- 21 mars 2021: on active mclk_raw par defaut en vue d'eviter des bugs
+            fast_mclk_raw_en_i <= '0';
             elcorr_ref_enabled <= '0';
             img_in_progress_i <= '0'; 
             acq_data_o <= '0';
@@ -226,7 +225,7 @@ begin
                
                when idle => 
                   if NOMINAL_MCLK_RAW = '0' and nominal_mclk_raw_last = '1' then -- on s'assure qu'il n y a pas de pulse "tronqué" 
-                     mclk_raw_en_i <= '1';                               
+                     nominal_mclk_raw_en_i <= '1';
                   end if;
                   gen_rst_i <= '0';
                   area_fifo_rd_i <= '0';
@@ -235,14 +234,26 @@ begin
                   gen_start_i <= fpa_int_last;                  
                   if fpa_int_last = '1' and  fpa_int_i = '0' then   -- front descendant de int                     
                      acq_data_o <= acq_int_last;
-                     ctrl_fsm <= lsydel_dly_st;
+                     ctrl_fsm <= chck_lsydel_speed_st;
                   end if;                               
                   rst_cnt_i <= (others => '0'); 
                   pause_cnt <= (others => '0');
                   flow_err  <= '0';
                   elcorr_tic <= '0';
                   elcorr_tac <= '0';
+ 
+               when chck_lsydel_speed_st =>
+                     if NOMINAL_MCLK_RAW = '0' then 
+                        nominal_mclk_raw_en_i    <= '0';
+                        ctrl_fsm <= speedup_lsydel_clk_st;
+                     end if;
                
+               when speedup_lsydel_clk_st => 
+                  if FAST_MCLK_RAW = '0' then  
+                     fast_mclk_raw_en_i <= '1';                    
+                     ctrl_fsm <= lsydel_dly_st;
+                  end if;
+                  
                when lsydel_dly_st => 
                   wait_cnt <= (others => '0');
                   if fpa_mclk_re = '1' then
@@ -269,7 +280,8 @@ begin
                   flow_err <= '0'; 
                   elcorr_ref_enabled <= FPA_INTF_CFG.ELCORR_ENABLED;
                   if fpa_mclk_fe = '1' then 
-                     mclk_raw_en_i <= '0';    -- arrêt des horloges raw
+                     nominal_mclk_raw_en_i <= '0';    -- arrêt des horloges raw 
+                     fast_mclk_raw_en_i    <= '0';    
                      ctrl_fsm <= active_flow_st; 
                   end if;
                
@@ -278,9 +290,9 @@ begin
                   readout_info_valid <= '1';
                   ctrl_fsm <= sync_flow_st;
                
-               when sync_flow_st =>  -- ne pas changer l'ordre des étapes 1 et 2 car en cas de simulatneité la condition 2 doit prevaloir 
-                  if AREA_FIFO_DATA.RAW.IMMINENT_AOI = '1'  then        -- etape2: l'entrée dans la zone user se fera à phase constante par rapport à l'horloge des ADCs
-                     if adc_ref_fe_pipe(0) = '0' then                              -- si on n'est pas synchro déjà alors on s'en va se synchroniser sur adc_ref_fe_pipe(0) avant de sortir SOL
+               when sync_flow_st =>  -- ne pas changer l'ordre des étapes 1 et 2 car en cas de simulatneité la condition 2 doit prevaloir
+                 if AREA_FIFO_DATA.RAW.IMMINENT_AOI = '1'  then        -- etape2: l'entrée dans la zone user se fera à phase constante par rapport à l'horloge des ADCs
+                    if adc_ref_fe_pipe(0) = '0' then                              -- si on n'est pas synchro déjà alors on s'en va se synchroniser sur adc_ref_fe_pipe(0) avant de sortir SOL
                         area_fifo_rd_i <= '0';
                         ctrl_fsm <= adc_sync_st;
                      else                                                           -- sinon, c'est qu'on est déjà synchro avec adc_ref_fe_pipe(FASTRD_SYNC_POS), alors on ne fait rien de particulier
@@ -300,9 +312,9 @@ begin
                when raw_clk_en_st =>
                   area_fifo_rd_i <= '0';                        -- le window fifo est arrêté
                   if NOMINAL_MCLK_RAW = '0' and nominal_mclk_raw_last = '1' then -- on s'assure qu'il n y a pas de pulse "tronqué" 
-                     mclk_raw_en_i <= '1';                               
+                     nominal_mclk_raw_en_i <= '1';                               
                   end if;
-                  if mclk_raw_en_i = '1' then
+                  if nominal_mclk_raw_en_i = '1' then
                      ctrl_fsm <= rst_gen_st;
                      elcorr_tic <= '1';
                   end if;                  
@@ -368,21 +380,24 @@ begin
             
             
             -- Clocks 
-            fpa_mclk_i <= (AREA_FIFO_DATA.CLK_INFO.CLK and area_fifo_rd_i) or (NOMINAL_MCLK_RAW and mclk_raw_en_i); 
+            fpa_mclk_i <= (AREA_FIFO_DATA.CLK_INFO.CLK and area_fifo_rd_i) or (NOMINAL_MCLK_RAW and nominal_mclk_raw_en_i) or (FAST_MCLK_RAW and fast_mclk_raw_en_i); 
             fpa_mclk_last <= fpa_mclk_i;
             
-            -- LSYNC
-            if fpa_int_i = '1' then 
-               imminent_well_rst_i <= '0';
-            else
-               if AREA_FIFO_DATA.RAW.EOF = '1' and area_fifo_rd_i = '1' then 
-                  imminent_well_rst_i <= '1';
-               end if;
-            end if;          
-            last_lsync_pipe(C_LSYNC_PIPE_LEN-1 downto 0) <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2 downto 0) & (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i and imminent_well_rst_i); 
-            last_lsync_i <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2);
+            -- LSYNC     
+--            if fpa_int_i = '1' then 
+--               imminent_well_rst_i <= '0';
+--            else
+--               if AREA_FIFO_DATA.RAW.EOF = '1' and area_fifo_rd_i = '1' then 
+--                  imminent_well_rst_i <= '1';
+--               end if;
+--            end if;          
+--            last_lsync_pipe(C_LSYNC_PIPE_LEN-1 downto 0) <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2 downto 0) & (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i and imminent_well_rst_i); 
+--            last_lsync_i <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2);
+--            
+--            fpa_lsync_i <= (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i and not imminent_well_rst_i) or last_lsync_i; 
             
-            fpa_lsync_i <= (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i and not imminent_well_rst_i) or last_lsync_i; 
+            fpa_lsync_i <= (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i); 
+
             
             
             -- 
@@ -478,8 +493,8 @@ begin
             adc_time_stamp.naoi_start        <= elcorr_ref_start_i and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
             adc_time_stamp.naoi_stop         <= elcorr_ref_end_i and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
             adc_time_stamp.aoi_sof           <= AREA_FIFO_DATA.USER.SOF and area_fifo_rd_i;
-            adc_time_stamp.aoi_sol           <= AREA_FIFO_DATA.USER.SOL and area_fifo_rd_i;
-            
+            adc_time_stamp.aoi_sol           <= AREA_FIFO_DATA.USER.SOL and area_fifo_rd_i; 
+           
          end if; 
       end if;
    end process;    

@@ -102,10 +102,10 @@ package body isc0804A_2k_intf_testbench_pkg is
       variable  vgood_samp_mean_numerator              : unsigned(31 downto 0);  
       variable  good_samp_first_pos_per_ch             : unsigned(31 downto 0);      
       variable  good_samp_last_pos_per_ch              : unsigned(31 downto 0);  
-      variable  adc_clk_source_phase                   : unsigned(31 downto 0);  
-      variable  adc_clk_pipe_sel                       : unsigned(31 downto 0);  
-      variable  spare3a                                : unsigned(31 downto 0);
-      variable  spare3b                                : unsigned(31 downto 0);
+      variable  adc_clk_source_phase1                  : unsigned(31 downto 0);  
+      variable  adc_clk_pipe_sel1                      : unsigned(31 downto 0);  
+      variable  adc_clk_source_phase3                  : unsigned(31 downto 0);
+      variable  adc_clk_pipe_sel3                      : unsigned(31 downto 0);
       variable  spare3c                                : unsigned(31 downto 0);
       variable  lsydel_mclk                            : unsigned(31 downto 0);
       variable  boost_mode                             : unsigned(31 downto 0);       
@@ -139,12 +139,12 @@ package body isc0804A_2k_intf_testbench_pkg is
       variable  elcorr_spare4                          : unsigned(31 downto 0);
       variable  roic_cst_output_mode                   : unsigned(31 downto 0);
       variable  spare2a                                : unsigned(31 downto 0);
-      variable  spare2b                                : unsigned(31 downto 0);
-      variable  spare2c                                : unsigned(31 downto 0);
+      variable  adc_clk_source_phase2                  : unsigned(31 downto 0);
+      variable  adc_clk_pipe_sel2                      : unsigned(31 downto 0);
       variable  roic_dbg_reg                           : unsigned(31 downto 0);
       variable  roic_test_row_en                       : unsigned(31 downto 0);
-      variable  spare4a                                : unsigned(31 downto 0);
-      variable  spare4b                                : unsigned(31 downto 0);
+      variable  adc_clk_source_phase4                  : unsigned(31 downto 0);
+      variable  adc_clk_pipe_sel4                      : unsigned(31 downto 0);
       variable  single_samp_mode_en                    : unsigned(31 downto 0);
       variable  nominal_clk_id_sample_pos              : unsigned(31 downto 0);
       variable  mclk1_id_sample_pos                    : unsigned(31 downto 0);
@@ -237,8 +237,8 @@ package body isc0804A_2k_intf_testbench_pkg is
       good_samp_first_pos_per_ch           := pix_samp_num_per_ch;
       good_samp_last_pos_per_ch            := pix_samp_num_per_ch; 
       
-      adc_clk_source_phase                 := to_unsigned(100*send_id, 32);
-      adc_clk_pipe_sel                     := to_unsigned(0, 32);
+      adc_clk_source_phase1                := to_unsigned(0, 32);
+      adc_clk_pipe_sel1                    := to_unsigned(0, 32);
       
       proxim_is_flegx                      := to_unsigned(1, 32);
       
@@ -246,13 +246,13 @@ package body isc0804A_2k_intf_testbench_pkg is
       boost_mode                           := to_unsigned(23,32);
       
       spare2a                              := to_unsigned(0,32);
-      spare2b                              := to_unsigned(0,32);
-      spare2c                              := to_unsigned(0,32);
-      spare3a                              := to_unsigned(0,32);
-      spare3b                              := to_unsigned(0,32);
+      adc_clk_source_phase2                := to_unsigned(0, 32);
+      adc_clk_pipe_sel2                    := to_unsigned(0, 32);
+      adc_clk_source_phase3                := to_unsigned(0, 32);
+      adc_clk_pipe_sel3                    := to_unsigned(0,32);
       spare3c                              := to_unsigned(0,32);
-      spare4a                              := to_unsigned(0,32);
-      spare4b                              := to_unsigned(0,32);
+      adc_clk_source_phase4                := to_unsigned(0, 32);
+      adc_clk_pipe_sel4                    := to_unsigned(0,32);
       
       -- Electronic chain correction                    
       -- valeurs par defaut (mode normal)                                                                                                                                               
@@ -410,14 +410,14 @@ package body isc0804A_2k_intf_testbench_pkg is
       & vgood_samp_mean_numerator               
       & good_samp_first_pos_per_ch              
       & good_samp_last_pos_per_ch               
-      & adc_clk_source_phase                    
-      & adc_clk_pipe_sel                        
+      & adc_clk_source_phase1
+      & adc_clk_pipe_sel1
       & spare2a                                 
       & lsydel_mclk                             
       & boost_mode                              
       & speedup_lsydel                          
-      & spare2b                                 
-      & spare2c                                 
+      & adc_clk_source_phase2                                 
+      & adc_clk_pipe_sel2                                 
       & elcorr_enabled                          
       & elcorr_spare1                           
       & elcorr_spare2                           
@@ -446,13 +446,13 @@ package body isc0804A_2k_intf_testbench_pkg is
       & cfg_num                                 
       & elcorr_spare4                          
       & roic_cst_output_mode
-      & spare3a                                
-      & spare3b                                
+      & adc_clk_source_phase3                                
+      & adc_clk_pipe_sel3                                
       & spare3c                                
       & roic_dbg_reg                           
       & roic_test_row_en                       
-      & spare4a                   
-      & spare4b
+      & adc_clk_source_phase4                   
+      & adc_clk_pipe_sel4
       & single_samp_mode_en      
       & nominal_clk_id_sample_pos
       & mclk1_id_sample_pos      

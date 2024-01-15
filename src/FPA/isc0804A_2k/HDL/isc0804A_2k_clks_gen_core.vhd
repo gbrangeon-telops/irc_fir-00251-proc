@@ -24,12 +24,16 @@ entity isc0804A_2k_clks_gen_core is
       ARESET                 : in std_logic;
       
       MCLK_SOURCE            : in std_logic;  -- ne s'interrompt pas lors de la reconfig      
-      ADC_CLK_SOURCE         : in std_logic;  -- ne s'interrompt pas lors de la reconfig       
+      ADC_CLK1_SOURCE        : in std_logic;  -- ne s'interrompt pas lors de la reconfig
+      ADC_CLK2_SOURCE        : in std_logic;  -- ne s'interrompt pas lors de la reconfig
+      ADC_CLK3_SOURCE        : in std_logic;  -- ne s'interrompt pas lors de la reconfig
+      ADC_CLK4_SOURCE        : in std_logic;  -- ne s'interrompt pas lors de la reconfig
       
       FPA_INTF_CFG           : in fpa_intf_cfg_type;      
       
       -- horloge standard
       NOMINAL_MCLK_RAW       : out std_logic;
+      FAST_MCLK_RAW          : out std_logic;
       PROG_MCLK_RAW          : out std_logic;
       
       ADC_REF_CLK            : out std_logic;  -- quad_clk utilisé par le readout_ctrler      
@@ -102,27 +106,39 @@ architecture rtl of isc0804A_2k_clks_gen_core is
    
    signal sync_fsm                       : sync_fsm_type;
    
-   signal sreset_mclk_source             : std_logic;
-   signal sreset_adc_clk_source          : std_logic;
+   signal sreset_mclk_source             : std_logic := '1';
+   signal sreset_adc_clk1_source         : std_logic := '1';
+   signal sreset_adc_clk2_source         : std_logic := '1';
+   signal sreset_adc_clk3_source         : std_logic := '1';
+   signal sreset_adc_clk4_source         : std_logic := '1';
    signal quad_clk_iob                   : std_logic_vector(4 downto 1);   
-   signal nominal_mclk_raw_i             : std_logic; 
+   signal nominal_mclk_raw_i             : std_logic;
+   signal fast_mclk_raw_i                : std_logic;
    signal prog_mclk_raw_i                : std_logic;
    signal quad_clk_raw                   : std_logic := '0';
-   signal quad_clk_from_adc_clk_source   : std_logic := '0';
-   signal quad_clk_from_adc_clk_source_sync : std_logic := '0';
    signal adc_ref_clk_i                  : std_logic := '0';
-   signal quad_clk_pipe                  : std_logic_vector(63 downto 0);
-   signal adc_clk_pipe_sel               : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL'LENGTH-1 downto 0);
+   signal quad_clk_pipe1                 : std_logic_vector(63 downto 0);
+   signal quad_clk_pipe2                 : std_logic_vector(63 downto 0);
+   signal quad_clk_pipe3                 : std_logic_vector(63 downto 0);
+   signal quad_clk_pipe4                 : std_logic_vector(63 downto 0);
+   signal adc_clk_pipe_sel1              : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL1'LENGTH-1 downto 0);
+   signal adc_clk_pipe_sel2              : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL1'LENGTH-1 downto 0);
+   signal adc_clk_pipe_sel3              : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL1'LENGTH-1 downto 0);
+   signal adc_clk_pipe_sel4              : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL1'LENGTH-1 downto 0);
    signal idle_cnt                       : unsigned(15 downto 0);
    
-   signal fifo_wr_en                     : std_logic;
    signal fifo_din                       : std_logic_vector(7 downto 0);
-   signal fifo_dout                      : std_logic_vector(7 downto 0);
-   signal fifo_dout_dval                 : std_logic;
+   signal fifo_wr_en1, fifo_wr_en2       : std_logic;
+   signal fifo_wr_en3, fifo_wr_en4       : std_logic;
+   signal fifo_dout1, fifo_dout2         : std_logic_vector(7 downto 0);
+   signal fifo_dout3, fifo_dout4         : std_logic_vector(7 downto 0);
+   signal fifo_dout_dval1, fifo_dout_dval2 : std_logic;
+   signal fifo_dout_dval3, fifo_dout_dval4 : std_logic;
    
    signal nominal_mclk_raw_last          : std_logic;
    signal nominal_mclk_raw_re            : std_logic;
-   signal wr_rst_busy                    : std_logic;
+   signal wr_rst_busy1, wr_rst_busy2     : std_logic;
+   signal wr_rst_busy3, wr_rst_busy4     : std_logic;
    
    signal nominal_pclk_raw_i             : std_logic;   
    
@@ -141,6 +157,7 @@ begin
    
    ADC_REF_CLK       <= adc_ref_clk_i;
    NOMINAL_MCLK_RAW  <= nominal_mclk_raw_i;    -- horloge à frequence nominale
+   FAST_MCLK_RAW     <= fast_mclk_raw_i;       -- horloge à frequence rapide
    PROG_MCLK_RAW     <= prog_mclk_raw_i;       -- horloge à frequence nominale   
    
    -----------------------------------------------------
@@ -152,13 +169,26 @@ begin
    
    U1B: sync_reset
    Port map(		
-      ARESET => ARESET, SRESET => sreset_adc_clk_source, CLK => ADC_CLK_SOURCE);
+      ARESET => ARESET, SRESET => sreset_adc_clk1_source, CLK => ADC_CLK1_SOURCE);
+
+   U1C: sync_reset
+   Port map(		
+      ARESET => ARESET, SRESET => sreset_adc_clk2_source, CLK => ADC_CLK2_SOURCE);
+
+   U1D: sync_reset
+   Port map(		
+      ARESET => ARESET, SRESET => sreset_adc_clk3_source, CLK => ADC_CLK3_SOURCE);
+      
+   U1E: sync_reset
+   Port map(		
+      ARESET => ARESET, SRESET => sreset_adc_clk4_source, CLK => ADC_CLK4_SOURCE);
+      
    --   --------------------------------------------------------
    --   -- Master_clock nominal
    --   -------------------------------------------------------- 
    U2A: Clk_Divider
    Generic map(
-      Factor=> DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(DEFINE_FPA_NOMINAL_MCLK_ID)
+    Factor=> DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(DEFINE_FPA_NOMINAL_MCLK_ID)
       )
    Port map( 
       Clock   => MCLK_SOURCE,    
@@ -175,7 +205,17 @@ begin
       Reset   => sreset_mclk_source, 
       Clk_div => nominal_pclk_raw_i   -- attention, c'est en realité un clock enable. FPA_NOMINAL_PCLK
       );
-   
+	  
+   U2C: Clk_Divider
+   Generic map(
+    Factor=> DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(DEFINE_FPA_MCLK2_ID)
+      )
+   Port map( 
+      Clock   => MCLK_SOURCE,    
+      Reset   => sreset_mclk_source, 
+      Clk_div => fast_mclk_raw_i   -- attention, c'est en realité un clock enable. FPA_NOMINAL_MCLK
+      );
+      
    --   --------------------------------------------------------
    --   -- prog clock 
    --   -------------------------------------------------------- 
@@ -201,62 +241,103 @@ begin
       Reset   => sreset_mclk_source, 
       Clk_div => adc_ref_clk_i   -- attention, c'est en realité un clock enable.
       ); 
-   
-   --------------------------------------------------------
-   -- quad_clk_from_adc_clk_source 
-   --------------------------------------------------------
-   U5: Clk_Divider
-   Generic map(
-      Factor => DEFINE_ADC_QUAD_CLK_FACTOR
-      )
-   Port map( 
-      Clock   => ADC_CLK_SOURCE, 
-      Reset   => sreset_adc_clk_source, 
-      Clk_div => quad_clk_from_adc_clk_source     -- attention, c'est en realité un clock enable.
-      ); 
-   
+
    --------------------------------------------------------
    --  dephasage fin des quad clock via fifo
    -------------------------------------------------------- 
    fifo_din(1 downto 0)<= nominal_pclk_raw_i & nominal_pclk_raw_i;
    
-   adcclk_sync : fwft_afifo_w8_d256
+   adcclk_sync1 : fwft_afifo_w8_d256
    port map (
       rst      => ARESET,
       wr_clk   => MCLK_SOURCE,
-      rd_clk   => ADC_CLK_SOURCE,
+      rd_clk   => ADC_CLK1_SOURCE,
       din      => fifo_din,
-      wr_en    => fifo_wr_en,
-      rd_en    => fifo_dout_dval,
-      dout     => fifo_dout,
+      wr_en    => fifo_wr_en1,
+      rd_en    => fifo_dout_dval1,
+      dout     => fifo_dout1,
       full     => open,
       almost_full => open,
       overflow => open,
       empty    => open,
-      valid    => fifo_dout_dval,
-      wr_rst_busy => wr_rst_busy,  
+      valid    => fifo_dout_dval1,
+      wr_rst_busy => wr_rst_busy1,  
       rd_rst_busy => open
       );
-   
-   -- write du fifo,
+
+   adcclk_sync2 : fwft_afifo_w8_d256
+   port map (
+      rst      => ARESET,
+      wr_clk   => MCLK_SOURCE,
+      rd_clk   => ADC_CLK2_SOURCE,
+      din      => fifo_din,
+      wr_en    => fifo_wr_en2,
+      rd_en    => fifo_dout_dval2,
+      dout     => fifo_dout2,
+      full     => open,
+      almost_full => open,
+      overflow => open,
+      empty    => open,
+      valid    => fifo_dout_dval2,
+      wr_rst_busy => wr_rst_busy2,  
+      rd_rst_busy => open
+      );
+
+   adcclk_sync3 : fwft_afifo_w8_d256
+   port map (
+      rst      => ARESET,
+      wr_clk   => MCLK_SOURCE,
+      rd_clk   => ADC_CLK3_SOURCE,
+      din      => fifo_din,
+      wr_en    => fifo_wr_en3,
+      rd_en    => fifo_dout_dval3,
+      dout     => fifo_dout3,
+      full     => open,
+      almost_full => open,
+      overflow => open,
+      empty    => open,
+      valid    => fifo_dout_dval3,
+      wr_rst_busy => wr_rst_busy3,  
+      rd_rst_busy => open
+      );
+
+   adcclk_sync4 : fwft_afifo_w8_d256
+   port map (
+      rst      => ARESET,
+      wr_clk   => MCLK_SOURCE,
+      rd_clk   => ADC_CLK4_SOURCE,
+      din      => fifo_din,
+      wr_en    => fifo_wr_en4,
+      rd_en    => fifo_dout_dval4,
+      dout     => fifo_dout4,
+      full     => open,
+      almost_full => open,
+      overflow => open,
+      empty    => open,
+      valid    => fifo_dout_dval4,
+      wr_rst_busy => wr_rst_busy4,  
+      rd_rst_busy => open
+      );
+      
+   -- write du fifo
    UCB : process(MCLK_SOURCE)
    begin
       if rising_edge(MCLK_SOURCE) then       
          if sreset_mclk_source = '1' then         
             sync_fsm <= idle; 
             idle_cnt <= (others => '0');
-            fifo_wr_en <= '0';
+            fifo_wr_en1 <= '0';
+            fifo_wr_en2 <= '0';
+            fifo_wr_en3 <= '0';
+            fifo_wr_en4 <= '0';
             nominal_mclk_raw_last <= '0';
             nominal_mclk_raw_re <= '0';
-            
          else
-            
             -- mclk_re
             nominal_mclk_raw_last <= nominal_mclk_raw_i;
             nominal_mclk_raw_re <= not nominal_mclk_raw_last and nominal_mclk_raw_i;
             
             case sync_fsm is
-               
                when idle =>
                   if nominal_mclk_raw_re = '1' then 
                      idle_cnt <= idle_cnt + 1;
@@ -267,14 +348,15 @@ begin
                   end if;
                
                when done_st =>
-                  fifo_wr_en <= not wr_rst_busy;
+                  fifo_wr_en1 <= not wr_rst_busy1;
+                  fifo_wr_en2 <= not wr_rst_busy2;
+                  fifo_wr_en3 <= not wr_rst_busy3;
+                  fifo_wr_en4 <= not wr_rst_busy4;
                
                when others =>
-               
+                  null;
             end case;             
-            
          end if;         
-         
       end if;
    end process; 
    
@@ -283,23 +365,89 @@ begin
    --------------------------------------------------------    
    U7A : double_sync_vector  
    port map(
-      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL),
-      Q => adc_clk_pipe_sel,
-      CLK => ADC_CLK_SOURCE); 
-   
-   U7B : process(ADC_CLK_SOURCE)
+      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL1),
+      Q => adc_clk_pipe_sel1,
+      CLK => ADC_CLK1_SOURCE); 
+
+   U7B : double_sync_vector  
+   port map(
+      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL2),
+      Q => adc_clk_pipe_sel2,
+      CLK => ADC_CLK2_SOURCE); 
+      
+   U7C : double_sync_vector  
+   port map(
+      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL3),
+      Q => adc_clk_pipe_sel3,
+      CLK => ADC_CLK3_SOURCE); 
+
+   U7D : double_sync_vector  
+   port map(
+      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL4),
+      Q => adc_clk_pipe_sel4,
+      CLK => ADC_CLK4_SOURCE); 
+      
+   U8A : process(ADC_CLK1_SOURCE)
    begin
-      if rising_edge(ADC_CLK_SOURCE) then                                          
+      if rising_edge(ADC_CLK1_SOURCE) then                                          
+         if sreset_adc_clk1_source = '1' then
+            quad_clk_pipe1 <= (others=>'0');
+         else
+            -- pipe de l'horloge des adcs
+            quad_clk_pipe1(0) <= fifo_dout1(0);
+            quad_clk_pipe1(31 downto 1) <= quad_clk_pipe1(30 downto 0);
          
-         -- pipe de l'horloge des adcs
-         quad_clk_pipe(0) <= fifo_dout(0);
-         quad_clk_pipe(31 downto 1) <= quad_clk_pipe(30 downto 0);
+            -- selection de l'horloge dephasagée pour chaque quad
+            quad_clk_iob(1) <= quad_clk_pipe1(to_integer(unsigned(adc_clk_pipe_sel1)));
+         end if;
+      end if;
+   end process;      
+
+   U8B : process(ADC_CLK2_SOURCE)
+   begin
+      if rising_edge(ADC_CLK2_SOURCE) then                                          
+         if sreset_adc_clk2_source = '1' then
+            quad_clk_pipe2 <= (others=>'0');
+         else
+            -- pipe de l'horloge des adcs
+            quad_clk_pipe2(0) <= fifo_dout2(0);
+            quad_clk_pipe2(31 downto 1) <= quad_clk_pipe2(30 downto 0);
          
-         -- selection de l'horloge dephasagée pour chaque quad
-         quad_clk_iob(4) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel)));
-         quad_clk_iob(3) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel)));
-         quad_clk_iob(2) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel)));
-         quad_clk_iob(1) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel)));
+            -- selection de l'horloge dephasagée pour chaque quad
+            quad_clk_iob(2) <= quad_clk_pipe2(to_integer(unsigned(adc_clk_pipe_sel2)));
+         end if;
+      end if;
+   end process;      
+
+   U8C : process(ADC_CLK3_SOURCE)
+   begin
+      if rising_edge(ADC_CLK3_SOURCE) then                                          
+         if sreset_adc_clk3_source = '1' then
+            quad_clk_pipe3 <= (others=>'0');
+         else
+            -- pipe de l'horloge des adcs
+            quad_clk_pipe3(0) <= fifo_dout3(0);
+            quad_clk_pipe3(31 downto 1) <= quad_clk_pipe3(30 downto 0);
+         
+            -- selection de l'horloge dephasagée pour chaque quad
+            quad_clk_iob(3) <= quad_clk_pipe3(to_integer(unsigned(adc_clk_pipe_sel3)));
+         end if;
+      end if;
+   end process;      
+
+   U8D : process(ADC_CLK4_SOURCE)
+   begin
+      if rising_edge(ADC_CLK4_SOURCE) then                                          
+         if sreset_adc_clk4_source = '1' then
+            quad_clk_pipe4 <= (others=>'0');
+         else
+            -- pipe de l'horloge des adcs
+            quad_clk_pipe4(0) <= fifo_dout4(0);
+            quad_clk_pipe4(31 downto 1) <= quad_clk_pipe4(30 downto 0);
+         
+            -- selection de l'horloge dephasagée pour chaque quad
+            quad_clk_iob(4) <= quad_clk_pipe4(to_integer(unsigned(adc_clk_pipe_sel4)));
+         end if;
       end if;
    end process;      
    

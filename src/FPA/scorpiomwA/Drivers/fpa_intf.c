@@ -273,7 +273,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    //extern int32_t gFpaDebugRegG;                         // non utilisé
-   static uint8_t cfg_num = 0; 
+   static uint8_t cfg_num;
    extern int32_t gFpaExposureTimeOffset;
    
    // on bâtit les parametres specifiques du scorpiomw
@@ -487,11 +487,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fast2_clk_id_sample_pos      = 1;
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;
-   
-   ptrA->cfg_num  = (uint32_t)cfg_num;   
+   ptrA->cfg_num  = ++cfg_num;
    
    // additional exposure time offset coming from flash 
    //ptrA->int_time_offset_mclk = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);

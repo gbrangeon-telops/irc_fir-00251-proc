@@ -14,7 +14,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use work.FPA_Define.all; 
-use work.fpa_common_pkg.all;
+use work.fpa_common_pkg.all;  
+use work.plle2_drp_define.all;
+
 use work.Tel2000.all;
 
 entity isc0804A_2k_clks_mmcm is 
@@ -26,23 +28,16 @@ entity isc0804A_2k_clks_mmcm is
       FPA_INT_CFG      : in fpa_intf_cfg_type;
       
       MCLK_SOURCE      : out std_logic;
-      ADC_CLK_SOURCE   : out std_logic;
-      MMCM_LOCKED      : out std_logic;
-      
-      CFG_IN_PROGRESS  : out std_logic      
+      ADC_CLK1_SOURCE  : out std_logic;
+      ADC_CLK2_SOURCE  : out std_logic;
+      ADC_CLK3_SOURCE  : out std_logic;
+      ADC_CLK4_SOURCE  : out std_logic;
+      MMCM_LOCKED      : out std_logic
       );
 end isc0804A_2k_clks_mmcm;
 
 architecture rtl of isc0804A_2k_clks_mmcm is 
-   
-   constant C_MMCM_RST_DURATION_mS     : real      := 200.0;      -- duree du reset du mmcm en millisec
-   constant C_CLK_IN_RATE_KHZ          : real      := 100_000.0;  -- frequence de l'horloge d'entrée du présent module   
-   constant C_MMCM_RST_DURATION_FACTOR : natural   := integer(C_MMCM_RST_DURATION_mS * C_CLK_IN_RATE_KHZ)    -- duree du reset en coups d'horloge CLK_IN
-   -- pragma translate_off
-   / integer(C_CLK_IN_RATE_KHZ)
-   -- pragma translate_on
-   ;   
-   
+
    component SYNC_RESET is
       port(
          CLK    : in std_logic;
@@ -51,186 +46,257 @@ architecture rtl of isc0804A_2k_clks_mmcm is
          );
    end component;
    
-   component isc0804A_17_5_MHz_mmcm_v2       
-      port
-         (
-         -- Status and control signals         
-         reset             : in     std_logic;  
-         locked            : out    std_logic;  
-         clk_in            : in     std_logic;
-         
-         -- Dynamic phase shift ports           
-         psclk             : in     std_logic;  
-         psen              : in     std_logic;  
-         psincdec          : in     std_logic;  
-         psdone            : out    std_logic;
-         
-         -- outputs                            
-         mclk_source       : out    std_logic;         
-         adc_clk_source    : out    std_logic      
-         );      
+   component double_sync_vector is
+      port(
+         D : in STD_LOGIC_vector;
+		   Q : out STD_LOGIC_vector;
+		   CLK : in STD_LOGIC
+      );
    end component;
    
-   type cfg_sm_type is(idle, rst_mmcm_st1, rst_mmcm_st2, wait_mmcm_rdy_st, wait_psdone_st, check_phase_st, inc_phase_st, wait_locked_st, wait_psbusy_st, update_cfg_st);   
+   component gh_gray2binary IS
+	   GENERIC (size: INTEGER := 8);
+	   PORT(	
+		   G   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);	-- gray code in
+		   B   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0) -- binary value out
+		);
+   end component;
    
-   signal cfg_sm              : cfg_sm_type;
-   signal mmcm_locked_i       : std_logic;
+   component isc0804A_17_5_MHz_mmcm_v3
+      port(
+         -- Clock out ports
+         mclk_source       : out    std_logic;
+         quad1_clk_source  : out    std_logic;
+         quad2_clk_source  : out    std_logic;
+         quad3_clk_source  : out    std_logic;
+         quad4_clk_source  : out    std_logic;
+         -- Dynamic reconfiguration ports
+         daddr             : in     std_logic_vector(6 downto 0);
+         dclk              : in     std_logic;
+         den               : in     std_logic;
+         din               : in     std_logic_vector(15 downto 0);
+         dout              : out    std_logic_vector(15 downto 0);
+         dwe               : in     std_logic;
+         drdy              : out    std_logic;
+         -- Status and control signals
+         reset             : in     std_logic;
+         locked            : out    std_logic;
+         -- Clock in ports
+         clk_in            : in     std_logic
+      );
+   end component;
+   
+   component pll_drp_ctrler
+      port(
+         -- User interface
+         SRESET      : in std_logic;                             
+         CLK         : in std_logic;                             
+         RSTROBE     : in std_logic;                             
+         RADDR       : in std_logic_vector(6 downto 0);          
+         RDOUT       : out std_logic_vector(15 downto 0);        
+         RDVAL       : out std_logic;                            
+         NEW_CFG     : in std_logic;                             
+         PHASES      : in phase_array_t(0 to 4);                 
+         PLL_RDY     : out std_logic;                            
+         -- PLL status and control signals
+         PLL_RESET  : out std_logic;                             
+         PLL_LOCKED : in std_logic;                              
+         -- DRP interface
+         DRP_DADDR : out std_logic_vector(6 downto 0);           
+         DRP_DCLK  : out std_logic;                              
+         DRP_DEN   : out std_logic;                              
+         DRP_DIN   : out std_logic_vector(15 downto 0);          
+         DRP_DOUT  : in std_logic_vector(15 downto 0);           
+         DRP_DWE   : out std_logic;                              
+         DRP_DRDY  : in std_logic                                
+      );
+   end component;
+
+   constant CNT_BIT_MAX : natural := 9;
+   
+   type cfg_sm_type is(idle, check_phases, new_cfg, pause, wait_lock); 
+   
+   signal cfg_sm              : cfg_sm_type := idle;
    signal sreset              : std_logic;
-   signal mmcm_rdy_i          : std_logic;
-   signal new_cfg_pending     : std_logic;
-   signal present_adc_clk_phase: std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
-   signal phase_cnt_i         : unsigned(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
-   signal pause_cnt           : unsigned(25 downto 0);
-   signal cfg_in_progress_i   : std_logic;
-   signal psen_i              : std_logic;
-   signal psdone_i            : std_logic;
-   signal psincdec_i          : std_logic;
-   signal mmcm_rst_i          : std_logic;
+   signal pll_locked_i        : std_logic;
+   signal pll_rdy_i           : std_logic;
+   signal phases_i            : phase_array_t(0 to 4) := (others=>(others=>'0'));
+   signal present_phases_i    : phase_array_t(1 to 4) := (others=>(others=>'0'));
+   signal drp_dclk_i          : std_logic;
+   signal drp_daddr_i         : std_logic_vector(6 downto 0);  
+   signal drp_en_i            : std_logic;
+   signal drp_dwe_i           : std_logic;
+   signal drp_din_i           : std_logic_vector(15 downto 0);  
+   signal drp_dout_i          : std_logic_vector(15 downto 0);
+   signal drp_drdy_i          : std_logic;
+   signal pll_rst_i           : std_logic;
+   signal new_cfg_i           : std_logic := '0';
+   signal new_cfg_num         : std_logic_vector(FPA_INT_CFG.CFG_NUM'length-1 downto 0) := (others=>'0');
+   signal present_cfg_num     : std_logic_vector(FPA_INT_CFG.CFG_NUM'length-1 downto 0) := (others=>'0');
+   signal new_cfg_gray        : std_logic_vector(FPA_INT_CFG.CFG_NUM'length-1 downto 0) := (others=>'0');
+   signal new_cfg_bin         : std_logic_vector(FPA_INT_CFG.CFG_NUM'length-1 downto 0);
+   signal cnt                 : unsigned(CNT_BIT_MAX downto 0) := (others=>'0');
    
 begin
-   
-   MMCM_LOCKED <= mmcm_locked_i;
-   CFG_IN_PROGRESS <= cfg_in_progress_i;
-   
-   U0 : sync_reset 
+
+   U0A : sync_reset 
    port map(
       ARESET => ARESET, 
       SRESET => sreset, 
       CLK    => CLK_100M_IN
       );
    
-   -----------------------------------------------------------------
-   -- Avec configuration dynamique
-   -----------------------------------------------------------------   
-   
-   U1: process(CLK_100M_IN)
-   begin          
-      if rising_edge(CLK_100M_IN) then         
+   -----------------
+   -- Output Mapping
+   -----------------
+   MMCM_LOCKED <= pll_rdy_i;
+
+   -----------------
+   -- Input Mapping
+   -----------------
+   U0B : process(CLK_100M_IN)
+   begin
+      if rising_edge(CLK_100M_IN) then
+         
+         phases_i(0) <= (others=>'0');
+         
          if sreset = '1' then
-            cfg_sm <= idle;
-            new_cfg_pending <= '0';
-            cfg_in_progress_i <= '1';
-            mmcm_locked_i <= '0';
-            present_adc_clk_phase <= (others => '0');
-            mmcm_rst_i <= '1';
-            psen_i  <= '0';
-            psincdec_i <= '0'; 
-            
-         else                      
-            
-            mmcm_locked_i <= not cfg_in_progress_i and mmcm_rdy_i; 
-            
-            if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= present_adc_clk_phase then 
-               new_cfg_pending <= '1';
-            else
-               new_cfg_pending <= '0';
-            end if;               
-            
-            -- fsm de prog de phase
-            case cfg_sm is
-               
-               when idle =>
-                  psen_i  <= '0';
-                  psincdec_i <= '0';        
-                  pause_cnt <= (others => '0');
-                  phase_cnt_i <= (others => '0');
-                  mmcm_rst_i <= '0';
-                  if new_cfg_pending = '1' and mmcm_rdy_i = '1' then
-                     cfg_sm <= rst_mmcm_st1;
-                     cfg_in_progress_i <= '1';
-                  end if;
-               
-               when rst_mmcm_st1 =>             -- reset du mmcm
-                  mmcm_rst_i <= '1';
-                  if mmcm_rdy_i = '0' then       
-                     cfg_sm <= rst_mmcm_st2;
-                  end if;
-               
-               when rst_mmcm_st2 =>             -- reset du mmcm
-                  pause_cnt <= pause_cnt + 1;
-                  if pause_cnt > C_MMCM_RST_DURATION_FACTOR then
-                     cfg_sm <= wait_mmcm_rdy_st;
-                  end if;
-               
-               when wait_mmcm_rdy_st =>        -- attente du rdy/locked du mmcm, preuve qu'il a complété son rst et est à l'écoute
-                  mmcm_rst_i <= '0';
-                  if mmcm_rdy_i = '1' then 
-                     cfg_sm <= check_phase_st;
-                  end if;               
-               
-               when check_phase_st =>         -- on cherche à savoir si on incremente la phase ou non (FPA_INT_CFG.ADC_CLK_SOURCE_PHASE est toujours positif)
-                  if phase_cnt_i >= FPA_INT_CFG.ADC_CLK_SOURCE_PHASE then 
-                     cfg_sm <= wait_locked_st; 
-                  else
-                     cfg_sm <= inc_phase_st; 
-                  end if;                   
-               
-               when inc_phase_st =>          --  incrementation d'une unité de la phase 
-                  psen_i  <= '1';
-                  psincdec_i <= '1';
-                  phase_cnt_i <= phase_cnt_i + 1;
-                  cfg_sm <= wait_psbusy_st; 
-               
-               when wait_psbusy_st =>       --  attendre que le mmcm fasse le dephasage unitaire
-                  psen_i  <= '0';
-                  psincdec_i <= '0';
-                  if psdone_i = '0' then 
-                     cfg_sm <= wait_psdone_st;
-                  end if;
-               
-               when wait_psdone_st =>      -- fin du dephasage unitaire fait par le mmcm. On retourne voir si le dephasage total demandé est atteint ou non
-                  if psdone_i = '1' then 
-                     cfg_sm <= check_phase_st;
-                  end if;
-               
-               when wait_locked_st =>      -- attente du locked global du mmcm
-                  pause_cnt <= (others => '0');
-                  if mmcm_rdy_i = '1' then
-                     cfg_sm <= update_cfg_st;
-                  end if;               
-               
-               when update_cfg_st =>       -- mise à jour de la cfg
-                  present_adc_clk_phase <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
-                  pause_cnt <= pause_cnt + 1;
-                  if pause_cnt(20) = '1' then -- ce delai permet à ce que les horloges soient bien stables avant que ne tombe le ARESET des modules les utilisant.
-                     cfg_in_progress_i <= '0';
-                     cfg_sm <= idle; 
-                  end if; 
-                  -- pragma translate_off
-                  if pause_cnt(3) = '1' then
-                     cfg_in_progress_i <= '0';
-                     cfg_sm <= idle; 
-                  end if; 
-                  -- pragma translate_on
-               
-               when others =>
-               
-            end case;               
-            
-         end if;  
+            phases_i(1) <= (others=>'0');
+            phases_i(2) <= (others=>'0');
+            phases_i(3) <= (others=>'0');
+            phases_i(4) <= (others=>'0');
+         else
+            phases_i(1) <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE1(8 downto 0));
+            phases_i(2) <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE2(8 downto 0));
+            phases_i(3) <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE3(8 downto 0));
+            phases_i(4) <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE4(8 downto 0));
+         end if;
       end if;
    end process;
    
    -----------------------------------------------------------------
-   -- MMCM/PPL
+   -- New Config Detection
    -----------------------------------------------------------------     
-   U2 :  isc0804A_17_5_MHz_mmcm_v2
+   
+   -- Gray-coded Config Num Sync
+   U1A : double_sync_vector port map(D => std_logic_vector(FPA_INT_CFG.CFG_NUM), Q => new_cfg_gray, CLK => CLK_100M_IN);
+   
+   -- Gray to Binary Decoding 
+   U1B : gh_gray2binary
+      generic map (size => FPA_INT_CFG.CFG_NUM'LENGTH)
+      port map (G => new_cfg_gray, B => new_cfg_bin);
+
+   -- Binary-coded Config Num Registration
+   U1C : process(CLK_100M_IN)
+   begin
+      if rising_edge(CLK_100M_IN) then
+         new_cfg_num <= new_cfg_bin;
+      end if;
+   end process;
+   
+   -- Config FSM
+   U1D : process(CLK_100M_IN)
+   begin
+      if rising_edge(CLK_100M_IN) then
+         if sreset = '1' then
+            new_cfg_i <= '0';
+            cnt <= (others=>'0');
+            cfg_sm <= idle;
+         else
+            
+            new_cfg_i <= '0'; -- default value 
+            
+            case cfg_sm is
+               when idle =>
+                  cnt <= (others=>'0');
+                  if new_cfg_num /= present_cfg_num then
+                     present_cfg_num <= new_cfg_num;   
+                     cfg_sm <= check_phases;
+                  end if;
+               
+               when check_phases =>
+                  if phases_i(1) /= present_phases_i(1) or phases_i(2) /= present_phases_i(2) or
+                     phases_i(3) /= present_phases_i(3) or phases_i(4) /= present_phases_i(4) then
+                     present_phases_i <= phases_i(1 to 4);
+                     cfg_sm <= new_cfg;
+                  else
+                     cfg_sm <= idle;
+                  end if;
+               
+               when new_cfg =>
+                  new_cfg_i <= '1';
+                  cfg_sm <= pause;
+
+               when pause =>  -- pause ~5 µs
+                  if cnt(CNT_BIT_MAX) = '1' then
+                     cfg_sm <= wait_lock;   
+                  else
+                     cnt <= cnt + 1;                  
+                  end if;
+                  
+               when wait_lock =>
+                  if pll_rdy_i = '1' then
+                     cfg_sm <= idle;
+                  end if;  
+                  
+               when others =>
+                  null;
+            end case;
+         end if;
+      end if;
+   end process;
+     
+   -----------------------------------------------------------------
+   -- PLL DRP Interface Controller
+   -----------------------------------------------------------------     
+   U2 : pll_drp_ctrler
+   port map ( 
+      -- User interface
+      SRESET            => sreset,
+      CLK               => CLK_100M_IN,
+      RSTROBE           => '0',
+      RADDR             => (others=>'0'),
+      RDOUT             => open,
+      RDVAL             => open,
+      NEW_CFG           => new_cfg_i,
+      PHASES            => phases_i,
+      PLL_RDY           => pll_rdy_i,
+      -- PLL status and control signals
+      PLL_RESET         => pll_rst_i,
+      PLL_LOCKED        => pll_locked_i,
+      -- DRP interface
+      DRP_DADDR         => drp_daddr_i,
+      DRP_DCLK          => drp_dclk_i,
+      DRP_DEN           => drp_en_i,
+      DRP_DIN           => drp_din_i,
+      DRP_DOUT          => drp_dout_i,
+      DRP_DWE           => drp_dwe_i,
+      DRP_DRDY          => drp_drdy_i
+   );
+   
+   -----------------------------------------------------------------
+   -- MMCM/PLL
+   -----------------------------------------------------------------
+   U3 : isc0804A_17_5_MHz_mmcm_v3
    port map (   
-      reset             => mmcm_rst_i,
-      locked            => mmcm_rdy_i,
       clk_in            => CLK_100M_IN,
-      
-      -- Dynamic phase shift ports
-      
-      psclk             =>   CLK_100M_IN,
-      psen              =>   psen_i,
-      psincdec          =>   psincdec_i,
-      psdone            =>   psdone_i,
-      
+      reset             => pll_rst_i,
+      locked            => pll_locked_i,
+      -- DRP Inteface
+      daddr             => drp_daddr_i,
+      dclk              => drp_dclk_i,
+      den               => drp_en_i,
+      dwe               => drp_dwe_i,
+      din               => drp_din_i,
+      dout              => drp_dout_i,
+      drdy              => drp_drdy_i,
       -- outputs
-      
       mclk_source       => MCLK_SOURCE,      
-      adc_clk_source    => ADC_CLK_SOURCE         
-      );      
+      quad1_clk_source  => ADC_CLK1_SOURCE,
+      quad2_clk_source  => ADC_CLK2_SOURCE,
+      quad3_clk_source  => ADC_CLK3_SOURCE,
+      quad4_clk_source  => ADC_CLK4_SOURCE
+   );      
    
 end rtl;
+

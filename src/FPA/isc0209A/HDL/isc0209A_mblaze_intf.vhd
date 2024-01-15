@@ -58,6 +58,14 @@ architecture rtl of isc0209A_mblaze_intf is
          CLK : in std_logic);
    end component;
    
+   component gh_binary2gray
+     GENERIC (size: INTEGER := 8);
+	  PORT(	
+         B   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+		 G   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0)
+       );
+   end component;
+   
    type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(7 downto 0);
    type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
@@ -86,6 +94,8 @@ architecture rtl of isc0209A_mblaze_intf is
    signal update_cfg                   : std_logic;
    signal user_cfg_in_progress         : std_logic := '0';
    signal user_cfg_i                   : fpa_intf_cfg_type;
+   signal cfg_num_bin_i                : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others => '0');
+   signal cfg_num_gray_i               : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal int_dval_i                   : std_logic := '0';
    signal int_time_i                   : unsigned(31 downto 0);
    signal int_indx_i                   : std_logic_vector(7 downto 0);
@@ -177,6 +187,13 @@ begin
    STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;    
    
    -------------------------------------------------  
+   -- Encodage Gray du # de config
+   -------------------------------------------------   
+   U3A : gh_binary2gray
+     generic map (size => USER_CFG.CFG_NUM'length) 
+     port map (B => cfg_num_bin_i, G => cfg_num_gray_i);
+   
+   -------------------------------------------------  
    -- reception Config                                
    -------------------------------------------------   
    U3: process(MB_CLK)
@@ -196,6 +213,8 @@ begin
          else                   
             
             user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
+            
+            user_cfg_i.cfg_num <= unsigned(cfg_num_gray_i);
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
             
@@ -267,10 +286,9 @@ begin
                   when X"08C" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0)); 
                   when X"090" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));
                   when X"094" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0)); 
-                  
                   when X"098" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
                   when X"09C" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
-                  when X"0A0" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
+                  when X"0A0" =>    cfg_num_bin_i                              <= std_logic_vector(unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)));                  
                   when X"0A4" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                   when X"0A8" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); 
                      

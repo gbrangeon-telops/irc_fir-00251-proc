@@ -240,7 +240,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                         // non utilisé
    float Nr, Nc, No, R, H, C, W;
-   static uint8_t cfg_num = 0; 
+   static uint8_t cfg_num;
    
    
    // on bâtit les parametres specifiques du hawk
@@ -410,11 +410,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
     // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;
-   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num  = ++cfg_num;
    
    if (init_done == 0)
       gFpaDebugRegG = 0;

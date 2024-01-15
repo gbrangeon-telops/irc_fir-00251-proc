@@ -56,12 +56,20 @@ architecture rtl of scorpiomwA_window_reg is
          );
    end component;
    
-   component double_sync_vector is       -- ENO : 10 oct 2017: necessaire pour ce module
+   component double_sync_vector
       port(
          D : in std_logic_vector;
          Q : out std_logic_vector;
          CLK : in std_logic
          );
+   end component;
+   
+   component gh_gray2binary
+	   GENERIC (size: INTEGER := 8);
+	   PORT(	
+		   G   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);	-- gray code in
+		   B   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0) -- binary value out
+		);
    end component;
    
    type   roic_cfg_fsm_type is (idle, check_done_st, rqst_st, cfg_io_st, check_init_st, send_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_reg_st, pause_st);
@@ -83,10 +91,11 @@ architecture rtl of scorpiomwA_window_reg is
    signal reprog_cnt          : unsigned(3 downto 0);
    signal error_i             : std_logic;
    signal fpa_error_i         : std_logic;
-   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num     : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal present_cfg_num     : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_gray    : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_bin     : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
-   signal new_cfg_num_sync    : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    --0-signal 
    
    --   attribute KEEP : string;
@@ -118,13 +127,20 @@ begin
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);
    
    --------------------------------------------------
-   --  cfg_num
+   -- Sync Gray cfg_num 
    --------------------------------------------------
    U1B : double_sync_vector  
    port map(
       D => std_logic_vector(FPA_INTF_CFG.CFG_NUM),
-      Q => new_cfg_num_sync,
+      Q => new_cfg_num_gray,
       CLK => CLK); 
+
+   --------------------------------------------------
+   -- Decodage Gray de cfg_num
+   --------------------------------------------------
+   U1C : gh_gray2binary
+      generic map (size => FPA_INTF_CFG.CFG_NUM'length) 
+	   port map (G => new_cfg_num_gray, B => new_cfg_num_bin);
    
    --------------------------------------------------
    --  cfg_num
@@ -134,7 +150,7 @@ begin
    begin
       if rising_edge(CLK) then 
          
-         new_cfg_num <= unsigned(new_cfg_num_sync);
+         new_cfg_num <= unsigned(new_cfg_num_bin);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then

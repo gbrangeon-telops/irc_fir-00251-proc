@@ -66,12 +66,13 @@ package FPA_define is
    constant DEFINE_FPA_MCLK3_ID                   : integer   := 3;
    constant DEFINE_FPA_MCLK_NUM                   : integer   := 4;               
    constant DEFINE_FPA_MASTER_CLK_SOURCE_FACTOR   : integer   := 8;
-   constant DEFINE_FPA_NOMINAL_MCLK_RATE_HZ       : integer   := 17_500_000;  -- vitesse nominale 
+   constant DEFINE_FPA_NOMINAL_MCLK_RATE_HZ       : integer   := 17_500_000;  -- vitesse nominale
    constant DEFINE_FPA_MCLK1_RATE_HZ              : integer   := integer(8.0/12.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 1ere cadence non-nominale d'opération 
-   constant DEFINE_FPA_MCLK2_RATE_HZ              : integer   := integer(8.0/7.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 2e   cadence non-nominale d'opération
+   constant DEFINE_FPA_MCLK2_RATE_HZ              : integer   := integer(8.0/6.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 2e   cadence non-nominale d'opération
    constant DEFINE_FPA_MCLK3_RATE_HZ              : integer   := integer(1.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 3e   cadence non-nominale d'opération
    constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ  : integer   := DEFINE_FPA_MASTER_CLK_SOURCE_FACTOR*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ;  -- choisi judicieusement en fonction du ppcm des horloges
-   
+   constant DEFINE_FPA_FAST_MCLK_RATE_HZ          : integer   := DEFINE_FPA_MCLK2_RATE_HZ;  -- vitesse fast
+  
    -- generation des infos d'horloge
    -- position 0     -> FPA_NOMINAL_MCLK 
    -- position 1     -> FPA_MCLK1
@@ -79,7 +80,8 @@ package FPA_define is
    -- position 3     -> FPA_MCLK3
    -- mettre 0 comme valeur aux positions non utilisées 
    constant DEFINE_FPA_CLK_INFO                   : fpa_clk_info_type := gen_fpa_clk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, DEFINE_FPA_MCLK3_RATE_HZ, DEFINE_FPA_MCLK2_RATE_HZ, DEFINE_FPA_MCLK1_RATE_HZ, DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- mettre 0 comme valeur aux positions non utilisées 
-   constant DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ      : real   := real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)/1000.0; 
+   constant DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ      : real   := real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)/1000.0;  
+   constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real   := real(DEFINE_FPA_FAST_MCLK_RATE_HZ)/1000.0;  
    constant DEFINE_FPA_INTCLK_RATE_KHZ            : real   := DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ;  -- l'horloge d'integration
    ------------------------------------------------------------
    -- misc
@@ -271,10 +273,22 @@ package FPA_define is
       -- les valeurs Vdac                 
       vdac_value                          : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)
       
-      -- adc clk_phase                    
-      adc_clk_source_phase                : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs
-      adc_clk_pipe_sel                    : unsigned(7 downto 0);
-      
+      -- Quad1 clk_phase                    
+      adc_clk_source_phase1               : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs
+      adc_clk_pipe_sel1                   : unsigned(7 downto 0);
+
+      -- Quad2 clk_phase                    
+      adc_clk_source_phase2               : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs
+      adc_clk_pipe_sel2                   : unsigned(7 downto 0);
+
+      -- Quad3 clk_phase                    
+      adc_clk_source_phase3               : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs
+      adc_clk_pipe_sel3                   : unsigned(7 downto 0);  
+
+      -- Quad4 clk_phase                    
+      adc_clk_source_phase4               : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs
+      adc_clk_pipe_sel4                   : unsigned(7 downto 0);  
+
       -- electronique de proximité
       proxim_is_flegx                     : std_logic;
       
@@ -286,10 +300,6 @@ package FPA_define is
       spare1a                             : std_logic_vector(7 downto 0);
       spare1c                             : std_logic_vector(7 downto 0);
       spare2a                             : std_logic_vector(7 downto 0);
-      spare2b                             : std_logic_vector(7 downto 0);
-      spare2c                             : std_logic_vector(7 downto 0); 
-      spare3a                             : std_logic_vector(7 downto 0); 
-      spare3b                             : std_logic_vector(7 downto 0); 
       spare3c                             : std_logic_vector(7 downto 0); 
       
       -- boost mode
@@ -349,11 +359,7 @@ package FPA_define is
       mclk1_id_sample_pos                 : unsigned(3 downto 0);
       mclk2_id_sample_pos                 : unsigned(3 downto 0);
       mclk3_id_sample_pos                 : unsigned(3 downto 0);
-      
-      -- spare
-      spare4a                             : std_logic_vector(31 downto 0);
-      spare4b                             : std_logic; 
-      
+     
       -- pour imposer un echantillon par pixel
       single_samp_mode_en                 : std_logic; 
       

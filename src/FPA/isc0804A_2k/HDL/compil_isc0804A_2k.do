@@ -21,7 +21,10 @@ do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 # sources FPA common
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\native_to_axil32.vhd
 do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do
-do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd2\compil_fastrd2_common.do
+do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd2\compil_fastrd2_common.do	 
+
+# source PLL DRP Controler
+do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\pll_drp_ctrler\compile_pll_drp_ctrler.do
 
 #acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_min_max_ctrl.vhd
 #acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_high_duration.vhd

@@ -76,6 +76,7 @@
 #define FPA_NOMINAL_MCLK_RATE_HZ       17500000
 
 #define FPA_MCLK_RATE_HZ               FPA_NOMINAL_MCLK_RATE_HZ          //5500000     //11100000          //11880000          //5000000    //11100000          // le master clock du FPA
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec] , one pixel per mclk edges (DDR) 
 
@@ -153,15 +154,15 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  good_samp_first_pos_per_ch            ;     
    uint32_t  good_samp_last_pos_per_ch             ;     
    
-   uint32_t  adc_clk_source_phase                  ;     
-   uint32_t  adc_clk_pipe_sel                      ;     
+   uint32_t  adc_clk_source_phase1                 ;
+   uint32_t  adc_clk_pipe_sel1                     ;
    uint32_t  spare2a                               ;     
    
    uint32_t  lsydel_mclk                           ;     
    uint32_t  boost_mode                            ;     
    uint32_t  speedup_lsydel                        ;     
-   uint32_t  spare2b                               ;     
-   uint32_t  spare2c                               ;     
+   uint32_t  adc_clk_source_phase2                 ;
+   uint32_t  adc_clk_pipe_sel2                     ;
    
    uint32_t  elcorr_enabled                        ;     
    uint32_t  elcorr_spare1                         ;     
@@ -195,14 +196,14 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  cfg_num                               ;     
    uint32_t  elcorr_spare4                         ;     
    uint32_t  roic_cst_output_mode                  ;     
-   uint32_t  spare3a                               ;
-   uint32_t  spare3b                               ;
+   uint32_t  adc_clk_source_phase3                 ;
+   uint32_t  adc_clk_pipe_sel3                     ;
    uint32_t  spare3c                               ;
    uint32_t  roic_dbg_reg                          ;     
    uint32_t  roic_test_row_en                      ;     
    
-   uint32_t  spare4a                               ;
-   uint32_t  spare4b                               ;
+   uint32_t  adc_clk_source_phase4                 ;
+   uint32_t  adc_clk_pipe_sel4                     ;
    
    uint32_t  single_samp_mode_en                   ;
    uint32_t  nominal_clk_id_sample_pos             ;

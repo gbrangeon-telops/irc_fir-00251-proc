@@ -58,6 +58,14 @@ architecture rtl of suphawkA_mblaze_intf is
          CLK : in std_logic);
    end component;
    
+   component gh_binary2gray
+     GENERIC (size: INTEGER := 8);
+	  PORT(	
+         B   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+		 G   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0)
+       );
+   end component;
+   
    type exp_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
    type exp_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
@@ -86,6 +94,8 @@ architecture rtl of suphawkA_mblaze_intf is
    signal update_cfg                   : std_logic;
    signal user_cfg_in_progress         : std_logic := '0';
    signal user_cfg_i                   : fpa_intf_cfg_type;
+   signal cfg_num_bin_i                : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others => '0');
+   signal cfg_num_gray_i               : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal int_dval_i                   : std_logic := '0';
    signal int_time_i                   : unsigned(31 downto 0);
    signal int_indx_i                   : std_logic_vector(7 downto 0);
@@ -169,7 +179,14 @@ begin
    STATUS_MOSI.ARVALID <= MB_MOSI.ARVALID;
    STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts 
    STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT; 
-   STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;    
+   STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;
+   
+   -------------------------------------------------  
+   -- Encodage Gray du # de config
+   -------------------------------------------------   
+   U3A : gh_binary2gray
+     generic map (size => USER_CFG.CFG_NUM'length) 
+     port map (B => cfg_num_bin_i, G => cfg_num_gray_i);
    
    -------------------------------------------------  
    -- reception Config                                
@@ -205,6 +222,8 @@ begin
             
             -- 
             user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);  -- isc0209A
+            
+            user_cfg_i.cfg_num <= unsigned(cfg_num_gray_i);
             
             -- diag 
             user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
@@ -357,7 +376,7 @@ begin
                   when X"19C" =>    user_cfg_i.sideband_cancel_en              <= data_i(0); 
                   when X"1A0" =>    user_cfg_i.spare4                          <= unsigned(data_i(user_cfg_i.spare4'length-1 downto 0)); 
 				  
-                  when X"1A4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
+                  when X"1A4" =>    cfg_num_bin_i                              <= std_logic_vector(unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)));                  
                   
                   when X"1A8" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val_enabled    <= data_i(0);
                   when X"1AC" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).forced_val'length-1 downto 0));

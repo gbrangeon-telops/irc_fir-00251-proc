@@ -46,7 +46,7 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
 acom D:\Telops\FIR-00251-Proc\IP\325\ip_axis32_merge_axis64\ip_axis32_merge_axis64_sim_netlist.vhdl 
 
-acom D:\Telops\FIR-00251-Proc\IP\325\isc0804A_17_5_MHz_mmcm_v2\isc0804A_17_5_MHz_mmcm_v2_sim_netlist.vhdl 
+acom D:\Telops\FIR-00251-Proc\IP\325\isc0804A_17_5_MHz_mmcm_v3\isc0804A_17_5_MHz_mmcm_v3_sim_netlist.vhdl 
 
 acom D:\Telops\FIR-00251-Proc\IP\325\dp_ram_byte_w32_d64\dp_ram_byte_w32_d64_sim_netlist.vhdl 
 
@@ -112,15 +112,19 @@ asim -ses isc0804A_2k_intf_testbench_TB
 --wave UUT/U1/U5/U2/* 
 
 -- status
-wave UUT/U1/U6/* 
+--wave UUT/U1/U6/* 
+
+-- afpa hw driver controller
+--wave UUT/U1/U5/U4/* 
 
 -- readout controller
-wave UUT/U1/U5/U5/* 
+--wave UUT/U1/U5/U5/* 
 
 -- clocks_gen
-#wave UUT/U1/U26/U1/* 
---wave UUT/U1/U26/U2/* 
---wave UUT/U1/U26/U1/* 
+wave UUT/U1/U26/U2/* 
+wave UUT/U1/U26/U2/U2/* 
+wave UUT/U1/U26/U2/U3/* 
+wave UUT/U1/U26/U1/* 
 wave UUT/U1/U26/*
 
 --wave UUT/U1/U5/U4/* 
@@ -200,6 +204,6 @@ wave UUT/U1/U26/*
 #wave UUT/U1/U25/U1/U1/*
 
 wave UUT/U1/*
-run 100 ms
---run 30 ms  
+--run 100 ms
+run 10 ms  
 --9.1 ms

@@ -249,7 +249,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaVCMO_mV;
    static uint16_t presentFpaVCMO_mV = XRO3503_VCMO_DEFAULT_mV;
    extern uint8_t gFpaSubWindowMode;
-   static uint8_t cfg_num = 0;
+   static uint8_t cfg_num;
    //static uint32_t presentSensorWellDepth = 0;
 
    // on bâtit les parametres specifiques
@@ -396,10 +396,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_temp_pwroff_correction = FPA_TEMP_PWROFF_CORRECTION;
 
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;
-   cfg_num++;
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num  = ++cfg_num;
    
    // cropping
    // le compteur de position démarre à 1 avec le SOL du readout et incrémente de 1 à chaque transaction du bus de 4 pixels (d'où les divisions par 4).

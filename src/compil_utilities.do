@@ -18,4 +18,5 @@ acom -nowarn DAGGEN_0523 -incr \
  D:\Telops\Common_HDL\Utilities\Clk_Divider_Async.vhd \
  D:\telops\Common_HDL\gh_vhdl_lib\memory\gh_fifo_async_sr.vhd \
  D:\telops\Common_HDL\Utilities\data_cdc_sync.vhd \
- D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_binary2gray.vhd
+ D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_binary2gray.vhd \
+ D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_gray2binary.vhd

@@ -295,7 +295,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    uint32_t elcorr_ref1_const = 1;
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
-   static uint8_t cfg_num = 0; 
+   static uint8_t cfg_num;
 
    // on bâtit les parametres specifiques du isc0209
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
@@ -691,12 +691,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_atemp_ofs  = (int32_t)elcorr_atemp_ofs;
 
    
-       // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;
-   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
+   ptrA->cfg_num  = ++cfg_num;
    
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);

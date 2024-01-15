@@ -59,6 +59,14 @@ architecture rtl of isc0804A_2k_mblaze_intf is
          CLK : in std_logic);
    end component;
    
+   component gh_binary2gray
+     GENERIC (size: INTEGER := 8);
+	  PORT(	
+         B   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+		 G   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0)
+       );
+   end component;
+   
    type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(7 downto 0);
    type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
@@ -85,7 +93,9 @@ architecture rtl of isc0804A_2k_mblaze_intf is
    --signal permit_inttime_change        : std_logic;
    signal update_cfg                   : std_logic;
    signal user_cfg_in_progress         : std_logic := '0';
-   signal user_cfg_i                   : fpa_intf_cfg_type;
+   signal user_cfg_i                   : fpa_intf_cfg_type; 
+   signal cfg_num_bin_i                : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others => '0');
+   signal cfg_num_gray_i               : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal int_dval_i                   : std_logic := '0';
    signal int_time_i                   : unsigned(31 downto 0);
    signal int_indx_i                   : std_logic_vector(7 downto 0);
@@ -174,11 +184,18 @@ begin
    STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts 
    STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT; 
    STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;    
+
+   -------------------------------------------------  
+   -- Encodage Gray du # de config
+   -------------------------------------------------   
+   U3A : gh_binary2gray
+     generic map (size => USER_CFG.CFG_NUM'length) 
+     port map (B => cfg_num_bin_i, G => cfg_num_gray_i);
    
    -------------------------------------------------  
    -- reception Config                                
    -------------------------------------------------   
-   U3: process(MB_CLK)
+   U3B: process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
@@ -195,6 +212,8 @@ begin
          else                   
             
             user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
+            
+            user_cfg_i.cfg_num <= unsigned(cfg_num_gray_i);
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;            
             
@@ -290,17 +309,19 @@ begin
                   when X"0DC" =>    user_cfg_i.good_samp_first_pos_per_ch              <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0));                                                                                                                           
                   when X"0E0" =>    user_cfg_i.good_samp_last_pos_per_ch               <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
                      
-                  -- quads                                                                                        
-                  when X"0E4" =>    user_cfg_i.adc_clk_source_phase                    <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
-                  when X"0E8" =>    user_cfg_i.adc_clk_pipe_sel                        <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
+                  -- quad1                                                                                        
+                  when X"0E4" =>    user_cfg_i.adc_clk_source_phase1                   <= unsigned(data_i(user_cfg_i.adc_clk_source_phase1'length-1 downto 0));
+                  when X"0E8" =>    user_cfg_i.adc_clk_pipe_sel1                       <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel1'length-1 downto 0));
                   when X"0EC" =>    user_cfg_i.spare2a                                 <= data_i(user_cfg_i.spare2a'length-1 downto 0);
                      
                   -- fast windowing                                                   
                   when X"0F0" =>    user_cfg_i.lsydel_mclk                             <= unsigned(data_i(user_cfg_i.lsydel_mclk'length-1 downto 0));                                                                                                                                       
                   when X"0F4" =>    user_cfg_i.boost_mode                              <= (data_i(user_cfg_i.boost_mode'length-1 downto 0));  
                   when X"0F8" =>    user_cfg_i.speedup_lsydel                          <= data_i(0); 
-                  when X"0FC" =>    user_cfg_i.spare2b                                 <= data_i(user_cfg_i.spare2b'length-1 downto 0); 
-                  when X"100" =>    user_cfg_i.spare2c                                 <= data_i(user_cfg_i.spare2c'length-1 downto 0); 
+
+                  -- quad2
+                  when X"0FC" =>    user_cfg_i.adc_clk_source_phase2                   <= unsigned(data_i(user_cfg_i.adc_clk_source_phase2'length-1 downto 0));
+                  when X"100" =>    user_cfg_i.adc_clk_pipe_sel2                       <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel2'length-1 downto 0));
                      
                   -- electrical correction                                            
                   when X"104" =>    user_cfg_i.elcorr_enabled                          <= data_i(0);
@@ -332,17 +353,21 @@ begin
                   when X"160" =>    user_cfg_i.elcorr_spare3                           <= data_i(0);                                             
                   
                   when X"164" =>    user_cfg_i.sat_ctrl_en                             <= data_i(0); 
-                  when X"168" =>    user_cfg_i.cfg_num                                 <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
+                  when X"168" =>    cfg_num_bin_i                                      <= std_logic_vector(unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)));
                   when X"16C" =>    user_cfg_i.elcorr_spare4                           <= data_i(0); 
                   when X"170" =>    user_cfg_i.roic_cst_output_mode                    <= data_i(0);                  
-                  when X"174" =>    user_cfg_i.spare3a                                 <= data_i(user_cfg_i.spare3a'length-1 downto 0);
-                  when X"178" =>    user_cfg_i.spare3b                                 <= data_i(user_cfg_i.spare3b'length-1 downto 0);
+
+                  -- quad3
+                  when X"174" =>    user_cfg_i.adc_clk_source_phase3                   <= unsigned(data_i(user_cfg_i.adc_clk_source_phase3'length-1 downto 0));
+                  when X"178" =>    user_cfg_i.adc_clk_pipe_sel3                       <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel3'length-1 downto 0));
+
                   when X"17C" =>    user_cfg_i.spare3c                                 <= data_i(user_cfg_i.spare3c'length-1 downto 0);
                   when X"180" =>    user_cfg_i.roic_dbg_reg                            <= data_i(user_cfg_i.roic_dbg_reg'length-1 downto 0); 
                   when X"184" =>    user_cfg_i.roic_test_row_en                        <= data_i(0);
                   
-                  when X"188" =>    user_cfg_i.spare4a                                 <= data_i(user_cfg_i.spare4a'length-1 downto 0);
-                  when X"18C" =>    user_cfg_i.spare4b                                 <= data_i(0);                  
+                  -- quad4
+                  when X"188" =>    user_cfg_i.adc_clk_source_phase4                   <= unsigned(data_i(user_cfg_i.adc_clk_source_phase4'length-1 downto 0));
+                  when X"18C" =>    user_cfg_i.adc_clk_pipe_sel4                       <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel4'length-1 downto 0));
                   
                   -- single sample mode
                   when X"190" =>    user_cfg_i.single_samp_mode_en                     <= data_i(0);

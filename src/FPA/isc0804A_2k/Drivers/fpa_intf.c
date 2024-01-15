@@ -97,7 +97,7 @@
 
 
 // horloges des zones FASTRD
-#define FAST_CLK_FACTOR                      (8.0/7.0)  // facteur multiplicatif de l'horloge détecteur
+#define FAST_CLK_FACTOR                      (8.0/6.0)  // facteur multiplicatif de l'horloge détecteur
 #define ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ    (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)                  // horloge rapide de la zone en question lorsqu,on active le fastwd
 #define ROIC_SAMPLE_ROW_FAST_CLK_RATE_HZ     (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)    // horloge rapide de la zone en question lorsqu,on active le fastwd
 #define ROIC_LSYNC_FAST_CLK_RATE_HZ          (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)    // horloge rapide de la zone en question lorsqu,on active le fastwd
@@ -132,7 +132,7 @@
 
 #define TOTAL_DAC_NUM                     8            // 8 dac au total
 
-#define ISC0804_FASTWINDOW_STRECTHING_AREA_MCLK  2
+#define ISC0804_2K_FASTWINDOW_STRECTHING_AREA_MCLK  1
 
 // Electrical correction : references
 #define ELCORR_REF1_VALUE_mV              2227                // ref0 au milieu de la plage dynamique
@@ -184,10 +184,17 @@
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19
 
 // Déphasage des ADC
-#define ISC0804_DEFAULT_REGC             3
-#define ISC0804_DEFAULT_REGD             28
-#define ISC0804_LN2_DEFAULT_REGD         28
-#define ISC0804_DEFAULT_REGF             18
+#define ISC0804_DEFAULT_REGC             0  // déphasage grossier quad1
+#define ISC0804_DEFAULT_REGH             1  // déphasage grossier quad2
+#define ISC0804_DEFAULT_REGJ             1  // déphasage grossier quad3
+#define ISC0804_DEFAULT_REGL             1  // déphasage grossier quad4
+#define ISC0804_DEFAULT_REGD             2  // déphasage fin quad1
+#define ISC0804_DEFAULT_REGI             10  // déphasage fin quad2
+#define ISC0804_DEFAULT_REGK             10  // déphasage fin quad3
+#define ISC0804_DEFAULT_REGM             20  // déphasage fin quad4
+
+// Déphasage de ligne
+#define ISC0804_DEFAULT_REGF             16
 
 #define ISC0804_BITSTREAM_FG   53696343  // bitstream ROIC standard de ForrestGump pour M1k
 #define ISC0804_BITSTREAM_FAST 322131831 // bitstream ROIC avec meilleur slew rate (M2k UD)
@@ -200,15 +207,17 @@
 
 #define DEFINE_FPA_NOMINAL_MCLK_RATE_HZ      FPA_NOMINAL_MCLK_RATE_HZ
 #define DEFINE_DEFINE_FPA_MCLK1_RATE_HZ      (8.0/12.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
-#define DEFINE_DEFINE_FPA_MCLK2_RATE_HZ      (8.0/7.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
+#define DEFINE_DEFINE_FPA_MCLK2_RATE_HZ      (FAST_CLK_FACTOR*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
 #define DEFINE_DEFINE_FPA_MCLK3_RATE_HZ      (1.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
 
 #define LINE_PAUSE                1.0F
+#define OVH_LINES_NUM             2.0F
 
 #define DYNAMIC_RANGE_DIV_BIT_POS                  21     // précision fractionnaire
 #define DYNAMIC_RANGE_SCALER_SATURATION_LEVEL      16000  // niveau de restauration des données sur le modèle M2K-UD
 #define DYNAMIC_RANGE_CLIPPING_LEVEL               8191   //8000  // niveau d'ecretage des donnnées du modèle M2K-UD
 #define DYNAMIC_RANGE_GLOBAL_OFFSET                0      //1675   // offset de base
+
 
 struct s_ProximCfgConfig 
 {   
@@ -248,10 +257,9 @@ struct isc0804_2k_param_s             //
    
    // parametrage du fastwindowing
    float lsydel_clock_factor;
-   float sample_row_clock_factor;
+   float ovh_lines_clock_factor;
    float lsync_clock_factor;
-   float remaining_lovh_clock_factor;
-   float unused_area_clock_factor;
+   float raw_area_clock_factor;
    
    // misc
    float readout_mclk;
@@ -298,11 +306,10 @@ t_FpaStatus gStat;
 
 
 // definition et activation des accelerateurs
-uint8_t speedup_lsydel;      // les speed_up n'ont que deux valeurs : 0 ou 1
-uint8_t speedup_sample_row; 
-uint8_t speedup_lsync;
-uint8_t speedup_remaining_lovh;
-uint8_t speedup_unused_area;
+uint8_t speedup_lsydel = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
+uint8_t speedup_ovh_lines = 1;
+uint8_t speedup_lsync = 0; // Les LSYNC de la user area ne sont pas accélérés.
+uint8_t speedup_raw_area = 1;
 uint32_t roic_xsize = (uint32_t)FPA_WIDTH_MAX;
 
 // Prototypes fonctions internes
@@ -375,12 +382,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
    extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe 
-   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
-   extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
+   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk du quad1
+   extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk du quad1
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                         // clipping level
-   //extern int32_t gFpaDebugRegH;                       // non utilisé
+   extern int32_t gFpaDebugRegH;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk du quad2
+   extern int32_t gFpaDebugRegI;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk du quad2
+   extern int32_t gFpaDebugRegJ;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk du quad3
+   extern int32_t gFpaDebugRegK;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk du quad3
+   extern int32_t gFpaDebugRegL;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk du quad4
+   extern int32_t gFpaDebugRegM;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk du quad4
+
    uint32_t elcorr_reg;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
@@ -399,8 +412,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
    float dynrange_factor;
-   static uint8_t cfg_num = 0; 
-   static uint8_t roic_dbg_reg_unlocked = 0;
+   static uint8_t cfg_num;
+   static uint8_t roic_dbg_reg_unlocked;
    
    // on bâtit les parametres specifiques du 0804
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -477,9 +490,21 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->roic_test_row_en = 0;
  
    // speedup_lsydel et autres ont été déjà assignés dans FPA_SpecificParams qui est déjà appelé au debut de la fonction FPA_SendConfigGC 
-   ptrA->speedup_lsydel            = 0;
-  
-   // raw area 
+   ptrA->speedup_lsydel            = 1;
+
+   /* General info regarding area definition (configuration of the readout controller)
+   * 1. For the current implementation, fpa mclk can be 2 differents frequency (nominal mclk & fast mclk)
+   * 2. Clock area index are defined in pclk (pclk index = [1,2,...,42]). There is 2 pclk cycles for each mclk. ROIC always output line on 21 mclk.
+   * 3. LSYNC is located at pclk index 1 & 2
+   * 4. Inside one line, there is 2 differents clock area (raw area & user area). Raw area is accelerated on fast mclk. User area work on nominal mclk
+   * 5. Each readout has M + 2 lines of 21 mclk cycle (M = pGCRegs->Height)
+   * 6. The 2 overhead lines are not part of the raw area, but are still accelerated on the fast mclk (except the LSYNC).
+   * 7. All LSYNC of the M + 2 lines are not accelerated (alway on nominal clk).
+   * 8. In full window, the raw area equal the user area.
+   * 9. Lsydel delay is accelerated on fast mclk but is not part of the raw area.
+   *  */
+
+   // Raw area (fast mclk domain)
    ptrA->raw_area_line_start_num          = 2;
    ptrA->raw_area_line_end_num            = (uint32_t)hh.roic_ysize + ptrA->raw_area_line_start_num - 1;
    ptrA->raw_area_line_period_pclk        = ((uint32_t)hh.roic_xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
@@ -491,31 +516,31 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->raw_area_lsync_start_posl_pclk   = 1;
    ptrA->raw_area_lsync_end_posl_pclk     = 2;
    ptrA->raw_area_lsync_num               = (uint32_t)hh.roic_ysize + 2;   
-   ptrA->raw_area_clk_id                  = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+   ptrA->raw_area_clk_id                  = (uint32_t)VHD_DEFINE_FPA_MCLK2_ID;
    
-   // user area 
+   // user area (nominal mclk domain)
    ptrA->user_area_line_start_num         = ptrA->raw_area_line_start_num;
    ptrA->user_area_line_end_num           = (uint32_t)pGCRegs->Height + ptrA->user_area_line_start_num - 1;
-   ptrA->user_area_sol_posl_pclk          = (((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2)/FPA_NUMTAPS + 1;
+   ptrA->user_area_sol_posl_pclk          = (((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2)/FPA_NUMTAPS + 3;
    ptrA->user_area_eol_posl_pclk          = ptrA->user_area_sol_posl_pclk + ((uint32_t)pGCRegs->Width/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk - 1;
    ptrA->user_area_clk_id                 = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    
-   // definition de la zone a. Zone additionnelle de changement d'horloge
+   // Stretching of the user area by one mclk cycle to account for fpa pipe delay.
    ptrA->clk_area_a_line_start_num        = ptrA->user_area_line_start_num;
    ptrA->clk_area_a_line_end_num          = ptrA->user_area_line_end_num;
-   ptrA->clk_area_a_sol_posl_pclk         = ptrA->user_area_sol_posl_pclk;
-   ptrA->clk_area_a_eol_posl_pclk         = ptrA->user_area_eol_posl_pclk;
+   ptrA->clk_area_a_sol_posl_pclk         = MIN( ptrA->user_area_eol_posl_pclk + 1 , ptrA->raw_area_line_period_pclk - 1);
+   ptrA->clk_area_a_eol_posl_pclk         = ptrA->clk_area_a_sol_posl_pclk + 1;
    ptrA->clk_area_a_clk_id                = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    ptrA->clk_area_a_spare                 = 0;
    
-   // definition de la zone b. Zone additionnelle de changement d'horloge
-   ptrA->clk_area_b_line_start_num        = ptrA->user_area_line_start_num;
-   ptrA->clk_area_b_line_end_num          = ptrA->user_area_line_end_num;  
-   ptrA->clk_area_b_sol_posl_pclk         = ptrA->user_area_sol_posl_pclk;
-   ptrA->clk_area_b_eol_posl_pclk         = ptrA->user_area_eol_posl_pclk;
+   // Overriding of LSYNC frequency with nominal mclk (LSYNC is always on nominal mlck even for the 2 overhead lines)
+   ptrA->clk_area_b_line_start_num        = ptrA->raw_area_line_start_num - 1;
+   ptrA->clk_area_b_line_end_num          = ptrA->raw_area_line_end_num + 1;
+   ptrA->clk_area_b_sol_posl_pclk         = ptrA->raw_area_lsync_start_posl_pclk;
+   ptrA->clk_area_b_eol_posl_pclk         = ptrA->raw_area_lsync_end_posl_pclk;
    ptrA->clk_area_b_clk_id                = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    ptrA->clk_area_b_spare                 = 0;
- 
+
    // nombre d'échantillons par canal  de carte ADC
    ptrA->pix_samp_num_per_ch           = (uint32_t)((float)ADC_SAMPLING_RATE_HZ/(hh.pclk_rate_hz));
    
@@ -567,18 +592,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // adc clk source phase
    if (sw_init_done == 0){
       gFpaDebugRegC = ISC0804_DEFAULT_REGC;
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas du LN2
-         gFpaDebugRegC = ISC0804_DEFAULT_REGC;
+      gFpaDebugRegH = ISC0804_DEFAULT_REGH;
+      gFpaDebugRegJ = ISC0804_DEFAULT_REGJ;
+      gFpaDebugRegL = ISC0804_DEFAULT_REGL;
    }       
-   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
+   ptrA->adc_clk_pipe_sel1 = (uint32_t)gFpaDebugRegC;
+   ptrA->adc_clk_pipe_sel2 = (uint32_t)gFpaDebugRegH;
+   ptrA->adc_clk_pipe_sel3 = (uint32_t)gFpaDebugRegJ;
+   ptrA->adc_clk_pipe_sel4 = (uint32_t)gFpaDebugRegL;
    
    // adc clk source phase
    if (sw_init_done == 0){         
-      gFpaDebugRegD = ISC0804_DEFAULT_REGD; //179200;
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas du LN2
-         gFpaDebugRegD = ISC0804_LN2_DEFAULT_REGD;
+      gFpaDebugRegD = ISC0804_DEFAULT_REGD;
+      gFpaDebugRegI = ISC0804_DEFAULT_REGI;
+      gFpaDebugRegK = ISC0804_DEFAULT_REGK;
+      gFpaDebugRegM = ISC0804_DEFAULT_REGM;
    }
-   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
+   ptrA->adc_clk_source_phase1 = (uint32_t)gFpaDebugRegD;
+   ptrA->adc_clk_source_phase2 = (uint32_t)gFpaDebugRegI;
+   ptrA->adc_clk_source_phase3 = (uint32_t)gFpaDebugRegK;
+   ptrA->adc_clk_source_phase4 = (uint32_t)gFpaDebugRegM;
          
    // autres
    ptrA->lsydel_mclk  = (uint32_t)(hh.lsydel_mclk - 1.0F);  // ajustement tenant compte des delais de chaine vhd   
@@ -823,10 +856,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num  = ++cfg_num;
    
    // mode single sample
    ptrA->nominal_clk_id_sample_pos    = MAX(MIN((uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)(2*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ), 1000), 1);
@@ -910,14 +940,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF(" ptrA->vgood_samp_mean_numerator             =  %d", (int32_t)( ptrA->vgood_samp_mean_numerator              ) );
       FPA_PRINTF(" ptrA->good_samp_first_pos_per_ch            =  %d", (int32_t)( ptrA->good_samp_first_pos_per_ch             ) );
       FPA_PRINTF(" ptrA->good_samp_last_pos_per_ch             =  %d", (int32_t)( ptrA->good_samp_last_pos_per_ch              ) );
-      FPA_PRINTF(" ptrA->adc_clk_source_phase                  =  %d", (int32_t)( ptrA->adc_clk_source_phase                   ) );
-      FPA_PRINTF(" ptrA->adc_clk_pipe_sel                      =  %d", (int32_t)( ptrA->adc_clk_pipe_sel                       ) );
+      FPA_PRINTF(" ptrA->adc_clk_source_phase1                 =  %d", (int32_t)( ptrA->adc_clk_source_phase1                  ) );
+      FPA_PRINTF(" ptrA->adc_clk_pipe_sel1                     =  %d", (int32_t)( ptrA->adc_clk_pipe_sel1                      ) );
       FPA_PRINTF(" ptrA->spare2a                               =  %d", (int32_t)( ptrA->spare2a                                ) );
       FPA_PRINTF(" ptrA->lsydel_mclk                           =  %d", (int32_t)( ptrA->lsydel_mclk                            ) );
       FPA_PRINTF(" ptrA->boost_mode                            =  %d", (int32_t)( ptrA->boost_mode                             ) );
       FPA_PRINTF(" ptrA->speedup_lsydel                        =  %d", (int32_t)( ptrA->speedup_lsydel                         ) );
-      FPA_PRINTF(" ptrA->spare2b                               =  %d", (int32_t)( ptrA->spare2b                                ) );
-      FPA_PRINTF(" ptrA->spare2c                               =  %d", (int32_t)( ptrA->spare2c                                ) );
+      FPA_PRINTF(" ptrA->adc_clk_source_phase2                 =  %d", (int32_t)( ptrA->adc_clk_source_phase2                  ) );
+      FPA_PRINTF(" ptrA->adc_clk_pipe_sel2                     =  %d", (int32_t)( ptrA->adc_clk_pipe_sel2                      ) );
       FPA_PRINTF(" ptrA->elcorr_enabled                        =  %d", (int32_t)( ptrA->elcorr_enabled                         ) );
       FPA_PRINTF(" ptrA->elcorr_spare1                         =  %d", (int32_t)( ptrA->elcorr_spare1                          ) );
       FPA_PRINTF(" ptrA->elcorr_spare2                         =  %d", (int32_t)( ptrA->elcorr_spare2                          ) );
@@ -946,8 +976,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF(" ptrA->cfg_num                               =  %d", (int32_t)( ptrA->cfg_num                                ) );
       FPA_PRINTF(" ptrA->elcorr_spare4                         =  %d", (int32_t)( ptrA->elcorr_spare4                          ) );
       FPA_PRINTF(" ptrA->roic_cst_output_mode                  =  %d", (int32_t)( ptrA->roic_cst_output_mode                   ) );
+      FPA_PRINTF(" ptrA->adc_clk_source_phase3                 =  %d", (int32_t)( ptrA->adc_clk_source_phase3                  ) );
+      FPA_PRINTF(" ptrA->adc_clk_pipe_sel3                     =  %d", (int32_t)( ptrA->adc_clk_pipe_sel3                      ) );
       FPA_PRINTF(" ptrA->roic_dbg_reg                          =  %d", (int32_t)( ptrA->roic_dbg_reg                           ) );
       FPA_PRINTF(" ptrA->roic_test_row_en                      =  %d", (int32_t)( ptrA->roic_test_row_en                       ) );
+      FPA_PRINTF(" ptrA->adc_clk_source_phase4                 =  %d", (int32_t)( ptrA->adc_clk_source_phase4                  ) );
+      FPA_PRINTF(" ptrA->adc_clk_pipe_sel4                     =  %d", (int32_t)( ptrA->adc_clk_pipe_sel4                      ) );
       FPA_PRINTF(" ptrA->single_samp_mode_en                   =  %d", (int32_t)( ptrA->single_samp_mode_en                    ) );
       FPA_PRINTF(" ptrA->nominal_clk_id_sample_pos             =  %d", (int32_t)( ptrA->nominal_clk_id_sample_pos              ) );
       FPA_PRINTF(" ptrA->mclk1_id_sample_pos                   =  %d", (int32_t)( ptrA->mclk1_id_sample_pos                    ) );
@@ -1025,19 +1059,21 @@ void FPA_SpecificParams(isc0804_2k_param_t *ptrH, float exposureTime_usec, const
    ptrH->lovh_mclk               = LINE_PAUSE;    //1.0F;     // duree du lsync + line pause;
    ptrH->lsydel_mclk             = 144.0F;
    ptrH->vhd_delay_mclk          = 7.0F;
-   ptrH->adc_sync_dly_mclk       = 0.0625F;  // le coût par ligne de lecture du synchronisateur en coup de MCLK
+   ptrH->adc_sync_dly_mclk       = (float)FPA_MCLK_RATE_HZ/(float)ADC_SAMPLING_RATE_HZ;  // le coût maximal par ligne de lecture du synchronisateur en coup de MCLK
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
 
    /*--------------------- CALCULS-------------------------------------------------------------
       Attention aux modifs en dessous de cette ligne! Y bien réfléchir avant de les faire
    -----------------------------------------------------------------------------------------  */ 
+   speedup_ovh_lines               = 1; // Acceleration of the 2 overhead lines (first & last)
+   speedup_lsync                   = 0; // Acceleration of all lSYNC.
+   speedup_raw_area                = 1; // Acceleration of raw area
    
    // fast windowing
    ptrH->lsydel_clock_factor         =  MAX(1.0F, ((float)ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_lsydel);
-   ptrH->sample_row_clock_factor     =  MAX(1.0F, ((float)ROIC_SAMPLE_ROW_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_sample_row);
+   ptrH->ovh_lines_clock_factor     =  MAX(1.0F, ((float)ROIC_SAMPLE_ROW_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_ovh_lines);
    ptrH->lsync_clock_factor          =  MAX(1.0F, ((float)ROIC_LSYNC_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_lsync);
-   ptrH->remaining_lovh_clock_factor =  MAX(1.0F, ((float)ROIC_REMAINING_LOVH_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_remaining_lovh);
-   ptrH->unused_area_clock_factor    =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
+   ptrH->raw_area_clock_factor       =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_raw_area);
    ptrH->roic_xsize                  = (float)FPA_WIDTH_MAX;
    // fenetre qui sera demandée au ROIC du FPA
    //   if ((uint8_t)FPA_FORCE_CENTER == 1)
@@ -1048,45 +1084,41 @@ void FPA_SpecificParams(isc0804_2k_param_t *ptrH, float exposureTime_usec, const
    ptrH->roic_ystart    = (uint32_t)pGCRegs->OffsetY;
    ptrH->roic_ysize     = (float)pGCRegs->Height;
 
-   // revision conditionnelle des parametres
-   /*if ((float)pGCRegs->Width < (float)FPA_WIDTH_MAX) {
-      if (speedup_unused_area == 1)
-         ptrH->line_stretch_mclk = (float)ISC0804_FASTWINDOW_STRECTHING_AREA_MCLK;
+   // Stretching of the user area to account for ROIC pipe delay application (domain clock change on FPA_MCLK are applied with 1 cycle of delay).
+   if ((float)pGCRegs->Width < (float)FPA_WIDTH_MAX) {
+      if (speedup_raw_area == 1)
+         ptrH->line_stretch_mclk = (float)ISC0804_2K_FASTWINDOW_STRECTHING_AREA_MCLK;
       else
          ptrH->line_stretch_mclk = 0.0F;
    }
    else {
       ptrH->line_stretch_mclk = 0.0F;
-   }*/
-   ptrH->line_stretch_mclk = 0.0F;
+   }
       
    // readout time
-   // readout part 1 (zone usager)
+   // readout part 1 (user area): All user area (excluding LSYNC). Maximum of 20 Nominal MCLK cycles.
    ptrH->readout_mclk  = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*pGCRegs->Height;
 
-   // readout part 2 (fovh: ligne de test et autres)
-   ptrH->readout_mclk  += (ptrH->roic_xsize/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number))/ptrH->sample_row_clock_factor;
+   // readout part 2 (2 lines ovh) :  Overhead lines (first and last) are accelerated (excluding LSYNC)
+   ptrH->readout_mclk  += (OVH_LINES_NUM*ptrH->roic_xsize/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number))/ptrH->ovh_lines_clock_factor;
 
-   // readout part 3a (lovh lsync)
-   ptrH->readout_mclk  += ptrH->roic_ysize*(1.0F/ptrH->lsync_clock_factor);
+   // readout part 3 (lovh : lsync) : All LSYNC (including the one of first and last overhead line) are on nominal mclk (they are not accelerated)
+   ptrH->readout_mclk  += (ptrH->roic_ysize + OVH_LINES_NUM)*(1.0F/ptrH->lsync_clock_factor);
    
-   // readout part 3b (remaining lovh)
-   ptrH->readout_mclk  += ptrH->roic_ysize*(ptrH->lovh_mclk - 1.0F)/ptrH->remaining_lovh_clock_factor;  // on lance cet  accélerateur au besoin avec l'horologe rapide LSYNC
+   // readout part 4 (raw area) : This represent the accelerated area (only present in subwindow)
+   ptrH->readout_mclk  += (1.0F/ptrH->raw_area_clock_factor)*((ptrH->roic_xsize - pGCRegs->Width)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(ptrH->roic_ysize);
 
-   // readout part 4 (zone à rejeter)
-   ptrH->readout_mclk  += (1.0F/ptrH->unused_area_clock_factor)*((ptrH->roic_xsize - pGCRegs->Width)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(ptrH->roic_ysize);
-
-   // readout part 5 (coût du synchronisateur)
-   ptrH->readout_mclk  +=  ptrH->adc_sync_dly_mclk*pGCRegs->Height;
+   // readout part 5 fpa mclk is resynchronized on transition from raw area to user area. Resynchronisation can take up to maximum one "adc ref clock cycle" (half the period of the fast mclk)
+   ptrH->readout_mclk  +=  (ptrH->adc_sync_dly_mclk*pGCRegs->Height)/ptrH->raw_area_clock_factor;
    
    // readout en usec
    ptrH->readout_usec   = ptrH->readout_mclk * ptrH->mclk_period_usec;
-   
+
    // delay
-   ptrH->lsydel_usec         = (ptrH->lsydel_mclk/ptrH->lsydel_clock_factor) * ptrH->mclk_period_usec;   //
-   ptrH->fpa_delay_usec      = ptrH->lsydel_usec + ptrH->reset_time_usec + ptrH->int_time_offset_usec;
-   ptrH->vhd_delay_usec      = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->delay_usec          = ptrH->fpa_delay_usec + ptrH->vhd_delay_usec;
+   ptrH->lsydel_usec          = (ptrH->lsydel_mclk/ptrH->lsydel_clock_factor) * ptrH->mclk_period_usec; // lsydel delay is accelerated on fast mclk
+   ptrH->fpa_delay_usec       = ptrH->lsydel_usec + ptrH->reset_time_usec + ptrH->int_time_offset_usec;
+   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->delay_usec           = ptrH->fpa_delay_usec + ptrH->vhd_delay_usec;
    
    if (exposureTime_usec - ptrH->int_time_offset_usec >= 1.0F*ptrH->mclk_period_usec)
       ptrH->int_signal_high_time_usec = exposureTime_usec - ptrH->int_time_offset_usec;

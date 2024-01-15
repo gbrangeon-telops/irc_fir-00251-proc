@@ -38,15 +38,33 @@ architecture rtl of isc0209A_window_reg is
          );
    end component;
    
+   component double_sync_vector
+      port(
+         D : in std_logic_vector;
+         Q : out std_logic_vector;
+         CLK : in std_logic
+         );
+   end component;
+   
+   component gh_gray2binary
+	   GENERIC (size: INTEGER := 8);
+	   PORT(	
+		   G   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);	-- gray code in
+		   B   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0) -- binary value out
+		);
+   end component;
+   
    type   window_cfg_fsm_type is (idle, check_done_st, rqst_st, wait_end_st, update_reg_st);
    signal window_cfg_fsm      : window_cfg_fsm_type;  
    signal wind_rqst_i         : std_logic;
    signal wind_reg_i          : std_logic_vector(31 downto 0);
    signal new_wind_reg        : std_logic_vector(31 downto 0);
    signal sreset              : std_logic;
-   signal present_wind_reg     : std_logic_vector(31 downto 0);
-   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num      : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal present_wind_reg    : std_logic_vector(31 downto 0);
+   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal present_cfg_num     : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_gray    : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_bin     : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
 begin
@@ -61,6 +79,22 @@ begin
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
    
    --------------------------------------------------
+   -- Sync Gray cfg_num 
+   --------------------------------------------------
+   U1B : double_sync_vector  
+   port map(
+      D => std_logic_vector(FPA_INTF_CFG.CFG_NUM),
+      Q => new_cfg_num_gray,
+      CLK => CLK); 
+
+   --------------------------------------------------
+   -- Decodage Gray de cfg_num
+   --------------------------------------------------
+   U1C : gh_gray2binary
+      generic map (size => FPA_INTF_CFG.CFG_NUM'length) 
+	   port map (G => new_cfg_num_gray, B => new_cfg_num_bin);
+   
+   --------------------------------------------------
    --  cfg_num
    --------------------------------------------------
    -- ENO: 26 nov 2018: Pour eviter bugs , reprogrammer le ROIC, dès qu'une config est reçue du MB.
@@ -70,7 +104,7 @@ begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= FPA_INTF_CFG.CFG_NUM;    
+         new_cfg_num <= unsigned(new_cfg_num_bin);    
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then

@@ -99,6 +99,14 @@ architecture RTL of suphawkA_detector_ctrler is
          );
    end component;
    
+   component gh_gray2binary
+	   GENERIC (size: INTEGER := 8);
+	   PORT(	
+		   G   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);	-- gray code in
+		   B   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0) -- binary value out
+		);
+   end component;
+   
    type dcr_fsm_type is (idle, check_st, first_dcr_wr, wait_first_dcr_wr_end, first_pause_st, reg_wr_st, second_dcr_wr, wait_second_dcr_wr_end, second_pause_st, what_else_st, dcr_rqst_st);
    signal dcr_fsm        : dcr_fsm_type;
    signal reg_en         : std_logic_vector(2 downto 0);
@@ -113,9 +121,10 @@ architecture RTL of suphawkA_detector_ctrler is
    signal spi_done_last  : std_logic;
    signal dcr_drem       : std_logic_vector(3 downto 0);
    
-   signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal new_cfg_num_sync    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_gray    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_bin     : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
    
@@ -171,13 +180,20 @@ begin
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);
    
    --------------------------------------------------
-   -- Sync cfg_num
+   -- Sync Gray cfg_num 
    --------------------------------------------------
-   U3B : double_sync_vector  
+   U1B : double_sync_vector  
    port map(
       D => std_logic_vector(USER_CFG.CFG_NUM),
-      Q => new_cfg_num_sync,
+      Q => new_cfg_num_gray,
       CLK => CLK); 
+
+   --------------------------------------------------
+   -- Decodage Gray de cfg_num
+   --------------------------------------------------
+   U1C : gh_gray2binary
+      generic map (size => USER_CFG.CFG_NUM'length) 
+	   port map (G => new_cfg_num_gray, B => new_cfg_num_bin);
    
    --------------------------------------------------
    --  cfg_num
@@ -188,7 +204,7 @@ begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-		 new_cfg_num <= unsigned(new_cfg_num_sync);
+		 new_cfg_num <= unsigned(new_cfg_num_bin);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then

@@ -350,8 +350,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float elcorr_comp_duration_usec;                 // la duree en usec disponible pour la prise des references
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
-   static uint8_t cfg_num = 0; 
-   static uint8_t roic_dbg_reg_unlocked = 0; 
+   static uint8_t cfg_num;
+   static uint8_t roic_dbg_reg_unlocked;
    
    
    // on bâtit les parametres specifiques du 0804
@@ -774,10 +774,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num = ++cfg_num;
       
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);

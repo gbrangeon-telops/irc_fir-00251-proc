@@ -266,6 +266,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    extern int32_t gFpaDebugRegF;
    extern int32_t gFpaDebugRegG;
    extern int32_t gFpaDebugRegH;
+   extern int32_t gFpaDebugRegI;
+   extern int32_t gFpaDebugRegJ;
+   extern int32_t gFpaDebugRegK;
+   extern int32_t gFpaDebugRegL;
+   extern int32_t gFpaDebugRegM;
    extern int32_t gFpaExposureTimeOffset;
 
    uint8_t argStr[12];
@@ -355,6 +360,26 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       {
          cmd = 17;
       }
+      else if (strcasecmp((char *)argStr, "REGI") == 0)
+      {
+         cmd = 18;
+      }
+      else if (strcasecmp((char *)argStr, "REGJ") == 0)
+      {
+         cmd = 19;
+      }
+      else if (strcasecmp((char *)argStr, "REGK") == 0)
+      {
+         cmd = 20;
+      }
+      else if (strcasecmp((char *)argStr, "REGL") == 0)
+      {
+         cmd = 21;
+      }
+      else if (strcasecmp((char *)argStr, "REGM") == 0)
+      {
+         cmd = 22;
+      }
       else
       {
          DT_ERR("Unsupported command arguments");
@@ -383,6 +408,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
          case 10: // REGF
          case 11: // REGG
          case 12: // REGH
+         case 18: // REGI
+         case 19: // REGJ
+         case 20: // REGK
+         case 21: // REGL
+         case 22: // REGM
 
             if (ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS)
             {
@@ -499,6 +529,26 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
          case 17: // BIAS
             gFpaScdDiodeBiasEnum = (uint8_t)iValue;
             break;
+
+         case 18: // REGI
+            gFpaDebugRegI = iValue;
+            break;
+
+         case 19: // REGJ
+            gFpaDebugRegJ = iValue;
+            break;
+
+         case 20: // REGK
+            gFpaDebugRegK = iValue;
+            break;
+
+         case 21: // REGL
+            gFpaDebugRegL = iValue;
+            break;
+
+         case 22: // REGM
+            gFpaDebugRegM = iValue;
+            break;
       }
 
 
@@ -577,6 +627,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA debug register F = %d", gFpaDebugRegF);
    DT_PRINTF("FPA debug register G = %d", gFpaDebugRegG);
    DT_PRINTF("FPA debug register H = %d", gFpaDebugRegH);
+   DT_PRINTF("FPA debug register I = %d", gFpaDebugRegI);
+   DT_PRINTF("FPA debug register J = %d", gFpaDebugRegJ);
+   DT_PRINTF("FPA debug register K = %d", gFpaDebugRegK);
+   DT_PRINTF("FPA debug register L = %d", gFpaDebugRegL);
+   DT_PRINTF("FPA debug register M = %d", gFpaDebugRegM);
   
    DT_PRINTF("FPA ElCorr Meas At Starvation = %d", gFpaElCorrMeasAtStarvation);
    DT_PRINTF("FPA ElCorr Meas At Saturation = %d", gFpaElCorrMeasAtSaturation);
@@ -2709,7 +2764,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
-   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2|BIAS value]");
+   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");

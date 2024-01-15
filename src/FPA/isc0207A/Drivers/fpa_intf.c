@@ -284,7 +284,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    uint32_t elcorr_reg;
    t_FpaStatus Stat;
-   static uint8_t cfg_num = 0;
+   static uint8_t cfg_num;
    uint32_t elcorr_enabled = 1;
    uint32_t elcorr_gain_corr_enabled = 0;
    float elcorr_comp_duration_usec;                 // la duree en usec disponible pour la prise des references
@@ -615,11 +615,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_atemp_ofs                     = (int32_t)elcorr_atemp_ofs;
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;
-   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num  = ++cfg_num;
    
    if ((((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2 >= (uint32_t)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
       ||((elcorr_gain_corr_enabled == 1) && (ptrA->roic_cst_output_mode == 1)))

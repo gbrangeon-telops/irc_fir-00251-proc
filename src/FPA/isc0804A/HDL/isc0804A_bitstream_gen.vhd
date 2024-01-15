@@ -53,12 +53,20 @@ architecture rtl of isc0804A_bitstream_gen is
          CLK    : in std_logic);
    end component;
    
-   component double_sync_vector is       -- ENO : 10 oct 2017: necessaire pour ce module
+   component double_sync_vector
       port(
          D : in std_logic_vector;
          Q : out std_logic_vector;
          CLK : in std_logic
          );
+   end component;
+   
+   component gh_gray2binary
+	   GENERIC (size: INTEGER := 8);
+	   PORT(	
+		   G   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);	-- gray code in
+		   B   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0) -- binary value out
+		);
    end component;
    
    type reset_fsm_type  is (assert_rst_st, desassert_rst_st, done_st);  
@@ -99,9 +107,10 @@ architecture rtl of isc0804A_bitstream_gen is
    signal mp                  : std_logic_vector(2 downto 0);
    signal cp                  : std_logic_vector(2 downto 0);
    
-   signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal new_cfg_num_sync    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_gray    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0) := (others=>'0');
+   signal new_cfg_num_bin     : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
 begin    
@@ -127,14 +136,21 @@ begin
       ); 
 
    --------------------------------------------------
-   -- Sync cfg_num
+   -- Sync Gray cfg_num 
    --------------------------------------------------
    U1B : double_sync_vector  
    port map(
       D => std_logic_vector(USER_CFG.CFG_NUM),
-      Q => new_cfg_num_sync,
+      Q => new_cfg_num_gray,
       CLK => CLK); 
-	  
+
+   --------------------------------------------------
+   -- Decodage Gray de cfg_num
+   --------------------------------------------------
+   U1C : gh_gray2binary
+      generic map (size => USER_CFG.CFG_NUM'length) 
+	   port map (G => new_cfg_num_gray, B => new_cfg_num_bin);
+      
    --------------------------------------------------
    --  bistream builder
    --------------------------------------------------
@@ -269,7 +285,7 @@ begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-		 new_cfg_num <= unsigned(new_cfg_num_sync);
+		 new_cfg_num <= unsigned(new_cfg_num_bin);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then
