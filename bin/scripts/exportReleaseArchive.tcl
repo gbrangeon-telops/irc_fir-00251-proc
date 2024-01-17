@@ -23,7 +23,7 @@ proc parseVersionFile {versionFile} {
     upvar 1 xmlVersion xmlVersion
     upvar 1 flashSettingsVersion flashSettingsVersion
     upvar 1 flashDynamicValuesVersion flashDynamicValuesVersion
-    upvar 1 calibFilesVersion srcDcalibFilesVersionir
+    upvar 1 calibFilesVersion calibFilesVersion
     
     
     set firmwareVersionMajor ""
@@ -90,7 +90,7 @@ proc parseVersionFile {versionFile} {
     } else {
         error "Missing flashSettingsVersionSubMinor"
     }
-    set flashSettingsVersion " $flashSettingsVersionMajor.$flashSettingsVersionMinor.$flashSettingsVersionSubMinor"
+    set flashSettingsVersion "$flashSettingsVersionMajor.$flashSettingsVersionMinor.$flashSettingsVersionSubMinor"
 
     set flashDynamicValuesVersionMajor ""
     if {[regexp {flashDynamicValuesVersionMajor[^\n\r0-9]+(\d+)} $versionFileStr match flashDynamicValuesVersionMajor]} {
