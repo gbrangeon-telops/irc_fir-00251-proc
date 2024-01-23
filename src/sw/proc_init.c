@@ -146,7 +146,7 @@ detected_hw_t gDetectedHw;
 rpCtrl_t theRpCtrl;
 slCtrl_t theSlCtrl;
 autofocusCtrl_t theAutoCtrl;
-
+flashIntfCtrl_t gflashIntfCtrl;
 
 #ifdef SCD_PROXY
    uint8_t gFrameRateChangePostponed = 0;
@@ -458,13 +458,6 @@ IRC_Status_t Proc_FM_Init()
    keys[3] = gFlashDynamicValues.FileOrderKey4;
    keys[4] = gFlashDynamicValues.FileOrderKey5;
    FM_SetFileListKeys(&gFM_files, keys, FM_MAX_NUM_FILE_ORDER_KEY);
-
-   keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
-   keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
-   keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
-   keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
-   keys[4] = gFlashDynamicValues.CalibrationCollectionFileOrderKey5;
-   FM_SetFileListKeys(&gFM_collections, keys, FM_MAX_NUM_FILE_ORDER_KEY);
 
    return IRC_SUCCESS;
 }
@@ -1168,7 +1161,7 @@ IRC_Status_t Proc_Led_Init()
  */
 IRC_Status_t Proc_FileSystem_Init()
 {
-   if (uffs_main(0) != 0)
+   if (uffs_main(&gflashIntfCtrl,0) != 0)
    {
       return IRC_FAILURE;
    }

@@ -443,6 +443,7 @@ void Calibration_SM()
    extern flashDynamicValues_t gFlashDynamicValues;
    extern bool blockLoadCmdFlag;
    extern bool gDisableFilterWheel;
+   extern uint8_t gCollectionIdx;
 
    int byteCount;
    int retval;
@@ -503,7 +504,7 @@ void Calibration_SM()
             gpsDisabled = false;
          }
 
-         if (cmLoadCalibration)
+         if (cmLoadCalibration &&  (gFM_collections.count == gCollectionIdx))
          {
             cmLoadCalibration = 0;
 

@@ -232,7 +232,7 @@ static void setBqState(BQ_State_t* p_state, BQ_State_t next_state)
 IRC_Status_t startActualization()
 {
    uint32_t numDataToProcess;
-   long spaceFree, spaceAct;
+   long  spaceAct;
 
    builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Pending;
 
@@ -260,11 +260,12 @@ IRC_Status_t startActualization()
 
    /* Check space availability for an actualization file */
    numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
-   spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
    spaceAct = CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
               CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
               numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
-   if (spaceFree < spaceAct)
+
+
+   if ( FM_GetFreeSpace() > (uint64_t)spaceAct)
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
       ACT_ERR("Filesystem has not enough space for actualization process.");
@@ -2833,7 +2834,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
    static fileRecord_t* actualization_file;
    static int fd = -1;
    static char shortFileName[48];
-   static char longFileName[FM_LONG_FILENAME_SIZE];
+   
    static CalibImageCorrection_ImageCorrectionFileHeader_t actFileHeader;
    static CalibImageCorrection_ImageCorrectionDataHeader_t actDataHeader;
 
@@ -2892,7 +2893,6 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       ACT_PRINTF("FWR_INIT_IO\n");
 
       defineActualizationFilename(shortFileName, sizeof(shortFileName), privateActualisationPosixTime, currentDeltaBeta);
-      sprintf(longFileName, "%s%s", FM_UFFS_MOUNT_POINT, shortFileName);
 
       ACT_INF("Writing to file : %s", shortFileName);
 
@@ -2901,7 +2901,8 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       // if file does not exist, create it
       if (!FM_FileExists(shortFileName))
       {
-         actualization_file = FM_CreateFile(shortFileName);
+         actualization_file = FM_CreateFile(shortFileName,
+               CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE+CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE+CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE*(gcRegsData.SensorWidth * gcRegsData.SensorHeight));
          if (actualization_file == NULL)
          {
             ACT_ERR("Error creating file %s.", shortFileName);
@@ -2967,7 +2968,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       {
          ACT_ERR("Error writing file header to file %s.", shortFileName);
          uffs_close(fd);
-         uffs_remove(longFileName);
+         FM_Remove(shortFileName);
          error = true;
          break;
       }
@@ -3045,7 +3046,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       {
          ACT_ERR("Error writing data header to file %s.", shortFileName);
          uffs_close(fd);
-         uffs_remove(longFileName);
+         FM_Remove(shortFileName);
          error = true;
          break;
       }
@@ -3076,7 +3077,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       {
          ACT_ERR("Error writing data to file %s.", shortFileName);
          uffs_close(fd);
-         uffs_remove(longFileName);
+         FM_Remove(shortFileName);
          error = true;
          break;
       }
@@ -3113,10 +3114,10 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
          break;
       }
 
-      if (uffs_space_free(FM_UFFS_MOUNT_POINT) < FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
+      if (FM_GetFreeSpace() < FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
       {
          ACT_ERR("Filesystem full.");
-         uffs_remove(longFileName);
+         FM_Remove(shortFileName);
          error = true;
          break;
       }

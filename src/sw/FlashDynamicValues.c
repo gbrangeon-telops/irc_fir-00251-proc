@@ -100,7 +100,7 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
    uint64_t tic;
    uint32_t i;
    fileRecord_t *p_file;
-   char filelongname[FM_LONG_FILENAME_SIZE];
+
 
    if (gDisableFlashDynamicValuesUpdate != 0)
    {
@@ -129,7 +129,7 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
    if (FM_FileExists(FDV_FILENAME))
    {
       // Create flash dynamic values temporary file
-      fd = FM_OpenFile(FDV_TMP_FILENAME, UO_WRONLY | UO_CREATE | UO_TRUNC);
+      fd = FM_CreateAndOpenFile(FDV_TMP_FILENAME, UO_WRONLY | UO_CREATE | UO_TRUNC,FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE);
       if (fd == -1)
       {
          FDV_ERR("Temporary file create failed.");
@@ -141,8 +141,7 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       {
          FM_ERR("File write failed.");
          uffs_close(fd);
-         sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, FDV_TMP_FILENAME);
-         uffs_remove(filelongname);
+         FM_Remove(FDV_TMP_FILENAME);
          return IRC_FAILURE;
       }
 
@@ -154,14 +153,14 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       }
 
       // Remove old flash dynamic values file
-      if (uffs_remove(FM_UFFS_MOUNT_POINT FDV_FILENAME) == -1)
+      if (FM_Remove(FDV_FILENAME) == -1)
       {
          FDV_ERR("Cannot remove old file.");
          return IRC_FAILURE;
       }
 
       // Rename flash dynamic values temporary file
-      if (uffs_rename(FM_UFFS_MOUNT_POINT FDV_TMP_FILENAME, FM_UFFS_MOUNT_POINT FDV_FILENAME) == -1)
+      if (FM_Rename(FDV_TMP_FILENAME,FDV_FILENAME) == -1)
       {
          FDV_ERR("Cannot rename temporary file.");
          return IRC_FAILURE;
@@ -194,7 +193,7 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       }
 
       // Create flash dynamic values file
-      fd = FM_OpenFile(FDV_FILENAME, UO_WRONLY | UO_CREATE | UO_TRUNC);
+      fd = FM_CreateAndOpenFile(FDV_FILENAME, UO_WRONLY | UO_CREATE | UO_TRUNC,FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE);
       if (fd == -1)
       {
          FDV_ERR("File create failed.");
@@ -206,8 +205,7 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       {
          FM_ERR("Initial file write failed.");
          uffs_close(fd);
-         sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, FDV_FILENAME);
-         uffs_remove(filelongname);
+         FM_Remove(FDV_FILENAME);
          return IRC_FAILURE;
       }
 
@@ -221,6 +219,13 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       strcpy(gFM_fileDB[i].name, FDV_FILENAME);
       gFM_fileDB[i].size = FM_GetFileSize(gFM_fileDB[i].name);
 
+      //Validation
+      if(gFM_fileDB[i].size != FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE) {
+         FDV_ERR("Invalid read size.");
+
+         gFM_fileDB[i].size = FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE;
+
+      }
       // Close flash dynamic values file data
       if (FM_CloseFile(&gFM_fileDB[i], FMP_RUNNING) != IRC_SUCCESS)
       {
@@ -246,9 +251,10 @@ IRC_Status_t FlashDynamicValues_Recover()
    uffs_DIR *dir;
    struct uffs_dirent *de;
    flashDynamicValues_t tmpFlashDynamicValues;
+   extern flashIntfCtrl_t gflashIntfCtrl;
 
    // Search temporary flash dynamic values file
-   dir = uffs_opendir(FM_UFFS_MOUNT_POINT);
+   dir = uffs_opendir(gflashIntfCtrl.mount_points[0]);
    if (dir != NULL)
    {
       while ((de = uffs_readdir(dir)) != NULL)
@@ -264,7 +270,7 @@ IRC_Status_t FlashDynamicValues_Recover()
                if (FM_FileExists(FDV_FILENAME))
                {
                   // Remove old flash dynamic values file
-                  if (uffs_remove(FM_UFFS_MOUNT_POINT FDV_FILENAME) == -1)
+                  if (FM_Remove(FDV_FILENAME) == -1)
                   {
                      FDV_ERR("Cannot remove file.");
                      return IRC_FAILURE;
@@ -272,7 +278,7 @@ IRC_Status_t FlashDynamicValues_Recover()
                }
 
                // Rename flash dynamic values temporary file
-               if (uffs_rename(FM_UFFS_MOUNT_POINT FDV_TMP_FILENAME, FM_UFFS_MOUNT_POINT FDV_FILENAME) == -1)
+               if (FM_Rename(FDV_TMP_FILENAME, FDV_FILENAME) == -1)
                {
                   FDV_ERR("Cannot rename temporary file.");
                   return IRC_FAILURE;
@@ -281,7 +287,7 @@ IRC_Status_t FlashDynamicValues_Recover()
             else
             {
                // Remove flash dynamic values temporary file
-               if (uffs_remove(FM_UFFS_MOUNT_POINT FDV_TMP_FILENAME) == -1)
+               if (FM_Remove(FDV_TMP_FILENAME) == -1)
                {
                   FDV_ERR("Cannot remove temporary file.");
                   return IRC_FAILURE;

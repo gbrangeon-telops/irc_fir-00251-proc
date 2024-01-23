@@ -419,7 +419,7 @@ void GC_Poller_FirmwareRevisionCallback(gcPolledReg_t *polledReg)
       {
          builtInTests[BITID_FirmwareRevisionsConsistency].result = BITR_Failed;
       }
-      ReleaseInfo_Print(&gReleaseInfo);
+      ReleaseInfo_Print();
    }
 }
 

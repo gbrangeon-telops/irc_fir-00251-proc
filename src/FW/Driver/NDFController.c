@@ -384,15 +384,15 @@ void NDF_ControllerProcess()
       if (!NDF_rawMode)
       {
          HDER_UpdateNDFPositionHeader(&gHderInserter, gcRegsData.NDFilterPosition);
-         prevPosition = gcRegsData.NDFilterPosition;
 
-         // Change calibration block
-         if (calibrationInfo.isValid && GC_CalibrationCollectionTypeNDFIsActive &&
-               (gcRegsData.NDFilterPosition != NDFP_NDFilterInTransition))
+         if (calibrationInfo.isValid && GC_CalibrationCollectionTypeNDFIsActive
+               && (gcRegsData.NDFilterPosition == NDFP_NDFilterInTransition)
+               && (prevPosition!=NDFP_NDFilterInTransition))
          {
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
          }
 
+         prevPosition = gcRegsData.NDFilterPosition;
       }
       else
       {

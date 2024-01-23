@@ -91,6 +91,10 @@ volatile int Total_Nand_check;
 
 #define DPRAM_BASE_ADDRESS	0xC0000000
 
+#define FM_UFFS_MOUNT_POINT_0            "/cs0/"
+#define FM_UFFS_MOUNT_POINT_1            "/cs1/"
+
+
 static int nand_init_flash(uffs_Device *dev);
 static int nand_release_flash(uffs_Device *dev);
 static int nand_read_pagewlayout(uffs_Device *dev, u32 block, u32 page, u8* data, int data_len, u8 *ecc, uffs_TagStore *ts, u8 *ecc_store);
@@ -111,15 +115,14 @@ static uffs_FlashOps g_my_nand_ops = {
 	nand_check_erased_block, // CheckErasedBlock();
 };
 
-enum nandModelEnum {
-   MT29F16G08AJADAWP = 0,
-   MT29F4G08ABADAWP = 1,
-   NAND_UNDEFINED
-};
-typedef enum nandModelEnum nandModel_t;
 
-nandModel_t g_my_nand_model = NAND_UNDEFINED;
+#define SET_DEFAULT_NAND_MODEL_STRUCT(model_struct) do{model_struct->nand_model = NAND_UNDEFINED;model_struct->nr_partition=0;}while(0)
+#define SET_MT29F4_NAND_MODEL_STRUCT(model_struct) do{model_struct->nand_model = MT29F4G08ABADAWP;model_struct->nr_partition=1;}while(0)
+#define SET_MT29F16_NAND_MODEL_STRUCT(model_struct) do{model_struct->nand_model = MT29F16G08AJADAWP;model_struct->nr_partition=2;}while(0)
 
+flashIntfCtrl_t *gpflash_intf_struct ;
+//nandModel_t g_my_nand_model = NAND_UNDEFINED;
+//unsigned int g_current_nrpartition = 0;
 /////////////////////////////////////////////////////////////////////////////////
 //
 // MT29F16G08AJADAWP NAND definitions
@@ -129,9 +132,7 @@ nandModel_t g_my_nand_model = NAND_UNDEFINED;
 #define MT29F16G08AJADAWP_ID2 0xD1
 #define MT29F16G08AJADAWP_ID3 0x95
 #define MT29F16G08AJADAWP_ID4 0xDA
-#define MT29F16G08AJADAWP_TOTAL_BLOCKS 8192  // total block on one 8gb chip select
-                                             // one partition can not span on 2 chip
-                                             // with NR_PARTITION 2, each partition has TOTAL_BLOCKS 8192
+
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -142,7 +143,6 @@ nandModel_t g_my_nand_model = NAND_UNDEFINED;
 #define MT29F4G08ABADAWP_ID2 0x90
 #define MT29F4G08ABADAWP_ID3 0x95
 #define MT29F4G08ABADAWP_ID4 0xD6
-#define MT29F4G08ABADAWP_TOTAL_BLOCKS  4096  // total block on chip
 
 #define PAGE_DATA_SIZE  2048     // page size
 #define PAGE_SPARE_SIZE 64       // spare size
@@ -152,35 +152,30 @@ nandModel_t g_my_nand_model = NAND_UNDEFINED;
 #define BLOCK_DATA_SIZE (PAGE_DATA_SIZE * PAGES_PER_BLOCK)
 
 
-// For model MT29F16G08AJADAWP:
-//    NR_PARTITION 1 permits to use only 8Gb
-//    NR_PARTITION 2 permits to use the whole 16Gb (not tested)
-//    using more than 1 partition consume much more memory ????
-// For model MT29F4G08ABADAWP:
-//    NR_PARTITION 1 permits to use the whole 4Gb
-//    To use NR_PARTITION 2, MT29F4G08ABADAWP_TOTAL_BLOCKS has to be reduced to 2048
-#define NR_PARTITION	1								/* total partitions max 2 for cs0 & cs1 */
+#if MAX_NR_PARTITION==1
+#define MT29F4G08ABADAWP_TOTAL_BLOCKS  4096  // total block on chip
+#else
+#define MT29F4G08ABADAWP_TOTAL_BLOCKS  4096  // total block on chip
 
-
-struct my_nand_chip g_nand_chip_1 = {0};
-#if NR_PARTITION > 1
-struct my_nand_chip g_nand_chip_2 = {0};
 #endif
+#define MT29F16G08AJADAWP_TOTAL_BLOCKS 8192  // total block on one 8gb chip select
+                                             // one partition can not span on 2 chip
+                                             // each partition has TOTAL_BLOCKS 8192
+
+struct my_nand_chip g_nand_chip[MAX_NR_PARTITION] = {0};
+
 struct uffs_StorageAttrSt g_my_flash_storage = {0};
 
 /* define mount table */
-static uffs_Device demo_device_1 = {0};
-#if NR_PARTITION > 1
-static uffs_Device demo_device_2 = {0};
-#endif
+static uffs_Device demo_device[MAX_NR_PARTITION] = {0};
 
-static uffs_MountTable demo_mount_table[] = {
-	{ &demo_device_1,  0, 0/*configured later*/, "/cs0/" },
-#if NR_PARTITION > 1
-	{ &demo_device_2,  0, 0/*configured later*/, "/cs1/" },
-#endif
-	{ NULL, 0, 0, NULL }
+static uffs_MountTable demo_mount_table[MAX_NR_PARTITION] = {
+	{ &demo_device[0],  0, 0/*configured later*/, FM_UFFS_MOUNT_POINT_0},
+	{ &demo_device[1],  0, 0/*configured later*/, FM_UFFS_MOUNT_POINT_1},
+
 };
+//convert dev_num to dev_idx
+#define dev_num_to_idx(dev_num) ((dev_num <= gpflash_intf_struct->nr_partition) && (dev_num >0))?(dev_num-1):0
 
 // sealed byte is use to know if a page was written
 // this is the last user byte in spare section
@@ -199,10 +194,12 @@ static void setup_flash_storage(struct uffs_StorageAttrSt *attr)
 	memset(attr, 0, sizeof(struct uffs_StorageAttrSt));
 
 	// setup NAND flash attributes.
-	if (g_my_nand_model == MT29F4G08ABADAWP)
+	if (gpflash_intf_struct->nand_model == MT29F4G08ABADAWP)
 	   attr->total_blocks = MT29F4G08ABADAWP_TOTAL_BLOCKS;   /* total blocks */
 	else     //MT29F16G08AJADAWP
-	   attr->total_blocks = MT29F16G08AJADAWP_TOTAL_BLOCKS;  /* total blocks */
+	{
+	   attr->total_blocks = MT29F16G08AJADAWP_TOTAL_BLOCKS*gpflash_intf_struct->nr_partition;  /* total blocks */
+	}
 	attr->page_data_size = PAGE_DATA_SIZE;		/* page data size */
 	attr->pages_per_block = PAGES_PER_BLOCK;	/* pages per block */
 	attr->spare_size = PAGE_SPARE_SIZE;		  	/* page spare size */
@@ -222,8 +219,13 @@ static void setup_flash_storage(struct uffs_StorageAttrSt *attr)
 #define CS0_N_BIT		0x04	// cs0 enable bit mask
 #define CS1_N_BIT		0x08	// cs1 enable bit mask
 #define CLE_BIT			0x10	// command latch enable bit mask
-#define ALE_BIT			0x20	// address latch enable bit mask
+#define ALE_BIT			  0x20	// address latch enable bit mask
+#define READYBUSY0_N_BIT         0x01  // ready busy0 bit mask
+#define READYBUSY1_N_BIT         0x02  // ready busy1 bit mask
 static XGpio Gpio;				// structure des definition GPIO
+
+static u32 g_cs_tab[MAX_NR_PARTITION] = {CS0_N_BIT,CS1_N_BIT};
+static u32 g_rb_tab[MAX_NR_PARTITION] = {READYBUSY0_N_BIT,READYBUSY1_N_BIT};
 
 #ifdef MOD_FAST
 static XGpio Gpio1;				// structure des definition GPIO
@@ -379,9 +381,19 @@ static void initGpioInterface(){  //Init GPIO interface to NAND
     my_XGpio_SetDataDirection(&Gpio, CHANNEL_DATA, 0xFF);			// Data bus input
     FlashIntf_SetOutput(&Flash_Interface, FLASH_INTF_CMD_OUT_OFFSET, 0x0F);	// Set default command
     my_XGpio_SetDataDirection(&Gpio, CHANNEL_COMMAND, 0xFFFFFF00);  // Command output
-    my_XGpio_DiscreteSet(&Gpio, CHANNEL_COMMAND, CS0_N_BIT);		// deselect cs0
-    my_XGpio_DiscreteSet(&Gpio, CHANNEL_COMMAND, CS1_N_BIT);		// deselect cs1
+    for(int i = 0; i < MAX_NR_PARTITION; i++ )
+       my_XGpio_DiscreteSet(&Gpio, CHANNEL_COMMAND, g_cs_tab[i]);		// deselect cs0 & cs1
 
+   // my_XGpio_DiscreteSet(&Gpio, CHANNEL_COMMAND, CS1_N_BIT);		// deselect cs1
+
+}
+static inline u32 GET_CHIP_SELECT(int dev_num)
+{
+   return g_cs_tab[dev_num_to_idx(dev_num)] ;
+}
+static inline u32 GET_CHIP_READYBUSY(int dev_num)
+{
+   return g_rb_tab[dev_num_to_idx(dev_num)] ;
 }
 
 // enable command latch
@@ -407,13 +419,13 @@ static inline void CHIP_CLR_ALE(uffs_Device *dev) {
 }
 // disable chip select
 static inline void CHIP_SET_NCS(uffs_Device *dev) {
-	u32 CS = dev->dev_num <= 1 ? CS0_N_BIT : CS1_N_BIT;
+	u32 CS = GET_CHIP_SELECT(dev->dev_num);
 	//set gpio nCS
 	my_XGpio_DiscreteSet(&Gpio, CHANNEL_COMMAND, CS);
 }
 // enable chip select
 static inline void CHIP_CLR_NCS(uffs_Device *dev) {
-	u32 CS = dev->dev_num <= 1 ? CS0_N_BIT : CS1_N_BIT;
+   u32 CS = GET_CHIP_SELECT(dev->dev_num);
 	//clear gpio nCS
 	my_XGpio_DiscreteClear(&Gpio, CHANNEL_COMMAND, CS);
 }
@@ -426,10 +438,11 @@ static inline int CHIP_READY(uffs_Device *dev) {
 	//wait gpio busy set then clear
 	//int iOnce = 1;
 	int data, timeout = 0x7ffff;
+	const u32 RB_MASK = GET_CHIP_READYBUSY(dev->dev_num);
 	do{
 		//data = my_XGpio_DiscreteRead(&Gpio2, 1);
 		data = FlashIntf_GetInput(&Flash_Interface, FLASH_INTF_READYBUSY_OFFSET);
-		data &= 0x1;
+		data &= RB_MASK;
 		//if (iOnce) {
 		//	iOnce = 0;
 		//	if (data == 0){
@@ -660,7 +673,7 @@ static int nand_readid(uffs_Device *dev) {
 	int ret;
 	u8 deviceid[4];
 
-	g_my_nand_model = NAND_UNDEFINED;   //reset nand model found
+	gpflash_intf_struct->nand_model = NAND_UNDEFINED;   //reset nand model found
 
 	CHIP_CLR_NCS(dev);
 	CHIP_SET_CLE(dev);
@@ -693,21 +706,28 @@ static int nand_readid(uffs_Device *dev) {
          (deviceid[2] == MT29F16G08AJADAWP_ID2) &&
          (deviceid[3] == MT29F16G08AJADAWP_ID3)) // don't check last one, it may be 0x5a or 0xda
    {
-      g_my_nand_model = MT29F16G08AJADAWP;
-      print("MT29F16G08AJADAWP NAND Flash detected\n\r");
-      return 0;
+      SET_MT29F16_NAND_MODEL_STRUCT(gpflash_intf_struct);
+      print("MT29F16G08AJADAWP NAND Flash detected \n\r");
+
+      ret = 0;
    }
    else if ((deviceid[0] == MT29F4G08ABADAWP_ID0) &&
          (deviceid[1] == MT29F4G08ABADAWP_ID1) &&
          (deviceid[2] == MT29F4G08ABADAWP_ID2) &&
          (deviceid[3] == MT29F4G08ABADAWP_ID3)) // don't check last one, it may be 0x56 or 0xd6
    {
-      g_my_nand_model = MT29F4G08ABADAWP;
-      print("MT29F4G08ABADAWP NAND Flash detected\n\r");
-      return 0;
+      SET_MT29F4_NAND_MODEL_STRUCT(gpflash_intf_struct);
+      print("MT29F4G08ABADAWP NAND Flash detected %d\n\r");
+      ret= 0;
    }
    else
       return 1;
+   if(gpflash_intf_struct->nr_partition > MAX_NR_PARTITION) {
+      MSG("ERROR NR partition is too high %d, driver can only handle %d!\n",gpflash_intf_struct->nr_partition,MAX_NR_PARTITION);
+      gpflash_intf_struct->nr_partition = MAX_NR_PARTITION;
+   }
+
+   return ret;
 }
 
 // force HW Ecc calculation
@@ -1218,7 +1238,7 @@ check_out:
 static int nand_erase_block(uffs_Device *dev, u32 block)
 {
 	u8 val = 0;
-
+	int ret = UFFS_FLASH_NO_ERR;
 	//MSG("E b:%ld\n",block);
 #ifdef SHOW_LOW_ACCESS
 	Total_Nand_erase++;
@@ -1241,8 +1261,9 @@ static int nand_erase_block(uffs_Device *dev, u32 block)
 	READ_DATA(dev, &val, 1);
 
 	CHIP_SET_NCS(dev);
+	ret = PARSE_STATUS(val);
 
-	return PARSE_STATUS(val);
+	return ret;
 }
 
 
@@ -1264,7 +1285,7 @@ static int nand_release_flash(uffs_Device *dev)
 {
 	// release your hardware here
 	struct my_nand_chip *chip = (struct my_nand_chip *) dev->attr->_private;
-
+	//TBD why?
 	chip = chip;
 
 	return 0;
@@ -1273,10 +1294,8 @@ static int nand_release_flash(uffs_Device *dev)
 #ifndef PERFORMANCE_LOW
 /* static alloc the memory for each partition
  * memory is allocated for the biggest number of TOTAL_BLOCKS for all models*/
-static int static_buffer_par1[UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, MT29F16G08AJADAWP_TOTAL_BLOCKS) / sizeof(int)];
-#if NR_PARTITION > 1
-static int static_buffer_par2[UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, MT29F16G08AJADAWP_TOTAL_BLOCKS) / sizeof(int)];
-#endif
+static int static_buffer_par[MAX_NR_PARTITION][UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, MT29F16G08AJADAWP_TOTAL_BLOCKS) / sizeof(int)];
+
 
 #if 0 // not used
 static void init_nand_chip(struct my_nand_chip *chip)
@@ -1288,14 +1307,11 @@ static void init_nand_chip(struct my_nand_chip *chip)
 static URET my_InitDevice(uffs_Device *dev)
 {
 	dev->attr = &g_my_flash_storage;				// NAND flash attributes
-	if (dev->dev_num == 1){
-		dev->attr->_private = (void *) &g_nand_chip_1;	// hook nand_chip data structure to attr->_private
-	}
-#if NR_PARTITION > 1
-	else {
-		dev->attr->_private = (void *) &g_nand_chip_2;	// hook nand_chip data structure to attr->_private
-	}
-#endif
+	//set dev_idx
+	unsigned int dev_idx = dev_num_to_idx(dev->dev_num);
+
+	dev->attr->_private = (void *) &g_nand_chip[dev_idx]; // hook nand_chip data structure to attr->_private
+
 	dev->ops = &g_my_nand_ops;						// NAND driver
 
 	//init_nand_chip(&g_nand_chip);
@@ -1312,35 +1328,29 @@ static URET my_ReleaseDevice(uffs_Device *dev)
 #ifndef PERFORMANCE_LOW
 static int my_init_filesystem(void)
 {
-	uffs_MountTable *mtbl = &(demo_mount_table[0]);
 
 	/* setup nand storage attributes */
 	setup_flash_storage(&g_my_flash_storage);
+	const u32 total_blocks_in_one_ce = g_my_flash_storage.total_blocks/gpflash_intf_struct->nr_partition;
+	//const u32 total_blocks_in_one_ce = g_my_flash_storage.total_blocks;
+	for (unsigned int i = 0; i <  gpflash_intf_struct->nr_partition; i++) {
+      /* Configure start_block */
+      demo_mount_table[i].start_block = 0;
+	   /* Configure end_block */
+	   demo_mount_table[i].end_block = total_blocks_in_one_ce-1;
+	   /* setup memory allocator */
+	   uffs_MemSetupStaticAllocator(&demo_device[i].mem, static_buffer_par[i], UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, total_blocks_in_one_ce));
 
-   /* Configure end_block */
-   demo_mount_table[0].end_block = g_my_flash_storage.total_blocks - 1;
-#if NR_PARTITION > 1
-   demo_mount_table[1].end_block = g_my_flash_storage.total_blocks - 1;
-#endif
-
-	/* setup memory allocator */
-	uffs_MemSetupStaticAllocator(&demo_device_1.mem, static_buffer_par1, UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, g_my_flash_storage.total_blocks));
-#if NR_PARTITION > 1
-	uffs_MemSetupStaticAllocator(&demo_device_2.mem, static_buffer_par2, UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, g_my_flash_storage.total_blocks));
-#endif
-
-	/* register mount table */
-	while(mtbl->dev) {
-		// setup device init/release entry
-		mtbl->dev->Init = my_InitDevice;
-		mtbl->dev->Release = my_ReleaseDevice;
-		uffs_RegisterMountTable(mtbl);
-		mtbl++;
 	}
-
+	/* register mount table */
+	for (unsigned int i = 0; i <  gpflash_intf_struct->nr_partition; i++) {
+      demo_mount_table[i].dev->Init = my_InitDevice;
+      demo_mount_table[i].dev->Release = my_ReleaseDevice;
+      uffs_RegisterMountTable(&(demo_mount_table[i]));
+	}
 	// mount partitions
-	for (mtbl = &(demo_mount_table[0]); mtbl->mount != NULL; mtbl++) {
-		uffs_Mount(mtbl->mount);
+	for (unsigned int i = 0; i <  gpflash_intf_struct->nr_partition; i++) {
+      uffs_Mount(demo_mount_table[i].mount);
 	}
 
 	return uffs_InitFileSystemObjects() == U_SUCC ? 0 : -1;
@@ -1349,12 +1359,11 @@ static int my_init_filesystem(void)
 
 static int my_release_filesystem(void)
 {
-	uffs_MountTable *mtb;
 	int ret = 0;
 
-	// unmount parttions
-	for (mtb = &(demo_mount_table[0]); ret == 0 && mtb->mount != NULL; mtb++) {
-		ret = uffs_UnMount(mtb->mount);
+	// unmount partions
+	for (unsigned int i = 0; i <  gpflash_intf_struct->nr_partition; i++) {
+	   ret = uffs_UnMount(demo_mount_table[i].mount);
 	}
 	// release objects
 	if (ret == 0)
@@ -1362,6 +1371,36 @@ static int my_release_filesystem(void)
 
 	return ret;
 }
+
+
+static inline int flash_intf_setMountPoints(struct flash_intf_struct* flashIntfCtrl) {
+
+   int ret = U_SUCC;
+
+   switch ( flashIntfCtrl->nr_partition)
+   {
+      case 2 :
+         strncpy(flashIntfCtrl->mount_points[1],FM_UFFS_MOUNT_POINT_1,FM_UFFS_MOUNT_POINT_SIZE);
+         flashIntfCtrl->mount_points[1][FM_UFFS_MOUNT_POINT_SIZE] = '\0';
+         /*no break*/
+      case 1 :
+         strncpy(flashIntfCtrl->mount_points[0],FM_UFFS_MOUNT_POINT_0,FM_UFFS_MOUNT_POINT_SIZE);
+         flashIntfCtrl->mount_points[0][FM_UFFS_MOUNT_POINT_SIZE] = '\0';
+         break;
+
+      default:
+         printf("ERROR current nr partition doesn t handle !\n");
+         flashIntfCtrl->nr_partition = 1;
+         strncpy(flashIntfCtrl->mount_points[0],FM_UFFS_MOUNT_POINT_0,FM_UFFS_MOUNT_POINT_SIZE);
+
+         ret = U_FAIL;
+         break;
+
+   }
+
+   return ret;
+}
+
 
 #ifdef PERFORMANCE_LOW
 
@@ -1519,10 +1558,18 @@ void nand_low_format()
 // iStep 0;  init UFFS file system
 // iStep 99; release
 // ret: 0 succes, != 0 failed.
-int uffs_main(int iStep)
+int uffs_main(flashIntfCtrl_t* flashIntfCtrl,int iStep)
 {
 	const u8 features_data[] = {0x08,0,0,0};
    int ret = 0;
+
+   if(flashIntfCtrl == NULL) {
+      print("ERROR flashIntfCtrl is null\n\r");
+      return -1;
+   }
+   gpflash_intf_struct = flashIntfCtrl;
+   //print DEBUG
+   //uffs_SetupDebugOutput();
 	switch (iStep){
 	case 0:
 		FlashIntf_Init(&Flash_Interface);
@@ -1550,6 +1597,8 @@ int uffs_main(int iStep)
 #else
 		ret = my_init_filesystem();
 #endif
+		ret = flash_intf_setMountPoints(flashIntfCtrl);
+
 		break;
 	case 99:
 		ret = my_release_filesystem();

@@ -24,6 +24,7 @@
 #include "NetworkInterface.h"
 #include "Protocol_F1F2.h"
 #include "IRC_Status.h"
+#include "flash-interface.h"
 #include "xparameters.h"
 #include "verbose.h"
 #include <stdint.h>
@@ -43,10 +44,10 @@
 
 #define FM_TEMP_FILE_DATA_BUFFER_SIZE  512
 
-#define FM_UFFS_MOUNT_POINT            "/cs0/"
-#define FM_UFFS_MOUNT_POINT_SIZE       5
-#define FM_LONG_FILENAME_SIZE          (FM_UFFS_MOUNT_POINT_SIZE + F1F2_FILE_NAME_SIZE + 1) /** mount point + filename + null char */
+//#define FM_UFFS_MOUNT_POINT            "/cs0/"
 
+#define FM_LONG_FILENAME_SIZE          (FM_UFFS_MOUNT_POINT_SIZE + F1F2_FILE_NAME_SIZE + 1) /** mount point + filename + null char */
+#define FM_FILENAME_SIZE               (FM_LONG_FILENAME_SIZE-FM_UFFS_MOUNT_POINT_SIZE)
 #define FM_MAX_NUM_FILE_ORDER_KEY      5    /**< Maximum number of file order key */
 
 #define GetFileID(fr) ((((uint64_t) fr->deviceSerialNumber) << 32) | (uint64_t) fr->posixTime)
@@ -56,6 +57,7 @@
  */
 enum fmState {
    FMS_INIT = 0,                       /**< Initializing file manager */
+   FMS_FILL_COLLECTION,                /**< Fill collection one by one */
    FMS_WAITING_FOR_REQUEST,            /**< Waiting for request from master */
    FMS_CHECKING_FILE_DATA              /**< Checking file data (CRC-16) */
 };
@@ -168,11 +170,17 @@ void File_Manager_SM();
 IRC_Status_t FM_InitFileDB();
 void FM_ListFileDB();
 uint8_t FM_FileExists(const char *filename);
+int FM_Remove(const char *filename);
+uint64_t FM_GetFreeSpace();
+IRC_Status_t FM_GetMountPoint(const char *filename,char mount_point[FM_MOUNT_POINT_STRING_SIZE]);
 uint32_t FM_GetFileSize(const char *filename);
 int FM_OpenFile(const char *filename, int oflag);
+int FM_CreateAndOpenFile(const char *filename, int oflag,uint32_t length);
+int FM_Rename(const char *old_name, const char *new_name);
 int FM_ReadFileToTmpFileDataBuffer(int fd, uint32_t length);
-fileRecord_t *FM_CreateFile(const char *filename);
+fileRecord_t *FM_CreateFile(const char *filename, uint32_t length);
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
+IRC_Status_t FM_AppendDataToFile(uint8_t *data, const char *filename, uint32_t length);
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
 IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase);
 IRC_Status_t FM_RemoveFile(fileRecord_t *file);
@@ -184,8 +192,11 @@ void FM_SortFileList(fileList_t *fileList);
 fileRecord_t *FM_FindFilePOSIXTimeInList(uint32_t posixTime, const fileList_t *fileList);
 fileRecord_t *FM_FindFileNameInList(const char *filename, const fileList_t *fileList);
 fileRecord_t *FM_GetFileRecord(uint32_t fileIndex);
-long flash_space_used(const char *mount_point);
-long flash_space_free(const char *mount_point);
+uint64_t flash_all_space_used();
+uint64_t flash_all_space_free();
+uint64_t flash_all_space_total();
+uint64_t flash_space_used(const char mount_point[FM_MOUNT_POINT_STRING_SIZE]);
+uint64_t flash_space_free(const char mount_point[FM_MOUNT_POINT_STRING_SIZE]);
 
 #endif // FILE_MANAGER_H
 

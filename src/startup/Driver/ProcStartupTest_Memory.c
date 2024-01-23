@@ -144,13 +144,14 @@ IRC_Status_t AutoTest_FlashMem(void) {
 
    // Test code taken from static function DebugTerminalParseFRW(circByteBuffer_t *cbuf)
    int fd;
-   char testfilename[] = FM_UFFS_MOUNT_POINT"TelopsFlashTest.bin";
+   char stestfilename[] = "TelopsFlashTest.bin";
    struct uffs_stat filestat;
    const uint32_t fileSize = 1024 * 1024;
    uint32_t counter;
    uint32_t counterMax;
    uint32_t data;
    uint32_t progressStep;
+   extern flashIntfCtrl_t gflashIntfCtrl;
 
    // There is supposed to be no remaining bytes in the buffer
    if (!CBB_Empty(&cbuf))
@@ -165,89 +166,94 @@ IRC_Status_t AutoTest_FlashMem(void) {
    progressStep = counterMax / 50;
 
    PRINTF("\n");
-   ATR_PRINTF("Writing flash test file");
-   fd = uffs_open(testfilename, UO_WRONLY | UO_CREATE | UO_TRUNC);
-   if (fd == -1)
-   {
-      ATR_ERR("Failed to open %s for writing.", testfilename);
-      return IRC_FAILURE;
-   }
+   for(int idx = 0; idx < gflashIntfCtrl.nr_partition ; idx++) {
+      char testfilename[FM_LONG_FILENAME_SIZE] = {0};
 
-   for (counter = 0; counter < counterMax;  counter++)
-   {
-      if (uffs_write(fd, &counter, sizeof(counter)) != sizeof(counter))
+      ATR_PRINTF("Writing flash test file in %s",gflashIntfCtrl.mount_points[idx]);
+      snprintf(testfilename,FM_LONG_FILENAME_SIZE, "%s%s", gflashIntfCtrl.mount_points[idx], stestfilename);
+
+      fd = uffs_open(testfilename, UO_WRONLY | UO_CREATE | UO_TRUNC);
+      if (fd == -1)
       {
-         ATR_ERR("File write failed (counter = %d).", counter);
-         return IRC_FAILURE;
-      }
-      if (counter % progressStep == 0) PRINT(".");
-   }
-
-   if (uffs_close(fd) == -1)
-   {
-      ATR_ERR("Failed to close %s.", testfilename);
-      return IRC_FAILURE;
-   }
-
-   ATR_PRINTF("Flash test file writing succeeded.");
-
-   ATR_PRINTF("Reading flash test file size...");
-   if (uffs_stat(testfilename, &filestat) == -1)
-   {
-      ATR_ERR("Failed to get file stat.");
-      return IRC_FAILURE;
-   }
-
-   ATR_INF("Flash test file size is %d bytes.", filestat.st_size);
-
-   if (filestat.st_size != fileSize)
-   {
-      ATR_ERR("Flash test file size mismatch.");
-      return IRC_FAILURE;
-   }
-
-   ATR_PRINTF("Reading flash test file");
-   fd = uffs_open(testfilename, UO_RDONLY);
-   if (fd == -1)
-   {
-      ATR_ERR("Failed to open %s for reading.", testfilename);
-      return IRC_FAILURE;
-   }
-
-   for (counter = 0; counter < counterMax;  counter++)
-   {
-      if (uffs_read(fd, &data, sizeof(data)) != sizeof(data))
-      {
-         ATR_ERR("File read failed (counter = %d).", counter);
+         ATR_ERR("Failed to open %s for writing.", testfilename);
          return IRC_FAILURE;
       }
 
-      if (data != counter)
+      for (counter = 0; counter < counterMax;  counter++)
       {
-         ATR_ERR("Data mismatch (counter = %d).", counter);
+         if (uffs_write(fd, &counter, sizeof(counter)) != sizeof(counter))
+         {
+            ATR_ERR("File write failed (counter = %d).", counter);
+            return IRC_FAILURE;
+         }
+         if (counter % progressStep == 0) PRINT(".");
+      }
+
+      if (uffs_close(fd) == -1)
+      {
+         ATR_ERR("Failed to close %s.", testfilename);
          return IRC_FAILURE;
       }
-      if (counter % progressStep == 0) PRINT(".");
+
+      ATR_PRINTF("Flash test file writing succeeded.");
+
+      ATR_PRINTF("Reading flash test file size...");
+      if (uffs_stat(testfilename, &filestat) == -1)
+      {
+         ATR_ERR("Failed to get file stat.");
+         return IRC_FAILURE;
+      }
+
+      ATR_INF("Flash test file size is %d bytes.", filestat.st_size);
+
+      if (filestat.st_size != fileSize)
+      {
+         ATR_ERR("Flash test file size mismatch.");
+         return IRC_FAILURE;
+      }
+
+      ATR_PRINTF("Reading flash test file");
+      fd = uffs_open(testfilename, UO_RDONLY);
+      if (fd == -1)
+      {
+         ATR_ERR("Failed to open %s for reading.", testfilename);
+         return IRC_FAILURE;
+      }
+
+      for (counter = 0; counter < counterMax;  counter++)
+      {
+         if (uffs_read(fd, &data, sizeof(data)) != sizeof(data))
+         {
+            ATR_ERR("File read failed (counter = %d).", counter);
+            return IRC_FAILURE;
+         }
+
+         if (data != counter)
+         {
+            ATR_ERR("Data mismatch (counter = %d).", counter);
+            return IRC_FAILURE;
+         }
+         if (counter % progressStep == 0) PRINT(".");
+      }
+      PRINT("\n");
+
+      if (uffs_close(fd) == -1)
+      {
+         ATR_ERR("Failed to close %s.", testfilename);
+         return IRC_FAILURE;
+      }
+
+      ATR_PRINTF("Flash test file reading succeeded.");
+
+      ATR_PRINTF("Removing flash test file...");
+      if (uffs_remove(testfilename) == -1)
+      {
+         ATR_ERR("Failed to remove %s.", testfilename);
+         return IRC_FAILURE;
+      }
+
+      ATR_PRINTF("Removing flash test file in %s succeeded.", gflashIntfCtrl.mount_points[idx]);
    }
-   PRINT("\n");
-
-   if (uffs_close(fd) == -1)
-   {
-      ATR_ERR("Failed to close %s.", testfilename);
-      return IRC_FAILURE;
-   }
-
-   ATR_PRINTF("Flash test file reading succeeded.");
-
-   ATR_PRINTF("Removing flash test file...");
-   if (uffs_remove(testfilename) == -1)
-   {
-      ATR_ERR("Failed to remove %s.", testfilename);
-      return IRC_FAILURE;
-   }
-
-   ATR_PRINTF("Removing flash test file succeeded.");
-
    ATR_PRINTF("Flash read and write test succeeded.");
    // End DebugTerminalParseFRW()
 

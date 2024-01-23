@@ -1257,10 +1257,12 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
    uffs_DIR *dp;
    struct uffs_dirent *ep;
    struct uffs_stat filestat;
-   long spaceTotal, spaceUsed, spaceFree;
+   uint64_t spaceTotal, spaceUsed;
+   uint64_t space_Free;
    char filename[FM_LONG_FILENAME_SIZE];
    uint32_t i;
    int retlen;
+   extern flashIntfCtrl_t gflashIntfCtrl;
 
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
@@ -1313,28 +1315,34 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
 
    if (fileList == NULL)
    {
-      dp = uffs_opendir(FM_UFFS_MOUNT_POINT);
-      if (dp != NULL)
-      {
-         i = 0;
-         while ((ep = uffs_readdir(dp)) != NULL)
+      for(int idx = 0; idx < gflashIntfCtrl.nr_partition ; idx++) {
+         dp = uffs_opendir(gflashIntfCtrl.mount_points[idx]);
+         if (dp != NULL)
          {
-            retlen = snprintf(filename,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
-            /* ensure generated "filename" string is valid */
-            if (retlen <= 0 || FM_LONG_FILENAME_SIZE <= retlen)
-                continue;
+            i = 0;
+            while ((ep = uffs_readdir(dp)) != NULL)
+            {
+               retlen = snprintf(filename,FM_LONG_FILENAME_SIZE, "%s%s", gflashIntfCtrl.mount_points[idx], ep->d_name);
+                /* ensure generated "filename" string is valid */
+                if (retlen <= 0 || FM_LONG_FILENAME_SIZE <= retlen)
+                	continue;
+               uffs_stat(filename, &filestat);
+               DT_PRINTF("%3d: %s (%d)", i++, ep->d_name, filestat.st_size);
+            }
+            DT_PRINTF("%d file(s)", i);
 
-            uffs_stat(filename, &filestat);
-            DT_PRINTF("%3d: %s (%d)", i++, ep->d_name, filestat.st_size);
+            spaceUsed = flash_space_used(gflashIntfCtrl.mount_points[idx]);
+            space_Free = flash_space_free(gflashIntfCtrl.mount_points[idx]);
+            DT_PRINTF("Space used in %s: = %llu B",gflashIntfCtrl.mount_points[idx], spaceUsed);
+            DT_PRINTF("Space free in %s: = %llu B",gflashIntfCtrl.mount_points[idx], space_Free );
+
+            uffs_closedir(dp);
          }
-         DT_PRINTF("%d file(s)", i);
-
-         uffs_closedir(dp);
-      }
-      else
-      {
-         DT_ERR("List failed.");
-         return IRC_FAILURE;
+         else
+         {
+            DT_ERR("List failed.");
+            return IRC_FAILURE;
+         }
       }
    }
    else
@@ -1348,11 +1356,14 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
 
    if ((fileList == NULL) || (fileList == &gFM_files))
    {
-      spaceTotal = uffs_space_total(FM_UFFS_MOUNT_POINT);
-      spaceUsed = flash_space_used(FM_UFFS_MOUNT_POINT);
-      spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
+      spaceTotal = flash_all_space_total();
+      spaceUsed = flash_all_space_used();
+      space_Free = flash_all_space_free();
 
-      DT_PRINTF("Space in bytes: used = %d, free = %d, total = %d", spaceUsed, spaceFree, spaceTotal);
+      DT_PRINTF("All Space in bytes: used = %llu", spaceUsed);
+      DT_PRINTF("All Space in bytes: free = %llu", space_Free);
+      DT_PRINTF("All Space in bytes: total= %llu", spaceTotal);
+
    }
 
    return IRC_SUCCESS;
@@ -1374,9 +1385,8 @@ IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
    char filename[FM_LONG_FILENAME_SIZE];
    int retval;
 
-   // Read filename
-   strcpy(filename, FM_UFFS_MOUNT_POINT);
-   arglen = GetNextArg(cbuf, (uint8_t *)&filename[FM_UFFS_MOUNT_POINT_SIZE], F1F2_FILE_NAME_SIZE);
+   // Read filename  
+   arglen = GetNextArg(cbuf, (uint8_t *)filename, F1F2_FILE_NAME_SIZE);
    if (arglen == 0)
    {
       DT_ERR("Empty file name.");
@@ -1384,7 +1394,7 @@ IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
    }
 
    // Add string terminator (null char)
-   filename[FM_UFFS_MOUNT_POINT_SIZE + arglen] = '\0';
+   filename[arglen] = '\0';
 
    // There is supposed to be no remaining bytes in the buffer
    if (!DebugTerminal_CommandIsEmpty(cbuf))
@@ -1394,13 +1404,13 @@ IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
    }
 
    // Protect flash dynamic values file
-   if (strcmp(filename, FM_UFFS_MOUNT_POINT FDV_FILENAME) == 0)
+   if (strcmp(filename, FDV_FILENAME) == 0)
    {
       DT_ERR("%s is protected.", filename);
       return IRC_FAILURE;
    }
 
-   retval = uffs_remove(filename);
+   retval = FM_Remove(filename);
    if (retval == -1)
    {
       DT_ERR("Failed to remove %s.", filename);
@@ -1813,6 +1823,7 @@ IRC_Status_t DebugTerminalParseFORMAT(circByteBuffer_t *cbuf)
 /**
  * Flash read and write test.
  * This parser is used to test flash reading and writing.
+ * Update: With more than one die, the test is made in each one.
  *
  * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
  *
@@ -1822,13 +1833,14 @@ IRC_Status_t DebugTerminalParseFORMAT(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseFRW(circByteBuffer_t *cbuf)
 {
    int fd;
-   char testfilename[] = FM_UFFS_MOUNT_POINT"TelopsFlashTest.bin";
-   struct uffs_stat filestat;
+   char stestfilename[] = "TelopsFlashTest.bin";
    const uint32_t fileSize = 1024 * 1024;
+   uint32_t currentFileSize = 0;
    uint32_t counter;
-   uint32_t counterMax;
    uint32_t data;
-   uint32_t progressStep;
+   const uint32_t counterMax = fileSize / sizeof(counter); // 1 MB
+   const uint32_t progressStep = counterMax / 50;
+   extern flashIntfCtrl_t gflashIntfCtrl;
 
    // There is supposed to be no remaining bytes in the buffer
    if (!DebugTerminal_CommandIsEmpty(cbuf))
@@ -1839,92 +1851,95 @@ IRC_Status_t DebugTerminalParseFRW(circByteBuffer_t *cbuf)
 
    DT_PRINT("Performing flash read and write test...");
 
-   counterMax = fileSize / sizeof(counter); // 1 MB
-   progressStep = counterMax / 50;
+   for(int idx = 0; idx < gflashIntfCtrl.nr_partition ; idx++) {
+      char testfilename[FM_LONG_FILENAME_SIZE] = {0};
 
-   FPGA_PRINT("DT: Writing flash test file");
-   fd = uffs_open(testfilename, UO_WRONLY | UO_CREATE | UO_TRUNC);
-   if (fd == -1)
-   {
-      DT_ERR("\nFailed to open %s for writing.", testfilename);
-      return IRC_SUCCESS;
-   }
+      DT_PRINTF("DT: Writing flash test file in %s",gflashIntfCtrl.mount_points[idx]);
+      snprintf(testfilename,FM_LONG_FILENAME_SIZE, "%s%s", gflashIntfCtrl.mount_points[idx], stestfilename);
 
-   for (counter = 0; counter < counterMax;  counter++)
-   {
-      if (uffs_write(fd, &counter, sizeof(counter)) != sizeof(counter))
+      fd = uffs_open( testfilename, UO_WRONLY | UO_CREATE | UO_TRUNC);
+      if (fd == -1)
       {
-         DT_ERR("\nFile write failed (counter = %d).", counter);
-         return IRC_SUCCESS;
-      }
-      if (counter % progressStep == 0) PRINT(".");
-   }
-   PRINT("\n");
-
-   if (uffs_close(fd) == -1)
-   {
-      DT_ERR("Failed to close %s.", testfilename);
-      return IRC_SUCCESS;
-   }
-
-   DT_PRINT("Flash test file writing succeeded.");
-
-   DT_PRINT("Reading flash test file size...");
-   if (uffs_stat(testfilename, &filestat) == -1)
-   {
-      DT_ERR("Failed to get file stat.");
-      return IRC_SUCCESS;
-   }
-
-   DT_PRINTF("Flash test file size is %d bytes.", filestat.st_size);
-
-   if (filestat.st_size != fileSize)
-   {
-      DT_ERR("Flash test file size mismatch.");
-      return IRC_SUCCESS;
-   }
-
-   FPGA_PRINT("DT: Reading flash test file");
-   fd = uffs_open(testfilename, UO_RDONLY);
-   if (fd == -1)
-   {
-      DT_ERR("\nFailed to open %s for reading.", testfilename);
-      return IRC_SUCCESS;
-   }
-
-   for (counter = 0; counter < counterMax;  counter++)
-   {
-      if (uffs_read(fd, &data, sizeof(data)) != sizeof(data))
-      {
-         DT_ERR("\nFile read failed (counter = %d).", counter);
+         DT_ERR("\nFailed to open %s for writing.Error %ld", testfilename,uffs_get_error());
          return IRC_SUCCESS;
       }
 
-      if (data != counter)
+      for (counter = 0; counter < counterMax;  counter++)
       {
-         DT_ERR("\nData mismatch (counter = %d).", counter);
+         if (uffs_write(fd, &counter, sizeof(counter)) != sizeof(counter))
+         {
+            DT_ERR("\nFile write failed (counter = %d).", counter);
+            return IRC_SUCCESS;
+         }
+         if (counter % progressStep == 0) PRINT(".");
+      }
+      PRINT("\n");
+
+      if (uffs_close(fd) == -1)
+      {
+         DT_ERR("Failed to close %s.", testfilename);
          return IRC_SUCCESS;
       }
-      if (counter % progressStep == 0) PRINT(".");
+
+      DT_PRINT("Flash test file writing succeeded.");
+
+      DT_PRINT("Reading flash test file size...");
+      if ((currentFileSize = FM_GetFileSize(stestfilename)) == 0)
+      {
+         DT_ERR("Failed to get file stat.");
+         return IRC_SUCCESS;
+      }
+
+      DT_PRINTF("Flash test file size is %d bytes.",currentFileSize);
+
+      if (fileSize != currentFileSize)
+      {
+         DT_ERR("Flash test file size mismatch.");
+         return IRC_SUCCESS;
+      }
+
+      FPGA_PRINT("DT: Reading flash test file");
+      fd = uffs_open(testfilename, UO_RDONLY);
+      if (fd == -1)
+      {
+         DT_ERR("\nFailed to open %s for reading.",testfilename);
+         return IRC_SUCCESS;
+      }
+
+      for (counter = 0; counter < counterMax;  counter++)
+      {
+         if (uffs_read(fd, &data, sizeof(data)) != sizeof(data))
+         {
+            DT_ERR("\nFile read failed (counter = %d).", counter);
+            return IRC_SUCCESS;
+         }
+
+         if (data != counter)
+         {
+            DT_ERR("\nData mismatch (counter = %d).", counter);
+            return IRC_SUCCESS;
+         }
+         if (counter % progressStep == 0) PRINT(".");
+      }
+      PRINT("\n");
+
+      if (uffs_close(fd) == -1)
+      {
+         DT_ERR("Failed to close %s.", testfilename);
+         return IRC_SUCCESS;
+      }
+
+      DT_PRINT("Flash test file reading succeeded.");
+
+      DT_PRINT("Removing flash test file...");
+      if (uffs_remove(testfilename) == -1)
+      {
+         DT_ERR("Failed to remove %s.", testfilename);
+         return IRC_SUCCESS;
+      }
+
+      DT_PRINT("Removing flash test file in %s succeeded.", gflashIntfCtrl.mount_points[idx]);
    }
-   PRINT("\n");
-
-   if (uffs_close(fd) == -1)
-   {
-      DT_ERR("Failed to close %s.", testfilename);
-      return IRC_SUCCESS;
-   }
-
-   DT_PRINT("Flash test file reading succeeded.");
-
-   DT_PRINT("Removing flash test file...");
-   if (uffs_remove(testfilename) == -1)
-   {
-      DT_ERR("Failed to remove %s.", testfilename);
-      return IRC_SUCCESS;
-   }
-
-   DT_PRINT("Removing flash test file succeeded.");
 
    DT_PRINT("Flash read and write test succeeded.");
 

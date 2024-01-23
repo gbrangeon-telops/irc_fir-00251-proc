@@ -34,6 +34,23 @@
 
 
 /**
+ * File data struct used in private.
+ */
+
+typedef struct file_struct  {
+   union {
+      struct  {
+         char mount[FM_UFFS_MOUNT_POINT_SIZE];
+         char filename[FM_FILENAME_SIZE];
+      };
+      char longFilename[FM_LONG_FILENAME_SIZE];
+   };
+
+   int fd;
+   long size;
+} file_struct_t ;
+
+/**
  * File manager network port.
  */
 netIntfPort_t fmPort;
@@ -88,6 +105,10 @@ fileRecord_t *gFM_flashDynamicValuesFile;
  */
 uint8_t tmpFileDataBuffer[FM_TEMP_FILE_DATA_BUFFER_SIZE];
 
+/*
+ * collection file loaded
+ */
+uint8_t gCollectionIdx = 0;
 
 void FM_ClearFileDB();
 int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
@@ -144,12 +165,15 @@ void File_Manager_SM()
    static uint32_t fileIndex;
    static uint32_t fileSize;
    static uint16_t fileCRC16;
-   static long spaceTotal, spaceUsed, spaceFree;
+   static uint64_t spaceTotal, spaceUsed, spaceFree;
+   static uint32_t length;
    extern char gFI_FileSignature[][5];
+   extern flashIntfCtrl_t gflashIntfCtrl;
+   extern flashDynamicValues_t gFlashDynamicValues;
    IRC_Status_t status;
    fileRecord_t *file;
-   uint32_t length;
-
+   static char mountname[FM_MOUNT_POINT_STRING_SIZE];
+   static uffs_Device *dev ;
    F1F2_CommandClear(&fmResponse.f1f2);
 
    switch (fmCurresntState)
@@ -158,11 +182,48 @@ void File_Manager_SM()
          // Clear file manager commands
          F1F2_CommandClear(&fmRequest.f1f2);
          F1F2_CommandClear(&fmResponse.f1f2);
-         
-         fmCurresntState = FMS_WAITING_FOR_REQUEST;
-         break;
 
+         fmCurresntState = FMS_FILL_COLLECTION;
+         /*no break*/
+      case FMS_FILL_COLLECTION:
+         // Validate collection files and fill information
+         if(gCollectionIdx < gFM_collections.count) {
+            //already load in initDB
+            if((gFM_collections.item[gCollectionIdx]->posixTime != gFlashDynamicValues.CalibrationCollectionPOSIXTimeAtStartup)) {
+               if (FM_FillCollectionInfo(gFM_collections.item[gCollectionIdx]) != IRC_SUCCESS)
+               {
+                  // Remove file from collection list
+                  FM_RemoveFileFromList(gFM_collections.item[gCollectionIdx], &gFM_collections);
+
+                  FM_ERR("Error to fill collection item %d",gCollectionIdx);
+                  status = IRC_FAILURE;
+               }
+            }
+            gCollectionIdx++;
+
+         }
+         else {
+            //SET key
+            fileOrder_t keys[FM_MAX_NUM_FILE_ORDER_KEY];
+            keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
+            keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
+            keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
+            keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
+            keys[4] = gFlashDynamicValues.CalibrationCollectionFileOrderKey5;
+            FM_SetFileListKeys(&gFM_collections, keys, FM_MAX_NUM_FILE_ORDER_KEY);
+
+            fmCurresntState = FMS_WAITING_FOR_REQUEST;
+            FM_INF("SM:Fill Collection Done.Go to waiting for request state");
+
+         }
+         break;
       case FMS_WAITING_FOR_REQUEST:
+         //check collection is read,because gCollectionIdx can be reset
+         if(gCollectionIdx < gFM_collections.count) {
+            fmCurresntState = FMS_FILL_COLLECTION;
+            break;
+         }
+
          // Check for new request
          if (CB_Pop(fmPort.cmdQueue, &fmRequest) == IRC_SUCCESS)
          {
@@ -200,8 +261,8 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_CREATE_REQ:
-                     // Create file
-                     file = FM_CreateFile(fmRequest.f1f2.payload.fileName.name);
+                     // Create file, maximum size 512
+                     file = FM_CreateFile(fmRequest.f1f2.payload.fileName.name,FM_TEMP_FILE_DATA_BUFFER_SIZE);
                      if (file != NULL)
                      {
                         // Add file to list
@@ -299,8 +360,19 @@ void File_Manager_SM()
                                  }
                                  else
                                  {
-                                    long spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
-                                    uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+                                    //In this case we want the freespace of the current mount point
+                                    status = FM_GetMountPoint(gFM_files.item[fileIndex]->name,mountname);
+                                    if(status == IRC_SUCCESS) {
+                                       spaceFree = flash_space_free(mountname);
+                                       dev = uffs_GetDeviceFromMountPoint(mountname);
+
+                                    }
+                                    else {
+                                       FM_ERR("File %s is not found, mount point set to default",gFM_files.item[fileIndex]->name);
+                                       spaceFree = FM_GetFreeSpace();
+                                       //get device info from any mount point
+                                       dev = uffs_GetDeviceFromMountPoint(gflashIntfCtrl.mount_points[0]);
+                                    }
                                     long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
                                     uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
                                     long tsfsLen, tsdvLen, tsicLen;
@@ -446,21 +518,21 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_USED_SPACE_REQ:
-                     spaceUsed = flash_space_used(FM_UFFS_MOUNT_POINT);
+                     spaceUsed = flash_all_space_used();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_USED_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceUsed;
                      break;
 
                   case F1F2_CMD_FILE_FREE_SPACE_REQ:
-                     spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
+                     spaceFree = flash_all_space_free();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_FREE_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceFree;
                      break;
 
                   case F1F2_CMD_FILE_TOTAL_SPACE_REQ:
-                     spaceTotal = uffs_space_total(FM_UFFS_MOUNT_POINT);
+                     spaceTotal = flash_all_space_total();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_TOTAL_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceTotal;
@@ -541,89 +613,109 @@ IRC_Status_t FM_InitFileDB()
    struct uffs_dirent *de;
    struct uffs_stat filestat;
    char filelongname[FM_LONG_FILENAME_SIZE];
-   IRC_Status_t status;
+   IRC_Status_t status = IRC_SUCCESS;
    uint32_t fileCount;
-   uint32_t i;
+   extern flashDynamicValues_t gFlashDynamicValues;
+   extern flashIntfCtrl_t gflashIntfCtrl;
    int retlen;
 
    FM_ClearFileDB();
 
-   fileCount = 0;
-
-   dir = uffs_opendir(FM_UFFS_MOUNT_POINT);
-   if (dir != NULL)
+   for(int idx = 0 ; idx < gflashIntfCtrl.nr_partition ; idx++)
    {
-      while ((de = uffs_readdir(dir)) != NULL)
+      fileCount = 0;
+      FM_PRINTF("Open mount %d: %s\n", idx,gflashIntfCtrl.mount_points[idx]);
+
+      dir = uffs_opendir(gflashIntfCtrl.mount_points[idx]);
+      if (dir != NULL)
       {
-         FM_PRINTF("%s file found.\n", de->d_name);
 
-         if (fileCount < FM_MAX_NUM_FILE)
-         {
-            retlen = snprintf(filelongname,FM_LONG_FILENAME_SIZE, "%s%s", FM_UFFS_MOUNT_POINT, de->d_name);
-            /* ensure generated "filename" string is valid */
-            if (retlen <= 0 || FM_LONG_FILENAME_SIZE <= retlen)
-                continue;
+          while ((de = uffs_readdir(dir)) != NULL)
+          {
+             FM_PRINTF("%s file found.\n", de->d_name);
 
+             if (fileCount < FM_MAX_NUM_FILE)
+             {
+                retlen = snprintf(filelongname,FM_LONG_FILENAME_SIZE, "%s%s", gflashIntfCtrl.mount_points[idx], de->d_name);
+                /* ensure generated "filename" string is valid */
+                if (retlen <= 0 || FM_LONG_FILENAME_SIZE <= retlen)
+                    continue;
+                if (uffs_stat(filelongname, &filestat) == 0)
+                {
+                   // Add file in database
+                   strcpy(gFM_fileDB[fileCount].name, de->d_name);
+                   gFM_fileDB[fileCount].size = filestat.st_size;
 
-            if (uffs_stat(filelongname, &filestat) == 0)
-            {
-               // Add file in database
-               strcpy(gFM_fileDB[fileCount].name, de->d_name);
-               gFM_fileDB[fileCount].size = filestat.st_size;
+                   // Close file
+                   status = FM_CloseFile(&gFM_fileDB[fileCount], FMP_INIT);
+                   if (status != IRC_SUCCESS)
+                   {
+                      FM_ERR("File %s failed to close.", filelongname);
+                   }
 
-               // Close file
-               status = FM_CloseFile(&gFM_fileDB[fileCount], FMP_INIT);
-               if (status != IRC_SUCCESS)
-               {
-                  FM_ERR("File %s failed to close.", filelongname);
-               }
+                   // Add file to list
+                   FM_AddFileToList(&gFM_fileDB[fileCount], &gFM_files, NULL);
 
-               // Add file to list
-               FM_AddFileToList(&gFM_fileDB[fileCount], &gFM_files, NULL);
+                   fileCount++;
+                }
+                else
+                {
+                   FM_ERR("File stat failed for %s.", filelongname);
+                }
+             }
+             else
+             {
+                FM_INF("File %s dropped because file DB size is limited to %d.", de->d_name, FM_MAX_NUM_FILE);
+             }
+          }
 
-               fileCount++;
-            }
-            else
-            {
-               FM_ERR("File stat failed for %s.", filelongname);
-            }
+          uffs_closedir(dir);
          }
          else
          {
-            FM_INF("File %s dropped because file DB size is limited to %d.", de->d_name, FM_MAX_NUM_FILE);
+            FM_ERR("Open dir failed.");
+            return IRC_FAILURE;
          }
       }
+       if (gFM_flashSettingsFile == NULL)
+       {
+          FM_ERR("Cannot find valid flash setting file.");
+          FlashSettings_Reset(&flashSettings);
+       }
 
-      uffs_closedir(dir);
 
-      if (gFM_flashSettingsFile == NULL)
-      {
-         FM_ERR("Cannot find valid flash setting file.");
-         FlashSettings_Reset(&flashSettings);
-      }
+       gCollectionIdx = 0;
+       //set last collection for Calibration SM if found
+       for (int i = gFM_collections.count - 1; i >= 0; i--)
+       {
+          if ((gFM_collections.item[i]->posixTime == gFlashDynamicValues.CalibrationCollectionPOSIXTimeAtStartup) || (i == 0))
+          {
+             FM_INF("Try to fill collection at posix %d",gFM_collections.item[i]->posixTime );
+             if (FM_FillCollectionInfo(gFM_collections.item[i]) != IRC_SUCCESS)
+             {
+                // Remove file from collection list
+                FM_RemoveFileFromList(gFM_collections.item[i], &gFM_collections);
 
-      // Validate collection files and fill information
-      i = 0;
-      while (i < gFM_collections.count)
-      {
-         if (FM_FillCollectionInfo(gFM_collections.item[i]) != IRC_SUCCESS)
-         {
-            // Remove file from collection list
-            FM_RemoveFileFromList(gFM_collections.item[i], &gFM_collections);
-         }
-         else
-         {
-            i++;
-         }
-      }
-   }
-   else
-   {
-      FM_ERR("Open dir failed.");
-      return IRC_FAILURE;
-   }
+                FM_INF("Error to fill collection item %d",i);
+                status = IRC_FAILURE;
+             }
+             else {
+                //skip the 0 for the next one
+                if(i==0) {
+                   gCollectionIdx++;
+                }
+             }
+             break;
+          }
 
-   return IRC_SUCCESS;
+       }
+
+       if(status != IRC_SUCCESS) {
+          FM_ERR("Failed to load first collection.");
+       }
+
+
+   return status;
 }
 
 /**
@@ -655,24 +747,271 @@ void FM_ListFileDB()
 }
 
 /**
- * Indicate whether file exists.
+ * Print file_data fields
+ *
+ * @param file_struct to be print
+ * @param add text to be print
+
+ */
+static void FM_PrintFileData(const file_struct_t *file_data,const char* function)
+{
+   FM_INF("File data info in %s:\n",function);
+   FM_INF("          -fd: %d \n",file_data->fd);
+   FM_INF("          -filename: %s \n",file_data->filename);
+   FM_INF("          -mount: %c%c%c%c%c \n",file_data->mount[0],file_data->mount[1],file_data->mount[2],file_data->mount[3],file_data->mount[4]);
+   FM_INF("          -longfilename: %s \n",file_data->longFilename);
+   FM_INF("          -size: %d \n",file_data->size);
+
+}
+/**
+*  Set the size field of file_struct_t, if file not present size is set to 0
+* @param file_struct to be read
+*
+* @return IRC_SUCCESS if file exists.
+* @return IRC_FAILURE if file does not exist.
+*/
+static IRC_Status_t FM_GetFileDataSize(file_struct_t* file_data)
+{
+   struct uffs_stat filestat;
+
+   /* judge file type, dir is to be delete by uffs_rmdir, others by uffs_remove */
+   if (uffs_lstat(file_data->longFilename, &filestat) < 0)
+   {
+      //FM_INF(" %s: not present %s",__func__, file_data->longFilename);
+      file_data->size = 0;
+      return  IRC_FAILURE;
+   }
+   else {
+      //FM_INF(" %s: size is %d, reading %s",__func__, filestat.st_size,file_data->longFilename);
+      file_data->size = filestat.st_size;
+   }
+   return IRC_SUCCESS;
+}
+
+
+/**
+ * Open an file using the filename and flag parameters, file_data must be initialized.
+ *
+ *
+ * @param file_struct.
+ * @param flag
+ */
+static IRC_Status_t FM_OpenFileData(file_struct_t* file_data, int oflag)
+{
+   if((file_data->fd = uffs_open( file_data->longFilename, oflag)) == -1) {
+      FM_ERR("Failed to open %s.Error %ld", file_data->longFilename,uffs_get_error());
+      return IRC_FAILURE;
+   }
+   return IRC_SUCCESS;
+}
+
+
+/**
+ *  Set the file data structure in input using the file name:
+ *  if file already exist get the size of the existent file and set the name
+ *  If no exist, set the size with the input if enough space within one of the mount else set with 0
+ *     then set the name with filename input
+ *
+ *    @param file_struct to be set
+ *    @param filename of the file to be create
+ *    @param minimum size of the file.
+ *
+ */
+static IRC_Status_t FM_InitFileData(file_struct_t* file_data,const char *filename, long size)
+{
+   extern flashIntfCtrl_t gflashIntfCtrl;
+
+   //init variables
+   file_data->fd = -1;
+   file_data->size = 0;
+   //memset(file_data->longFilename,0,FM_LONG_FILENAME_SIZE);
+
+   for (int i = 0; i <gflashIntfCtrl.nr_partition ; i++) {
+      snprintf(file_data->longFilename,FM_LONG_FILENAME_SIZE, "%s%s", gflashIntfCtrl.mount_points[i], filename);
+
+      if( FM_GetFileDataSize(file_data)== IRC_SUCCESS) {
+         //at this point file struct is set
+         return IRC_SUCCESS;
+      }
+      //clear name
+      //memset(file_data->longFilename,0,FM_LONG_FILENAME_SIZE);
+   }
+
+
+   //try found mount available
+   for (int i = 0; i <gflashIntfCtrl.nr_partition ; i++) {
+       if( (flash_space_free(gflashIntfCtrl.mount_points[i])) >= size) {
+          strncpy(file_data->mount,gflashIntfCtrl.mount_points[i],FM_MOUNT_POINT_STRING_SIZE);
+          file_data->size = size;
+          break;
+       }
+    }
+
+   if(file_data->size == 0) {
+      FM_ERR("%s :Not enough space to create %s !\n",__func__,filename);
+      return IRC_FAILURE;
+   }
+
+   strncat(file_data->longFilename, filename,FM_FILENAME_SIZE);
+
+   return IRC_SUCCESS;
+}
+
+/**
+ *  Call the InitFileDAta function with size of 1, the purpose is to get the file data info from an existant file
+ *  In the case, the file doesn't exist in the flash, function will return Failure
+ *    @param file_struct to be get
+ *    @param filename of the file to be get
+ *
+ *    @return IRC_SUCCESS if file exists.
+ *    @return IRC_FAILURE if file does not exist.
+ */
+static IRC_Status_t FM_GetFileData(file_struct_t* file_data,const char *filename)
+{
+   FM_InitFileData(file_data,filename,1);
+   if(file_data->size == 1 ) {
+      FM_DBG("%s :Warning: File is not present %s \n",__func__,file_data->longFilename);
+      return IRC_FAILURE;
+   }
+   return IRC_SUCCESS;
+}
+
+/**
+ * The Generic Write function open, seek, write and close the file
+ * @param data to be write
+ * @param filename of the file
+ * @param offset and length :writes up to length from the buffer starting at offset
+ * @param flag: flag must include UO_WRONLY
+ *
+ *  @return IRC_SUCCESS if data are added to the file
+ *  @return IRC_FAILURE if failed during the write process.
+ */
+static IRC_Status_t FM_GenericWriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length,int oflag)
+{
+   int fd = FM_OpenFile(filename, oflag);
+   if (fd == -1)
+   {
+      FM_ERR("Failed to open %s.", filename);
+      return IRC_FAILURE;
+   }
+
+   if (uffs_seek(fd, offset, USEEK_SET) == -1)
+   {
+      FM_ERR("File seek failed.");
+      return IRC_FAILURE;
+   }
+
+   if (uffs_write(fd, data, length) != length)
+   {
+      FM_ERR("File write failed.");
+      uffs_close(fd);
+      return IRC_FAILURE;
+   }
+
+
+   if (uffs_close(fd) == -1)
+   {
+      FM_ERR("File close failed.\n");
+      return IRC_FAILURE;
+   }
+
+   return IRC_SUCCESS;
+}
+
+
+
+/**
+ * Indicate whether file exists in one of the mount.
  *
  * @param filename is the name of the file.
  *
- * @return 1 if file exists.
+ * @return 1 if file exists in one.
  * @return 0 if file does not exist.
  */
 uint8_t FM_FileExists(const char *filename)
 {
-   char filelongname[FM_LONG_FILENAME_SIZE];
-   struct uffs_stat filestat;
 
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   return (uffs_stat(filelongname, &filestat) == 0);
+  file_struct_t file_data;
+  extern flashIntfCtrl_t gflashIntfCtrl;
+  for (int i = 0; i <gflashIntfCtrl.nr_partition ; i++) {
+     snprintf(file_data.longFilename,FM_LONG_FILENAME_SIZE, "%s%s", gflashIntfCtrl.mount_points[i], filename);
+     if( FM_GetFileDataSize(&file_data) == IRC_SUCCESS) {
+
+        return 1;
+     }
+  }
+
+   return 0;
+
 }
 
 /**
- * Return file size.
+ * Remove file in any mount using the filename.
+ *
+ * @param filename is the name of the file.
+ *
+ * @return 0 if remove successfully
+ * @return -1 if file doesn t exist or can't be remove
+ */
+int FM_Remove(const char *filename)
+{
+   file_struct_t file_data;
+   if(FM_GetFileData(&file_data,filename) == IRC_FAILURE)
+   {
+      FM_ERR("File remove failed.");
+      FM_PrintFileData(&file_data,__func__);
+   }
+   else {
+      return uffs_remove(file_data.longFilename);
+   }
+
+   return -1;
+}
+
+/**
+ * Indicate free space from the largest mount space
+ *
+ * @return Space available of the largest mount space
+ */
+uint64_t FM_GetFreeSpace()
+{
+   extern flashIntfCtrl_t gflashIntfCtrl;
+   long largeFreeSpace = 0,freeSpace;
+   for (int i = 0; i <gflashIntfCtrl.nr_partition ; i++) {
+      if( (freeSpace = flash_space_free(gflashIntfCtrl.mount_points[i])) > largeFreeSpace) {
+         largeFreeSpace = freeSpace;
+      }
+   }
+   return largeFreeSpace;
+}
+
+/**
+ * Get the mount point for a file.
+ *
+ * @param filename is the name of the file
+ * @param mount_point to set
+ *
+ * @return 0 if set successfully
+ * @return -1 if file doesn t exist
+ */
+IRC_Status_t FM_GetMountPoint(const char *filename,char mount_point[FM_MOUNT_POINT_STRING_SIZE])
+{
+   file_struct_t file_data;
+   if(FM_GetFileData(&file_data,filename) == IRC_FAILURE)
+   {
+      FM_ERR("File get mount point failed.");
+      FM_PrintFileData(&file_data,__func__);
+      return IRC_FAILURE;
+   }
+   else {
+      strncpy(mount_point,file_data.mount,FM_UFFS_MOUNT_POINT_SIZE);
+      mount_point[FM_UFFS_MOUNT_POINT_SIZE] = '\0';
+   }
+   return IRC_SUCCESS;
+}
+
+/**
+ * Return file size. The function GetFileData fill all the file_data fields
  *
  * @param filename is the name of the file.
  *
@@ -681,19 +1020,68 @@ uint8_t FM_FileExists(const char *filename)
  */
 uint32_t FM_GetFileSize(const char *filename)
 {
-   char filelongname[FM_LONG_FILENAME_SIZE];
-   struct uffs_stat filestat;
+   file_struct_t file_data;
 
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   if (uffs_stat(filelongname, &filestat) == -1)
+   if(FM_GetFileData(&file_data,filename)  == IRC_FAILURE)
    {
-      FM_ERR("File stat failed.");
+      FM_ERR("File %s get size failed.");
+      FM_PrintFileData(&file_data,__func__);
       return 0;
    }
 
-   return filestat.st_size;
+   return (uint32_t)file_data.size;
 }
 
+/**
+ * Create file data and add UO_CREATE flag then call the open function
+ *    @param: filename to be created and opened
+ *    @param: flag for the open function
+ *    @param: minimum length of the file
+ *
+ *    @return the file descriptor
+ *
+ */
+int FM_CreateAndOpenFile(const char *filename, int oflag,uint32_t length)
+{
+   file_struct_t file_data;
+   IRC_Status_t status;
+   oflag |= UO_CREATE;
+   status = FM_InitFileData(&file_data,filename,length);
+   if (status == IRC_FAILURE)
+   {
+      FDV_ERR("%s:Can't init file data",__func__);
+      return -1;
+   }
+   status = FM_OpenFileData(&file_data,oflag);
+   if (status == IRC_FAILURE)
+   {
+      FDV_ERR("%s: Can't open file data",__func__);
+   }
+   return file_data.fd;
+}
+
+/**
+ * Rename a file (old_name) in flash, using the new_name in input.
+ * The file will stay in the same mount directory.
+ *
+ *  @param: old name of the file to be changed
+ *  @param: new name to apply
+ */
+int FM_Rename(const char *old_name, const char *new_name)
+{
+   file_struct_t old_file_data,new_file_data;
+   if(FM_GetFileData(&old_file_data,old_name) == IRC_FAILURE)
+   {
+      FM_ERR("File rename failed.");
+      FM_PrintFileData(&old_file_data,__func__);
+      return -1;
+   }
+   //set new name with mount of the old file
+   strncpy(new_file_data.mount,old_file_data.mount,FM_UFFS_MOUNT_POINT_SIZE);
+   strncpy(new_file_data.filename,new_name,FM_FILENAME_SIZE);
+   return uffs_rename(old_file_data.longFilename,new_file_data.longFilename) ;
+
+}
 /**
  * Open file and return file descriptor.
  *
@@ -705,10 +1093,25 @@ uint32_t FM_GetFileSize(const char *filename)
  */
 int FM_OpenFile(const char *filename, int oflag)
 {
-   char filelongname[FM_LONG_FILENAME_SIZE];
 
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   return uffs_open(filelongname, oflag);
+   file_struct_t file_data;
+   if(oflag & UO_CREATE) {
+      FM_INF("Warning:Call FM_CreateAndOpenFile function instead of set UO_CREATE flag.");
+
+   }
+
+   if(FM_GetFileData(&file_data,filename) == IRC_FAILURE) {
+      FM_ERR("%s:Failed to get file",__func__);
+      FM_PrintFileData(&file_data,__func__);
+      return -1;
+   }
+
+   if(FM_OpenFileData(&file_data,oflag) == IRC_FAILURE) {
+      FM_ERR("Error using open with %s", filename);
+
+   }
+
+   return file_data.fd;
 }
 
 
@@ -773,7 +1176,20 @@ IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t o
 
    return IRC_SUCCESS;
 }
-
+/**
+ * Append data to file stored in file system.
+ *
+ * @param data is a pointer to the byte buffer that contains data to be written.
+ * @param filename is the name of the file to write.
+ * @param length is the number of bytes to write to the file.
+ *
+ * @return IRC_SUCCESS if data was successfully written.
+ * @return IRC_FAILURE if failed to write data.
+ */
+IRC_Status_t FM_AppendDataToFile(uint8_t *data, const char *filename, uint32_t length)
+{
+   return FM_GenericWriteDataToFile(data,filename, 0, length,UO_WRONLY | UO_APPEND);
+}
 /**
  * Write data to file stored in file system.
  *
@@ -787,48 +1203,20 @@ IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t o
  */
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length)
 {
-   int fd = FM_OpenFile(filename, UO_WRONLY);
-   if (fd == -1)
-   {
-      FM_ERR("Failed to open %s.", filename);
-      return IRC_FAILURE;
-   }
-
-   if (uffs_seek(fd, offset, USEEK_SET) == -1)
-   {
-      FM_ERR("File seek failed.");
-      return IRC_FAILURE;
-   }
-
-   if (uffs_write(fd, data, length) != length)
-   {
-      FM_ERR("File write failed.");
-      uffs_close(fd);
-      return IRC_FAILURE;
-   }
-
-   if (uffs_close(fd) == -1)
-   {
-      FM_ERR("File close failed.\n");
-      return IRC_FAILURE;
-   }
-
-   return IRC_SUCCESS;
+   return FM_GenericWriteDataToFile(data,filename, offset, length,UO_WRONLY );
 }
 
+
 /**
- * Create zero length file in file system.
+ * Create preallocate length file in file system.
  *
  * @param filename is the name of the file to create.
  *
  * @return file record pointer if file was successfully created.
  * @return NULL if failed to create file.
  */
-fileRecord_t *FM_CreateFile(const char *filename)
+fileRecord_t *FM_CreateFile(const char *filename, uint32_t length)
 {
-   int fd;
-   char filelongname[FM_LONG_FILENAME_SIZE];
-   uint32_t i;
 
    // Check if file exists
    if (FM_FileExists(filename))
@@ -838,7 +1226,7 @@ fileRecord_t *FM_CreateFile(const char *filename)
    }
 
    // Find empty file record index
-   i = 0;
+   int i = 0;
    while ((i < FM_MAX_NUM_FILE) && (gFM_fileDB[i].name[0] != '\0'))
    {
       i++;
@@ -851,19 +1239,26 @@ fileRecord_t *FM_CreateFile(const char *filename)
    }
 
    // Create file
-   fd = FM_OpenFile(filename, UO_WRONLY | UO_CREATE | UO_TRUNC);
-   if (fd == -1)
+   file_struct_t file_data;
+   FM_InitFileData(&file_data,filename,length);
+
+   if(file_data.size == 0) {
+      FM_ERR("File creation failed, not enough size");
+      return NULL;
+   }
+
+   FM_OpenFileData(&file_data, UO_WRONLY | UO_CREATE | UO_TRUNC);
+   if (file_data.fd == -1)
    {
       FM_ERR("File open failed.");
       return NULL;
    }
 
-   if (uffs_close(fd) == -1)
+
+   if (uffs_close(file_data.fd ) == -1)
    {
       FM_ERR("File close failed.");
-
-      sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-      if (uffs_remove(filelongname) == -1)
+      if (uffs_remove(file_data.longFilename) == -1)
       {
          FM_ERR("File remove failed.");
       }
@@ -1023,17 +1418,13 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
 {
    extern flashDynamicValues_t gFlashDynamicValues;
 
-   char filelongname[FM_LONG_FILENAME_SIZE];
-
    if ((file == NULL) || (file->name[0] == '\0'))
    {
       FM_ERR("Invalid file.");
       return IRC_FAILURE;
    }
 
-   // Remove file from file system
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, file->name);
-   if (uffs_remove(filelongname) == -1)
+   if (FM_Remove(file->name) == -1)
    {
       FM_ERR("File remove failed.");
       return IRC_FAILURE;
@@ -1092,15 +1483,18 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
 IRC_Status_t FM_Format()
 {
    extern flashDynamicValues_t gFlashDynamicValues;
+   extern flashIntfCtrl_t gflashIntfCtrl;
 
    IRC_Status_t status = IRC_SUCCESS;
 
    Calibration_Reset();
 
-   if (uffs_format(FM_UFFS_MOUNT_POINT) != 0)
-   {
-      FM_ERR("Failed to format file system.");
-      status =  IRC_FAILURE;
+   for (int i = 0; i <gflashIntfCtrl.nr_partition ; i++) {
+      if (uffs_format(gflashIntfCtrl.mount_points[i]) != 0)
+      {
+         FM_ERR("Failed to format file system.");
+         status =  IRC_FAILURE;
+      }
    }
 
    FM_ClearFileDB();
@@ -1537,14 +1931,46 @@ void FM_ClearFileDB()
    memset(gFM_fileDB, 0, sizeof(gFM_fileDB));
 }
 
+uint64_t flash_all_space_used()
+{
+   extern flashIntfCtrl_t gflashIntfCtrl;
+   uint64_t space_used = 0;
+   for(int idx = 0 ; idx < gflashIntfCtrl.nr_partition ; idx++) {
+      space_used += flash_space_used(gflashIntfCtrl.mount_points[idx]);
+   }
+
+   return space_used;
+}
+uint64_t flash_all_space_free()
+{
+   extern flashIntfCtrl_t gflashIntfCtrl;
+   uint64_t space_free = 0;
+   for(int idx = 0 ; idx < gflashIntfCtrl.nr_partition ; idx++) {
+      space_free += flash_space_free(gflashIntfCtrl.mount_points[idx]);
+
+   }
+
+   return space_free;
+}
+uint64_t flash_all_space_total()
+{
+   extern flashIntfCtrl_t gflashIntfCtrl;
+   uint64_t space_total = 0;
+   for(int idx = 0 ; idx < gflashIntfCtrl.nr_partition ; idx++) {
+      space_total += uffs_space_total(gflashIntfCtrl.mount_points[idx]);
+   }
+
+   return space_total;
+}
+
 /**
  * Return NAND flash used space, corrected for reserved blocks
  **/
-long flash_space_used(const char *mount_point)
+uint64_t flash_space_used(const char mount_point[FM_MOUNT_POINT_STRING_SIZE])
 {
-   uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+   uffs_Device *dev = uffs_GetDeviceFromMountPoint(mount_point);
    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-   long spaceUsed = uffs_space_used(mount_point);
+   uint64_t spaceUsed = uffs_space_used(mount_point);
 
    /* Compensate for reserved blocks */
    spaceUsed += (dev->cfg.reserved_free_blocks-1) * blkSize;
@@ -1554,11 +1980,13 @@ long flash_space_used(const char *mount_point)
 /**
  * Return NAND flash free space, corrected for reserved blocks
  **/
-long flash_space_free(const char *mount_point)
+uint64_t flash_space_free(const char mount_point[FM_MOUNT_POINT_STRING_SIZE])
 {
-   uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+   uffs_Device *dev = uffs_GetDeviceFromMountPoint(mount_point);
+
    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-   long spaceFree = uffs_space_free(mount_point);
+   uint64_t spaceFree = uffs_space_free(mount_point);
+
 
    /* Compensate for reserved blocks */
    spaceFree -= (dev->cfg.reserved_free_blocks-1) * blkSize;

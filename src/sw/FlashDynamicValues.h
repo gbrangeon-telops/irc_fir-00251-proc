@@ -32,7 +32,7 @@
 
 #define FDV_FILENAME             "FlashDynamicValues.tsdv"
 #define FDV_TMP_FILENAME         "FlashDynamicValuesTmp.tsdv"
-
+#define FDV_FILENAME_SIZE        24U
 /**
  * Flash dynamic values data type
  */
