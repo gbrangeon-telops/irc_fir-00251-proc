@@ -109,6 +109,17 @@ package Proxy_define is
    constant DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR  : unsigned(31 downto 0):= to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_INTCLK_RATE_KHZ)), 32);
    
    
+   -- misc 
+   type misc_cfg_type is
+   record
+      x_to_readout_start_dly                 : unsigned(15 downto 0);
+      fval_re_to_dval_re_dly                 : unsigned(15 downto 0);
+      hdr_start_to_lval_re_dly               : unsigned(15 downto 0);
+      lval_pause_dly                         : unsigned(15 downto 0);
+      x_to_next_fsync_re_dly                 : unsigned(15 downto 0);
+      xsize_div_per_pixel_num                : unsigned(9 downto 0);
+   end record;
+   
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------
@@ -138,6 +149,8 @@ package Proxy_define is
       -- kpix
       kpix_pgen_value                : std_logic_vector(15 downto 0); 
       kpix_mean_value                : std_logic_vector(15 downto 0);
+	  
+	  misc                           : misc_cfg_type; -- les changements dans misc ne font pas programmer le detecteur
       
       cfg_num                        : unsigned(7 downto 0);
       
