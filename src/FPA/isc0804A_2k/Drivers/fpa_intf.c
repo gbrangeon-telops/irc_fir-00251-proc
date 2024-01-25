@@ -184,14 +184,14 @@
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19
 
 // Déphasage des ADC
-#define ISC0804_DEFAULT_REGC             0  // déphasage grossier quad1
-#define ISC0804_DEFAULT_REGH             1  // déphasage grossier quad2
-#define ISC0804_DEFAULT_REGJ             1  // déphasage grossier quad3
-#define ISC0804_DEFAULT_REGL             1  // déphasage grossier quad4
-#define ISC0804_DEFAULT_REGD             2  // déphasage fin quad1
-#define ISC0804_DEFAULT_REGI             10  // déphasage fin quad2
-#define ISC0804_DEFAULT_REGK             10  // déphasage fin quad3
-#define ISC0804_DEFAULT_REGM             20  // déphasage fin quad4
+#define ISC0804_DEFAULT_REGC             2  // déphasage grossier quad1
+#define ISC0804_DEFAULT_REGH             2  // déphasage grossier quad2
+#define ISC0804_DEFAULT_REGJ             2  // déphasage grossier quad3
+#define ISC0804_DEFAULT_REGL             3  // déphasage grossier quad4
+#define ISC0804_DEFAULT_REGD             4  // déphasage fin quad1
+#define ISC0804_DEFAULT_REGI             2  // déphasage fin quad2
+#define ISC0804_DEFAULT_REGK             4  // déphasage fin quad3
+#define ISC0804_DEFAULT_REGM             18 // déphasage fin quad4
 
 // Déphasage de ligne
 #define ISC0804_DEFAULT_REGF             15
