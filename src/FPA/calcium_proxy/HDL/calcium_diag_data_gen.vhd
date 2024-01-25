@@ -14,11 +14,18 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.math_real.all;
 use work.FPA_define.all;
 use work.Proxy_define.all;
 
 
 entity calcium_diag_data_gen is
+   
+   generic(
+      
+      DETECTOR_HEIGHT : positive := 512
+      
+      );
    
    port(
       
@@ -90,6 +97,7 @@ architecture rtl of calcium_diag_data_gen is
    signal line_size_i       : std_logic_vector(15 downto 0);
    signal diag_line_gen_en  : std_logic;
    signal pix_first_value   : std_logic_vector(23 downto 0);
+   signal pix_coarse_value  : unsigned(pix_coarse_range_type);
    signal incr_value        : std_logic_vector(23 downto 0);
    signal pix_diag_data     : std_logic_vector(23 downto 0);
    signal pix_diag_dval     : std_logic;
@@ -104,6 +112,8 @@ architecture rtl of calcium_diag_data_gen is
    signal diag_clk_i        : std_logic;
    signal diag_clk_last     : std_logic;
    signal pix_samp_trig_i   : std_logic := '1';
+   
+   constant COARSE_SHIFT_N  : integer := integer(ceil(log2(real(DETECTOR_HEIGHT)))) - pix_coarse_value'LENGTH;
   
 begin
    
@@ -233,7 +243,11 @@ begin
                   if diag_done_i = '0' then
                      diag_line_gen_en <= '0';
                      line_cnt         <= line_cnt + 1;
+					 pix_coarse_value <= resize(line_cnt srl COARSE_SHIFT_N, pix_coarse_value'LENGTH);
                      diag_fsm         <= wait_line_gen_end_st;
+					 if FPA_INTF_CFG.COMN.FPA_DIAG_TYPE = TELOPS_DIAG_CNST then -- constant
+					 pix_coarse_value <= (others => '0');
+					 end if;
                   end if;
                
                when wait_line_gen_end_st =>
@@ -242,9 +256,11 @@ begin
 				  
 				  for i in 0 to pix_data_i.pix_data'length-1 loop
                      if revert_img = '1' then 
-                        pix_data_i.pix_data(i+1) <= not std_logic_vector(unsigned(pix_diag_data)+to_unsigned(i*DIAG_DATA_INC, pix_diag_data'length)); -- dégradé gauche 
+                        pix_data_i.pix_data(i+1)                         <= not std_logic_vector(unsigned(pix_diag_data)+to_unsigned(i*DIAG_DATA_INC, pix_diag_data'length)); -- dégradé gauche
+                        pix_data_i.pix_data(i+1)(pix_coarse_value'RANGE) <= not std_logic_vector(pix_coarse_value); 
                      else
-                        pix_data_i.pix_data(i+1) <=     std_logic_vector(unsigned(pix_diag_data)+to_unsigned(i*DIAG_DATA_INC, pix_diag_data'length)); -- dégradé droite
+                        pix_data_i.pix_data(i+1)                         <=     std_logic_vector(unsigned(pix_diag_data)+to_unsigned(i*DIAG_DATA_INC, pix_diag_data'length)); -- dégradé droite
+                        pix_data_i.pix_data(i+1)(pix_coarse_value'RANGE) <=     std_logic_vector(pix_coarse_value); 
                      end if;
                   end loop;
 				  
