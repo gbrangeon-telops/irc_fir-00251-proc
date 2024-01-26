@@ -510,7 +510,7 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
       HDER_UpdateOpticalSerialNumbersHeader(&gHderInserter, pGCRegs);
 
       // Update exposure time if necessary
-      if (calibrationInfo.collection.CalibrationType == CALT_MULTIPOINT)
+      if (calibrationInfo.collection.CalibrationType == CALT_MULTIPOINT && GC_CalibrationIsActive)
          GC_SetExposureTime((float)calibrationInfo.blocks[blockIndex].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
 
       // Save calibration block POSIX time
