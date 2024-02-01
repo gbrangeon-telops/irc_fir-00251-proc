@@ -104,6 +104,7 @@ architecture rtl of calcium_diag_data_gen is
    signal pix_offset_value  : pix_data_array_type;
    signal incr_value        : std_logic_vector(23 downto 0);
    signal pix_diag_data     : std_logic_vector(23 downto 0);
+   signal pix_diag_lval     : std_logic;
    signal pix_diag_dval     : std_logic;
    signal pix_diag_last     : std_logic;
    signal diag_done_i       : std_logic;
@@ -181,7 +182,7 @@ begin
       DIAG_DVAL     => pix_diag_dval,
       DIAG_SOL      => open,
       DIAG_EOL      => pix_diag_last,    
-      DIAG_LVAL     => open,
+      DIAG_LVAL     => pix_diag_lval,
       DIAG_DONE     => diag_done_i
       );
    
@@ -269,7 +270,7 @@ begin
                   end if;
                
                when wait_line_gen_end_st =>
-                  lval_i     <= '1';   
+                  lval_i     <= pix_diag_lval;   
                   dval_i     <= pix_diag_dval; -- on se branche sur le module générateur de données diag   
                   aoi_dval_i <= pix_diag_dval;
 				  aoi_last_i <= pix_diag_last and line_cnt ?>= FPA_INTF_CFG.height;
@@ -285,7 +286,6 @@ begin
                   end loop;
 				  
                   if diag_done_i = '1' then
-                     lval_i   <= '0';  
                      diag_fsm <= line_pause_st;
                      dly_cnt  <= to_unsigned(6, dly_cnt'length); -- pour tenir compte des délais supplémentaires (vus en simulation)
                   end if;
