@@ -23,6 +23,7 @@ entity calcium_diag_data_gen is
    
    generic(
       
+      DETECTOR_WIDTH  : positive := 640;
       DETECTOR_HEIGHT : positive := 512
       
       );
@@ -93,14 +94,18 @@ architecture rtl of calcium_diag_data_gen is
    signal fval_last         : std_logic;
    alias  lval_i           is pix_data_i.lval;
    alias  dval_i           is pix_data_i.dval;    
+   alias  aoi_dval_i       is pix_data_i.aoi_dval;    
+   alias  aoi_last_i       is pix_data_i.aoi_last;    
    signal sreset            : std_logic;
    signal line_size_i       : std_logic_vector(15 downto 0);
    signal diag_line_gen_en  : std_logic;
    signal pix_first_value   : std_logic_vector(23 downto 0);
    signal pix_coarse_value  : unsigned(pix_coarse_range_type);
+   signal pix_offset_value  : pix_data_array_type;
    signal incr_value        : std_logic_vector(23 downto 0);
    signal pix_diag_data     : std_logic_vector(23 downto 0);
    signal pix_diag_dval     : std_logic;
+   signal pix_diag_last     : std_logic;
    signal diag_done_i       : std_logic;
    signal dly_cnt           : unsigned(15 downto 0);
    signal line_cnt          : unsigned(15 downto 0);
@@ -114,6 +119,10 @@ architecture rtl of calcium_diag_data_gen is
    signal pix_samp_trig_i   : std_logic := '1';
    
    constant COARSE_SHIFT_N  : integer := integer(ceil(log2(real(DETECTOR_HEIGHT)))) - pix_coarse_value'LENGTH;
+   constant RESIDUE_MAX_VAL : integer := (DETECTOR_WIDTH-1)*DIAG_DATA_INC;
+   constant RESIDUE_BIT_CNT : integer := integer(ceil(log2(real(RESIDUE_MAX_VAL+1))));
+   constant RESIDUE_BIT_MSK : integer := 2**RESIDUE_BIT_CNT-1;
+   constant RESIDUE_INI_VAL : integer := RESIDUE_BIT_MSK-RESIDUE_MAX_VAL;
   
 begin
    
@@ -171,7 +180,7 @@ begin
       DIAG_DATA     => pix_diag_data,
       DIAG_DVAL     => pix_diag_dval,
       DIAG_SOL      => open,
-      DIAG_EOL      => open,    
+      DIAG_EOL      => pix_diag_last,    
       DIAG_LVAL     => open,
       DIAG_DONE     => diag_done_i
       );
@@ -199,8 +208,12 @@ begin
                pix_first_value <= std_logic_vector(to_unsigned(4096, pix_first_value'length));
                incr_value      <= (others => '0');
             else                                                       -- dégradé linéaire constant et dégradé linéaire dynamique
-               pix_first_value <= (others => '0');
-               incr_value      <= std_logic_vector(to_unsigned(pix_data_i.pix_data'length*DIAG_DATA_INC, incr_value'length));           
+			   if revert_img = '0' then
+                  pix_first_value <= (others => '0');
+			   else               
+                  pix_first_value <= std_logic_vector(to_unsigned(RESIDUE_INI_VAL, pix_first_value'length));
+			   end if;
+               incr_value <= std_logic_vector(to_unsigned(pix_data_i.pix_data'length*DIAG_DATA_INC, incr_value'length));           
             end if;
            
             case diag_fsm is 
@@ -243,34 +256,41 @@ begin
                   if diag_done_i = '0' then
                      diag_line_gen_en <= '0';
                      line_cnt         <= line_cnt + 1;
-					 pix_coarse_value <= resize(line_cnt srl COARSE_SHIFT_N, pix_coarse_value'LENGTH);
-                     diag_fsm         <= wait_line_gen_end_st;
+					 diag_fsm         <= wait_line_gen_end_st;
 					 if FPA_INTF_CFG.COMN.FPA_DIAG_TYPE = TELOPS_DIAG_CNST then -- constant
-					 pix_coarse_value <= (others => '0');
-					 end if;
+					    pix_coarse_value <= (others => '0');
+						pix_offset_value <= (others => (others => '0'));
+					 else
+					    pix_coarse_value <= resize(line_cnt srl COARSE_SHIFT_N, pix_coarse_value'LENGTH);
+						for i in 0 to pix_offset_value'length-1 loop
+						   pix_offset_value(i+1) <= std_logic_vector(to_unsigned(i*DIAG_DATA_INC, pix_offset_value(i+1)'length));
+						end loop;
+                     end if;
                   end if;
                
                when wait_line_gen_end_st =>
-                  lval_i <= '1';   
-                  dval_i <= pix_diag_dval; -- on se branche sur le module générateur de données diag
+                  lval_i     <= '1';   
+                  dval_i     <= pix_diag_dval; -- on se branche sur le module générateur de données diag   
+                  aoi_dval_i <= pix_diag_dval;
+				  aoi_last_i <= pix_diag_last and line_cnt ?>= FPA_INTF_CFG.height;
 				  
 				  for i in 0 to pix_data_i.pix_data'length-1 loop
                      if revert_img = '1' then 
-                        pix_data_i.pix_data(i+1)                         <= not std_logic_vector(unsigned(pix_diag_data)+to_unsigned(i*DIAG_DATA_INC, pix_diag_data'length)); -- dégradé gauche
+                        pix_data_i.pix_data(i+1)                         <= not std_logic_vector(unsigned(pix_diag_data(pix_data_range_type))+unsigned(pix_offset_value(i+1))) and std_logic_vector(to_unsigned(RESIDUE_BIT_MSK, pix_data_i.pix_data(i+1)'LENGTH)); -- dégradé gauche
                         pix_data_i.pix_data(i+1)(pix_coarse_value'RANGE) <= not std_logic_vector(pix_coarse_value); 
                      else
-                        pix_data_i.pix_data(i+1)                         <=     std_logic_vector(unsigned(pix_diag_data)+to_unsigned(i*DIAG_DATA_INC, pix_diag_data'length)); -- dégradé droite
+                        pix_data_i.pix_data(i+1)                         <=     std_logic_vector(unsigned(pix_diag_data(pix_data_range_type))+unsigned(pix_offset_value(i+1))); -- dégradé droite
                         pix_data_i.pix_data(i+1)(pix_coarse_value'RANGE) <=     std_logic_vector(pix_coarse_value); 
                      end if;
                   end loop;
 				  
-                  if diag_done_i = '1' then  
+                  if diag_done_i = '1' then
+                     lval_i   <= '0';  
                      diag_fsm <= line_pause_st;
                      dly_cnt  <= to_unsigned(6, dly_cnt'length); -- pour tenir compte des délais supplémentaires (vus en simulation)
                   end if;
                
-               when line_pause_st =>
-                  lval_i  <= '0';  
+               when line_pause_st =>  
                   dly_cnt <= dly_cnt + 1;
                   if dly_cnt >= FPA_INTF_CFG.MISC.lval_pause_dly then
                      diag_fsm <= start_line_gen_st;
