@@ -131,7 +131,7 @@ begin
    -- Reset
    --------------------------------------------------   
    U1 : sync_reset
-   port map(
+   port map (
       ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset

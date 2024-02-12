@@ -5,6 +5,7 @@ use ieee.std_logic_1164.all;
 
 library work;
 use work.FPA_define.all;
+use work.proxy_define.all;
 use work.TEL2000.all;
 use work.fpa_common_pkg.all;
 use work.calcium640D_intf_testbench_pkg.all;
@@ -59,7 +60,7 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_tb is
          MB_MISO        : out t_axi4_lite_miso);
    end component;
    
-   
+      
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
    constant ACQ_TRIG_PERIOD         : time := 100 us;
@@ -288,8 +289,8 @@ begin
          & vdac_value_7                   
          & vdac_value_8;       
          
-         --
-         
+--         
+   
       end if;
    end process;   
    

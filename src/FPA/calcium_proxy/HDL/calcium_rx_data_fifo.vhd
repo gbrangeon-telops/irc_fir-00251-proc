@@ -98,8 +98,8 @@ architecture rtl of calcium_rx_data_fifo is
    signal unused_fval               : std_logic;
    signal quad_data_pipe1           : calcium_quad_data_type;
    signal quad_data_pipe2           : calcium_quad_data_type;
-   signal lval_cnt                  : unsigned(FPA_INTF_CFG.active_line_end_num'LENGTH-1 downto 0);
-   signal dval_cnt                  : unsigned(FPA_INTF_CFG.active_line_width_div4'LENGTH-1 downto 0);
+   signal lval_cnt                  : unsigned(FPA_INTF_CFG.active_line_end_num'length-1 downto 0);
+   signal dval_cnt                  : unsigned(FPA_INTF_CFG.active_line_width_div4'length-1 downto 0);
    signal fifo_ovfl_sync            : std_logic;
    signal fifo_ovfl_err_i           : std_logic;
    signal fifo_rd_err_i             : std_logic;
