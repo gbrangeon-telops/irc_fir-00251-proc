@@ -10,6 +10,7 @@
 --!   $URL$
 ------------------------------------------------------------------
 
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.all; 
 use IEEE.numeric_std.all;
@@ -17,57 +18,86 @@ use work.fpa_define.all;
 use work.proxy_define.all;
 
 entity calcium_clks_gen is
+   port (
+      ARESET         : in std_logic;
+      CLK_100M       : in std_logic;
       
-      port(
+      FPA_INTF_CFG   : in fpa_intf_cfg_type;
       
-      ARESET           : in std_logic;
-      CLK_100M_IN      : in std_logic;
+      GLOBAL_RST     : out std_logic;
       
-      MMCM_LOCKED      : out std_logic;
-      
-      TX_CLK           : out std_logic;
-      CLK_100M         : out std_logic;
-      QUAD_CLK_SOURCE  : out std_logic      
-      
-      );
+      CLK_DDR        : out std_logic
+   );
 end calcium_clks_gen;
 
 architecture rtl of calcium_clks_gen is
    
-   component bb1920D_clks_mmcm 
+   component rst_conditioner is
+      generic (
+         RESET_PULSE_DELAY : natural := 80; 
+         RESET_PULSE_LEN   : natural := 9
+      );
+      port ( 
+         ARESET      : in std_logic;
+         SLOWEST_CLK : in std_logic;
+         ORST        : out std_logic   
+      );
+   end component;
+   
+   component sync_reset
+      port (
+         ARESET : in std_logic;
+         CLK    : in std_logic;
+         SRESET : out std_logic := '1'
+      );
+   end component;
+
+   component calciumD_clks_mmcm 
       port ( 
          clk_in         : in  std_logic;
          reset          : in  std_logic;
          locked         : out std_logic; 
-         clk_100        : out std_logic;
-         clk_70         : out std_logic;
-         clk_140        : out std_logic
-         );
+         clk_ddr        : out std_logic
+      );
    end component;
    
-   signal  clk_a     : std_logic;
-   signal  clk_b     : std_logic;
-   signal  clk_c     : std_logic;
+   signal sreset              : std_logic;
+   signal cond_reset_in       : std_logic;
+   signal mmcm_locked_i       : std_logic;
    
 begin
    
-   Gen_BB1920_8CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) generate   
-      begin  
-      
-      U1 :  bb1920D_clks_mmcm
-      port map (   
-         clk_in          => CLK_100M_IN,
-         reset           => ARESET, 
-         locked          => MMCM_LOCKED,   
-         clk_100         => clk_a,
-         clk_70          => clk_b,
-         clk_140         => clk_c
-         ); 
-          
-      TX_CLK          <=  clk_c;   -- 100 MHz       
-      CLK_100M        <=  clk_a;   -- 100 MHz        
-      QUAD_CLK_SOURCE <=  clk_b;   --  70 MHz
-      
-   end generate;
+   --------------------------------------------------
+   -- Resets
+   --------------------------------------------------   
+   U1A : rst_conditioner
+   generic map (
+      RESET_PULSE_DELAY => 80,
+      RESET_PULSE_LEN   => 9
+   )
+   port map (
+      ARESET      => cond_reset_in,
+      SLOWEST_CLK => CLK_100M,
+      ORST        => GLOBAL_RST
+   );
+   cond_reset_in <= not mmcm_locked_i;
+   
+   U1B : sync_reset
+   port map (
+      ARESET => ARESET,
+      CLK    => CLK_100M,
+      SRESET => sreset
+   );
+   
+   --------------------------------------------------
+   -- Clock Wizard
+   --------------------------------------------------
+   U2 :  calciumD_clks_mmcm
+   port map (   
+      clk_in          => CLK_100M,
+      reset           => ARESET, 
+      locked          => mmcm_locked_i,   
+      clk_ddr         => CLK_DDR
+   );
    
 end rtl;

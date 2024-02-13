@@ -85,6 +85,7 @@ architecture rtl of calcium_rx_data_fifo is
       );
    end component;
    
+   signal cond_reset_in             : std_logic;
    signal cond_reset                : std_logic;
    signal sreset_rx_clk             : std_logic;
    signal sreset_clk                : std_logic;
@@ -129,10 +130,11 @@ begin
       RESET_PULSE_LEN   => 9
    )
    port map (
-      ARESET      => not RX_RDY,
+      ARESET      => cond_reset_in,
       SLOWEST_CLK => RX_CLK,
       ORST        => cond_reset
-   ); 
+   );
+   cond_reset_in <= not RX_RDY;
    
    U1B : sync_reset
    port map (
