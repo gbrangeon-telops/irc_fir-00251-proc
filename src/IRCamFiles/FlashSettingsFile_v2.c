@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.14.0
+ * Generated from the flash settings file structure definition XLS file version 2.15.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -111,6 +111,13 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* BPNoiseThreshold = */ 1.333147F,
    /* BPDuration = */ 60000,
    /* BPNCoadd = */ 64,
+   /* ADCQuad1CoarsePhase = */ 0,
+   /* ADCQuad2CoarsePhase = */ 0,
+   /* ADCQuad3CoarsePhase = */ 0,
+   /* ADCQuad4CoarsePhase = */ 0,
+   /* ADCQuad1FinePhase = */ 0,
+   /* ADCQuad2FinePhase = */ 0,
+   /* ADCQuad3FinePhase = */ 0,
    /* AECPlusExpTimeMargin = */ 0.600000F,
    /* AECPlusFluxMargin = */ 0.9F,
    /* BPOutlierThreshold = */ 3.306613F,
@@ -165,6 +172,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ExposureTimeMin = */ 0.0F,
    /* ClConfiguration = */ 2,
    /* SaveConfigurationEnabled = */ 0,
+   /* ADCQuad4FinePhase = */ 0,
    /* FPATemperatureConversionCoef0 = */ 0.0F,
    /* FPATemperatureConversionCoef1 = */ 0.0F,
    /* FPATemperatureConversionCoef2 = */ 0.0F,
@@ -337,10 +345,13 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->BPNoiseThreshold, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->BPDuration, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&hdr->BPNCoadd, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-      numBytes += 2; // Skip FREE space
-      numBytes += 4; // Skip FREE space
-      numBytes += 4; // Skip FREE space
-      numBytes += 4; // Skip FREE space
+      memcpy(&hdr->ADCQuad1CoarsePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ADCQuad2CoarsePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ADCQuad3CoarsePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ADCQuad4CoarsePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ADCQuad1FinePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ADCQuad2FinePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ADCQuad3FinePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->AECPlusExpTimeMargin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->AECPlusFluxMargin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->BPOutlierThreshold, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
@@ -395,7 +406,7 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ExposureTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->ClConfiguration, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->SaveConfigurationEnabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 2; // Skip FREE space
+      memcpy(&hdr->ADCQuad4FinePhase, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->FPATemperatureConversionCoef0, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->FPATemperatureConversionCoef1, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->FPATemperatureConversionCoef2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
@@ -602,10 +613,13 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->BPNoiseThreshold, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->BPDuration, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&buffer[numBytes], &hdr->BPNCoadd, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-      memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
-      memset(&buffer[numBytes], 0, 4); numBytes += 4; // FREE space
-      memset(&buffer[numBytes], 0, 4); numBytes += 4; // FREE space
-      memset(&buffer[numBytes], 0, 4); numBytes += 4; // FREE space
+      memcpy(&buffer[numBytes], &hdr->ADCQuad1CoarsePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ADCQuad2CoarsePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ADCQuad3CoarsePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ADCQuad4CoarsePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ADCQuad1FinePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ADCQuad2FinePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ADCQuad3FinePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->AECPlusExpTimeMargin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->AECPlusFluxMargin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->BPOutlierThreshold, sizeof(float)); numBytes += sizeof(float);
@@ -660,7 +674,7 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ExposureTimeMin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->ClConfiguration, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->SaveConfigurationEnabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+      memcpy(&buffer[numBytes], &hdr->ADCQuad4FinePhase, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef0, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef1, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef2, sizeof(float)); numBytes += sizeof(float);
@@ -818,6 +832,13 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("BPNoiseThreshold: " _PCF(3) "\n", _FFMT(hdr->BPNoiseThreshold, 3));
    FPGA_PRINTF("BPDuration: %u ms\n", hdr->BPDuration);
    FPGA_PRINTF("BPNCoadd: %u frames\n", hdr->BPNCoadd);
+   FPGA_PRINTF("ADCQuad1CoarsePhase: %u counts\n", hdr->ADCQuad1CoarsePhase);
+   FPGA_PRINTF("ADCQuad2CoarsePhase: %u counts\n", hdr->ADCQuad2CoarsePhase);
+   FPGA_PRINTF("ADCQuad3CoarsePhase: %u counts\n", hdr->ADCQuad3CoarsePhase);
+   FPGA_PRINTF("ADCQuad4CoarsePhase: %u counts\n", hdr->ADCQuad4CoarsePhase);
+   FPGA_PRINTF("ADCQuad1FinePhase: %u counts\n", hdr->ADCQuad1FinePhase);
+   FPGA_PRINTF("ADCQuad2FinePhase: %u counts\n", hdr->ADCQuad2FinePhase);
+   FPGA_PRINTF("ADCQuad3FinePhase: %u counts\n", hdr->ADCQuad3FinePhase);
    FPGA_PRINTF("AECPlusExpTimeMargin: " _PCF(3) "\n", _FFMT(hdr->AECPlusExpTimeMargin, 3));
    FPGA_PRINTF("AECPlusFluxMargin: " _PCF(3) "\n", _FFMT(hdr->AECPlusFluxMargin, 3));
    FPGA_PRINTF("BPOutlierThreshold: " _PCF(3) "\n", _FFMT(hdr->BPOutlierThreshold, 3));
@@ -872,6 +893,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ExposureTimeMin: " _PCF(3) " us\n", _FFMT(hdr->ExposureTimeMin, 3));
    FPGA_PRINTF("ClConfiguration: %u\n", hdr->ClConfiguration);
    FPGA_PRINTF("SaveConfigurationEnabled: %u\n", hdr->SaveConfigurationEnabled);
+   FPGA_PRINTF("ADCQuad4FinePhase: %u counts\n", hdr->ADCQuad4FinePhase);
    FPGA_PRINTF("FPATemperatureConversionCoef0: " _PCF(3) " K\n", _FFMT(hdr->FPATemperatureConversionCoef0, 3));
    FPGA_PRINTF("FPATemperatureConversionCoef1: " _PCF(3) " K/V\n", _FFMT(hdr->FPATemperatureConversionCoef1, 3));
    FPGA_PRINTF("FPATemperatureConversionCoef2: " _PCF(3) " K/V^2\n", _FFMT(hdr->FPATemperatureConversionCoef2, 3));
@@ -879,7 +901,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("FPATemperatureConversionCoef4: " _PCF(3) " K/V^4\n", _FFMT(hdr->FPATemperatureConversionCoef4, 3));
    FPGA_PRINTF("FPATemperatureConversionCoef5: " _PCF(3) " K/V^5\n", _FFMT(hdr->FPATemperatureConversionCoef5, 3));
    FPGA_PRINTF("ElCorrMeasAtStarvation: %u counts\n", hdr->ElCorrMeasAtStarvation);
-   FPGA_PRINTF("ElCorrMeasAtSaturation: %u counts\n", hdr->ElCorrMeasAtSaturation);
+   FPGA_PRINTF("ElCorrMeasAtSaturation: %u\n", hdr->ElCorrMeasAtSaturation);
    FPGA_PRINTF("ElCorrMeasAtReference1: %u counts\n", hdr->ElCorrMeasAtReference1);
    FPGA_PRINTF("ElCorrMeasAtReference2: %u counts\n", hdr->ElCorrMeasAtReference2);
    FPGA_PRINTF("FpaScdDiodeBiasEnum: %u\n", hdr->FpaScdDiodeBiasEnum);

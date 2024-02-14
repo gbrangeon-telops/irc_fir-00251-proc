@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.14.0
+ * Generated from the flash settings file structure definition XLS file version 2.15.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      14
+#define FLASHSETTINGS_FILEMINORVERSION_V2      15
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -117,6 +117,13 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float BPNoiseThreshold;   /**< Threshold for tagging a pixel as flicker (T > threshold). */
    uint32_t BPDuration;   /**< Duration of the acquisition. */
    uint16_t BPNCoadd;   /**< Number of frames to use for average estimation. */
+   uint16_t ADCQuad1CoarsePhase;   /**< ADC Quad1 Coarse Phase Adjustment */
+   uint16_t ADCQuad2CoarsePhase;   /**< ADC Quad2 Coarse Phase Adjustment */
+   uint16_t ADCQuad3CoarsePhase;   /**< ADC Quad3 Coarse Phase Adjustment */
+   uint16_t ADCQuad4CoarsePhase;   /**< ADC Quad4 Coarse Phase Adjustment */
+   uint16_t ADCQuad1FinePhase;   /**< ADC Quad1 Fine Phase Adjustment */
+   uint16_t ADCQuad2FinePhase;   /**< ADC Quad2 Fine Phase Adjustment */
+   uint16_t ADCQuad3FinePhase;   /**< ADC Quad3 Fine Phase Adjustment */
    float AECPlusExpTimeMargin;   /**< Margin on the exposure time for hysteresis purpose of the AEC+. */
    float AECPlusFluxMargin;   /**< Margin on the detector's flux for hysteresis purpose of the AEC+. */
    float BPOutlierThreshold;   /**< Threshold for tagging a pixel as an outlier. */
@@ -171,6 +178,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float ExposureTimeMin;   /**< Minimum exposure time to overwrite value from FPA driver. */
    uint8_t ClConfiguration;   /**< Camera link configuration. */
    uint8_t SaveConfigurationEnabled;   /**< Indicates whether the save configuration functionality is enabled. */
+   uint16_t ADCQuad4FinePhase;   /**< ADC Quad4 Fine Phase Adjustment */
    float FPATemperatureConversionCoef0;   /**< 0 order coefficient for FPA diode temperature conversion. */
    float FPATemperatureConversionCoef1;   /**< 1st order coefficient for FPA diode temperature conversion. */
    float FPATemperatureConversionCoef2;   /**< 2nd order coefficient for FPA diode temperature conversion. */

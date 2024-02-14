@@ -236,6 +236,14 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern uint16_t gFpaElCorrMeasAtSaturation;
    extern uint16_t gFpaElCorrMeasAtReference1;
    extern uint16_t gFpaElCorrMeasAtReference2;
+   extern uint16_t gFpaADCQuad1CoarsePhase;
+   extern uint16_t gFpaADCQuad2CoarsePhase;
+   extern uint16_t gFpaADCQuad3CoarsePhase;
+   extern uint16_t gFpaADCQuad4CoarsePhase;
+   extern uint16_t gFpaADCQuad1FinePhase;
+   extern uint16_t gFpaADCQuad2FinePhase;
+   extern uint16_t gFpaADCQuad3FinePhase;
+   extern uint16_t gFpaADCQuad4FinePhase;
    extern bool gDisableFilterWheel;
    extern flashSettings_t flashSettings_default;
    extern t_bufferManager gBufManager;
@@ -392,7 +400,15 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gFpaElCorrMeasAtStarvation = p_flashSettings->ElCorrMeasAtStarvation; 
    gFpaElCorrMeasAtSaturation = p_flashSettings->ElCorrMeasAtSaturation;
    gFpaElCorrMeasAtReference1 = p_flashSettings->ElCorrMeasAtReference1;
-   gFpaElCorrMeasAtReference2 = p_flashSettings->ElCorrMeasAtReference2;   
+   gFpaElCorrMeasAtReference2 = p_flashSettings->ElCorrMeasAtReference2;
+   gFpaADCQuad1CoarsePhase = p_flashSettings->ADCQuad1CoarsePhase;
+   gFpaADCQuad2CoarsePhase = p_flashSettings->ADCQuad2CoarsePhase;
+   gFpaADCQuad3CoarsePhase = p_flashSettings->ADCQuad3CoarsePhase;
+   gFpaADCQuad4CoarsePhase = p_flashSettings->ADCQuad4CoarsePhase;
+   gFpaADCQuad1FinePhase =  p_flashSettings->ADCQuad1FinePhase;
+   gFpaADCQuad2FinePhase =  p_flashSettings->ADCQuad2FinePhase;
+   gFpaADCQuad3FinePhase =  p_flashSettings->ADCQuad3FinePhase;
+   gFpaADCQuad4FinePhase =  p_flashSettings->ADCQuad4FinePhase;
 
    // Update external fan speed setpoint
    gcRegsData.ExternalFanSpeedSetpoint = p_flashSettings->ExternalFanSpeedSetpoint;
