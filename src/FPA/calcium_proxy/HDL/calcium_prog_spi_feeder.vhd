@@ -20,7 +20,7 @@ use work.proxy_define.all;
 use work.tel2000.all;
 
 entity calcium_prog_spi_feeder is
-   port(		 
+   port (
       ARESET      : in std_logic;
       CLK         : in std_logic;
       
@@ -33,7 +33,7 @@ entity calcium_prog_spi_feeder is
       TX_MISO     : in t_ll_ext_miso;
       TX_DREM     : out std_logic_vector(3 downto 0); -- DREM = 8, 7, 6, ....1, pour signifier le nnombre de Bit valides dans le EOF  
       FRM_DONE    : in std_logic
-      );
+   );
 end calcium_prog_spi_feeder;
 
 architecture rtl of calcium_prog_spi_feeder is
@@ -42,14 +42,16 @@ architecture rtl of calcium_prog_spi_feeder is
    constant C_SPI_DATA_BYTE_NUM_M1 : natural := C_SPI_DATA_BYTE_NUM - 1;
    
    component sync_reset
-      port(
+      port (
          ARESET : in std_logic;
-         SRESET : out std_logic;
-         CLK    : in std_logic);
+         CLK    : in std_logic;
+         SRESET : out std_logic := '1'
+      );
    end component;  
    
    type spi_feeder_fsm_type  is (idle, latch_data_st, launch_spi_tx_st, check_end_st, wait_spi_end_st, count_dec_st, check_eof_gen_st);
-   type byte_array_type is array (0 to C_SPI_DATA_BYTE_NUM_M1) of std_logic_vector(7 downto 0); 
+   type byte_array_type is array (0 to C_SPI_DATA_BYTE_NUM_M1) of std_logic_vector(7 downto 0);
+   
    signal spi_feeder_fsm            : spi_feeder_fsm_type;
    signal sreset                    : std_logic; 
    signal tx_mosi_i                 : t_ll_ext_mosi8;
@@ -62,57 +64,56 @@ architecture rtl of calcium_prog_spi_feeder is
    
 begin  
    
+   -- Output mapping
    TX_MOSI <= tx_mosi_i;
    SPI_DONE <= spi_done_i;
    TX_DREM <= std_logic_vector(tx_drem_i);
    
-   ------------------------------------------------
-   -- determination des bytes
-   ------------------------------------------------
-   Ub : for ii in 0 to C_SPI_DATA_BYTE_NUM_M1 generate 
+   -- Input mapping
+   g0 : for ii in 0 to C_SPI_DATA_BYTE_NUM_M1 generate 
       spi_byte(ii) <= SPI_DATA(8*ii + 7 downto 8*ii);
    end generate; 
    
    --------------------------------------------------
-   -- synchro reset 
-   --------------------------------------------------   
+   -- Reset
+   --------------------------------------------------
    U1 : sync_reset
-   port map(
+   port map (
       ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset
-      );   
+   );   
    
    ------------------------------------------------
    -- Voir s'il faut programmer le détecteur
    ------------------------------------------------
-   U3 : process(CLK)
+   U2 : process(CLK)
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then
             tx_mosi_i.dval <= '0';
-            spi_feeder_fsm <= idle;			
+            spi_feeder_fsm <= idle;
             spi_done_i <= '0';
          else 
             
-            case spi_feeder_fsm is            
+            case spi_feeder_fsm is
                
-               when idle =>               
+               when idle =>
                   tx_mosi_i.dval <= '0';
                   tx_mosi_i.sof  <= '1'; 
                   tx_mosi_i.eof  <= '0';
                   tx_drem_i <= to_unsigned(8, tx_drem_i'length);
-                  byte_cnt <= C_SPI_DATA_BYTE_NUM_M1; 
+                  byte_cnt <= C_SPI_DATA_BYTE_NUM_M1;
                   spi_done_i <= '1';
                   if SPI_EN = '1' then
-                     spi_feeder_fsm <= latch_data_st; 
+                     spi_feeder_fsm <= latch_data_st;
                   end if;
                
                when latch_data_st =>
                   for ii in 0 to C_SPI_DATA_BYTE_NUM_M1 loop
                      spi_byte_latch(ii) <= spi_byte(ii);
                   end loop;
-                  spi_feeder_fsm <= launch_spi_tx_st; 
+                  spi_feeder_fsm <= launch_spi_tx_st;
                            
                when launch_spi_tx_st =>              -- on prend des morceaux de 8 bits qu'on envoie au driver spi
                   spi_done_i <= '0';
@@ -129,17 +130,17 @@ begin
                      spi_feeder_fsm <= wait_spi_end_st;
                   else 
                      spi_feeder_fsm <= count_dec_st;
-                  end if; 
+                  end if;
                
-               when count_dec_st =>        -- ce compteur permet de balayer lentement le mpt de configuraion du detecteur 
-                  byte_cnt <= byte_cnt - 1;          
+               when count_dec_st =>        -- ce compteur permet de balayer lentement le mot de configuration du detecteur 
+                  byte_cnt <= byte_cnt - 1;
                   tx_drem_i <= to_unsigned(8, tx_drem_i'length);
-                  spi_feeder_fsm <= check_eof_gen_st; 
+                  spi_feeder_fsm <= check_eof_gen_st;
                
-               when check_eof_gen_st =>                
+               when check_eof_gen_st =>
                   if byte_cnt = 0 then
                      tx_mosi_i.eof <= '1';
-                  end if; 
+                  end if;
                   spi_feeder_fsm <= launch_spi_tx_st;
                
                when  wait_spi_end_st =>

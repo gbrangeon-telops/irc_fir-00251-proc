@@ -31,11 +31,16 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd \
  #d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ddc_brd_id_reader.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_id_reader.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\flex_brd_id_reader.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx_v2.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_switch_ctrl.vhd \
+ d:\Telops\Common_HDL\SPI\ads1118_driver.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\monitoring_adc_ctrl.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler_sadc.vhd \
+ d:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_adc_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_trig_controller.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hw_driver_ctrler.vhd \
