@@ -183,16 +183,6 @@
 #define ELCORR_MODE_FREE_WHEELING_CORR                9
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19
 
-// Déphasage des ADC
-#define ISC0804_DEFAULT_REGC             2  // déphasage grossier quad1
-#define ISC0804_DEFAULT_REGH             2  // déphasage grossier quad2
-#define ISC0804_DEFAULT_REGJ             2  // déphasage grossier quad3
-#define ISC0804_DEFAULT_REGL             3  // déphasage grossier quad4
-#define ISC0804_DEFAULT_REGD             4  // déphasage fin quad1
-#define ISC0804_DEFAULT_REGI             2  // déphasage fin quad2
-#define ISC0804_DEFAULT_REGK             4  // déphasage fin quad3
-#define ISC0804_DEFAULT_REGM             18 // déphasage fin quad4
-
 // Déphasage de ligne
 #define ISC0804_DEFAULT_REGF             16
 
@@ -393,7 +383,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegK;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk du quad3
    extern int32_t gFpaDebugRegL;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk du quad4
    extern int32_t gFpaDebugRegM;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk du quad4
-
+   extern uint16_t gFpaADCQuad1CoarsePhase;              // ajustemnt grossier phase adc_clk du quad1 provenant des FS
+   extern uint16_t gFpaADCQuad2CoarsePhase;              // ajustemnt grossier phase adc_clk du quad2 provenant des FS
+   extern uint16_t gFpaADCQuad3CoarsePhase;              // ajustemnt grossier phase adc_clk du quad3 provenant des FS
+   extern uint16_t gFpaADCQuad4CoarsePhase;              // ajustemnt grossier phase adc_clk du quad4 provenant des FS
+   extern uint16_t gFpaADCQuad1FinePhase;                // ajustement fin phase adc_clk du quad1 provenant des FS
+   extern uint16_t gFpaADCQuad2FinePhase;                // ajustement fin phase adc_clk du quad2 provenant des FS
+   extern uint16_t gFpaADCQuad3FinePhase;                // ajustement fin phase adc_clk du quad3 provenant des FS
+   extern uint16_t gFpaADCQuad4FinePhase;                // ajustement fin phase adc_clk du quad4 provenant des FS
    uint32_t elcorr_reg;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
@@ -591,10 +588,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    // adc clk source phase
    if (sw_init_done == 0){
-      gFpaDebugRegC = ISC0804_DEFAULT_REGC;
-      gFpaDebugRegH = ISC0804_DEFAULT_REGH;
-      gFpaDebugRegJ = ISC0804_DEFAULT_REGJ;
-      gFpaDebugRegL = ISC0804_DEFAULT_REGL;
+      gFpaDebugRegC = gFpaADCQuad1CoarsePhase;
+      gFpaDebugRegH = gFpaADCQuad2CoarsePhase;
+      gFpaDebugRegJ = gFpaADCQuad3CoarsePhase;
+      gFpaDebugRegL = gFpaADCQuad4CoarsePhase;
    }       
    ptrA->adc_clk_pipe_sel1 = (uint32_t)gFpaDebugRegC;
    ptrA->adc_clk_pipe_sel2 = (uint32_t)gFpaDebugRegH;
@@ -603,10 +600,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc clk source phase
    if (sw_init_done == 0){         
-      gFpaDebugRegD = ISC0804_DEFAULT_REGD;
-      gFpaDebugRegI = ISC0804_DEFAULT_REGI;
-      gFpaDebugRegK = ISC0804_DEFAULT_REGK;
-      gFpaDebugRegM = ISC0804_DEFAULT_REGM;
+      gFpaDebugRegD = gFpaADCQuad1FinePhase;
+      gFpaDebugRegI = gFpaADCQuad2FinePhase;
+      gFpaDebugRegK = gFpaADCQuad3FinePhase;
+      gFpaDebugRegM = gFpaADCQuad4FinePhase;
    }
    ptrA->adc_clk_source_phase1 = (uint32_t)gFpaDebugRegD;
    ptrA->adc_clk_source_phase2 = (uint32_t)gFpaDebugRegI;
