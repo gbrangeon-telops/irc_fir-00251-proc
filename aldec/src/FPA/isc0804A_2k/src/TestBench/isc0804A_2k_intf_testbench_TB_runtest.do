@@ -73,7 +73,7 @@ acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0804A_2k\src\edge_measure_stat.vh
 acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0804A_2k\src\edge_distance_measure.bde
 acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync.vhd
 
-acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0804A_2k\src\TestBench\isc0804A_2k_intf_testbench_pkg.vhd 
+acom -2008 D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0804A_2k\src\TestBench\isc0804A_2k_intf_testbench_pkg.vhd 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0804A_2k\src\isc0804A_2k_intf_testbench.bde
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0804A_2k\src\TestBench\isc0804A_2k_intf_testbench_TB.vhd
 
@@ -117,14 +117,18 @@ asim -ses isc0804A_2k_intf_testbench_TB
 -- afpa hw driver controller
 --wave UUT/U1/U5/U4/* 
 
+-- int gen
+--wave UUT/U1/U5/U1/* 
+
 -- readout controller
---wave UUT/U1/U5/U5/* 
+wave UUT/U1/U5/U5/U4/* 
+wave UUT/U1/U5/U5/U2/* 
 
 -- clocks_gen
-wave UUT/U1/U26/U2/* 
-wave UUT/U1/U26/U2/U2/* 
-wave UUT/U1/U26/U2/U3/* 
-wave UUT/U1/U26/U1/* 
+--wave UUT/U1/U26/U2/* 
+--wave UUT/U1/U26/U2/U2/* 
+--wave UUT/U1/U26/U2/U3/* 
+--wave UUT/U1/U26/U1/* 
 wave UUT/U1/U26/*
 
 --wave UUT/U1/U5/U4/* 
@@ -205,5 +209,5 @@ wave UUT/U1/U26/*
 
 wave UUT/U1/*
 --run 100 ms
-run 10 ms  
+run 15 ms  
 --9.1 ms
