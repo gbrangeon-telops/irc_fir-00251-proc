@@ -265,7 +265,7 @@ IRC_Status_t startActualization()
               numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
 
 
-   if ( FM_GetFreeSpace() > (uint64_t)spaceAct)
+   if ( FM_GetFreeSpace() < (uint64_t)spaceAct)
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
       ACT_ERR("Filesystem has not enough space for actualization process.");
@@ -551,7 +551,7 @@ IRC_Status_t Actualization_SM()
          }
          else // gcRegsData.ImageCorrectionMode == ICM_BlackBody
          {
-            // cas sans ICU -> BB externe. Utiliser alors la calibration en cours comme bloc de référence
+            // cas sans ICU -> BB externe. Utiliser alors la calibration en cours comme bloc de rÃ©fÃ©rence
             ACT_INF("Using external BB");
 
             usingICU = false;
@@ -670,7 +670,7 @@ IRC_Status_t Actualization_SM()
          if (TimedOut(&act_tic_verbose))
          {
             ACT_INF( "ICU phase %d (%dms)", icuPhase, (uint32_t) elapsed_time_us( tic_TotalDuration ) / 1000 );
-            ACT_PRINTF( "Waiting for ICU black body temperature to stabilize (" _PCF(2) " °C)...\n", _FFMT(ICUTemp,2));
+            ACT_PRINTF( "Waiting for ICU black body temperature to stabilize (" _PCF(2) " Â°C)...\n", _FFMT(ICUTemp,2));
             RestartTimer(&act_tic_verbose);
          }
 
@@ -681,7 +681,7 @@ IRC_Status_t Actualization_SM()
          // Reset stability variables when the delta exceeds tolerance
          if ( ( max_temp - min_temp ) > tol)
          {
-            ACT_PRINTF( "Min: " _PCF(2) " °C, Max: " _PCF(2) " °C, Timer: " _PCF(2) " s\n", _FFMT(min_temp,2), _FFMT(max_temp,2), _FFMT((float)elapsed_time_us( act_tic_stability.timer ) / (float)TIME_ONE_SECOND_US, 2) );
+            ACT_PRINTF( "Min: " _PCF(2) " Â°C, Max: " _PCF(2) " Â°C, Timer: " _PCF(2) " s\n", _FFMT(min_temp,2), _FFMT(max_temp,2), _FFMT((float)elapsed_time_us( act_tic_stability.timer ) / (float)TIME_ONE_SECOND_US, 2) );
 
             min_temp = ICUTemp;
             max_temp = ICUTemp;
@@ -1070,7 +1070,7 @@ IRC_Status_t Actualization_SM()
          // and postpone the division by N for later.
          // After each pass, we'll have processed a block from a single frame
          // The fastest way to sum the pixel (memory access-wise) is to make 32-bit wide accesses.
-         // 3.98 us/px (1.88 réel) (3 reads, 2 write par 2 pixels, (1.5r, 1w)/px)
+         // 3.98 us/px (1.88 rÃ©el) (3 reads, 2 write par 2 pixels, (1.5r, 1w)/px)
 
          uint32_t* data_in = (uint32_t*)(sequenceOffset + dataOffset + (pixelOffset<<1));
          uint32_t* data_out = (uint32_t*)(mu_buffer + pixelOffset);
@@ -1155,7 +1155,7 @@ IRC_Status_t Actualization_SM()
          currentDeltaBeta->dbEntry->info.referenceTemperature = T_BB; // [K]
 
          // Compute FCal scale according to exposure time. We apply it to FCalBB to save on floating point operations
-         scaleFCal = currentDeltaBeta->dbEntry->info.exposureTime * blockInfo->NUCMultFactor * coaddData.NCoadd; // CR_WARNING exposure time is assumed to be in µs
+         scaleFCal = currentDeltaBeta->dbEntry->info.exposureTime * blockInfo->NUCMultFactor * coaddData.NCoadd; // CR_WARNING exposure time is assumed to be in Âµs
 
          // Compute sqrt(FCalBB)
          // find the index of the LUT which has the ICU type
@@ -1182,7 +1182,7 @@ IRC_Status_t Actualization_SM()
 
          // Initialize number of data to process and data pointers
          p_PixData = mu_buffer + imageDataOffset; // skip the header lines (2 rows)
-         p_Data = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE)); // adresse des données de calibration
+         p_Data = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE)); // adresse des donnÃ©es de calibration
 
          if (currentDeltaBeta->dbEntry->info.discardOffset)
          {
@@ -1264,7 +1264,7 @@ IRC_Status_t Actualization_SM()
 
             if (usingICU && gActualizationParams.badPixelsDetection) // do bad pixel detection if enabled and if using ICU
             {
-               currentDeltaBeta->dbEntry->valid = 1;  // doit être updaté avant détection bad pixel
+               currentDeltaBeta->dbEntry->valid = 1;  // doit Ãªtre updatÃ© avant dÃ©tection bad pixel
                gStartBadPixelDetection = 1;
                setActState(&state, ACT_DetectBadPixels);
             }
@@ -2431,9 +2431,9 @@ static void unpackLUTData( uint32_t LUTData, LUTRQInfo_t *p_LUTInfo, float *p_m,
 
    lut_data_t* data = (lut_data_t*)(&LUTData); // reinterpret cast the data
 
-   /* CR_WARNING présentement M et B sont NON SIGNÉS.
+   /* CR_WARNING prÃ©sentement M et B sont NON SIGNÃ‰S.
     * si un jour M_Signed et B_Signed deviennent actifs
-    * il faut réactiver et tester les deux if() ci-dessous
+    * il faut rÃ©activer et tester les deux if() ci-dessous
     */
    raw = data->m;
    if (0 && p_LUTInfo->M_Signed)
@@ -3211,11 +3211,11 @@ void configureIcuParams(ICUParams_t* p)
    p->WaitTime1 = flashSettings.ImageCorrectionWaitTime1; // [ms]
    p->StabilizationTime1 = flashSettings.ImageCorrectionStabilizationTime1; // [ms]
    p->Timeout1 = flashSettings.ImageCorrectionTimeout1; // [ms]
-   p->TemperatureTolerance1 = CC_TO_C(flashSettings.ImageCorrectionTemperatureTolerance1); // [°C]
+   p->TemperatureTolerance1 = CC_TO_C(flashSettings.ImageCorrectionTemperatureTolerance1); // [Â°C]
    p->WaitTime2 = flashSettings.ImageCorrectionWaitTime2; // [ms]
    p->StabilizationTime2 = flashSettings.ImageCorrectionStabilizationTime2; // [ms]
    p->Timeout2 = flashSettings.ImageCorrectionTimeout2; // [ms]
-   p->TemperatureTolerance2 = CC_TO_C(flashSettings.ImageCorrectionTemperatureTolerance2); // [°C]
+   p->TemperatureTolerance2 = CC_TO_C(flashSettings.ImageCorrectionTemperatureTolerance2); // [Â°C]
 }
 
 void ACT_resetDebugOptions()
@@ -3377,7 +3377,7 @@ static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calib
 }
 
 
-void ACT_invalidateActualizations(int type) // todo invalider seulement les actualisations externes compatibles avec les paramètres de ICU existantes (si plus d'un bloc ICU)
+void ACT_invalidateActualizations(int type) // todo invalider seulement les actualisations externes compatibles avec les paramÃ¨tres de ICU existantes (si plus d'un bloc ICU)
 {
    int i;
    deltabeta_t* current = NULL;
@@ -3717,7 +3717,7 @@ static IRC_Status_t cleanBetaDistribution_SM(float* beta, int numPixels, statist
          // calculer le nouveau seuil
          data_thresh = thresh * sqrtf(stats->var);
 
-         // étiqueter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
+         // Ã©tiqueter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
          lowerThreshold = stats->mu - data_thresh;
          higherThreshold = stats->mu + data_thresh;
 
