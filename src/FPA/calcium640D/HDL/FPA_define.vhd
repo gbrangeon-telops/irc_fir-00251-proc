@@ -24,14 +24,16 @@ use work.fpa_common_pkg.all;
 
 package FPA_define is    
    
-   
-   
-   
+   --------------------------------------------------
+   -- Définitions propres au calcium640D
+   --------------------------------------------------
+   constant DEFINE_XSIZE_MAX                 : integer := 640;    -- dimension en X maximale
+   constant DEFINE_YSIZE_MAX                 : integer := 512;    -- dimension en Y maximale
+   constant XSIZE_MAX                        : integer := DEFINE_XSIZE_MAX;  -- pour les modules utilisant XSIZE_MAX
+   constant YSIZE_MAX                        : integer := DEFINE_YSIZE_MAX;  -- pour les modules utilisant YSIZE_MAX
    
 end FPA_define;
 
 package body FPA_define is
-   
-   
    
 end package body FPA_define; 
