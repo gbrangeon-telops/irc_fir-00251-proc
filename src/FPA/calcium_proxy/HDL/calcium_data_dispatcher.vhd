@@ -55,9 +55,7 @@ end calcium_data_dispatcher;
 
 architecture rtl of calcium_data_dispatcher is 
    
-   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS       : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR  
-   constant C_EXP_TIME_CONV_DENOMINATOR               : integer := 2**C_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
-   -- constant C_EXP_TIME_CONV_NUMERATOR              : unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 4 downto 0):= to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**C_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_INTCLK_RATE_KHZ)), C_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 5);     --
+   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS       : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR
    constant C_EXP_TIME_CONV_NUMERATOR_BITLEN          : integer := C_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 5;
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27  : natural := C_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 27; --pour un total de 27 bits pour le temps d'integration
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := C_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1; 
@@ -86,7 +84,7 @@ architecture rtl of calcium_data_dispatcher is
    end component;
    
    type frame_fsm_type is (idle, wait_fval_st);
-   type fast_hder_sm_type is (idle, exp_info_dval_st, send_hder_st, wait_acq_hder_st);                    
+   type fast_hder_sm_type is (idle, exp_info_dval_st, send_hder_st, wait_acq_hder_st);
    type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
    
    signal exp_time_pipe                : exp_time_pipe_type;
@@ -129,7 +127,7 @@ begin
    
    --------------------------------------------------
    -- Reset
-   --------------------------------------------------   
+   --------------------------------------------------
    U1 : sync_reset
    port map (
       ARESET => ARESET,
@@ -158,8 +156,8 @@ begin
    -- Gestion des intégrations  
    --------------------------------------------------
    U3 : process(CLK)
-   begin          
-      if rising_edge(CLK) then         
+   begin
+      if rising_edge(CLK) then
          if sreset = '1' then 
             frame_fsm <= idle;
             acq_hder_fifo_wr <= '0';
@@ -169,7 +167,7 @@ begin
             readout_i <= '0';
             fpa_int_last <= '0';
             
-         else         
+         else
             
             fpa_int_last <= FPA_INT;
             
@@ -198,7 +196,7 @@ begin
                      readout_i <= '1';                 -- signal de readout, à sortir même en mode xtra_trig
                      acq_data <= acq_hder;            -- les données sortiront si elles correspondent à une acq int
                      frame_fsm <= wait_fval_st;
-                  end if;                   
+                  end if;
                
                when wait_fval_st =>
                   acq_hder_fifo_rd <= '0';
@@ -208,13 +206,13 @@ begin
                      acq_hder <= '0';
                      acq_data <= '0';
                      frame_fsm <= idle;
-                  end if;      
+                  end if;
                
                when others =>
                
             end case;
             
-         end if;         
+         end if;
       end if;
    end process;
    
@@ -222,10 +220,10 @@ begin
    -- Sortie des pixels
    --------------------------------------------------
    U4 : process(CLK)
-   begin          
+   begin
       if rising_edge(CLK) then 
          -- données
-         TX_QUAD_DATA.PIX_DATA      <= RX_QUAD_DATA.PIX_DATA;            
+         TX_QUAD_DATA.PIX_DATA      <= RX_QUAD_DATA.PIX_DATA;
          -- signaux de controle
          TX_QUAD_DATA.FVAL          <= RX_QUAD_DATA.FVAL and acq_data;
          TX_QUAD_DATA.LVAL          <= RX_QUAD_DATA.LVAL and acq_data;
@@ -233,14 +231,14 @@ begin
          TX_QUAD_DATA.AOI_DVAL      <= RX_QUAD_DATA.AOI_DVAL and acq_data;
          TX_QUAD_DATA.AOI_LAST      <= RX_QUAD_DATA.AOI_LAST and acq_data;
       end if;
-   end process; 
+   end process;
    
    --------------------------------------------------
    -- Sorties du header fast
    --------------------------------------------------
    U5 : process(CLK)
-   begin          
-      if rising_edge(CLK) then         
+   begin
+      if rising_edge(CLK) then
          if sreset = '1' then
             fast_hder_sm <= idle;
             hder_mosi_i.awvalid <= '0';
@@ -256,20 +254,20 @@ begin
             
             acq_hder_last <= '0';
             
-         else            
+         else
             
             acq_hder_last <= acq_hder;
             
             -- construction des données hder fast
-            hder_param.exp_time <= int_time_100MHz; 
+            hder_param.exp_time <= int_time_100MHz;
             hder_param.frame_id <= unsigned(frame_id_i);
-            hder_param.sensor_temp_raw <= FPA_TEMP_STAT.TEMP_DATA(hder_param.sensor_temp_raw'length-1 downto 0);
+            hder_param.sensor_temp_raw <= resize(FPA_TEMP_STAT.TEMP_DATA, hder_param.sensor_temp_raw'length);
             hder_param.exp_index <= unsigned(int_indx_i);
             hder_param.rdy <= int_time_100MHz_dval;
             
             --  generation des données de l'image info (exp_feedbk et frame_id proviennent de hw_driver pour eviter d'ajouter un clk supplementaire dans le présent module)
             dispatch_info_i.exp_info.exp_time <= hder_param.exp_time;
-            dispatch_info_i.exp_info.exp_indx <= hder_param.exp_index;
+            dispatch_info_i.exp_info.exp_indx <= std_logic_vector(hder_param.exp_index);
             
             -- sortie de la partie header fast provenant du module
             case fast_hder_sm is
@@ -282,7 +280,7 @@ begin
                   dispatch_info_i.exp_info.exp_dval <= '0';
                   pause_cnt <= (others => '0');
                   if hder_param.rdy = '1' and acq_hder = '1' then
-                     fast_hder_sm <= exp_info_dval_st;                     
+                     fast_hder_sm <= exp_info_dval_st;
                   end if;
                
                when exp_info_dval_st =>
@@ -291,34 +289,34 @@ begin
                      dispatch_info_i.exp_info.exp_dval <= '1';  -- sortira après dispatch_info_i.exp_info afin de reduire les risques d'aleas de séquences sur les regitres
                   end if;
                   if pause_cnt = 12 then                         -- ainsi dispatch_info_i.exp_info.exp_dval durera au moins 12-4 = 8 CLK
-                     dispatch_info_i.exp_info.exp_dval <= '0';                            
+                     dispatch_info_i.exp_info.exp_dval <= '0';
                      fast_hder_sm <= send_hder_st;
                   end if;
                
-               when send_hder_st =>                  
-                  if hder_link_rdy = '1' then                         
+               when send_hder_st =>
+                  if hder_link_rdy = '1' then
                      if hcnt = 1 then -- frame_id 
-                        hder_mosi_i.awaddr <= x"0000" &  std_logic_vector(hder_param.frame_id(7 downto 0)) &  std_logic_vector(resize(FrameIDAdd32, 8));--
+                        hder_mosi_i.awaddr <= x"0000" &  std_logic_vector(hder_param.frame_id(7 downto 0)) & std_logic_vector(resize(FrameIDAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <=  std_logic_vector(hder_param.frame_id);
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= FrameIDBWE;
                         
                      elsif hcnt = 2 then -- sensor_temp_raw
-                        hder_mosi_i.awaddr <= x"0000" &  std_logic_vector(hder_param.frame_id(7 downto 0)) &  std_logic_vector(resize(SensorTemperatureRawAdd32, 8));--
+                        hder_mosi_i.awaddr <= x"0000" &  std_logic_vector(hder_param.frame_id(7 downto 0)) & std_logic_vector(resize(SensorTemperatureRawAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
-                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_param.sensor_temp_raw), 32), SensorTemperatureRawShift)); --resize(hder_param.sensor_temp_raw, 32);
+                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_param.sensor_temp_raw), 32), SensorTemperatureRawShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= SensorTemperatureRawBWE;
                         
                      elsif hcnt = 3 then    -- exp_time -- en troisieme position pour donner du temps au calcul de hder_param.exp_time
-                        hder_mosi_i.awaddr <= x"FFFF" & std_logic_vector(hder_param.frame_id(7 downto 0)) &  std_logic_vector(resize(ExposureTimeAdd32, 8));--
+                        hder_mosi_i.awaddr <= x"FFFF" & std_logic_vector(hder_param.frame_id(7 downto 0)) & std_logic_vector(resize(ExposureTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <=  std_logic_vector(hder_param.exp_time);
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= ExposureTimeBWE;
                         fast_hder_sm <= wait_acq_hder_st;
-                     end if;                     
+                     end if;
                      hcnt <= hcnt + 1;
                      --                  else
                      --                     hder_mosi_i.awvalid <= '0';
@@ -335,34 +333,34 @@ begin
                
                when others =>
                
-            end case;               
+            end case;
             
-         end if;  
+         end if;
       end if;
-   end process; 
+   end process;
    
-   -----------------------------------------------------  
-   -- calcul du temps d'integration en coups de 100MHz                               
+   -----------------------------------------------------
+   -- calcul du temps d'integration en coups de 100MHz
    -----------------------------------------------------
    U6 : process (CLK)
    begin
       if rising_edge(CLK) then 
          
          -- pipe pour le calcul du temps d'integration en clk de 100 MHz
-         exp_time_pipe(0) <= resize(int_time_i, exp_time_pipe(0)'length) ;
-         exp_time_pipe(1) <= resize(exp_time_pipe(0) * resize(FPA_INTF_CFG.COMN.INTCLK_TO_CLK100_CONV_NUMERATOR, C_EXP_TIME_CONV_NUMERATOR_BITLEN), exp_time_pipe(0)'length);          
+         exp_time_pipe(0) <= resize(int_time_i, exp_time_pipe(0)'length);
+         exp_time_pipe(1) <= resize(exp_time_pipe(0) * resize(FPA_INTF_CFG.COMN.INTCLK_TO_CLK100_CONV_NUMERATOR, C_EXP_TIME_CONV_NUMERATOR_BITLEN), exp_time_pipe(0)'length);
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
-         exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
-         int_time_100MHz  <= exp_time_pipe(3)(int_time_100MHz'length-1 downto 0);
+         exp_time_pipe(3) <= exp_time_pipe(2) + unsigned(resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
+         int_time_100MHz  <= resize(exp_time_pipe(3), int_time_100MHz'length);
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          exp_dval_pipe(0)           <= acq_hder and not acq_hder_last;
-         exp_dval_pipe(1)           <= exp_dval_pipe(0); 
-         exp_dval_pipe(2)           <= exp_dval_pipe(1); 
+         exp_dval_pipe(1)           <= exp_dval_pipe(0);
+         exp_dval_pipe(2)           <= exp_dval_pipe(1);
          exp_dval_pipe(3)           <= exp_dval_pipe(2);
          exp_dval_pipe(4)           <= exp_dval_pipe(3);
          exp_dval_pipe(5)           <= exp_dval_pipe(4);
-         int_time_100MHz_dval       <= exp_dval_pipe(5);         
+         int_time_100MHz_dval       <= exp_dval_pipe(5);
          
       end if;
    end process; 
@@ -374,9 +372,9 @@ begin
    begin          
       if rising_edge(CLK) then
          if sreset = '1' then
-            SPEED_ERR <= '0';   
-            CFG_MISMATCH <= '0'; 
-            FIFO_ERR <= '0'; 
+            SPEED_ERR <= '0';
+            CFG_MISMATCH <= '0';
+            FIFO_ERR <= '0';
             ASSUMP_ERR <= '0';
             DONE <= '0';
             
@@ -388,11 +386,11 @@ begin
             end if;
             
             -- done
-            DONE <= not readout_i; 
+            DONE <= not readout_i;
             
          end if;
          
       end if;
-   end process; 
+   end process;
    
 end rtl;
