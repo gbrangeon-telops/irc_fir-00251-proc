@@ -25,6 +25,11 @@ if {$size_arg == "both" || $size_arg == "160"} {
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"
    
+   #Import makefile
+   file delete "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160/makefile.defs"
+   file link "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160/makefile.defs" "D:/Telops/FIR-00251-Proc/sdk/makefile.defs"
+
+
    #Delay to avoid "Configuration with name release is not defined" error
    after 6000
 
@@ -52,6 +57,10 @@ if {$size_arg == "both" || $size_arg == "325"} {
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
    
+   #Import makefile
+   file delete "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325/makefile.defs"
+   file link "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325/makefile.defs" "D:/Telops/FIR-00251-Proc/sdk/makefile.defs"
+
    #Delay to avoid "Configuration with name release is not defined" error
    after 6000
 
@@ -88,15 +97,6 @@ if {$compile_arg == "both" || $compile_arg == "main_only"} {
    projects -clean -type app -name fir_00251_proc_${detector}_$size
    file delete -force fir_00251_proc_${detector}_$size/Release/
 }
-
-#prebuild
-if {[ catch {[source "D:/Telops/FIR-00251-Proc/bin/scripts/generateBuildInfoFile.tcl"]} ]} {
-   puts "Catch the error because no input"
-}
-
-set scriptEnvironment "D:/Telops/FIR-00251-Proc/bin/scripts/setEnvironment.tcl"
-genCore $scriptEnvironment $detector "160"
-genCore $scriptEnvironment $detector "325"
 
 after 1000
 
