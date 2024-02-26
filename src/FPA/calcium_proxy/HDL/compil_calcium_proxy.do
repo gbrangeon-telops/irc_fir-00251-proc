@@ -11,7 +11,7 @@ acom -nowarn DAGGEN_0523 -incr \
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
-acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
+do D:\Telops\FIR-00251-Common\compile_all_common.do
 
 #signal stat
 acom \
@@ -54,13 +54,8 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_min_max_ctrl.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\edge_counter.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt_min_max.bde \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde
-
-acom -incr -nowarn DAGGEN_0523 \
- D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd \
- D:\Telops\FIR-00251-Common\VHDL\Utilities\axis16_combine_axis64.vhd
 
 # sources Calcium
 do D:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\compil_kpix_recombine.do

@@ -36,30 +36,29 @@ package Proxy_define is
    constant DEFINE_FPA_TAP_NUMBER                     : natural   := 8;          -- nécessaire pour ADC_BRD_INFO. À ENLEVER
    constant DEFINE_FLEX_VOLTAGEP_mV                   : natural   := 5500;       -- doit être défini mais pas utilisé: la tension intermédiaire vflex de ce détecteur est à 5.5V
    constant DEFINE_FPA_TEMP_CH_GAIN                   : real      := 1.0;        -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l'ampli buffer et des resistances entre les deux
-   constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';        -- pas besoin de config particulière au demarrage
+   constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';        -- doit être défini mais pas utilisé: pas besoin de config particulière au demarrage
    constant DEFINE_FPA_PROG_SCLK_RATE_KHZ             : integer   := 1_000;      -- horloge SPI pour la programmation du FPA. Doit être 1 MHz (ou 10?)
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP         : integer   := 1;          -- on doit laisser 1 image dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP                : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
    constant DEFINE_FPA_POWER_ON_WAIT_MS               : integer   := 1_200;      -- en msec, duree d'attente après allumage pour declarer le FPA rdy. Le ramp-up du LT3042 est d'environ 1s
-   constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 24786;      -- Minimum ADC value for power-on : 0.775 V, soit 35°C
-   constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 26833;      -- Maximum ADC value for power-on : 0.838 V, soit -5°C
+   constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 30720;      -- minimum ADC value for power-on : 0.960V de 2N2222 (soit 120K)
+   constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 35200;      -- maximum ADC value for power-on : 1.100V de 2N2222 (soit 40K) to protect against ultra low temp
    constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
-   constant DEFINE_FPA_100M_CLK_RATE_KHZ              : integer   := 100_000;    --  horloge de 100M en KHz
+   constant DEFINE_FPA_100M_CLK_RATE_KHZ              : integer   := 100_000;    -- horloge de 100M en KHz
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ              : integer   := 40_000;     -- nécessaire pour ADC_BRD_INFO. À ENLEVER
    
-   -- limites imposées aux tensions VDAC provenant de celles de FP_VCC1 à FP_VCC8 du Fleg 
-   -- provient du script F:\Bibliotheque\Electronique\PCB\EFP-00266-001 (Generic Flex Board TEL-2000)\Documentation\calcul_LT3042.m
-   -- ATTENTION il faut avoir completer la correspondance entre VCC et  les tensions du détecteur avant que le script ne donne des resultats valides
-   -- Les marges de 100 counts représentent environ 30mV.
+   -- limites imposées aux tensions VDAC
+   -- proviennent des scripts FLEG_VccVoltage_To_DacWord et FLEG_DacWord_To_VccVoltage dans
+   -- \\STARK\DisqueTELOPS\Bibliotheque\Electronique\PCB\EFP-00331-001_Senseeker Proxy\Documentation
    constant DEFINE_DAC_LIMIT : fleg_vdac_limit_array_type   := (
-      ( 7765-100, 10130+100),     -- limites du DAC1 -> DETECTSUB 2.8V à 3.5V
-      ( 5400-100,  7427+100),     -- limites du DAC2 -> CTIA_REF 2.1V à 2.7V
-      (        0,  9454+100),     -- limites du DAC3 -> VTESTG 0V à 3.3V
-      ( 3373-100,  5063+100),     -- limites du DAC4 -> CM 1.5V à 2V
-      ( 3373-100,  5063+100),     -- limites du DAC5 -> VCMO 1.5V à 2V
-      (        0,     16383),     -- limites du DAC6 -> not connected
-      (        0,     16383),     -- limites du DAC7 -> not connected
-      (        0,     16383)      -- limites du DAC8 -> not connected
+      ( 3373,  5400),      -- limites du DAC1 -> VA1.8 1.5V à 2.1V
+      (    0, 11796),      -- limites du DAC2 -> VPIXRST 0V à 3.6V
+      ( 3880,  5400),      -- limites du DAC3 -> VDHS1.8 1.65V à 2.1V
+      ( 3880,  5400),      -- limites du DAC4 -> VD1.8 1.65V à 2.1V
+      ( 8440, 10467),      -- limites du DAC5 -> VA3.3 3.0V à 3.6V
+      ( 9830, 11796),      -- limites du DAC6 -> VDETGUARD 3.0V à 3.6V
+      ( 8440, 10467),      -- limites du DAC7 -> VDETCOM 3.0V à 3.6V
+      (    0,  5400)       -- limites du DAC8 -> VPIXQNB 0V à 2.1V (mais le LDO ne pourra descendre plus bas que 0.5V)
    );
    
    --------------------------------------------
@@ -79,7 +78,8 @@ package Proxy_define is
    constant DEFINE_FPA_POWER_WAIT_FACTOR                    : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ*DEFINE_FPA_POWER_ON_WAIT_MS);
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS    : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR
    constant DEFINE_FPA_PROG_SCLK_RATE_FACTOR                : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ/DEFINE_FPA_PROG_SCLK_RATE_KHZ);
-   constant DEFINE_DIAG_DATA_CLK_FACTOR                     : integer := 2; -- ???
+   constant FPA_PIX_THROUGHPUT_MAX_MPIX                     : real    := real(8*400*2) / real(24);    -- 8 canaux à 400MHz DDR à 24b par pixel [Mpix/s]
+   constant DEFINE_DIAG_DATA_CLK_FACTOR                     : integer := integer(ceil(real(4*DEFINE_FPA_100M_CLK_RATE_KHZ) / real(FPA_PIX_THROUGHPUT_MAX_MPIX*1000.0))); -- il faut ralentir le throughput du DIAG (4 pix à 100MHz) pour qu'il soit <= au FPA
    
    
    -- misc 
@@ -99,38 +99,38 @@ package Proxy_define is
    type fpa_intf_cfg_type is
    record     
       -- cette partie provient du contrôleur du temps d'integration
-      int_time                         : unsigned(31 downto 0);          -- temps d'integration en coups de MCLK. 
-      int_indx                         : std_logic_vector(7 downto 0);   -- index du  temps d'integration
-      int_signal_high_time             : unsigned(31 downto 0);          -- duree en MCLK pendant laquelle lever le signal d'integration pour avoir int_time. depend des offsets de temps d'intégration   
-      
-      -- feedback d'intégration
-      int_fdbk_dly                     : unsigned(3 downto 0);          -- delai en MCLK avant generation du feedback d'integration.
+      int_time                         : unsigned(31 downto 0);            -- temps d'integration en CLK_100MHz 
+      int_indx                         : std_logic_vector(7 downto 0);     -- index du  temps d'integration
+      int_signal_high_time             : unsigned(31 downto 0);            -- duree en CLK_100MHz pendant laquelle lever le signal d'integration pour avoir int_time. depend de l'offset de temps d'intégration
       
       -- cette partie provient du microBlaze
-      -- common
-      comn                             : fpa_comn_cfg_type;      -- partie commune (utilisée par les modules communs)
+      comn                             : fpa_comn_cfg_type;                -- config commune. définition dans fpa_common_pkg
       
-      -- les valeurs Vdac
-      vdac_value                       : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)
+      offsetx                          : unsigned(9 downto 0);             -- décalage horizontal de l'AOI en nbre de colonnes. 0 signifie aucun décalage
+      offsety                          : unsigned(9 downto 0);             -- décalage vertical de l'AOI en nbre de lignes. 0 signifie aucun décalage
+      width                            : unsigned(9 downto 0);             -- largeur de l'AOI en nbre de colonnes
+      height                           : unsigned(9 downto 0);             -- hauteur de l'AOI en nbre de lignes
       
-      -- window
-      offsetx                          : unsigned(9 downto 0);
-      offsety                          : unsigned(9 downto 0);
-      width                            : unsigned(9 downto 0);
-      height                           : unsigned(9 downto 0);
+      active_line_start_num            : unsigned(3 downto 0);             -- le numero de la premiere ligne de l'AOI. 1 signifie qu'aucune ligne n'est rejetée au début
+      active_line_end_num              : unsigned(9 downto 0);             -- le numero de la derniere ligne de l'AOI. (active_line_start_num + height - 1)
+      active_line_width_div4           : unsigned(7 downto 0);             -- le nombre de transactions dans une ligne. (width / 4)
       
-      -- kpix
-      kpix_pgen_value                  : std_logic_vector(15 downto 0);
-      kpix_mean_value                  : std_logic_vector(15 downto 0);
+      misc                             : misc_cfg_type;                    -- config du module diag
       
-      misc                             : misc_cfg_type; -- les changements dans misc ne font pas programmer le detecteur
+      fpa_int_time_offset              : signed(31 downto 0);              -- offset en CLK_100MHz à ajouter au temps d'intégration pour que le résultat soit conforme à la commande.
+                                                                           -- offset est signé: positif signifie que la commande doit être plus longue que le résultat voulu, négatif signifie que la commande doit être plus courte que le résultat voulu
       
-      fpa_int_time_offset              : signed(31 downto 0);
+      int_fdbk_dly                     : unsigned(3 downto 0);             -- delai en CLK_100MHz avant generation du feedback d'integration
       
-      cfg_num                          : unsigned(7 downto 0);
+      kpix_pgen_value                  : std_logic_vector(15 downto 0);    --
+      kpix_mean_value                  : std_logic_vector(15 downto 0);    --
+      
+      
+      cfg_num                          : unsigned(7 downto 0);             -- numéro incrémental de la config actuelle
+      
+      vdac_value                       : fleg_vdac_value_type;             -- config du DAC. définition dans fleg_brd_define
       
    end record;
-   
    
    ----------------------------------------------
    -- Type hder_param

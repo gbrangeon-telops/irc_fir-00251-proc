@@ -42,6 +42,7 @@ entity calcium_mblaze_intf is
    );
 end calcium_mblaze_intf;
 
+
 architecture rtl of calcium_mblaze_intf is
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS       : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR
@@ -57,10 +58,10 @@ architecture rtl of calcium_mblaze_intf is
       );
    end component;
    
-   type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(USER_CFG.int_indx'length-1 downto 0);
-   type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
+   type exp_indx_pipe_type is array (0 to 4) of std_logic_vector(USER_CFG.int_indx'length-1 downto 0);
+   type exp_time_pipe_type is array (0 to 4) of unsigned(USER_CFG.int_time'length-1 downto 0);
+   type conv_exp_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
    
-   signal exp_time_pipe                : exp_time_pipe_type;
    signal sreset                       : std_logic;
    signal axi_awaddr	                  : std_logic_vector(31 downto 0);
    signal axi_awready	               : std_logic;
@@ -76,7 +77,6 @@ architecture rtl of calcium_mblaze_intf is
    signal slv_reg_rden                 : std_logic;
    signal slv_reg_wren                 : std_logic;
    signal data_i                       : std_logic_vector(31 downto 0);
-   signal update_cfg                   : std_logic;
    signal user_cfg_in_progress         : std_logic;
    signal user_cfg_i                   : fpa_intf_cfg_type;
    signal int_dval_i                   : std_logic := '0';
@@ -84,6 +84,9 @@ architecture rtl of calcium_mblaze_intf is
    signal int_indx_i                   : std_logic_vector(USER_CFG.int_indx'length-1 downto 0);
    signal int_signal_high_time_i       : unsigned(USER_CFG.int_signal_high_time'length-1 downto 0);
    signal exp_indx_pipe                : exp_indx_pipe_type;
+   signal exp_time_pipe                : exp_time_pipe_type;
+   signal conv_exp_time_pipe           : conv_exp_time_pipe_type;
+   signal conv_int_time_i              : unsigned(19 downto 0);
    signal exp_dval_pipe                : std_logic_vector(7 downto 0) := (others => '0');
    signal fpa_softw_stat_i             : fpa_firmw_stat_type;
    signal ctrled_reset_i               : std_logic;
@@ -97,36 +100,12 @@ architecture rtl of calcium_mblaze_intf is
    
 begin
    
+   -- Output mapping
    MB_RESET <= ctrled_reset_i;
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
    COOLER_STAT.COOLER_ON <= '1';
    
-   --------------------------------------------------
-   -- Sync reset
-   -------------------------------------------------- 
-   U1 : sync_reset
-   port map(ARESET => ARESET, CLK => MB_CLK, SRESET => sreset); 
-   
-   ------------------------------------------------  
-   -- sortie de la config                              
-   -------------------------------------------------  
-   U2: process(MB_CLK)
-   begin
-      if rising_edge(MB_CLK) then
-         
-         update_cfg <= user_cfg_rdy;
-         
-         if update_cfg = '1' then -- la config au complet 
-            USER_CFG <= user_cfg_i;
-            valid_cfg_received <= '1';
-         end if;
-      end if;  
-   end process;   
-   
-   -------------------------------------------------  
-   -- liens axil                           
-   -------------------------------------------------  
    -- I/O Connections assignments
    MB_MISO.AWREADY     <= axi_awready;
    MB_MISO.WREADY      <= axi_wready;
@@ -135,221 +114,206 @@ begin
    MB_MISO.ARREADY     <= axi_arready;
    MB_MISO.RDATA	     <= axi_rdata;
    MB_MISO.RRESP	     <= axi_rresp;
-   MB_MISO.RVALID      <= axi_rvalid; 
+   MB_MISO.RVALID      <= axi_rvalid;
    
    -- STATUS_MOSI toujours envoyé au fpa_status_gen pour eviter des delais
    STATUS_MOSI.AWVALID <= '0';   -- registres de statut en mode lecture seulement
    STATUS_MOSI.AWADDR  <= (others => '0');   -- registres de statut en mode lecture seulement
    STATUS_MOSI.AWPROT  <= (others => '0'); -- registres de statut en mode lecture seulement
-   STATUS_MOSI.WVALID  <= '0'; -- registres de statut en mode lecture seulement    
-   STATUS_MOSI.WDATA   <= (others => '0'); -- registres de statut en mode lecture seulement 
-   STATUS_MOSI.WSTRB   <= (others => '0'); -- registres de statut en mode lecture seulement 
+   STATUS_MOSI.WVALID  <= '0'; -- registres de statut en mode lecture seulement
+   STATUS_MOSI.WDATA   <= (others => '0'); -- registres de statut en mode lecture seulement
+   STATUS_MOSI.WSTRB   <= (others => '0'); -- registres de statut en mode lecture seulement
    STATUS_MOSI.BREADY  <= '0'; -- registres de statut en mode lecture seulement
    STATUS_MOSI.ARVALID <= MB_MOSI.ARVALID;
-   STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts 
-   STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT; 
-   STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;    
+   STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts
+   STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT;
+   STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;
    
-   -------------------------------------------------  
-   -- reception Config                                
-   -------------------------------------------------   
---   U3: process(MB_CLK)
---   begin
---      if rising_edge(MB_CLK) then
---         if sreset = '1' then
---            ctrled_reset_i <= '1';
---            reset_err_i <= '0';
---            user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre
---            dac_cfg_in_progress <= '1';
---            mb_ctrled_reset_i <= '0';
---            
---         else                   
---            
---            
---            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
---            
---            -- temps d'exposition en mclk
---            if int_dval_i = '1' then
---               user_cfg_i.int_time <= int_time_i;
---               user_cfg_i.int_indx <= int_indx_i;
---               user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
---            end if;
---            
---            
---            -- reste de la config
---            if slv_reg_wren = '1' then  
---               case axi_awaddr(11 downto 0) is             
---                  
---                  -- comn
---                  when X"000" =>    user_cfg_i.comn.fpa_diag_mode              <= data_i(0); user_cfg_in_progress <= '1';
---                  when X"004" =>    user_cfg_i.comn.fpa_diag_type              <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
---                  when X"008" =>    user_cfg_i.comn.fpa_pwr_on                 <= data_i(0);
---                  when X"00C" =>    user_cfg_i.comn.fpa_trig_ctrl_mode         <= data_i(user_cfg_i.comn.fpa_trig_ctrl_mode'length-1 downto 0);
---                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));
---                  when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));
---                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));
---                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));
---                  when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
---                  when X"024" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0);
---                     
---                  -- diag
---                  when X"028" =>    user_cfg_i.diag.ysize                      <= unsigned(data_i(user_cfg_i.diag.ysize'length-1 downto 0));
---                  when X"02C" =>    user_cfg_i.diag.xsize_div_tapnum           <= unsigned(data_i(user_cfg_i.diag.xsize_div_tapnum'length-1 downto 0));
---                     
---                  -- prog ctrl
---                  when X"030" =>    user_cfg_i.xstart                          <= unsigned(data_i(user_cfg_i.xstart'length-1 downto 0));
---                  when X"034" =>    user_cfg_i.ystart                          <= unsigned(data_i(user_cfg_i.ystart'length-1 downto 0));
---                  when X"038" =>    user_cfg_i.xstop                           <= unsigned(data_i(user_cfg_i.xstop'length-1 downto 0));
---                  when X"03C" =>    user_cfg_i.ystop                           <= unsigned(data_i(user_cfg_i.ystop'length-1 downto 0));
---                  when X"040" =>    user_cfg_i.sub_window_mode                 <= data_i(0);
---                  when X"044" =>    user_cfg_i.read_dir_down                   <= data_i(0);
---                  when X"048" =>    user_cfg_i.read_dir_left                   <= data_i(0);
---                  when X"04C" =>    user_cfg_i.gain                            <= data_i(0);
---                  when X"050" =>    user_cfg_i.ctia_bias_current               <= data_i(user_cfg_i.ctia_bias_current'length-1 downto 0);
---                     
---                  -- dval gen
---                  when X"054" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0)); 
---                     
---                  -- readout ctrl
---                  when X"058" =>    user_cfg_i.line_period_pclk                <= unsigned(data_i(user_cfg_i.line_period_pclk'length-1 downto 0));
---                  when X"05C" =>    user_cfg_i.readout_pclk_cnt_max            <= unsigned(data_i(user_cfg_i.readout_pclk_cnt_max'length-1 downto 0));
---                  when X"060" =>    user_cfg_i.active_line_start_num           <= unsigned(data_i(user_cfg_i.active_line_start_num'length-1 downto 0));
---                  when X"064" =>    user_cfg_i.active_line_end_num             <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));
---                  when X"068" =>    user_cfg_i.window_lsync_num                <= unsigned(data_i(user_cfg_i.window_lsync_num'length-1 downto 0));
---                  when X"06C" =>    user_cfg_i.sof_posf_pclk                   <= unsigned(data_i(user_cfg_i.sof_posf_pclk'length-1 downto 0));
---                  when X"070" =>    user_cfg_i.eof_posf_pclk                   <= unsigned(data_i(user_cfg_i.eof_posf_pclk'length-1 downto 0));
---                  when X"074" =>    user_cfg_i.sol_posl_pclk                   <= unsigned(data_i(user_cfg_i.sol_posl_pclk'length-1 downto 0));
---                  when X"078" =>    user_cfg_i.eol_posl_pclk                   <= unsigned(data_i(user_cfg_i.eol_posl_pclk'length-1 downto 0));
---                  when X"07C" =>    user_cfg_i.eol_posl_pclk_p1                <= unsigned(data_i(user_cfg_i.eol_posl_pclk_p1'length-1 downto 0));
---                     
---                  -- sample proc
---                  when X"080" =>    user_cfg_i.pix_samp_num_per_ch             <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));
---                  when X"084" =>    user_cfg_i.hgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));  
---                  when X"088" =>    user_cfg_i.hgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0)); 
---                  when X"08C" =>    user_cfg_i.vgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));  
---                  when X"090" =>    user_cfg_i.vgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));  
---                  when X"094" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0)); 
---                  when X"098" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0)); 
---                     
---                  -- clk gen
---                  when X"09C" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));
---                  when X"0A0" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
---                     
---                  -- image info
---                  when X"0A4" =>    user_cfg_i.offsetx                         <= unsigned(data_i(user_cfg_i.offsetx'length-1 downto 0));
---                  when X"0A8" =>    user_cfg_i.offsety                         <= unsigned(data_i(user_cfg_i.offsety'length-1 downto 0));
---                  when X"0AC" =>    user_cfg_i.width                           <= unsigned(data_i(user_cfg_i.width'length-1 downto 0));
---                  when X"0B0" =>    user_cfg_i.height                          <= unsigned(data_i(user_cfg_i.height'length-1 downto 0));
---                     
---                  -- digio
---                  when X"0B4" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);
---                  when X"0B8" =>    user_cfg_i.fpa_pwr_override_mode           <= data_i(0);
---                  
---                  -- diag lovh
---                  when X"0BC" =>    user_cfg_i.diag.lovh_mclk_source           <= unsigned(data_i(user_cfg_i.diag.lovh_mclk_source'length-1 downto 0));
---
---                  -- fpa temp correction
---                  when X"0C0" =>    user_cfg_i.fpa_temp_pwroff_correction      <= unsigned(data_i(user_cfg_i.fpa_temp_pwroff_correction'length-1 downto 0));
---				  
---                  -- new config
---                  when X"0C4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
---                     
---                  -- cropping
---                  when X"0C8" =>    user_cfg_i.aoi_data.sol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.sol_pos'length-1 downto 0)); 
---                  when X"0CC" =>    user_cfg_i.aoi_data.eol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.eol_pos'length-1 downto 0));                       
---                  when X"0D0" =>    user_cfg_i.aoi_flag1.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.sol_pos'length-1 downto 0));                       
---                  when X"0D4" =>    user_cfg_i.aoi_flag1.eol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.eol_pos'length-1 downto 0));                         
---                  when X"0D8" =>    user_cfg_i.aoi_flag2.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.sol_pos'length-1 downto 0));
---                  when X"0DC" =>    user_cfg_i.aoi_flag2.eol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.eol_pos'length-1 downto 0)); user_cfg_in_progress <= '0'; 
---                     
---                  -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
---                  when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
---                  when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
---                  when X"AE8" =>    fpa_softw_stat_i.fpa_input                 <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
---                     
---                  -- pour effacer erreurs latchées
---                  when X"AEC" =>    reset_err_i                                <= data_i(0); 
---                     
---                  -- pour un reset complet du module FPA
---                  when X"AF0" =>    mb_ctrled_reset_i                          <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on eteint la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
---                     
---                     ----------------------------------------------------------------------------------------------------------------------------------------                  
---                     -- EN0 15 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
---                  ----------------------------------------------------------------------------------------------------------------------------------------
---                  when X"D00" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0)); dac_cfg_in_progress <= '1';
---                  when X"D04" =>    user_cfg_i.vdac_value(2)                   <= unsigned(data_i(user_cfg_i.vdac_value(2)'length-1 downto 0));
---                  when X"D08" =>    user_cfg_i.vdac_value(3)                   <= unsigned(data_i(user_cfg_i.vdac_value(3)'length-1 downto 0));
---                  when X"D0C" =>    user_cfg_i.vdac_value(4)                   <= unsigned(data_i(user_cfg_i.vdac_value(4)'length-1 downto 0));
---                  when X"D10" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));
---                  when X"D14" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));
---                  when X"D18" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));
---                  when X"D1C" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); dac_cfg_in_progress <= '0';
---                  
---                  when others =>
---                  
---               end case;     
---               
---            end if; 
---         end if; 
---      end if; 
---   end process;
+   --------------------------------------------------
+   -- Reset
+   --------------------------------------------------
+   U1 : sync_reset
+   port map (
+      ARESET => ARESET,
+      CLK    => MB_CLK,
+      SRESET => sreset
+   ); 
    
-   ------------------------------------------------  
-   -- calcul du temps d'integration en coups de MCLK                               
-   -------------------------------------------------
-   U4: process (MB_CLK)
+   --------------------------------------------------
+   -- sortie de la config
+   --------------------------------------------------
+   U2 : process(MB_CLK)
    begin
-      if rising_edge(MB_CLK) then 
-         
-         abs_fpa_int_time_offset_i <= unsigned(abs(user_cfg_i.fpa_int_time_offset));
-         
-         -- pipe pour le calcul du temps d'integration en mclk
-         exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
-         exp_time_pipe(1) <= resize(exp_time_pipe(0) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), exp_time_pipe(0)'length);          
-         exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
-         exp_time_pipe(3) <= exp_time_pipe(2) + unsigned(resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
-         int_time_i <= resize(exp_time_pipe(3), int_time_i'length);
-         
-         -- tenir compte de l'offset pour la commande envoyée au fpa
-         -- int_signal_high_time est parfaitement synchronisé avec int_time_i
-         if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then
-            -- offset positif
-            int_signal_high_time_i <= resize(exp_time_pipe(3) - abs_fpa_int_time_offset_i, int_signal_high_time_i'length);
-         else
-            -- offset négatif
-            int_signal_high_time_i <= resize(exp_time_pipe(3) + abs_fpa_int_time_offset_i, int_signal_high_time_i'length);
-         end if;
-         
-         -- pipe de synchro pour l'index           
-         exp_indx_pipe(0) <= resize(FPA_EXP_INFO.EXP_INDX, exp_indx_pipe(0)'length);
-         exp_indx_pipe(1) <= exp_indx_pipe(0); 
-         exp_indx_pipe(2) <= exp_indx_pipe(1); 
-         exp_indx_pipe(3) <= exp_indx_pipe(2); 
-         int_indx_i       <= exp_indx_pipe(3);
-         
-         -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
-         exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
-         exp_dval_pipe(1) <= exp_dval_pipe(0); 
-         exp_dval_pipe(2) <= exp_dval_pipe(1); 
-         exp_dval_pipe(3) <= exp_dval_pipe(2);
-         exp_dval_pipe(4) <= exp_dval_pipe(3);
-         exp_dval_pipe(5) <= exp_dval_pipe(4);
-         int_dval_i       <= exp_dval_pipe(5);         
-         
-      end if;
-   end process; 
-   
-   ------------------------------------------------  
-   -- calcul des parametres de frame rate
-   -------------------------------------------------
-   U4B: process (MB_CLK)
-   begin
-      if rising_edge(MB_CLK) then 
+      if rising_edge(MB_CLK) then
          
          -- user_cfg_rdy
          user_cfg_rdy_pipe(0) <= not (user_cfg_in_progress or dac_cfg_in_progress);
          user_cfg_rdy_pipe(7 downto 1) <= user_cfg_rdy_pipe(6 downto 0);
-         user_cfg_rdy <= not (user_cfg_in_progress or dac_cfg_in_progress) and user_cfg_rdy_pipe(7); 
+         user_cfg_rdy <= not (user_cfg_in_progress or dac_cfg_in_progress) and user_cfg_rdy_pipe(7);
+         
+         if user_cfg_rdy = '1' then -- la config au complet 
+            USER_CFG <= user_cfg_i;
+            valid_cfg_received <= '1';
+         end if;
+         
+      end if;
+   end process;
+   
+   --------------------------------------------------
+   -- reception Config
+   --------------------------------------------------
+   U3 : process(MB_CLK)
+   begin
+      if rising_edge(MB_CLK) then
+         if sreset = '1' then
+            ctrled_reset_i <= '1';
+            reset_err_i <= '0';
+            user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre
+            dac_cfg_in_progress <= '1';
+            mb_ctrled_reset_i <= '0';
+            fpa_softw_stat_i.dval <='0';
+            
+         else                   
+            
+            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
+            
+            -- temps d'exposition
+            if int_dval_i = '1' then
+               user_cfg_i.int_time <= int_time_i;
+               user_cfg_i.int_indx <= int_indx_i;
+               user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
+            end if;
+            
+            -- reste de la config
+            if slv_reg_wren = '1' then  
+               case axi_awaddr(11 downto 0) is             
+                  
+                  -- comn
+                  when X"000" =>    user_cfg_i.comn.fpa_diag_mode                      <= data_i(0); user_cfg_in_progress <= '1';
+                  when X"004" =>    user_cfg_i.comn.fpa_diag_type                      <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
+                  when X"008" =>    user_cfg_i.comn.fpa_pwr_on                         <= data_i(0);
+                  when X"00C" =>    user_cfg_i.comn.fpa_acq_trig_mode                  <= data_i(user_cfg_i.comn.fpa_acq_trig_mode'length-1 downto 0);
+                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly              <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));
+                  when X"014" =>    user_cfg_i.comn.fpa_xtra_trig_mode                 <= data_i(user_cfg_i.comn.fpa_xtra_trig_mode'length-1 downto 0);
+                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly             <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));
+                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly          <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));
+                  when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig               <= data_i(0);
+                  when X"024" =>    user_cfg_i.comn.fpa_intf_data_source               <= data_i(0);
+                  when X"028" =>    user_cfg_i.comn.fpa_xtra_trig_int_time             <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_int_time'length-1 downto 0));
+                  when X"02C" =>    user_cfg_i.comn.fpa_prog_trig_int_time             <= unsigned(data_i(user_cfg_i.comn.fpa_prog_trig_int_time'length-1 downto 0));
+                  when X"030" =>    user_cfg_i.comn.intclk_to_clk100_conv_numerator    <= unsigned(data_i(user_cfg_i.comn.intclk_to_clk100_conv_numerator'length-1 downto 0));
+                  when X"034" =>    user_cfg_i.comn.clk100_to_intclk_conv_numerator    <= unsigned(data_i(user_cfg_i.comn.clk100_to_intclk_conv_numerator'length-1 downto 0));
+                  
+                  when X"038" =>    user_cfg_i.offsetx      <= unsigned(data_i(user_cfg_i.offsetx'length-1 downto 0));
+                  when X"03C" =>    user_cfg_i.offsety      <= unsigned(data_i(user_cfg_i.offsety'length-1 downto 0));
+                  when X"040" =>    user_cfg_i.width        <= unsigned(data_i(user_cfg_i.width'length-1 downto 0));
+                  when X"044" =>    user_cfg_i.height       <= unsigned(data_i(user_cfg_i.height'length-1 downto 0));
+                  
+                  when X"048" =>    user_cfg_i.active_line_start_num       <= unsigned(data_i(user_cfg_i.active_line_start_num'length-1 downto 0));
+                  when X"04C" =>    user_cfg_i.active_line_end_num         <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));
+                  when X"050" =>    user_cfg_i.active_line_width_div4      <= unsigned(data_i(user_cfg_i.active_line_width_div4'length-1 downto 0));
+                     
+                  when X"054" =>    user_cfg_i.misc.x_to_readout_start_dly       <= unsigned(data_i(user_cfg_i.misc.x_to_readout_start_dly'length-1 downto 0)); 
+                  when X"058" =>    user_cfg_i.misc.fval_re_to_dval_re_dly       <= unsigned(data_i(user_cfg_i.misc.fval_re_to_dval_re_dly'length-1 downto 0));
+                  when X"05C" =>    user_cfg_i.misc.lval_pause_dly               <= unsigned(data_i(user_cfg_i.misc.lval_pause_dly'length-1 downto 0));
+                  when X"060" =>    user_cfg_i.misc.x_to_next_fsync_re_dly       <= unsigned(data_i(user_cfg_i.misc.x_to_next_fsync_re_dly'length-1 downto 0));
+                  when X"064" =>    user_cfg_i.misc.xsize_div_per_pixel_num      <= unsigned(data_i(user_cfg_i.misc.xsize_div_per_pixel_num'length-1 downto 0));
+                  
+                  when X"068" =>    user_cfg_i.fpa_int_time_offset   <= signed(data_i(user_cfg_i.fpa_int_time_offset'length-1 downto 0));
+                  
+                  when X"06C" =>    user_cfg_i.int_fdbk_dly    <= unsigned(data_i(user_cfg_i.int_fdbk_dly'length-1 downto 0));
+                  
+                  when X"070" =>    user_cfg_i.kpix_pgen_value    <= data_i(user_cfg_i.kpix_pgen_value'length-1 downto 0);
+                  when X"074" =>    user_cfg_i.kpix_mean_value    <= data_i(user_cfg_i.kpix_mean_value'length-1 downto 0);
+                  
+                  
+                  when X"078" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                     
+                  -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
+                  when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
+                  when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
+                  when X"AE8" =>    fpa_softw_stat_i.fpa_input                 <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
+                     
+                  -- pour effacer erreurs latchées
+                  when X"AEC" =>    reset_err_i                                <= data_i(0); 
+                     
+                  -- pour un reset complet du module FPA
+                  when X"AF0" =>    mb_ctrled_reset_i                          <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on eteint la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                     
+                     ----------------------------------------------------------------------------------------------------------------------------------------                  
+                     -- EN0 15 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
+                  ----------------------------------------------------------------------------------------------------------------------------------------
+                  when X"D00" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0)); dac_cfg_in_progress <= '1';
+                  when X"D04" =>    user_cfg_i.vdac_value(2)                   <= unsigned(data_i(user_cfg_i.vdac_value(2)'length-1 downto 0));
+                  when X"D08" =>    user_cfg_i.vdac_value(3)                   <= unsigned(data_i(user_cfg_i.vdac_value(3)'length-1 downto 0));
+                  when X"D0C" =>    user_cfg_i.vdac_value(4)                   <= unsigned(data_i(user_cfg_i.vdac_value(4)'length-1 downto 0));
+                  when X"D10" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));
+                  when X"D14" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));
+                  when X"D18" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));
+                  when X"D1C" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); dac_cfg_in_progress <= '0';
+                  
+                  when others =>
+                  
+               end case;     
+               
+            end if; 
+         end if; 
+      end if; 
+   end process;
+   
+   --------------------------------------------------
+   -- calcul du temps d'integration
+   --------------------------------------------------
+   U4 : process(MB_CLK)
+   begin
+      if rising_edge(MB_CLK) then
+         
+         -- conv_int_time_i, int_time_i, int_signal_high_time_i et int_indx_i sont parfaitement synchronisés
+         
+         abs_fpa_int_time_offset_i <= unsigned(abs(user_cfg_i.fpa_int_time_offset));
+         
+         -- pipe pour le calcul de conversion du temps d'integration en int clk pour le fpa
+         conv_exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, conv_exp_time_pipe(0)'length);
+         if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then   -- tenir compte de l'offset pour la commande envoyée au fpa
+            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) + abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset positif
+         else
+            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) - abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset négatif
+         end if;
+         conv_exp_time_pipe(2) <= resize(conv_exp_time_pipe(1) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);          
+         conv_exp_time_pipe(3) <= resize(conv_exp_time_pipe(2)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), conv_exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
+         conv_exp_time_pipe(4) <= conv_exp_time_pipe(3) + unsigned(resize(conv_exp_time_pipe(2)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), conv_exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
+         conv_int_time_i <= resize(conv_exp_time_pipe(4), conv_int_time_i'length);
+         
+         -- pipe de synchro pour le temps d'integration (non converti)
+         exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length);
+         exp_time_pipe(1) <= exp_time_pipe(0);
+         exp_time_pipe(2) <= exp_time_pipe(1);
+         exp_time_pipe(3) <= exp_time_pipe(2);
+         exp_time_pipe(4) <= exp_time_pipe(3);
+         int_time_i       <= exp_time_pipe(4);
+         
+         if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then   -- tenir compte de l'offset pour la commande envoyée au fpa
+            int_signal_high_time_i <= resize(exp_time_pipe(4) + abs_fpa_int_time_offset_i, int_signal_high_time_i'length); -- offset positif
+         else
+            int_signal_high_time_i <= resize(exp_time_pipe(4) - abs_fpa_int_time_offset_i, int_signal_high_time_i'length); -- offset négatif
+         end if;
+         
+         -- pipe de synchro pour l'index
+         exp_indx_pipe(0) <= resize(FPA_EXP_INFO.EXP_INDX, exp_indx_pipe(0)'length);
+         exp_indx_pipe(1) <= exp_indx_pipe(0);
+         exp_indx_pipe(2) <= exp_indx_pipe(1);
+         exp_indx_pipe(3) <= exp_indx_pipe(2);
+         exp_indx_pipe(4) <= exp_indx_pipe(3);
+         int_indx_i       <= exp_indx_pipe(4);
+         
+         -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
+         exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
+         exp_dval_pipe(1) <= exp_dval_pipe(0);
+         exp_dval_pipe(2) <= exp_dval_pipe(1);
+         exp_dval_pipe(3) <= exp_dval_pipe(2);
+         exp_dval_pipe(4) <= exp_dval_pipe(3);
+         exp_dval_pipe(5) <= exp_dval_pipe(4);
+         int_dval_i       <= exp_dval_pipe(5);
          
       end if;
    end process;
