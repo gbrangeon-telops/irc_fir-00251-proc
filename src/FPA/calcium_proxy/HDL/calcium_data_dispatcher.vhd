@@ -85,10 +85,8 @@ architecture rtl of calcium_data_dispatcher is
    
    type frame_fsm_type is (idle, wait_fval_st);
    type fast_hder_sm_type is (idle, exp_info_dval_st, send_hder_st, wait_acq_hder_st);
-   type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
    
-   signal exp_time_pipe                : exp_time_pipe_type;
-   signal exp_dval_pipe                : std_logic_vector(7 downto 0) := (others => '0');
+   signal exp_dval_pipe                : std_logic_vector(2 downto 0) := (others => '0');
    signal fast_hder_sm                 : fast_hder_sm_type;
    signal frame_fsm                    : frame_fsm_type;
    signal sreset                       : std_logic;
@@ -106,8 +104,6 @@ architecture rtl of calcium_data_dispatcher is
    signal int_time_i                   : unsigned(31 downto 0);
    signal hder_mosi_i                  : t_axi4_lite_mosi;
    signal hder_link_rdy                : std_logic;
-   signal int_time_100MHz              : unsigned(31 downto 0);
-   signal int_time_100MHz_dval         : std_logic;
    signal dispatch_info_i              : img_info_type;
    signal hder_param                   : hder_param_type;
    signal hcnt                         : unsigned(7 downto 0);
@@ -188,9 +184,9 @@ begin
                   -- lance l'écriture du header dès qu'on sait que la prochaine image reçue
                   -- correspond à une acq int.
                   acq_hder <= acq_hder_fifo_dout(72);
-                  frame_id_i <= acq_hder_fifo_dout(31 downto 0);
-                  int_time_i <= unsigned(acq_hder_fifo_dout(63 downto 32));
                   int_indx_i <= acq_hder_fifo_dout(71 downto 64);
+                  int_time_i <= unsigned(acq_hder_fifo_dout(63 downto 32));
+                  frame_id_i <= acq_hder_fifo_dout(31 downto 0);
                   if RX_QUAD_DATA.FVAL = '1' then     -- en quittant idle, frame_id_i et acq_hder sont implicitement latchés, donc pas besoin de latchs explicites
                      acq_hder_fifo_rd <= acq_hder_fifo_dval; -- mise à jour de la sortie du fwft pour le prochain frame
                      readout_i <= '1';                 -- signal de readout, à sortir même en mode xtra_trig
@@ -251,19 +247,24 @@ begin
             hder_mosi_i.arprot <= (others => '0');
             
             dispatch_info_i.exp_info.exp_dval <= '0';
-            
             acq_hder_last <= '0';
+            exp_dval_pipe <= (others => '0');
             
          else
             
             acq_hder_last <= acq_hder;
             
+            -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
+            exp_dval_pipe(0)           <= acq_hder and not acq_hder_last;
+            exp_dval_pipe(1)           <= exp_dval_pipe(0);
+            exp_dval_pipe(2)           <= exp_dval_pipe(1);
+            
             -- construction des données hder fast
-            hder_param.exp_time <= int_time_100MHz;
+            hder_param.exp_time <= int_time_i;
             hder_param.frame_id <= unsigned(frame_id_i);
             hder_param.sensor_temp_raw <= resize(FPA_TEMP_STAT.TEMP_DATA, hder_param.sensor_temp_raw'length);
             hder_param.exp_index <= unsigned(int_indx_i);
-            hder_param.rdy <= int_time_100MHz_dval;
+            hder_param.rdy <= exp_dval_pipe(2);
             
             --  generation des données de l'image info (exp_feedbk et frame_id proviennent de hw_driver pour eviter d'ajouter un clk supplementaire dans le présent module)
             dispatch_info_i.exp_info.exp_time <= hder_param.exp_time;
@@ -337,38 +338,12 @@ begin
             
          end if;
       end if;
-   end process;
-   
-   -----------------------------------------------------
-   -- calcul du temps d'integration en coups de 100MHz
-   -----------------------------------------------------
-   U6 : process (CLK)
-   begin
-      if rising_edge(CLK) then 
-         
-         -- pipe pour le calcul du temps d'integration en clk de 100 MHz
-         exp_time_pipe(0) <= resize(int_time_i, exp_time_pipe(0)'length);
-         exp_time_pipe(1) <= resize(exp_time_pipe(0) * resize(FPA_INTF_CFG.COMN.INTCLK_TO_CLK100_CONV_NUMERATOR, C_EXP_TIME_CONV_NUMERATOR_BITLEN), exp_time_pipe(0)'length);
-         exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
-         exp_time_pipe(3) <= exp_time_pipe(2) + unsigned(resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
-         int_time_100MHz  <= resize(exp_time_pipe(3), int_time_100MHz'length);
-         
-         -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
-         exp_dval_pipe(0)           <= acq_hder and not acq_hder_last;
-         exp_dval_pipe(1)           <= exp_dval_pipe(0);
-         exp_dval_pipe(2)           <= exp_dval_pipe(1);
-         exp_dval_pipe(3)           <= exp_dval_pipe(2);
-         exp_dval_pipe(4)           <= exp_dval_pipe(3);
-         exp_dval_pipe(5)           <= exp_dval_pipe(4);
-         int_time_100MHz_dval       <= exp_dval_pipe(5);
-         
-      end if;
    end process; 
    
    -----------------------------------------------------
    -- generation misc signaux
    -----------------------------------------------------
-   U7 : process(CLK)
+   U6 : process(CLK)
    begin          
       if rising_edge(CLK) then
          if sreset = '1' then
