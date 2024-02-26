@@ -74,8 +74,8 @@ package FPA_define is
    constant DEFINE_FPA_INT_FBK_AVAILABLE          : std_logic := '0';
    constant DEFINE_FPA_POWER_ON_WAIT_US           : integer   := 10_000;     -- en usec, duree d'attente après allumage  pour declarer le FPA rdy. Faible chiffre car comptabilisé dans 
    constant DEFINE_FPA_TEMP_TRIG_PERIOD_US        : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
-   constant DEFINE_FPA_TEMP_RAW_MIN               : integer   := 30720;      -- Minimum ADC value for isc0804A power-on : 1.00 V de 2N2222 (soit 91K)  
-   constant DEFINE_FPA_TEMP_RAW_MAX               : integer   := 35200;      -- Maximum ADC value for isc0804A power-on : (to protect against ultra low temp). 1.039V 
+   constant DEFINE_FPA_TEMP_RAW_MIN               : integer   := 30720;      -- minimum ADC value for power-on : 0.960V de 2N2222 (soit 120K)
+   constant DEFINE_FPA_TEMP_RAW_MAX               : integer   := 35200;      -- maximum ADC value for power-on : 1.100V de 2N2222 (soit 40K) to protect against ultra low temp
    
    constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer   := 100_000;    --  horloge de 100M en KHz
