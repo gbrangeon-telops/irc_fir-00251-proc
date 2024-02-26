@@ -24,7 +24,7 @@ end digio_dummy;
 
 architecture rtl of digio_dummy is
 
-constant FPA_DIGIO_V              : real := 3300.0;  
+constant FPA_DIGIO_V              : real := 1800.0;  
 constant BRD_GAIN                 : real := 590.0/(1000.0 + 590.0);
 constant ADC_RANGE_V              : real := 2048.0;
 constant ADC_RESOLUTION           : integer := 15; 

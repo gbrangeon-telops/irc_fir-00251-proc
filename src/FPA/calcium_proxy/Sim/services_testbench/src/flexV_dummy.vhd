@@ -24,7 +24,7 @@ end flexV_dummy;
 
 architecture rtl of flexV_dummy is
 
-constant FPA_FLEX_V               : real := 7950.0;  
+constant FPA_FLEX_V               : real := 5500.0;  
 constant BRD_GAIN                 : real := 332.0/(1000.0 + 332.0);
 constant ADC_RANGE_V              : real := 2048.0;
 constant ADC_RESOLUTION           : integer := 15; 
