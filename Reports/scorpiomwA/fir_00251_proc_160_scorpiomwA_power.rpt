@@ -1,8 +1,8 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------------
-| Tool Version     : Vivado v.2018.3_(AR71898_AR71948) (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
-| Date             : Fri Jan 19 21:37:19 2024
-| Host             : TELOPS336 running 64-bit major release  (build 9200)
+| Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date             : Fri Feb 23 19:37:07 2024
+| Host             : Telops331 running 64-bit major release  (build 9200)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/scorpiomwA/fir_00251_proc_160_scorpiomwA_power.rpt
 | Design           : fir_00251_proc_scorpiomwA
 | Device           : xc7k160tfbg676-1
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 4.335        |
+| Total On-Chip Power (W)  | 4.334        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 4.180        |
+| Dynamic (W)              | 4.179        |
 | Device Static (W)        | 0.155        |
 | Effective TJA (C/W)      | 1.9          |
 | Max Ambient (C)          | 91.9         |
@@ -52,17 +52,17 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.421 |       78 |       --- |             --- |
-| Slice Logic              |     0.186 |   217577 |       --- |             --- |
-|   LUT as Logic           |     0.146 |    64237 |    101400 |           63.35 |
-|   Register               |     0.018 |   108735 |    202800 |           53.62 |
+| Clocks                   |     0.417 |       78 |       --- |             --- |
+| Slice Logic              |     0.186 |   217578 |       --- |             --- |
+|   LUT as Logic           |     0.146 |    64280 |    101400 |           63.39 |
+|   Register               |     0.018 |   108739 |    202800 |           53.62 |
 |   CARRY4                 |     0.016 |     4322 |     25350 |           17.05 |
-|   LUT as Shift Register  |     0.004 |     3900 |     35000 |           11.14 |
+|   LUT as Shift Register  |     0.004 |     3897 |     35000 |           11.13 |
 |   LUT as Distributed RAM |     0.002 |     2384 |     35000 |            6.81 |
 |   F7/F8 Muxes            |    <0.001 |      532 |    101400 |            0.52 |
-|   Others                 |    <0.001 |    14093 |       --- |             --- |
+|   Others                 |    <0.001 |    14095 |       --- |             --- |
 |   BUFR                   |     0.000 |        1 |       152 |            0.66 |
-| Signals                  |     0.235 |   161574 |       --- |             --- |
+| Signals                  |     0.239 |   161571 |       --- |             --- |
 | Block RAM                |     0.156 |    193.5 |       325 |           59.54 |
 | MMCM                     |     0.631 |        7 |         8 |           87.50 |
 | PLL                      |     0.185 |        2 |         8 |           25.00 |
@@ -72,7 +72,7 @@ Table of Contents
 | PHASER                   |     0.385 |       40 |       --- |             --- |
 | XADC                     |     0.002 |        1 |       --- |             --- |
 | Static Power             |     0.155 |          |           |                 |
-| Total                    |     4.335 |          |           |                 |
+| Total                    |     4.334 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -82,7 +82,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     1.311 |       1.251 |      0.060 |
+| Vccint    |       1.000 |     1.310 |       1.251 |      0.060 |
 | Vccaux    |       1.800 |     0.827 |       0.808 |      0.019 |
 | Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
 | Vcco25    |       2.500 |     0.011 |       0.009 |      0.001 |
@@ -225,25 +225,25 @@ Table of Contents
 +------------------------------------------------------------+-----------+
 | Name                                                       | Power (W) |
 +------------------------------------------------------------+-----------+
-| fir_00251_proc_scorpiomwA                                  |     4.180 |
-|   ACQ                                                      |     3.833 |
-|     BD                                                     |     2.002 |
+| fir_00251_proc_scorpiomwA                                  |     4.179 |
+|   ACQ                                                      |     3.834 |
+|     BD                                                     |     2.001 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_4                    |     0.002 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_5                    |     0.002 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_6                    |     0.002 |
 |       MIG_2DDR.IOBUFDS_DIFF_OUT_DCIEN_7                    |     0.002 |
-|       MIG_2DDR.core_wrapper_i                              |     1.993 |
+|       MIG_2DDR.core_wrapper_i                              |     1.991 |
 |     BULK_USART                                             |     0.110 |
 |       U11                                                  |     0.108 |
-|     CALIB                                                  |     0.536 |
+|     CALIB                                                  |     0.538 |
 |       U11                                                  |     0.002 |
 |       U14                                                  |     0.002 |
 |       U15                                                  |     0.002 |
 |       U17                                                  |     0.032 |
-|       U19                                                  |     0.018 |
+|       U19                                                  |     0.019 |
 |       U30                                                  |     0.013 |
 |       U31                                                  |     0.015 |
-|       gen_cal_1ch.CORE                                     |     0.444 |
+|       gen_cal_1ch.CORE                                     |     0.445 |
 |       gen_cal_1ch.U13                                      |     0.001 |
 |       gen_cal_1ch.U2                                       |     0.002 |
 |       gen_cal_1ch.U3                                       |     0.002 |
@@ -270,7 +270,7 @@ Table of Contents
 |       U2                                                   |     0.001 |
 |     IRIG                                                   |     0.001 |
 |     MGT                                                    |     1.080 |
-|       MGTS                                                 |     1.070 |
+|       MGTS                                                 |     1.069 |
 |       U3                                                   |     0.009 |
 |       U4                                                   |     0.001 |
 |     SFW_INTF                                               |     0.006 |
@@ -284,7 +284,7 @@ Table of Contents
 |       g0.U11                                               |     0.003 |
 |     U11                                                    |     0.001 |
 |     U2                                                     |     0.023 |
-|       U2                                                   |     0.001 |
+|       U2                                                   |     0.002 |
 |       U3                                                   |     0.001 |
 |       U4                                                   |     0.014 |
 |       U5                                                   |     0.003 |
@@ -300,19 +300,19 @@ Table of Contents
 |       U7                                                   |     0.001 |
 |       U8                                                   |     0.001 |
 |   U1                                                       |     0.062 |
-|     CH0                                                    |     0.058 |
+|     CH0                                                    |     0.059 |
 |       U15                                                  |     0.008 |
 |       U18                                                  |     0.008 |
 |       U21                                                  |     0.008 |
 |       U24                                                  |     0.008 |
 |     U4                                                     |     0.002 |
 |       U3                                                   |     0.002 |
-|   U3                                                       |     0.177 |
+|   U3                                                       |     0.176 |
 |     U21                                                    |     0.009 |
 |       U2                                                   |     0.003 |
 |       U3                                                   |     0.002 |
 |       U4                                                   |     0.001 |
-|       U6                                                   |     0.002 |
+|       U6                                                   |     0.001 |
 |     U26                                                    |     0.112 |
 |       U1                                                   |     0.002 |
 |       U2                                                   |     0.110 |
@@ -323,7 +323,7 @@ Table of Contents
 |       U2                                                   |     0.002 |
 |       U3                                                   |     0.002 |
 |       U4                                                   |     0.002 |
-|       U5                                                   |     0.010 |
+|       U5                                                   |     0.009 |
 |     U6                                                     |     0.002 |
 |     U7                                                     |     0.002 |
 |     U9                                                     |     0.021 |

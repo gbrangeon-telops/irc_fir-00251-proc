@@ -1,8 +1,8 @@
 Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------
-| Tool Version     : Vivado v.2018.3_(AR71898_AR71948) (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
-| Date             : Fri Jan 19 15:27:15 2024
-| Host             : TELOPS336 running 64-bit major release  (build 9200)
+| Tool Version     : Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date             : Fri Feb 23 12:00:50 2024
+| Host             : Telops331 running 64-bit major release  (build 9200)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/blackbird1920D/fir_00251_proc_325_blackbird1920D_power.rpt
 | Design           : fir_00251_proc_blackbird1920D
 | Device           : xc7k325tfbg676-1
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 6.307        |
+| Total On-Chip Power (W)  | 6.302        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 6.072        |
+| Dynamic (W)              | 6.067        |
 | Device Static (W)        | 0.236        |
 | Effective TJA (C/W)      | 1.9          |
-| Max Ambient (C)          | 88.2         |
-| Junction Temperature (C) | 36.8         |
+| Max Ambient (C)          | 88.3         |
+| Junction Temperature (C) | 36.7         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,16 +52,16 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.802 |       97 |       --- |             --- |
-| Slice Logic              |     0.320 |   338636 |       --- |             --- |
-|   LUT as Logic           |     0.246 |    97903 |    203800 |           48.04 |
-|   Register               |     0.032 |   168113 |    407600 |           41.24 |
+| Clocks                   |     0.799 |       97 |       --- |             --- |
+| Slice Logic              |     0.319 |   338639 |       --- |             --- |
+|   LUT as Logic           |     0.245 |    97883 |    203800 |           48.03 |
+|   Register               |     0.032 |   168114 |    407600 |           41.24 |
 |   CARRY4                 |     0.029 |     7544 |     50950 |           14.81 |
-|   LUT as Shift Register  |     0.009 |     6654 |     64000 |           10.40 |
+|   LUT as Shift Register  |     0.009 |     6668 |     64000 |           10.42 |
 |   LUT as Distributed RAM |     0.004 |     3780 |     64000 |            5.91 |
 |   F7/F8 Muxes            |    <0.001 |     1106 |    203800 |            0.54 |
-|   Others                 |    <0.001 |    23544 |       --- |             --- |
-| Signals                  |     0.414 |   244943 |       --- |             --- |
+|   Others                 |    <0.001 |    23546 |       --- |             --- |
+| Signals                  |     0.412 |   244931 |       --- |             --- |
 | Block RAM                |     0.209 |    262.5 |       445 |           58.99 |
 | MMCM                     |     0.726 |        7 |        10 |           70.00 |
 | PLL                      |     0.185 |        2 |        10 |           20.00 |
@@ -71,7 +71,7 @@ Table of Contents
 | PHASER                   |     0.527 |       58 |       --- |             --- |
 | XADC                     |     0.002 |        1 |       --- |             --- |
 | Static Power             |     0.236 |          |           |                 |
-| Total                    |     6.307 |          |           |                 |
+| Total                    |     6.302 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -81,7 +81,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     2.250 |       2.133 |      0.117 |
+| Vccint    |       1.000 |     2.245 |       2.128 |      0.116 |
 | Vccaux    |       1.800 |     1.112 |       1.082 |      0.030 |
 | Vcco33    |       3.300 |     0.004 |       0.003 |      0.001 |
 | Vcco25    |       2.500 |     0.028 |       0.027 |      0.001 |
@@ -241,22 +241,22 @@ Table of Contents
 +------------------------------------------------------------+-----------+
 | Name                                                       | Power (W) |
 +------------------------------------------------------------+-----------+
-| fir_00251_proc_blackbird1920D                              |     6.072 |
-|   ACQ                                                      |     5.471 |
-|     BD                                                     |     2.707 |
-|       MIG_4DDR.core_wrapper_i                              |     2.707 |
+| fir_00251_proc_blackbird1920D                              |     6.067 |
+|   ACQ                                                      |     5.467 |
+|     BD                                                     |     2.704 |
+|       MIG_4DDR.core_wrapper_i                              |     2.704 |
 |     BULK_USART                                             |     0.110 |
 |       U11                                                  |     0.108 |
-|     CALIB                                                  |     1.114 |
+|     CALIB                                                  |     1.113 |
 |       U11                                                  |     0.002 |
 |       U14                                                  |     0.002 |
 |       U15                                                  |     0.002 |
-|       U17                                                  |     0.057 |
-|       U19                                                  |     0.019 |
+|       U17                                                  |     0.055 |
+|       U19                                                  |     0.018 |
 |       U30                                                  |     0.026 |
-|       U31                                                  |     0.030 |
-|       gen_cal_2ch.CORE_0                                   |     0.483 |
-|       gen_cal_2ch.CORE_1                                   |     0.485 |
+|       U31                                                  |     0.029 |
+|       gen_cal_2ch.CORE_0                                   |     0.485 |
+|       gen_cal_2ch.CORE_1                                   |     0.484 |
 |       gen_cal_2ch.U20                                      |     0.002 |
 |       gen_cal_2ch.U4                                       |     0.003 |
 |       gen_cal_2ch.U9                                       |     0.004 |
@@ -282,15 +282,15 @@ Table of Contents
 |     ICU                                                    |     0.002 |
 |       U2                                                   |     0.002 |
 |     IRIG                                                   |     0.002 |
-|     MGT                                                    |     1.401 |
-|       MGTS                                                 |     1.390 |
+|     MGT                                                    |     1.403 |
+|       MGTS                                                 |     1.391 |
 |       U3                                                   |     0.009 |
 |       U4                                                   |     0.002 |
 |     SFW_INTF                                               |     0.006 |
 |       U2                                                   |     0.001 |
 |       U3                                                   |     0.001 |
 |       U7                                                   |     0.002 |
-|     TRIG                                                   |     0.010 |
+|     TRIG                                                   |     0.009 |
 |       U1                                                   |     0.002 |
 |       U3                                                   |     0.003 |
 |       U4                                                   |     0.001 |
@@ -349,23 +349,23 @@ Table of Contents
 |       U8                                                   |     0.008 |
 |       U9                                                   |     0.008 |
 |     U8                                                     |     0.002 |
-|   FPA                                                      |     0.186 |
+|   FPA                                                      |     0.185 |
 |     U19                                                    |     0.015 |
 |     U24                                                    |     0.092 |
 |       Gen_BB1920_8CHN.U1                                   |     0.092 |
 |     U26                                                    |     0.004 |
 |     U33                                                    |     0.002 |
 |       agen_wr64_rd128_d512.fwft_afifo_wr66_rd132_d512_inst |     0.002 |
-|     U4                                                     |     0.017 |
+|     U4                                                     |     0.016 |
 |     U5                                                     |     0.012 |
-|       U1                                                   |     0.006 |
+|       U1                                                   |     0.005 |
 |       U3                                                   |     0.001 |
 |       U6                                                   |     0.002 |
 |       U9                                                   |     0.002 |
 |     U6                                                     |     0.002 |
 |     U7                                                     |     0.002 |
 |       U2                                                   |     0.002 |
-|     U9                                                     |     0.040 |
+|     U9                                                     |     0.039 |
 |       U1                                                   |     0.009 |
 |       U17                                                  |     0.004 |
 |       U18                                                  |     0.007 |
