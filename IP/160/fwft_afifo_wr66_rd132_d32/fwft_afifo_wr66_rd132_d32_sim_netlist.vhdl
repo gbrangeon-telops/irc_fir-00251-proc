@@ -1,8 +1,8 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Fri Oct  6 15:29:25 2023
--- Host        : Telops330 running 64-bit major release  (build 9200)
+-- Date        : Thu Feb 22 03:48:08 2024
+-- Host        : Telops331 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/fwft_afifo_wr66_rd132_d32/fwft_afifo_wr66_rd132_d32_sim_netlist.vhdl
 -- Design      : fwft_afifo_wr66_rd132_d32

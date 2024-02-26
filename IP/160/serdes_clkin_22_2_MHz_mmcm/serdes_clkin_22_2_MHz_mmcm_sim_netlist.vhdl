@@ -1,8 +1,8 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Fri Oct  6 15:37:14 2023
--- Host        : Telops330 running 64-bit major release  (build 9200)
+-- Date        : Thu Feb 22 03:46:49 2024
+-- Host        : Telops331 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/serdes_clkin_22_2_MHz_mmcm/serdes_clkin_22_2_MHz_mmcm_sim_netlist.vhdl
 -- Design      : serdes_clkin_22_2_MHz_mmcm
