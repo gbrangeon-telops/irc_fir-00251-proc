@@ -140,20 +140,6 @@ begin
       wait for 100 ns;
    end process;
    
-   -- Exposure Time
-   U3 : process
-   begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(500, FPA_EXP_INFO.exp_time'length);     -- in clk cycle of 10ns (100MHz)
-      FPA_EXP_INFO.exp_indx <= x"05";
-      FPA_EXP_INFO.exp_dval <= '1';
-      wait for 15 ms;
-      FPA_EXP_INFO.exp_dval <= '0';
-      wait until rising_edge(MB_CLK);
-      FPA_EXP_INFO.exp_time <= to_unsigned(10_000, FPA_EXP_INFO.exp_time'length);
-      FPA_EXP_INFO.exp_dval <= '1';
-      wait;
-   end process;
-   
    -- MicroBlaze Interface
    U4 : process
       variable start_pos : integer;
@@ -172,6 +158,8 @@ begin
       MB_MOSI.bready <= '0';
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';
+      
+      FPA_EXP_INFO.exp_dval <= '0';
       
       wait until ARESET = '0';
       
@@ -205,6 +193,14 @@ begin
       -- Wait for MMCM lock + delay to have every modules out of reset
       wait for 2 ms;
       
+      -- Configure exposure time
+      wait until rising_edge(MB_CLK);
+      FPA_EXP_INFO.exp_time <= to_unsigned(500, FPA_EXP_INFO.exp_time'length);     -- in clk cycle of 10ns (100MHz)
+      FPA_EXP_INFO.exp_indx <= x"05";
+      FPA_EXP_INFO.exp_dval <= '1';
+      wait until rising_edge(MB_CLK);
+      FPA_EXP_INFO.exp_dval <= '0';
+      
 --      -- Write 2nd config
 --      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
 --         wait until rising_edge(MB_CLK);      
@@ -213,6 +209,16 @@ begin
 --         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
 --         wait for 30 ns;
 --      end loop;
+
+      wait for 4 ms;
+
+      -- Configure exposure time
+      wait until rising_edge(MB_CLK);
+      FPA_EXP_INFO.exp_time <= to_unsigned(10_000, FPA_EXP_INFO.exp_time'length);     -- in clk cycle of 10ns (100MHz)
+      FPA_EXP_INFO.exp_indx <= x"04";
+      FPA_EXP_INFO.exp_dval <= '1';
+      wait until rising_edge(MB_CLK);
+      FPA_EXP_INFO.exp_dval <= '0';
       
       report "FCR written";
       
