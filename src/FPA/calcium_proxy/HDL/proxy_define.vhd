@@ -40,7 +40,8 @@ package Proxy_define is
    constant DEFINE_FPA_PROG_SCLK_RATE_KHZ             : integer   := 1_000;      -- horloge SPI pour la programmation du FPA. Doit être 1 MHz (ou 10?)
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP         : integer   := 1;          -- on doit laisser 1 image dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP                : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
-   constant DEFINE_FPA_POWER_ON_WAIT_MS               : integer   := 1_200;      -- en msec, duree d'attente après allumage pour declarer le FPA rdy. Le ramp-up du LT3042 est d'environ 1s
+   constant DEFINE_FPA_POWER_ON_WAIT_MS               : integer   := 1_200;      -- en msec, duree d'attente après allumage. Le ramp-up du LT3045 est d'environ 1s
+   constant DEFINE_FPA_OUT_OF_RESET_WAIT_MS           : integer   := 100;        -- en msec, duree d'attente après avoir sorti le roic du reset
    constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 30720;      -- minimum ADC value for power-on : 0.960V de 2N2222 (soit 120K)
    constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 35200;      -- maximum ADC value for power-on : 1.100V de 2N2222 (soit 40K) to protect against ultra low temp
    constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
@@ -76,6 +77,7 @@ package Proxy_define is
    -- Calculs
    ----------------------------------------------
    constant DEFINE_FPA_POWER_WAIT_FACTOR                    : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ*DEFINE_FPA_POWER_ON_WAIT_MS);
+   constant DEFINE_FPA_OUT_OF_RESET_WAIT_FACTOR             : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ*DEFINE_FPA_OUT_OF_RESET_WAIT_MS);
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS    : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR
    constant DEFINE_FPA_PROG_SCLK_RATE_FACTOR                : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ/DEFINE_FPA_PROG_SCLK_RATE_KHZ);
    constant FPA_PIX_THROUGHPUT_MAX_MPIX                     : real    := real(8*400*2) / real(24);    -- 8 canaux à 400MHz DDR à 24b par pixel [Mpix/s]

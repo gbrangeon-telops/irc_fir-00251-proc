@@ -113,7 +113,7 @@ architecture rtl of calcium_io_intf is
       );
    end component;
    
-   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, fpa_pwr_on_st, fpa_pwr_pause_st, fpa_pwred_st, fpa_prog_st, passthru_st);
+   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, fpa_pwr_on_st, fpa_pwr_pause_st, fpa_out_of_reset_st, fpa_out_of_reset_pause_st, fpa_pwred_st, passthru_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st);
    
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
@@ -264,7 +264,7 @@ begin
                   end if;
                   
                   -- pragma translate_off
-                  if fpa_timer_cnt = 50 then 
+                  if fpa_timer_cnt = 5000 then 
                      fpa_digio_fsm <= fpa_pwr_on_st;
                   end if;
                   -- pragma translate_on 
@@ -279,6 +279,25 @@ begin
                when fpa_pwr_pause_st =>
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
+                     fpa_digio_fsm <=  fpa_out_of_reset_st;
+                  end if;
+                  
+                  -- pragma translate_off
+                  if fpa_timer_cnt = 50 then 
+                     fpa_digio_fsm <= fpa_out_of_reset_st;
+                  end if;
+                  -- pragma translate_on
+               
+               -- Sort le ROIC du reset
+               when fpa_out_of_reset_st =>
+                  pocan_reset_i <= '0';
+                  fpa_timer_cnt <= 0;
+                  fpa_digio_fsm <= fpa_out_of_reset_pause_st;
+                  
+               -- Delai du ROIC de sortir du reset  
+               when fpa_out_of_reset_pause_st =>
+                  fpa_timer_cnt <= fpa_timer_cnt + 1;
+                  if fpa_timer_cnt > DEFINE_FPA_OUT_OF_RESET_WAIT_FACTOR then
                      fpa_digio_fsm <=  fpa_pwred_st;
                   end if;
                   
@@ -291,28 +310,19 @@ begin
                -- annoncer la bonne nouvelle relative à l'allumage du détecteur
                when fpa_pwred_st =>
                   fpa_powered_i <= '1';         -- permet au driver de placer une requete de programmation
-                  pocan_reset_i <= '0';         -- on sort le roic du reset
                   if PROG_EN = '1'  then        -- attendre que le programmateur du FPA soit activée => trig arrêté
-                     fpa_digio_fsm <= fpa_prog_st;
+                     fpa_digio_fsm <= passthru_st;
                   end if;
                   
                -- venir ici rapidement pour ne pas manquer la communication du programmateur
-               when fpa_prog_st =>
+               when passthru_st =>     -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
+                  pixqnb_en_i <= PROG_INIT_DONE;   -- on active le LDO vTstPixQNB seulement quand le ROIC a été programmé
                   roic_sclk_iob <= PROG_SCLK;
                   roic_mosi_iob <= PROG_MOSI;
                   roic_miso_iob <= ROIC_MISO;
-                  if PROG_INIT_DONE = '1' then  -- on attend que la 1re programmation du ROIC soit faite
-                     fpa_digio_fsm <= passthru_st;
-                  end if;
-               
-               when passthru_st =>              -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  pixqnb_en_i <= '1';           -- on active le LDO vTstPixQNB seulement quand le ROIC a été programmé
-                  roic_sclk_iob <= PROG_SCLK;
-                  roic_mosi_iob <= PROG_MOSI;
-                  roic_miso_iob <= ROIC_MISO;
-                  clk_ddr_disabled <= '0';      -- on active CLK_DDR seulement quand le ROIC a été programmé
+                  clk_ddr_disabled <= '0';         -- on active CLK_DDR seulement quand le ROIC a été programmé
                   clk_frm_iob <= FPA_INT;
-                  clk_rd_iob <= '0';            -- not used for now
+                  clk_rd_iob <= '0';               -- not used for now
                
                when others =>
                
@@ -346,7 +356,7 @@ begin
                   end if;
                   
                   -- pragma translate_off
-                  if dac_timer_cnt = 50 then
+                  if dac_timer_cnt = 100 then
                      dac_digio_fsm <= dac_pwred_st;
                   end if;
                   -- pragma translate_on
