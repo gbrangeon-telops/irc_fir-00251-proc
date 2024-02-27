@@ -226,8 +226,11 @@ begin
                   when X"070" =>    user_cfg_i.kpix_pgen_value    <= data_i(user_cfg_i.kpix_pgen_value'length-1 downto 0);
                   when X"074" =>    user_cfg_i.kpix_mean_value    <= data_i(user_cfg_i.kpix_mean_value'length-1 downto 0);
                   
+                  when X"078" =>    user_cfg_i.use_ext_pixqnb        <= data_i(0);
+                  when X"07C" =>    user_cfg_i.clk_frm_pulse_width   <= unsigned(data_i(user_cfg_i.clk_frm_pulse_width'length-1 downto 0));
                   
-                  when X"078" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  
+                  when X"080" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

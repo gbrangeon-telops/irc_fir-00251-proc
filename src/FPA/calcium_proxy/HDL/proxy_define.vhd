@@ -127,6 +127,9 @@ package Proxy_define is
       kpix_pgen_value                  : std_logic_vector(15 downto 0);    --
       kpix_mean_value                  : std_logic_vector(15 downto 0);    --
       
+      use_ext_pixqnb                   : std_logic;                        -- indique s'il faut activer le bias externe vTstPixQNB. S'il est désactivé, le bias interne doit être configuré
+      clk_frm_pulse_width              : unsigned(7 downto 0);             -- durée fixe du pulse CLK_FRM en CLK_100MHz lorsque le temps d'intégration est contrôlé à l'interne du ROIC (configuré par registres).
+                                                                           -- la valeur 0 est réservée pour le contrôle du temps d'intégration à l'externe (largeur du pulse CLK_FRM). CLK_FRM sera une copie de FPA_INT
       
       cfg_num                          : unsigned(7 downto 0);             -- numéro incrémental de la config actuelle
       

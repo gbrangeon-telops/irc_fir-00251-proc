@@ -20,7 +20,7 @@ use work.fpa_define.all;
 
 package calcium640D_intf_testbench_pkg is
    
-   constant USER_CFG_VECTOR_SIZE             : natural := 31;  -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE             : natural := 33;  -- number of variables to write in the USER_CFG
    constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
@@ -62,6 +62,8 @@ package body calcium640D_intf_testbench_pkg is
       variable int_fdbk_dly : unsigned(31 downto 0);
       variable kpix_pgen_value : unsigned(31 downto 0);
       variable kpix_mean_value : unsigned(31 downto 0);
+      variable use_ext_pixqnb : unsigned(31 downto 0);
+      variable clk_frm_pulse_width : unsigned(31 downto 0);
       variable cfg_num : unsigned(31 downto 0);
       
       -- Return variable
@@ -115,10 +117,13 @@ package body calcium640D_intf_testbench_pkg is
       s_fpa_int_time_offset := to_signed(-1, 32);
       u_fpa_int_time_offset := unsigned(std_logic_vector(s_fpa_int_time_offset));
       
-      int_fdbk_dly := to_unsigned(0, 32);
+      int_fdbk_dly := to_unsigned(3, 32);    -- 3 clk_100M entre FPA_INT et CLK_FRM
       
       kpix_pgen_value   := to_unsigned(0, 32);
       kpix_mean_value   := to_unsigned(0, 32);
+      
+      use_ext_pixqnb          := (others => '1');
+      clk_frm_pulse_width     := to_unsigned(50, 32);
       
       cfg_num := to_unsigned(send_id, 32);
       
@@ -154,6 +159,8 @@ package body calcium640D_intf_testbench_pkg is
       & int_fdbk_dly
       & kpix_pgen_value
       & kpix_mean_value
+      & use_ext_pixqnb
+      & clk_frm_pulse_width
       & cfg_num;
       
       return y;

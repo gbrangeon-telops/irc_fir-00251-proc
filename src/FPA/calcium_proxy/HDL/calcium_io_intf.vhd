@@ -29,6 +29,8 @@ entity calcium_io_intf is
       CLK            : in std_logic;
       ARESET         : in std_logic;
       
+      FPA_INTF_CFG   : in fpa_intf_cfg_type;
+      
       -- hw_driver side
       FPA_PWR        : in std_logic;
       FPA_POWERED    : out std_logic;
@@ -114,18 +116,23 @@ architecture rtl of calcium_io_intf is
    end component;
    
    type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, fpa_pwr_on_st, fpa_pwr_pause_st, fpa_out_of_reset_st, fpa_out_of_reset_pause_st, fpa_pwred_st, passthru_st);
+   type clk_frm_fsm_type is (idle, trig_on_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st);
    
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
+   signal clk_frm_fsm      : clk_frm_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
    signal sreset           : std_logic;
    signal fsm_sreset       : std_logic;
-   signal dac_timer_cnt    : natural;
    signal fpa_timer_cnt    : natural;
+   signal clk_frm_cnt      : unsigned(FPA_INTF_CFG.CLK_FRM_PULSE_WIDTH'length-1 downto 0);
+   signal dac_timer_cnt    : natural;
    signal fpa_powered_i    : std_logic;
    signal dac_powered_i    : std_logic;
    signal dac_output_disabled : std_logic;
    signal clk_ddr_disabled : std_logic;
+   signal fpa_int_last     : std_logic;
+   signal clk_frm_i        : std_logic;
    
    signal fpa_on_i         : std_logic;
    signal pixqnb_en_i      : std_logic;
@@ -316,12 +323,12 @@ begin
                   
                -- venir ici rapidement pour ne pas manquer la communication du programmateur
                when passthru_st =>     -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  pixqnb_en_i <= PROG_INIT_DONE;   -- on active le LDO vTstPixQNB seulement quand le ROIC a été programmé
+                  pixqnb_en_i <= FPA_INTF_CFG.USE_EXT_PIXQNB and PROG_INIT_DONE;   -- s'il est requis, on active le LDO vTstPixQNB seulement quand le ROIC a été programmé
                   roic_sclk_iob <= PROG_SCLK;
                   roic_mosi_iob <= PROG_MOSI;
                   roic_miso_iob <= ROIC_MISO;
                   clk_ddr_disabled <= '0';         -- on active CLK_DDR seulement quand le ROIC a été programmé
-                  clk_frm_iob <= FPA_INT;
+                  clk_frm_iob <= clk_frm_i;
                   clk_rd_iob <= '0';               -- not used for now
                
                when others =>
@@ -333,9 +340,57 @@ begin
    end process;
    
    --------------------------------------------------
-   -- Gestion des signaux du DAC
+   -- Génération du signal CLK_FRM
    --------------------------------------------------
    U6 : process(CLK)
+   begin
+      if rising_edge(CLK) then
+         if fsm_sreset = '1' then
+            clk_frm_i <= '0';
+            clk_frm_cnt <= (others => '0');
+            clk_frm_fsm <= idle;
+            fpa_int_last <= '0';
+         else
+            
+            fpa_int_last <= FPA_INT;
+            
+            -- Si le pulse width n'est pas configuré, on fait une copie de FPA_INT (pour le mode intégration externe)
+            if FPA_INTF_CFG.CLK_FRM_PULSE_WIDTH = 0 then
+               clk_frm_i <= fpa_int_last;    -- pour avoir la même latence peu importe le mode
+            else
+            
+               -- Si le pulse width est configuré, on génère un trig avec une durée fixe (pour le mode intégration interne)
+               case clk_frm_fsm is
+                  
+                  when idle =>
+                     clk_frm_i <= '0';
+                     if fpa_int_last = '0' and FPA_INT = '1' then
+                        clk_frm_cnt <= FPA_INTF_CFG.CLK_FRM_PULSE_WIDTH;
+                        clk_frm_fsm <= trig_on_st;
+                     end if;
+                  
+                  when trig_on_st => 
+                     clk_frm_i <= '1';
+                     clk_frm_cnt <= clk_frm_cnt - 1;
+                     if clk_frm_cnt = 0 then
+                        clk_frm_i <= '0';
+                        clk_frm_fsm <= idle;
+                     end if;
+                  
+                  when others =>
+                  
+               end case;
+               
+            end if;
+            
+         end if;
+      end if;
+   end process;
+   
+   --------------------------------------------------
+   -- Gestion des signaux du DAC
+   --------------------------------------------------
+   U7 : process(CLK)
    begin
       if rising_edge(CLK) then
          if fsm_sreset = '1' then        -- fsm_sreset vaut '1' si sreset ou détecteur non allumé.
