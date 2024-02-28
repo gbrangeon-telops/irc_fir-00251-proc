@@ -20,7 +20,7 @@ use work.fpa_define.all;
 
 package calcium640D_intf_testbench_pkg is
    
-   constant USER_CFG_VECTOR_SIZE             : natural := 33;  -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE             : natural := 35;  -- number of variables to write in the USER_CFG
    constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
@@ -64,6 +64,8 @@ package body calcium640D_intf_testbench_pkg is
       variable kpix_mean_value : unsigned(31 downto 0);
       variable use_ext_pixqnb : unsigned(31 downto 0);
       variable clk_frm_pulse_width : unsigned(31 downto 0);
+      variable fpa_serdes_lval_num : unsigned(31 downto 0);
+      variable fpa_serdes_lval_len : unsigned(31 downto 0);
       variable cfg_num : unsigned(31 downto 0);
       
       -- Return variable
@@ -125,6 +127,9 @@ package body calcium640D_intf_testbench_pkg is
       use_ext_pixqnb          := (others => '1');
       clk_frm_pulse_width     := to_unsigned(50, 32);
       
+      fpa_serdes_lval_num     := to_unsigned(user_ysize + 4, 32);
+      fpa_serdes_lval_len     := to_unsigned(user_xsize/8, 32);
+      
       cfg_num := to_unsigned(send_id, 32);
       
       
@@ -161,6 +166,8 @@ package body calcium640D_intf_testbench_pkg is
       & kpix_mean_value
       & use_ext_pixqnb
       & clk_frm_pulse_width
+      & fpa_serdes_lval_num
+      & fpa_serdes_lval_len
       & cfg_num;
       
       return y;

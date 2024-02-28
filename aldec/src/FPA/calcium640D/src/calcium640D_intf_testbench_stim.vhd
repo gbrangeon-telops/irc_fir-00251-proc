@@ -23,14 +23,11 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
          CLK_100M : in STD_LOGIC;
          MB_CLK : in STD_LOGIC;
          ROIC_MISO : in STD_LOGIC;
-         RX_CLK : in STD_LOGIC;
-         RX_RDY : in STD_LOGIC;
          XTRA_TRIG : in STD_LOGIC;
          DOUT_MISO : in t_axi4_stream_miso;
          FPA_EXP_INFO : in exp_info_type;
          HDER_MISO : in t_axi4_lite_miso;
          MB_MOSI : in t_axi4_lite_mosi;
-         RX_DATA : in STD_LOGIC_VECTOR(191 downto 0);
          CLK_DDR_N : out STD_LOGIC;
          CLK_DDR_P : out STD_LOGIC;
          CLK_FRM : out STD_LOGIC;
@@ -80,14 +77,11 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    signal CLK_100M : STD_LOGIC := '0';
    signal MB_CLK : STD_LOGIC;
    signal ROIC_MISO : STD_LOGIC;       -- À implémenter !!!
-   signal RX_CLK : STD_LOGIC;
-   signal RX_RDY : STD_LOGIC;
    signal XTRA_TRIG : STD_LOGIC := '0';
    signal DOUT_MISO : t_axi4_stream_miso;
    signal FPA_EXP_INFO : exp_info_type;
    signal HDER_MISO : t_axi4_lite_miso;
    signal MB_MOSI : t_axi4_lite_mosi;
-   signal RX_DATA : STD_LOGIC_VECTOR(191 downto 0);   -- À implémenter !!!
    signal CLK_DDR_N : STD_LOGIC;
    signal CLK_DDR_P : STD_LOGIC;
    signal CLK_FRM : STD_LOGIC;
@@ -235,14 +229,11 @@ begin
       CLK_100M => CLK_100M,
       MB_CLK => MB_CLK,
       ROIC_MISO => ROIC_MISO,
-      RX_CLK => RX_CLK,
-      RX_RDY => RX_RDY,
       XTRA_TRIG => XTRA_TRIG,
       DOUT_MISO => DOUT_MISO,
       FPA_EXP_INFO => FPA_EXP_INFO,
       HDER_MISO => HDER_MISO,
       MB_MOSI => MB_MOSI,
-      RX_DATA => RX_DATA,
       CLK_DDR_N => CLK_DDR_N,
       CLK_DDR_P => CLK_DDR_P,
       CLK_FRM => CLK_FRM,

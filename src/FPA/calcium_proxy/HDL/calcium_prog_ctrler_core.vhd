@@ -30,7 +30,8 @@ entity calcium_prog_ctrler_core is
       -- interfaçage avec le contrôleur principal
       PROG_EN          : in std_logic;
       PROG_RQST        : out std_logic;
-      PROG_DONE        : out std_logic; 
+      PROG_DONE        : out std_logic;
+      ROIC_INIT_DONE   : out std_logic;
       
       -- sortie vers spi
       SPI_DATA         : out std_logic_vector(15 downto 0);
@@ -77,6 +78,7 @@ architecture rtl of calcium_prog_ctrler_core is
    signal pause_cnt                 : unsigned(C_END_OF_TRANSMISSION_WAIT_NB_BITS-1 downto 0);
    signal prog_rqst_i               : std_logic;
    signal prog_done_i               : std_logic;
+   signal roic_init_done_i          : std_logic;
    signal spi_en_i                  : std_logic;
    signal spi_data_i                : std_logic_vector(SPI_DATA'length-1 downto 0);
    signal cfg_num_gray              : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
@@ -93,6 +95,7 @@ begin
    -- Output mapping
    PROG_RQST <= prog_rqst_i;
    PROG_DONE <= prog_done_i;
+   ROIC_INIT_DONE <= roic_init_done_i;
    SPI_DATA <= spi_data_i;
    SPI_EN <= spi_en_i;
    
@@ -161,6 +164,7 @@ begin
             prog_rqst_i <= '0';
             spi_en_i <= '0';
             present_cfg_num <= not new_cfg_num;
+            roic_init_done_i <= '0';
             
          else    
             
@@ -215,6 +219,7 @@ begin
                when pause_st =>
                   pause_cnt <= pause_cnt + 1;
                   if pause_cnt >= C_END_OF_TRANSMISSION_WAIT_FACTOR then
+                     roic_init_done_i <= '1';   -- l'init du roic est terminée lorsque la 1re config est transmise
                      prog_fsm <= idle;
                   end if;
                

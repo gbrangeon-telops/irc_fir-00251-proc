@@ -171,7 +171,7 @@ begin
             user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre
             dac_cfg_in_progress <= '1';
             mb_ctrled_reset_i <= '0';
-            fpa_softw_stat_i.dval <='0';
+            fpa_softw_stat_i.dval <= '0';
             
          else                   
             
@@ -229,9 +229,12 @@ begin
                   when X"078" =>    user_cfg_i.use_ext_pixqnb        <= data_i(0);
                   when X"07C" =>    user_cfg_i.clk_frm_pulse_width   <= unsigned(data_i(user_cfg_i.clk_frm_pulse_width'length-1 downto 0));
                   
+                  when X"080" =>    user_cfg_i.fpa_serdes_lval_num   <= unsigned(data_i(user_cfg_i.fpa_serdes_lval_num'length-1 downto 0));
+                  when X"084" =>    user_cfg_i.fpa_serdes_lval_len   <= unsigned(data_i(user_cfg_i.fpa_serdes_lval_len'length-1 downto 0));
                   
-                  when X"080" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
-                     
+                  
+                  when X"088" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  

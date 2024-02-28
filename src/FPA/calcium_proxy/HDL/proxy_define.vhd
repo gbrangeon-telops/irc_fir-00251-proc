@@ -131,6 +131,9 @@ package Proxy_define is
       clk_frm_pulse_width              : unsigned(7 downto 0);             -- durée fixe du pulse CLK_FRM en CLK_100MHz lorsque le temps d'intégration est contrôlé à l'interne du ROIC (configuré par registres).
                                                                            -- la valeur 0 est réservée pour le contrôle du temps d'intégration à l'externe (largeur du pulse CLK_FRM). CLK_FRM sera une copie de FPA_INT
       
+      fpa_serdes_lval_num              : unsigned(10 downto 0);            -- nombre total de LVAL dans un FVAL pour la calibration des serdes d'entrée
+      fpa_serdes_lval_len              : unsigned(10 downto 0);            -- nombre de pixel_clk dans un LVAL (width / 8) pour la calibration des serdes d'entrée
+      
       cfg_num                          : unsigned(7 downto 0);             -- numéro incrémental de la config actuelle
       
       vdac_value                       : fleg_vdac_value_type;             -- config du DAC. définition dans fleg_brd_define

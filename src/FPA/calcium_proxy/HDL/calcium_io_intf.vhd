@@ -44,7 +44,7 @@ entity calcium_io_intf is
       PROG_SCLK      : in std_logic;
       PROG_MOSI      : in std_logic;
       PROG_MISO      : out std_logic;
-      PROG_INIT_DONE : in std_logic;
+      ROIC_INIT_DONE : in std_logic;
       
       CLK_DDR        : in std_logic;
       
@@ -323,13 +323,17 @@ begin
                   
                -- venir ici rapidement pour ne pas manquer la communication du programmateur
                when passthru_st =>     -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  pixqnb_en_i <= FPA_INTF_CFG.USE_EXT_PIXQNB and PROG_INIT_DONE;   -- s'il est requis, on active le LDO vTstPixQNB seulement quand le ROIC a été programmé
+                  -- Signaux SPI pour permettre la programmation du ROIC
                   roic_sclk_iob <= PROG_SCLK;
                   roic_mosi_iob <= PROG_MOSI;
                   roic_miso_iob <= ROIC_MISO;
-                  clk_ddr_disabled <= '0';         -- on active CLK_DDR seulement quand le ROIC a été programmé
-                  clk_frm_iob <= clk_frm_i;
-                  clk_rd_iob <= '0';               -- not used for now
+                  if ROIC_INIT_DONE = '1' then
+                     -- Signaux activés seulement une fois que le ROIC a été programmé
+                     pixqnb_en_i <= FPA_INTF_CFG.USE_EXT_PIXQNB;
+                     clk_ddr_disabled <= '0';
+                     clk_frm_iob <= clk_frm_i;
+                     clk_rd_iob <= '0';               -- not used for now
+                  end if;
                
                when others =>
                
