@@ -9,7 +9,7 @@ set sth_content [read $fd]
 close $fd
 
 regsub -all {\\} $sth_content {/} sth_content
-regsub -all {=.*} $sth_content {} sth_content
+regsub -all {=[^\n]*} $sth_content {} sth_content
 set sth_content [string range $sth_content 1 end]
 set sth_content [split $sth_content \[\]]
 
