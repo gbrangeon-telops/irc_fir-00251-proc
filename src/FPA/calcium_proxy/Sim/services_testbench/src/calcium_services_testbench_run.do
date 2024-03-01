@@ -15,23 +15,19 @@ do d:\Telops\FIR-00251-Proc\src\compil_utilities.do
 # FPA common 
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd
-acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_id_reader.vhd
-acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\flex_brd_id_reader.vhd
+acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ddc_brd_id_reader.vhd
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_switch_ctrl.vhd
 acom d:\Telops\Common_HDL\SPI\ads1118_driver.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\monitoring_adc_ctrl.vhd
-acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler_sadc.vhd
-acom d:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_adc_ctrl.vhd
 
 # calcium services
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services_ctrl.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services.bde
 
 # emulateur
-acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\brd_mux_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\monit_adc_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\fpa_temp_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\digio_dummy.vhd
@@ -61,15 +57,13 @@ wave UUT/U1/*
 -- switch
 --wave UUT/U1/U3/*
 
--- adc brd_id_reader
---wave UUT/U1/U5/*
-
 -- services ctrl
 --wave UUT/U1/U8/* 
 
--- flex brd_id_reader
+-- ddc brd_id_reader
 --wave UUT/U1/U6/*
+--wave UUT/U1/U6/U2*
 
 
 
-run 3 ms
+run 4 ms

@@ -66,10 +66,10 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    constant FPA_SOFTW_STAT_FPA_ROIC    : std_logic_vector(7 downto 0) := FPA_ROIC_CALCIUM;
    constant FPA_SOFTW_STAT_FPA_OUTPUT  : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL;
    constant FPA_SOFTW_STAT_FPA_INPUT   : std_logic_vector(7 downto 0) := LVCMOS18;
-   constant FPA_SOFTW_STAT_BASE_ADD    : natural := to_integer(unsigned(x"AE0"));
+   constant FPA_SOFTW_STAT_BASE_ADD    : natural := 2784;  -- x"AE0"
    
    constant VDAC_VALUE              : unsigned(31 downto 0) := to_unsigned(4005, 32);    -- x"FA5" all DACs to the same value
-   constant DAC_CFG_BASE_ADD        : natural := to_integer(unsigned(x"D00"));
+   constant DAC_CFG_BASE_ADD        : natural := 3328;     -- x"D00"
    constant DAC_CFG_VECTOR_SIZE     : natural := 8;
    
    signal ACQ_TRIG : STD_LOGIC;

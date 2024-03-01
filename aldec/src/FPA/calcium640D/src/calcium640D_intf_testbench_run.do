@@ -13,7 +13,6 @@ acom D:\Telops\FIR-00251-Proc\IP\325\ip_axis16_combine_axis64\ip_axis16_combine_
 do D:\Telops\FIR-00251-Proc\src\FPA\calcium640D\HDL\compil_calcium640D.do
 
 # emulateur
-acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\brd_mux_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\monit_adc_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\fpa_temp_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\digio_dummy.vhd
@@ -29,5 +28,5 @@ asim -ses calcium640D_intf_testbench_stim
 
 wave UUT/U1/*
 
-run 1 ms
+run 4 ms
 
