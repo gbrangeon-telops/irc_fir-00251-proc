@@ -1,8 +1,9 @@
-cd [file dirname [file normalize [info script]]]/..
-set sth_file [pwd]/aldec/compile/sources.sth
+#cd [file dirname [file normalize [info script]]]/..
+#set sth_file [pwd]/aldec/compile/sources.sth
+set sth_file [pwd]/sources.sth
 
 if {[file exists $sth_file] != 1} {
-	return -code error "Top design not set within the Active-HDL workspace"
+	return -code error "sth file not found within the working directory"
 }
 set fd [open $sth_file]
 set sth_content [read $fd]
@@ -18,6 +19,7 @@ if {[dict exists $sth_content "Files List"] != 1} {
 }
 set proj_srcs [dict get $sth_content "Files List"]
 
+regsub -all -nocase {_sim_netlist\.vhdl} $proj_srcs {.xci} proj_srcs
 set proj_srcs [lsearch -all -inline -nocase $proj_srcs */Telops/*]
 set proj_top [lindex $proj_srcs end]
 set proj_dir [file rootname $proj_top]
