@@ -78,7 +78,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 13.3.0
+// Generated from XML camera definition file version 13.3.1
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -3284,8 +3284,8 @@ void GC_MemoryBufferLegacyModeCallback(gcCallbackPhase_t phase, gcCallbackAccess
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // Cette mise-à-jour des paramètres max ne change rien en pratique dans HypIR/VTT puisque le registre est modifié au démarrage.
-      // C'est utile pour valider la différence de comportement dans MatLab.
+      // Cette mise-Ã -jour des paramÃ¨tres max ne change rien en pratique dans HypIR/VTT puisque le registre est modifiÃ© au dÃ©marrage.
+      // C'est utile pour valider la diffÃ©rence de comportement dans MatLab.
       BufferManager_UpdateSequenceMaxParameters(&gcRegsData);
    }
 }
