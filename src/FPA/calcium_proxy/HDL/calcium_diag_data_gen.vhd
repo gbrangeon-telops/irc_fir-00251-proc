@@ -273,7 +273,11 @@ begin
                   lval_i     <= pix_diag_lval;   
                   dval_i     <= pix_diag_dval; -- on se branche sur le module générateur de données diag   
                   aoi_dval_i <= pix_diag_dval;
-				  aoi_last_i <= pix_diag_last and line_cnt ?>= FPA_INTF_CFG.height;
+				  if pix_diag_last = '1' and line_cnt >= FPA_INTF_CFG.height then
+				     aoi_last_i <=	'1';
+				  else
+				     aoi_last_i <=	'0';
+                  end if;
 				  
 				  for i in 0 to pix_data_i.pix_data'length-1 loop
                      if revert_img = '1' then 
