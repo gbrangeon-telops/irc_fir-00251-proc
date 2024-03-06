@@ -31,15 +31,23 @@ create_project $proj_name $proj_dir
 
 # Set project properties
 set obj [get_projects $proj_name]
-set_property "part" "xc7k70tfbg676-1" $obj
 set_property "simulator_language" "VHDL" $obj
 set_property "target_language" "VHDL" $obj
 
 # Add sources
-add_files $proj_srcs
+add_files -quiet $proj_srcs
+
+# Set target part
+set proj_part [lindex [get_ips -quiet] 0]
+if {$proj_part != ""} {
+	set proj_part [get_property "part" $proj_part]
+} else {
+	set proj_part "xc7k70tfbg676-1"
+}
+set_property "part" $proj_part $obj
 
 # Use VHDL 2008
-set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL}]
+set_property file_type {VHDL 2008} [get_files -filter {FILE_TYPE == VHDL && IS_GENERATED == 0}]
 
 # Set top level design
 set_property top [lindex [find_top -fileset [current_fileset]] 0] [current_fileset]
