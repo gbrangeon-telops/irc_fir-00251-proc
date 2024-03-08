@@ -76,9 +76,9 @@ begin
                 pix_out          <= DATA_RESET;
             else
                 for i in 1 to 4 loop
-                    compute_pipeline(0, i) <= unsigned(kpix_data(i)) + unsigned(kpix_mean);
-                    compute_pipeline(1, i) <= compute_pipeline(0, i) * unsigned(data_pipeline(0).pix_data(i)(pix_coarse_range_type));
-                    compute_pipeline(2, i) <= compute_pipeline(1, i) + unsigned(data_pipeline(1).pix_data(i)(pix_residue_range_type));
+                    compute_pipeline(0, i) <= resize(unsigned(kpix_data(i)) + unsigned(kpix_mean), compute_pipeline(0, i)'LENGTH);
+                    compute_pipeline(1, i) <= resize(compute_pipeline(0, i) * unsigned(data_pipeline(0).pix_data(i)(pix_coarse_range_type)), compute_pipeline(1, i)'LENGTH);
+                    compute_pipeline(2, i) <= resize(compute_pipeline(1, i) + unsigned(data_pipeline(1).pix_data(i)(pix_residue_range_type)), compute_pipeline(2, i)'LENGTH);
                 end loop;
                 
                 data_pipeline(0) <= pix_in;
