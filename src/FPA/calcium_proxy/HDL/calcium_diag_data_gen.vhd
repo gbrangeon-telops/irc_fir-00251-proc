@@ -34,7 +34,6 @@ entity calcium_diag_data_gen is
       CLK          : in std_logic;
       
       FPA_INTF_CFG : in fpa_intf_cfg_type;
-      DIAG_MODE_EN : in std_logic;
       
       FPA_INT      : in std_logic;
       
@@ -224,11 +223,9 @@ begin
                   line_cnt   <= (others => '0');
                   pix_data_i <= ((others => (others => '0')), others => '0');
                   
-                  diag_line_gen_en <= '0'; 
-                  if DIAG_MODE_EN = '1' then 
-                     if fpa_int_last = '1' and fpa_int_i = '0' then
-                        diag_fsm <= x_to_readout_start_dly_st;              
-                     end if;
+                  diag_line_gen_en <= '0';
+                  if fpa_int_last = '1' and fpa_int_i = '0' then
+                     diag_fsm <= x_to_readout_start_dly_st;              
                   end if;
                
                when x_to_readout_start_dly_st =>    
