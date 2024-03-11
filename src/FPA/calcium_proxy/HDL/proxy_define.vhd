@@ -137,6 +137,8 @@ package Proxy_define is
       
       vdac_value                       : fleg_vdac_value_type;             -- config du DAC. définition dans fleg_brd_define
       
+	  compr_ratio_fp32                 : std_logic_vector(31 downto 0);
+	  
    end record;
    
    ----------------------------------------------
