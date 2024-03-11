@@ -229,7 +229,7 @@ begin
                   end if;
                
                when x_to_readout_start_dly_st =>    
-                  if dly_cnt >= FPA_INTF_CFG.MISC.x_to_readout_start_dly then 
+                  if dly_cnt >= FPA_INTF_CFG.diag.x_to_readout_start_dly then 
                      diag_fsm <= fval_on_st;                   
                   else
                      dly_cnt <= dly_cnt + 1; 
@@ -241,7 +241,7 @@ begin
                   dly_cnt  <= (others => '0');
                
                when fval_re_to_dval_re_dly_st =>   
-                  if dly_cnt = FPA_INTF_CFG.MISC.fval_re_to_dval_re_dly then 
+                  if dly_cnt = FPA_INTF_CFG.diag.fval_re_to_dval_re_dly then 
                      diag_fsm <= start_line_gen_st;
                   else
                      dly_cnt <= dly_cnt + 1; 
@@ -249,7 +249,7 @@ begin
 
                when start_line_gen_st =>
                   diag_line_gen_en <= '1'; -- on active le module générateur de données diag
-                  line_size_i      <= std_logic_vector(resize(FPA_INTF_CFG.MISC.xsize_div_per_pixel_num, line_size_i'length)); 
+                  line_size_i      <= std_logic_vector(resize(FPA_INTF_CFG.diag.xsize_div_per_pixel_num, line_size_i'length)); 
                   dly_cnt          <= (others => '0');
                   if diag_done_i = '0' then
                      diag_line_gen_en <= '0';
@@ -293,7 +293,7 @@ begin
                
                when line_pause_st =>  
                   dly_cnt <= dly_cnt + 1;
-                  if dly_cnt >= FPA_INTF_CFG.MISC.lval_pause_dly then
+                  if dly_cnt >= FPA_INTF_CFG.diag.lval_pause_dly then
                      diag_fsm <= start_line_gen_st;
                   end if;
                   if line_cnt >= FPA_INTF_CFG.height then
@@ -306,7 +306,7 @@ begin
                
                when x_to_next_fsync_re_dly_st =>
                   dly_cnt <= dly_cnt + 1;                                                                             
-                  if dly_cnt = FPA_INTF_CFG.MISC.x_to_next_fsync_re_dly then
+                  if dly_cnt = FPA_INTF_CFG.diag.x_to_next_fsync_re_dly then
                      diag_fsm <= idle; 
                   end if;
                

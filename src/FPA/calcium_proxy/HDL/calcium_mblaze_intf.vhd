@@ -213,11 +213,11 @@ begin
                   when X"04C" =>    user_cfg_i.active_line_end_num         <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));
                   when X"050" =>    user_cfg_i.active_line_width_div4      <= unsigned(data_i(user_cfg_i.active_line_width_div4'length-1 downto 0));
                      
-                  when X"054" =>    user_cfg_i.misc.x_to_readout_start_dly       <= unsigned(data_i(user_cfg_i.misc.x_to_readout_start_dly'length-1 downto 0)); 
-                  when X"058" =>    user_cfg_i.misc.fval_re_to_dval_re_dly       <= unsigned(data_i(user_cfg_i.misc.fval_re_to_dval_re_dly'length-1 downto 0));
-                  when X"05C" =>    user_cfg_i.misc.lval_pause_dly               <= unsigned(data_i(user_cfg_i.misc.lval_pause_dly'length-1 downto 0));
-                  when X"060" =>    user_cfg_i.misc.x_to_next_fsync_re_dly       <= unsigned(data_i(user_cfg_i.misc.x_to_next_fsync_re_dly'length-1 downto 0));
-                  when X"064" =>    user_cfg_i.misc.xsize_div_per_pixel_num      <= unsigned(data_i(user_cfg_i.misc.xsize_div_per_pixel_num'length-1 downto 0));
+                  when X"054" =>    user_cfg_i.diag.x_to_readout_start_dly       <= unsigned(data_i(user_cfg_i.diag.x_to_readout_start_dly'length-1 downto 0)); 
+                  when X"058" =>    user_cfg_i.diag.fval_re_to_dval_re_dly       <= unsigned(data_i(user_cfg_i.diag.fval_re_to_dval_re_dly'length-1 downto 0));
+                  when X"05C" =>    user_cfg_i.diag.lval_pause_dly               <= unsigned(data_i(user_cfg_i.diag.lval_pause_dly'length-1 downto 0));
+                  when X"060" =>    user_cfg_i.diag.x_to_next_fsync_re_dly       <= unsigned(data_i(user_cfg_i.diag.x_to_next_fsync_re_dly'length-1 downto 0));
+                  when X"064" =>    user_cfg_i.diag.xsize_div_per_pixel_num      <= unsigned(data_i(user_cfg_i.diag.xsize_div_per_pixel_num'length-1 downto 0));
                   
                   when X"068" =>    user_cfg_i.fpa_int_time_offset   <= signed(data_i(user_cfg_i.fpa_int_time_offset'length-1 downto 0));
                   

@@ -33,7 +33,6 @@ package Proxy_define is
    constant DEFINE_FPA_OUTPUT                         : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL; 
    constant DEFINE_FPA_INPUT                          : std_logic_vector(7 downto 0) := LVCMOS18;
    constant DEFINE_FPA_TEMP_DIODE_CURRENT_uA          : natural   := 100;        -- doit être défini mais pas utilisé: source courant sur EFA-00331. consigne pour courant de polarisation de la diode de lecture de température
-   constant DEFINE_FPA_TAP_NUMBER                     : natural   := 8;          -- nécessaire pour ADC_BRD_INFO. À ENLEVER
    constant DEFINE_FLEX_VOLTAGEP_mV                   : natural   := 5500;       -- doit être défini mais pas utilisé: la tension intermédiaire vflex de ce détecteur est à 5.5V
    constant DEFINE_FPA_TEMP_CH_GAIN                   : real      := 1.0;        -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l'ampli buffer et des resistances entre les deux
    constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';        -- doit être défini mais pas utilisé: pas besoin de config particulière au demarrage
@@ -46,7 +45,6 @@ package Proxy_define is
    constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 35200;      -- maximum ADC value for power-on : 1.100V de 2N2222 (soit 40K) to protect against ultra low temp
    constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ              : integer   := 100_000;    -- horloge de 100M en KHz
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ              : integer   := 40_000;     -- nécessaire pour ADC_BRD_INFO. À ENLEVER
    
    -- limites imposées aux tensions VDAC
    -- proviennent des scripts FLEG_VccVoltage_To_DacWord et FLEG_DacWord_To_VccVoltage dans
@@ -84,8 +82,8 @@ package Proxy_define is
    constant DEFINE_DIAG_DATA_CLK_FACTOR                     : integer := integer(ceil(real(4*DEFINE_FPA_100M_CLK_RATE_KHZ) / real(FPA_PIX_THROUGHPUT_MAX_MPIX*1000.0))); -- il faut ralentir le throughput du DIAG (4 pix à 100MHz) pour qu'il soit <= au FPA
    
    
-   -- misc 
-   type misc_cfg_type is
+   -- diag 
+   type diag_cfg_type is
    record
       x_to_readout_start_dly                 : unsigned(15 downto 0);
       fval_re_to_dval_re_dly                 : unsigned(15 downto 0);
@@ -116,7 +114,7 @@ package Proxy_define is
       active_line_end_num              : unsigned(9 downto 0);             -- le numero de la derniere ligne de l'AOI. (active_line_start_num + height - 1)
       active_line_width_div4           : unsigned(7 downto 0);             -- le nombre de transactions dans une ligne. (width / 4)
       
-      misc                             : misc_cfg_type;                    -- config du module diag
+      diag                             : diag_cfg_type;                    -- config du module diag
       
       fpa_int_time_offset              : signed(31 downto 0);              -- offset en CLK_100MHz à ajouter au temps d'intégration pour que le résultat soit conforme à la commande.
                                                                            -- offset est signé: positif signifie que la commande doit être plus longue que le résultat voulu, négatif signifie que la commande doit être plus courte que le résultat voulu
@@ -133,12 +131,12 @@ package Proxy_define is
       fpa_serdes_lval_num              : unsigned(10 downto 0);            -- nombre total de LVAL dans un FVAL pour la calibration des serdes d'entrée
       fpa_serdes_lval_len              : unsigned(10 downto 0);            -- nombre de pixel_clk dans un LVAL (width / 8) pour la calibration des serdes d'entrée
       
+      compr_ratio_fp32                 : std_logic_vector(31 downto 0);    -- 
+      
       cfg_num                          : unsigned(7 downto 0);             -- numéro incrémental de la config actuelle
       
       vdac_value                       : fleg_vdac_value_type;             -- config du DAC. définition dans fleg_brd_define
       
-	  compr_ratio_fp32                 : std_logic_vector(31 downto 0);
-	  
    end record;
    
    ----------------------------------------------
