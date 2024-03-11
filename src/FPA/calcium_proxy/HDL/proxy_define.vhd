@@ -89,7 +89,6 @@ package Proxy_define is
    record
       x_to_readout_start_dly                 : unsigned(15 downto 0);
       fval_re_to_dval_re_dly                 : unsigned(15 downto 0);
-      hdr_start_to_lval_re_dly               : unsigned(15 downto 0);
       lval_pause_dly                         : unsigned(15 downto 0);
       x_to_next_fsync_re_dly                 : unsigned(15 downto 0);
       xsize_div_per_pixel_num                : unsigned(9 downto 0);
