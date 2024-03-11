@@ -66,4 +66,4 @@ wave UUT/U1/*
 
 
 
-run 4 ms
+run 8 ms
