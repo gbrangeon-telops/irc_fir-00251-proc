@@ -244,7 +244,7 @@ begin
                   dly_cnt  <= (others => '0');
                
                when fval_re_to_dval_re_dly_st =>   
-                  if dly_cnt = (FPA_INTF_CFG.MISC.fval_re_to_dval_re_dly + FPA_INTF_CFG.MISC.hdr_start_to_lval_re_dly) then 
+                  if dly_cnt = FPA_INTF_CFG.MISC.fval_re_to_dval_re_dly then 
                      diag_fsm <= start_line_gen_st;
                   else
                      dly_cnt <= dly_cnt + 1; 
