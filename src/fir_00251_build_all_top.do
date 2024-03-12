@@ -37,6 +37,7 @@ do  "$FIR251PROC\src\fir_00251_proc_acq_build.do"
 #CLINK receivers
 do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
 do  "$FIR251PROC\src\bb1920_serdes\HDL\compil_bb1920_receiver.do"
+#do  "$FIR251PROC\src\nbits\HDL\compil_nbits_receiver.do"
 
 #ADC receiver interface
 do  "$FIR251PROC\src\quad_serdes\HDL\build_quad_receiver.do"
