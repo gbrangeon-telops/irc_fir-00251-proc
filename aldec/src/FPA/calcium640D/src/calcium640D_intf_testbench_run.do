@@ -8,6 +8,11 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_wr192_rd96_d16\fwft_afifo_wr192_
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\ip_axis16_combine_axis64\ip_axis16_combine_axis64_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\ip_axis_fi32tofp32\ip_axis_fi32tofp32_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\ip_axis_fp32tofi32\ip_axis_fp32tofi32_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\ip_fp32_axis_exp\ip_fp32_axis_exp_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\ip_fp32_axis_log\ip_fp32_axis_log_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\ip_fp32_axis_mult\ip_fp32_axis_mult_sim_netlist.vhdl
 
 # FPA module
 do D:\Telops\FIR-00251-Proc\src\FPA\calcium640D\HDL\compil_calcium640D.do
