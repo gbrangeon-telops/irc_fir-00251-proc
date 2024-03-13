@@ -150,7 +150,7 @@
 // Electrical correction : valeurs par defaut si aucune mesure dispo dans les flashsettings
 #define ELCORR_DEFAULT_STARVATION_DL      1300        // @ centered pix (320, 256)
 #define ELCORR_DEFAULT_SATURATION_DL      15500       // @ centered pix (320, 256)
-#define ELCORR_DEFAULT_REFERENCE1_DL      7800        // @ centered pix (320, 256)
+#define ELCORR_DEFAULT_REFERENCE1_DL      4100        // @ centered pix (320, 256)
 #define ELCORR_DEFAULT_REFERENCE2_DL      475         // @ centered pix (320, 256)
 
 // Electrical correction : limites des valeurs en provenance de la flash
