@@ -135,7 +135,7 @@
 #define ISC0804_2K_FASTWINDOW_STRECTHING_AREA_MCLK  1
 
 // Electrical correction : references
-#define ELCORR_REF1_VALUE_mV              2227                // ref0 au milieu de la plage dynamique
+#define ELCORR_REF1_VALUE_mV              1730     //2227     // ref0 au milieu de la plage dynamique
 #define ELCORR_REF2_VALUE_mV              1200
 #define ELCORR_REF_DAC_ID                 5                   // position (entre 1 et 8) du dac dédié aux references 
 #define ELCORR_REF_MAXIMUM_SAMP           120                 // le nombre de sample au max supporté par le vhd
