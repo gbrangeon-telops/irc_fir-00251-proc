@@ -31,8 +31,8 @@ use IEEE.MATH_REAL.ALL;
 -- any Xilinx leaf cells in this code.
 library UNISIM;
 use UNISIM.VComponents.all;
-library XPM;
-use XPM.VComponents.all;
+--library XPM;
+--use XPM.VComponents.all;
 
 entity kpix_bramwrapper is
     Generic (
@@ -53,6 +53,65 @@ entity kpix_bramwrapper is
 end kpix_bramwrapper;
 
 architecture Behavioral of kpix_bramwrapper is
+   component xpm_memory_sdpram
+     generic (
+   
+       -- Common module generics
+       MEMORY_SIZE             : integer := 2048           ;
+       MEMORY_PRIMITIVE        : string  := "auto"         ;
+       CLOCKING_MODE           : string  := "common_clock" ;
+       ECC_MODE                : string  := "no_ecc"       ;
+       MEMORY_INIT_FILE        : string  := "none"         ;
+       MEMORY_INIT_PARAM       : string  := ""             ;
+       USE_MEM_INIT            : integer := 1              ;
+       WAKEUP_TIME             : string  := "disable_sleep";
+       AUTO_SLEEP_TIME         : integer := 0              ;
+       MESSAGE_CONTROL         : integer := 0              ;
+       USE_EMBEDDED_CONSTRAINT : integer := 0              ;
+       MEMORY_OPTIMIZATION     : string  := "true";
+   
+       -- Port A module generics
+       WRITE_DATA_WIDTH_A      : integer := 32 ;
+       BYTE_WRITE_WIDTH_A      : integer := 32 ;
+       ADDR_WIDTH_A            : integer := 6  ;
+       RST_MODE_A              : string  := "SYNC";
+   
+       -- Port B module generics
+       READ_DATA_WIDTH_B       : integer := 32          ;
+       ADDR_WIDTH_B            : integer := 6           ;
+       READ_RESET_VALUE_B      : string  := "0"         ;
+       READ_LATENCY_B          : integer := 2           ;
+       WRITE_MODE_B            : string  := "no_change" ;
+       RST_MODE_B              : string  := "SYNC"
+   
+   
+     );
+     port (
+   
+       -- Common module ports
+       sleep          : in  std_logic;
+   
+       -- Port A module ports
+       clka           : in  std_logic;
+       ena            : in  std_logic;
+       wea            : in  std_logic_vector((WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A)-1 downto 0);
+       addra          : in  std_logic_vector(ADDR_WIDTH_A-1 downto 0);
+       dina           : in  std_logic_vector(WRITE_DATA_WIDTH_A-1 downto 0);
+       injectsbiterra : in  std_logic;
+       injectdbiterra : in  std_logic;
+   
+       -- Port B module ports
+       clkb           : in  std_logic;
+       rstb           : in  std_logic;
+       enb            : in  std_logic;
+       regceb         : in  std_logic;
+       addrb          : in  std_logic_vector(ADDR_WIDTH_B-1 downto 0);
+       doutb          : out std_logic_vector(READ_DATA_WIDTH_B-1 downto 0);
+       sbiterrb       : out std_logic;
+       dbiterrb       : out std_logic
+     );
+   end component;
+
    signal wena_i : std_logic_vector(0 downto 0);
 begin
    wena_i(0) <= wena;
