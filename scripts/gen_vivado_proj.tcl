@@ -19,7 +19,7 @@ if {[dict exists $sth_content "Files List"] != 1} {
 }
 set proj_srcs [dict get $sth_content "Files List"]
 
-regsub -all -nocase {_sim_netlist\.vhdl} $proj_srcs {.xci} proj_srcs
+regsub -all -nocase {_(sim_netlist|stub)\.vhdl} $proj_srcs {.xci} proj_srcs
 set proj_srcs [lsearch -all -inline -nocase $proj_srcs */Telops/*]
 set proj_top [lindex $proj_srcs end]
 set proj_dir [file rootname $proj_top]
