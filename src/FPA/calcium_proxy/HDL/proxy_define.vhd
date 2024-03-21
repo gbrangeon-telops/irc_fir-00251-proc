@@ -23,6 +23,7 @@ use IEEE.math_real.all;
 use work.fpa_common_pkg.all;
 use work.fpa_define.all;
 use work.fleg_brd_define.all;
+use work.tel2000.all;
 
 package Proxy_define is
 
@@ -180,9 +181,71 @@ package Proxy_define is
       aoi_last       : std_logic;
    end record;
    
+   ----------------------------------------------
+   -- Functions
+   ----------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type;
+   
 end Proxy_define;
 
 package body Proxy_define is
    
+   ---------------------------------------------------------------------------------------------------------------
+   -- Fonction utilisée par le module fpa_status_gen pour transférer la FPA_INTF_CFG par AXIL vers le microBlaze
+   ---------------------------------------------------------------------------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type is
+      variable a : fpa_intf_cfg_slv_array_type;
+   begin
+      a := (
+         std_logic_vector(resize(FPA_INTF_CFG.int_time, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.int_indx, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.int_signal_high_time, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_diag_mode, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_diag_type, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_pwr_on, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_acq_trig_mode, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_acq_trig_ctrl_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_xtra_trig_mode, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_xtra_trig_ctrl_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_trig_ctrl_timeout_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_stretch_acq_trig, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_intf_data_source, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_xtra_trig_int_time, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.fpa_prog_trig_int_time, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.intclk_to_clk100_conv_numerator, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.comn.clk100_to_intclk_conv_numerator, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.offsetx, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.offsety, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.width, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.height, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.active_line_start_num, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.active_line_end_num, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.active_line_width_div4, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.diag.x_to_readout_start_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.diag.fval_re_to_dval_re_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.diag.lval_pause_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.diag.x_to_next_fsync_re_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.diag.xsize_div_per_pixel_num, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.fpa_int_time_offset, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.int_fdbk_dly, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.kpix_pgen_value, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.kpix_mean_value, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.use_ext_pixqnb, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.clk_frm_pulse_width, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_num, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_len, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.cfg_num, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(1), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(2), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(3), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(4), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(5), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(6), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(7), a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.vdac_value(8), a(0)'length)),
+         others => (others => '0')     -- champs inutilisés
+      );
+      return a;
+   end fpa_intf_cfg_to_slv_array;
    
 end package body Proxy_define;

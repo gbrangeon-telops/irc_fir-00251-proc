@@ -97,6 +97,8 @@ architecture rtl of calcium_mblaze_intf is
    signal mb_ctrled_reset_i            : std_logic;
    signal dac_cfg_in_progress          : std_logic;
    signal abs_fpa_int_time_offset_i    : unsigned(USER_CFG.fpa_int_time_offset'length-1 downto 0);
+   signal kpix_value                   : std_logic_vector(31 downto 0);
+   signal kpix_dval                    : std_logic;
    
 begin
    
@@ -125,7 +127,7 @@ begin
    STATUS_MOSI.WSTRB   <= (others => '0'); -- registres de statut en mode lecture seulement
    STATUS_MOSI.BREADY  <= '0'; -- registres de statut en mode lecture seulement
    STATUS_MOSI.ARVALID <= MB_MOSI.ARVALID;
-   STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts
+   STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(STATUS_BASE_ARADDR_WIDTH-1 downto 0), 32);
    STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT;
    STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;
    
@@ -172,10 +174,12 @@ begin
             dac_cfg_in_progress <= '1';
             mb_ctrled_reset_i <= '0';
             fpa_softw_stat_i.dval <= '0';
+            kpix_dval <= '0';
             
          else                   
             
-            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
+            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;
+            kpix_dval <= '0'; -- remet le dval à 0
             
             -- temps d'exposition
             if int_dval_i = '1' then
@@ -232,8 +236,9 @@ begin
                   when X"080" =>    user_cfg_i.fpa_serdes_lval_num   <= unsigned(data_i(user_cfg_i.fpa_serdes_lval_num'length-1 downto 0));
                   when X"084" =>    user_cfg_i.fpa_serdes_lval_len   <= unsigned(data_i(user_cfg_i.fpa_serdes_lval_len'length-1 downto 0));
                   
+                  when X"088" =>    user_cfg_i.compr_ratio_fp32   <= data_i(user_cfg_i.compr_ratio_fp32'length-1 downto 0);
                   
-                  when X"088" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  when X"08C" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -245,6 +250,9 @@ begin
                      
                   -- pour un reset complet du module FPA
                   when X"AF0" =>    mb_ctrled_reset_i                          <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on eteint la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                  
+                  -- pour écrire les valeurs de kpix dans la BRAM
+                  when X"B00" =>    kpix_value     <= data_i(kpix_value'length-1 downto 0); kpix_dval <= '1';   -- le dval monte pour 1 clk
                      
                      ----------------------------------------------------------------------------------------------------------------------------------------                  
                      -- EN0 15 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
@@ -367,7 +375,7 @@ begin
    begin
       if rising_edge(MB_CLK) then         
          
-         --if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts
+         --if  MB_MOSI.ARADDR(STATUS_BASE_ARADDR_WIDTH) = '1' then    -- adresse de base pour la lecture des statuts
          axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
          --else 
          --axi_rdata <= (others =>'1'); 
