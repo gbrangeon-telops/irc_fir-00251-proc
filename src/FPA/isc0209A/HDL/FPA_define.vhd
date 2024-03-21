@@ -21,7 +21,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.MATH_REAL.all;
 use work.fpa_common_pkg.all; 
-use work.fleg_brd_define.all; 
+use work.fleg_brd_define.all;
+use work.tel2000.all;
 
 package FPA_define is    
    
@@ -403,15 +404,26 @@ package FPA_define is
       samp_pulse     : std_logic; 
    end record;
    
-   
    ----------------------------------------------
-   -- quues fontions                                    
+   -- Functions
    ----------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type;
    
 end FPA_define;
 
 package body FPA_define is
    
-   
+   ---------------------------------------------------------------------------------------------------------------
+   -- Fonction utilisée par le module fpa_status_gen pour transférer la FPA_INTF_CFG par AXIL vers le microBlaze
+   ---------------------------------------------------------------------------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type is
+      variable a : fpa_intf_cfg_slv_array_type;
+   begin
+      a := (
+         0 => std_logic_vector(resize(FPA_INTF_CFG.int_time, a(0)'length)),
+         others => (others => '0')     -- champs inutilisés
+      );
+      return a;
+   end fpa_intf_cfg_to_slv_array;
    
 end package body FPA_define; 

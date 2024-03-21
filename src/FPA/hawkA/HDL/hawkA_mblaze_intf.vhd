@@ -176,7 +176,7 @@ begin
    STATUS_MOSI.WSTRB   <= (others => '0'); -- registres de statut en mode lecture seulement 
    STATUS_MOSI.BREADY  <= '0'; -- registres de statut en mode lecture seulement
    STATUS_MOSI.ARVALID <= MB_MOSI.ARVALID;
-   STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts 
+   STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(STATUS_BASE_ARADDR_WIDTH-1 downto 0), 32); 
    STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT; 
    STATUS_MOSI.RREADY  <= MB_MOSI.RREADY;    
    
@@ -427,7 +427,7 @@ begin
    begin
       if rising_edge(MB_CLK) then         
          
-         --if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts
+         --if  MB_MOSI.ARADDR(STATUS_BASE_ARADDR_WIDTH) = '1' then    -- adresse de base pour la lecture des statuts
          axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
          --else 
          --axi_rdata <= (others =>'1'); 

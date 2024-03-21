@@ -39,6 +39,7 @@
 // #define FH_TX_VERBOSE
 // #define FLAGGING_VERBOSE
 // #define FM_VERBOSE
+// #define FPA_VERBOSE
 // #define FS_VERBOSE
 // #define FU_VERBOSE
 // #define FW_VERBOSE

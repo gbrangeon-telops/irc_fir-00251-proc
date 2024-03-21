@@ -82,6 +82,8 @@
 #define AR_STATUS_BASE_ADD                 0x0400  // adresse de base des statuts generiques
 #define AR_PRIVATE_STATUS_BASE_ADD         0x0800  // adresse de base des statuts specifiques ou privées
 #define AR_FPA_TEMPERATURE                 0x002C  // adresse temperature
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD           (AR_STATUS_BASE_ADD + 0x0200)
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_STRUCT_CFG_ADD             0x200
@@ -1126,6 +1128,16 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
    PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
    PrivateStat->roic_read_reg                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
+}
+
+/* Pour afficher le feedback de FPA_INTF_CFG */
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
 }
 
 /* Construction des packets de la commande sérielle */

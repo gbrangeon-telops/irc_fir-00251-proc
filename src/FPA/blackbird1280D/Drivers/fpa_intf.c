@@ -121,7 +121,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AR_STATUS_BASE_ADD                0x0400  // adresse de base 
 #define AR_PRIVATE_STATUS_BASE_ADD        0x0800  // adresse de base des statuts specifiques ou privées
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
-#define AR_FPA_INT_TIME                   0x00C0  // adresse temps d'intégration
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD          (AR_STATUS_BASE_ADD + 0x0200)
+#define AR_FPA_INT_TIME                   0x0000  // adresse temps d'intégration
 
 
 // adresse d'ecriture de la config diag du manufacturier
@@ -646,8 +648,20 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    // generation de fpa_init_done et fpa_init_success
    Stat->fpa_init_success = (Stat->hw_init_success & sw_init_success);
    Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done);
-
 }
+
+//--------------------------------------------------------------------------
+// Pour afficher le feedback de FPA_INTF_CFG
+//--------------------------------------------------------------------------
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
+}
+
 
 void  FPA_SoftwType(const t_FpaIntf *ptrA)
 {
@@ -815,7 +829,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    if (GC_FWSynchronouslyRotatingModeIsActive || gFpaInit)
       vhd_int_time = 0.0F;
    else
-      vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME); // read from vhdl (in 100MHz clks)
+      vhd_int_time = AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + AR_FPA_INT_TIME); // read from vhdl (in 100MHz clks)
 
    Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
    Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection
@@ -951,7 +965,7 @@ void FPA_SendFrameResolution_SerialCmd_V2(const t_FpaIntf *ptrA)
    // on bâtit la commande
    Cmd.Header              = 0xAA;
    Cmd.ID                  = 0x8000 + (uint8_t)gFpaDebugRegA;
-   PRINTF("Cmd.ID = %d \n",Cmd.ID );
+   FPA_PRINTF("Cmd.ID = %d \n",Cmd.ID );
    Cmd.DataLength          = 0;
    Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_FRAME_RES_CMD_RAM_BASE_ADD;
    FPA_BuildCmdPacket(&ScdPacketTx, &Cmd); // on batit les packets de bytes

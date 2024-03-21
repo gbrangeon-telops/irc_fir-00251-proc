@@ -78,6 +78,8 @@
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                0x0400  // adresse de base 
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD          (AR_STATUS_BASE_ADD + 0x0200)
 
 // adresse d'ecriture du signal declenchant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -501,6 +503,18 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->int_to_int_delay_min          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB4);
    Stat->int_to_int_delay_max          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);    
    Stat->fast_hder_cnt                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
+}
+
+//--------------------------------------------------------------------------
+// Pour afficher le feedback de FPA_INTF_CFG
+//--------------------------------------------------------------------------
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
 }
 
 

@@ -59,6 +59,8 @@
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                0x0400    // adresse de base 
 #define AR_FPA_TEMPERATURE                0x002C    // adresse temperature
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD          (AR_STATUS_BASE_ADD + 0x0200)
 
 // adresse d'écriture du régistre du type du pilote C 
 #define AW_FPA_ROIC_SW_TYPE               0xAE0      // adresse à lauquelle on dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
@@ -873,7 +875,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->dynrange_op_sel             = (uint32_t)ELCORR_SW_TO_NORMAL_OP;
 
    // Affichage de debug
-   #ifdef FPA_VERBOSE
          FPA_PRINTF(" ptrA->fpa_diag_mode                         =  %d", (int32_t)( ptrA->fpa_diag_mode                          ) );
          FPA_PRINTF(" ptrA->fpa_diag_type                         =  %d", (int32_t)( ptrA->fpa_diag_type                          ) );
          FPA_PRINTF(" ptrA->fpa_pwr_on                            =  %d", (int32_t)( ptrA->fpa_pwr_on                             ) );
@@ -986,7 +987,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          FPA_PRINTF(" ptrA->dynrange_clipping_level               =  %d", (int32_t)( ptrA->dynrange_clipping_level                ) );
          FPA_PRINTF(" ptrA->dynrange_global_offset                =  %d", (int32_t)( ptrA->dynrange_global_offset                 ) );
          FPA_PRINTF(" ptrA->dynrange_op_sel                       =  %d", (int32_t)( ptrA->dynrange_op_sel                        ) );
-   #endif
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
@@ -1265,6 +1265,19 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
       sw_init_success = 1;
    } 
 }
+
+//--------------------------------------------------------------------------
+// Pour afficher le feedback de FPA_INTF_CFG
+//--------------------------------------------------------------------------
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////                                                                          
 //  I N T E R N A L    F U N C T I O N S 

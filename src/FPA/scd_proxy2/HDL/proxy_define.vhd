@@ -21,7 +21,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.math_real.all;
 use work.fpa_common_pkg.all;
-use work.fpa_define.all;  
+use work.fpa_define.all;
+use work.tel2000.all;
 
 package Proxy_define is
    
@@ -289,12 +290,28 @@ package Proxy_define is
       run            : std_logic;
       abort          : std_logic;
       prog_trig_mode : std_logic;  -- à '1', impose le mode prog_trig. prog_trig avant l'envoi de la commande et prog_trig après l'envoi de la commande
-   end record;  
+   end record;
+   
+   ----------------------------------------------
+   -- Functions
+   ----------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type;
    
 end Proxy_define;
 
 package body Proxy_define is
    
-   
+   ---------------------------------------------------------------------------------------------------------------
+   -- Fonction utilisée par le module fpa_status_gen pour transférer la FPA_INTF_CFG par AXIL vers le microBlaze
+   ---------------------------------------------------------------------------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type is
+      variable a : fpa_intf_cfg_slv_array_type;
+   begin
+      a := (
+         0 => std_logic_vector(resize(FPA_INTF_CFG.int_time, a(0)'length)),
+         others => (others => '0')     -- champs inutilisés
+      );
+      return a;
+   end fpa_intf_cfg_to_slv_array;
    
 end package body Proxy_define; 

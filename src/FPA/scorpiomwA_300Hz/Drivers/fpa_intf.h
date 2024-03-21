@@ -19,6 +19,15 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
+#ifdef FPA_VERBOSE
+   #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#else
+   #define FPA_PRINTF(fmt, ...)    DUMMY_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#endif
+
+#define FPA_ERR(fmt, ...)        FPGA_PRINTF("FPA: Error: " fmt "\n", ##__VA_ARGS__)
+#define FPA_INF(fmt, ...)        FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+
 #define FPA_DEVICE_MODEL_NAME    "SCORPIOMWA_27MHz"
 
 #define FPA_WIDTH_MIN      136    //
@@ -81,8 +90,6 @@
 #define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_PIX_THROUGHPUT_PEAK  (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
-
-#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
@@ -272,6 +279,9 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA);
 
 // pour avoir les statuts complets
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
+
+// pour afficher le feedback de FPA_INTF_CFG
+void FPA_PrintConfig(const t_FpaIntf *ptrA);
 
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);

@@ -19,6 +19,15 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
+#ifdef FPA_VERBOSE
+   #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#else
+   #define FPA_PRINTF(fmt, ...)    DUMMY_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#endif
+
+#define FPA_ERR(fmt, ...)        FPGA_PRINTF("FPA: Error: " fmt "\n", ##__VA_ARGS__)
+#define FPA_INF(fmt, ...)        FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+
 #define FPA_DEVICE_MODEL_NAME    "ISC0207A_3K_8.3MHz Off Center V1"
 
 #define FPA_WIDTH_MIN      64    //
@@ -79,8 +88,6 @@
 #define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR)
-
-#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
@@ -264,25 +271,6 @@ struct s_FpaStatus    //
    uint32_t  int_to_int_delay_min;
    uint32_t  int_to_int_delay_max; 
    uint32_t  fast_hder_cnt;
-   uint32_t  integration_time;
-   
-   uint32_t raw_area_line_start_num        ;
-   uint32_t raw_area_line_end_num          ;
-   uint32_t raw_area_sof_posf_pclk         ;
-   uint32_t raw_area_eof_posf_pclk         ;
-   uint32_t raw_area_sol_posl_pclk         ;
-   uint32_t raw_area_eol_posl_pclk         ;
-   uint32_t raw_area_eol_posl_pclk_p1      ;
-   uint32_t raw_area_window_lsync_num      ;
-   uint32_t raw_area_line_period_pclk      ;
-   uint32_t raw_area_readout_pclk_cnt_max  ;
-   uint32_t user_area_line_start_num       ;
-   uint32_t user_area_line_end_num         ;
-   uint32_t user_area_sol_posl_pclk        ;
-   uint32_t user_area_eol_posl_pclk        ;
-   uint32_t user_area_eol_posl_pclk_p1     ;
-   uint32_t stretch_area_sol_posl_pclk     ;
-   uint32_t stretch_area_eol_posl_pclk     ;
    
 };
 typedef struct s_FpaStatus t_FpaStatus;
@@ -309,6 +297,9 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA);
 
 // pour avoir les statuts complets
 void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA);
+
+// pour afficher le feedback de FPA_INTF_CFG
+void FPA_PrintConfig(const t_FpaIntf *ptrA);
 
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);

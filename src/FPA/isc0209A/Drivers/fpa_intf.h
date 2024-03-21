@@ -18,7 +18,14 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 
-#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#ifdef FPA_VERBOSE
+   #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#else
+   #define FPA_PRINTF(fmt, ...)    DUMMY_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#endif
+
+#define FPA_ERR(fmt, ...)        FPGA_PRINTF("FPA: Error: " fmt "\n", ##__VA_ARGS__)
+#define FPA_INF(fmt, ...)        FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 /************************************************************************/
 // If needed, the DEFINE_HSI should be added to the SDK project symbols.
@@ -290,6 +297,9 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA);
 
 // pour avoir les statuts complets
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
+
+// pour afficher le feedback de FPA_INTF_CFG
+void FPA_PrintConfig(const t_FpaIntf *ptrA);
 
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);

@@ -114,7 +114,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AR_STATUS_BASE_ADD                0x0400  // adresse de base 
 #define AR_PRIVATE_STATUS_BASE_ADD        0x0800  // adresse de base des statuts specifiques ou privées
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
-#define AR_FPA_INT_TIME                   0x00C0  // adresse temps d'intégration
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD          (AR_STATUS_BASE_ADD + 0x0200)
+#define AR_FPA_INT_TIME                   0x0000  // adresse temps d'intégration
 
 // BB1280 (n'est pas utilisé par le Hercule): adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
@@ -405,7 +407,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
    ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * (float)FPA_MCLK_RATE_HZ);
-   FPGA_PRINTF("scd_frame_period_min = %d x 12.5ns\n", ptrA->scd_frame_period_min);
+   FPA_PRINTF("scd_frame_period_min = %d x 12.5ns\n", ptrA->scd_frame_period_min);
    
    // mode diag scd
    ptrA->scd_bit_pattern = 0;
@@ -617,6 +619,18 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done);
 }
 
+//--------------------------------------------------------------------------
+// Pour afficher le feedback de FPA_INTF_CFG
+//--------------------------------------------------------------------------
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////                                                                          
 //  I N T E R N A L    F U N C T I O N S 
@@ -809,7 +823,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    if (GC_FWSynchronouslyRotatingModeIsActive)
       vhd_int_time = 0.0F;
    else
-      vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
+      vhd_int_time = AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + AR_FPA_INT_TIME);
 
    Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
    Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection

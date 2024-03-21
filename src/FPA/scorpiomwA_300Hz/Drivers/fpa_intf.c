@@ -57,6 +57,8 @@
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                0x0400    // adresse de base 
 #define AR_FPA_TEMPERATURE                0x002C    // adresse temperature
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD          (AR_STATUS_BASE_ADD + 0x0200)
 
 // adresse d'écriture du régistre du type du pilote C 
 #define AW_FPA_ROIC_SW_TYPE               0xAE0      // adresse à lauquelle on dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
@@ -138,9 +140,7 @@
 
 #define DEFINE_FPA_NOMINAL_MCLK_RATE_HZ       27000000
 #define DEFINE_FPA_FAST1_MCLK_RATE_HZ         (0.5*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
-#define DEFINE_FPA_FAST2_MCLK_RATE_HZ         (2*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ) 
-
-#define AR_PRIVATE_STATUS_BASE_ADD         0x0800  // adresse de base des statuts specifiques ou privées
+#define DEFINE_FPA_FAST2_MCLK_RATE_HZ         (2*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
 
 #define ROIC_ADDITIONAL_LINES                   2  // Pour corriger la calibration en sous-fenetre on lit 2 lignes de plus.
 
@@ -513,81 +513,81 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // printf
    if ((uint32_t)gFpaDebugRegA == 1)
    {
-      FPA_PRINTF("ptrA->fpa_diag_mode                         = %d", ptrA->fpa_diag_mode                          );
-      FPA_PRINTF("ptrA->fpa_diag_type                         = %d", ptrA->fpa_diag_type                          );
-      FPA_PRINTF("ptrA->fpa_pwr_on                            = %d", ptrA->fpa_pwr_on                             );
-      FPA_PRINTF("ptrA->fpa_init_cfg                          = %d", ptrA->fpa_init_cfg                           );
-      FPA_PRINTF("ptrA->fpa_init_cfg_received                 = %d", ptrA->fpa_init_cfg_received                  );
-      FPA_PRINTF("ptrA->fpa_acq_trig_mode                     = %d", ptrA->fpa_acq_trig_mode                      );
-      FPA_PRINTF("ptrA->fpa_acq_trig_ctrl_dly                 = %d", ptrA->fpa_acq_trig_ctrl_dly                  );
-      FPA_PRINTF("ptrA->fpa_xtra_trig_mode                    = %d", ptrA->fpa_xtra_trig_mode                     );
-      FPA_PRINTF("ptrA->fpa_xtra_trig_ctrl_dly                = %d", ptrA->fpa_xtra_trig_ctrl_dly                 );
-      FPA_PRINTF("ptrA->fpa_trig_ctrl_timeout_dly             = %d", ptrA->fpa_trig_ctrl_timeout_dly              );
-      FPA_PRINTF("ptrA->fpa_stretch_acq_trig                  = %d", ptrA->fpa_stretch_acq_trig                   );
-      FPA_PRINTF("ptrA->fpa_intf_data_source                  = %d", ptrA->fpa_intf_data_source                   );
-      FPA_PRINTF("ptrA->roic_xstart                           = %d", ptrA->roic_xstart                            );
-      FPA_PRINTF("ptrA->roic_ystart                           = %d", ptrA->roic_ystart                            );
-      FPA_PRINTF("ptrA->roic_xsize                            = %d", ptrA->roic_xsize                             );
-      FPA_PRINTF("ptrA->roic_ysize                            = %d", ptrA->roic_ysize                             );
-      FPA_PRINTF("ptrA->roic_windcfg_part1                    = %d", ptrA->roic_windcfg_part1                     );
-      FPA_PRINTF("ptrA->roic_windcfg_part2                    = %d", ptrA->roic_windcfg_part2                     );
-      FPA_PRINTF("ptrA->roic_windcfg_part3                    = %d", ptrA->roic_windcfg_part3                     );
-      FPA_PRINTF("ptrA->roic_windcfg_part4                    = %d", ptrA->roic_windcfg_part4                     );
-      FPA_PRINTF("ptrA->roic_uprow_upcol                      = %d", ptrA->roic_uprow_upcol                       );
-      FPA_PRINTF("ptrA->roic_sizea_sizeb                      = %d", ptrA->roic_sizea_sizeb                       );
-      FPA_PRINTF("ptrA->roic_itr                              = %d", ptrA->roic_itr                               );
-      FPA_PRINTF("ptrA->roic_gain                             = %d", ptrA->roic_gain                              );
-      FPA_PRINTF("ptrA->roic_gpol_code                        = %d", ptrA->roic_gpol_code                         );
-      FPA_PRINTF("ptrA->roic_reset_time_mclk                  = %d", ptrA->roic_reset_time_mclk                   );
-      FPA_PRINTF("ptrA->diag_ysize                            = %d", ptrA->diag_ysize                             );
-      FPA_PRINTF("ptrA->diag_xsize_div_tapnum                 = %d", ptrA->diag_xsize_div_tapnum                  );
-      FPA_PRINTF("ptrA->real_mode_active_pixel_dly            = %d", ptrA->real_mode_active_pixel_dly             );
-      FPA_PRINTF("ptrA->adc_quad2_en                          = %d", ptrA->adc_quad2_en                           );
-      FPA_PRINTF("ptrA->chn_diversity_en                      = %d", ptrA->chn_diversity_en                       );
-      FPA_PRINTF("ptrA->raw_area_line_start_num               = %d", ptrA->raw_area_line_start_num                );
-      FPA_PRINTF("ptrA->raw_area_line_end_num                 = %d", ptrA->raw_area_line_end_num                  );
-      FPA_PRINTF("ptrA->raw_area_sof_posf_pclk                = %d", ptrA->raw_area_sof_posf_pclk                 );
-      FPA_PRINTF("ptrA->raw_area_eof_posf_pclk                = %d", ptrA->raw_area_eof_posf_pclk                 );
-      FPA_PRINTF("ptrA->raw_area_sol_posl_pclk                = %d", ptrA->raw_area_sol_posl_pclk                 );
-      FPA_PRINTF("ptrA->raw_area_eol_posl_pclk                = %d", ptrA->raw_area_eol_posl_pclk                 );
-      FPA_PRINTF("ptrA->raw_area_lsync_start_posl_pclk        = %d", ptrA->raw_area_lsync_start_posl_pclk         );
-      FPA_PRINTF("ptrA->raw_area_lsync_end_posl_pclk          = %d", ptrA->raw_area_lsync_end_posl_pclk           );
-      FPA_PRINTF("ptrA->raw_area_lsync_num                    = %d", ptrA->raw_area_lsync_num                     );
-      FPA_PRINTF("ptrA->raw_area_clk_id                       = %d", ptrA->raw_area_clk_id                        );
-      FPA_PRINTF("ptrA->raw_area_line_period_pclk             = %d", ptrA->raw_area_line_period_pclk              );
-      FPA_PRINTF("ptrA->raw_area_readout_pclk_cnt_max         = %d", ptrA->raw_area_readout_pclk_cnt_max          );
-      FPA_PRINTF("ptrA->user_area_line_start_num              = %d", ptrA->user_area_line_start_num               );
-      FPA_PRINTF("ptrA->user_area_line_end_num                = %d", ptrA->user_area_line_end_num                 );
-      FPA_PRINTF("ptrA->user_area_sol_posl_pclk               = %d", ptrA->user_area_sol_posl_pclk                );
-      FPA_PRINTF("ptrA->user_area_eol_posl_pclk               = %d", ptrA->user_area_eol_posl_pclk                );
-      FPA_PRINTF("ptrA->user_area_clk_id                      = %d", ptrA->user_area_clk_id                       );
-      FPA_PRINTF("ptrA->clk_area_a_line_start_num             = %d", ptrA->clk_area_a_line_start_num              );
-      FPA_PRINTF("ptrA->clk_area_a_line_end_num               = %d", ptrA->clk_area_a_line_end_num                );
-      FPA_PRINTF("ptrA->clk_area_a_sol_posl_pclk              = %d", ptrA->clk_area_a_sol_posl_pclk               );
-      FPA_PRINTF("ptrA->clk_area_a_eol_posl_pclk              = %d", ptrA->clk_area_a_eol_posl_pclk               );
-      FPA_PRINTF("ptrA->clk_area_a_clk_id                     = %d", ptrA->clk_area_a_clk_id                      );
-      FPA_PRINTF("ptrA->clk_area_a_spare                      = %d", ptrA->clk_area_a_spare                       );
-      FPA_PRINTF("ptrA->clk_area_b_line_start_num             = %d", ptrA->clk_area_b_line_start_num              );
-      FPA_PRINTF("ptrA->clk_area_b_line_end_num               = %d", ptrA->clk_area_b_line_end_num                ); 
-      FPA_PRINTF("ptrA->clk_area_b_sol_posl_pclk              = %d", ptrA->clk_area_b_sol_posl_pclk               );
-      FPA_PRINTF("ptrA->clk_area_b_eol_posl_pclk              = %d", ptrA->clk_area_b_eol_posl_pclk               );
-      FPA_PRINTF("ptrA->clk_area_b_clk_id                     = %d", ptrA->clk_area_b_clk_id                      );
-      FPA_PRINTF("ptrA->clk_area_b_spare                      = %d", ptrA->clk_area_b_spare                       );
-      FPA_PRINTF("ptrA->hgood_samp_sum_num                    = %d", ptrA->hgood_samp_sum_num                     );
-      FPA_PRINTF("ptrA->hgood_samp_mean_numerator             = %d", ptrA->hgood_samp_mean_numerator              );
-      FPA_PRINTF("ptrA->vgood_samp_sum_num                    = %d", ptrA->vgood_samp_sum_num                     );
-      FPA_PRINTF("ptrA->vgood_samp_mean_numerator             = %d", ptrA->vgood_samp_mean_numerator              );
-      FPA_PRINTF("ptrA->good_samp_first_pos_per_ch            = %d", ptrA->good_samp_first_pos_per_ch             );
-      FPA_PRINTF("ptrA->good_samp_last_pos_per_ch             = %d", ptrA->good_samp_last_pos_per_ch              );
-      FPA_PRINTF("ptrA->adc_clk_source_phase                  = %d", ptrA->adc_clk_source_phase                   );
-      FPA_PRINTF("ptrA->adc_clk_pipe_sel                      = %d", ptrA->adc_clk_pipe_sel                       );
-      FPA_PRINTF("ptrA->cfg_num                               = %d", ptrA->cfg_num                                );
-      FPA_PRINTF("ptrA->int_time_offset_mclk                  = %d", ptrA->int_time_offset_mclk                   );
-      FPA_PRINTF("ptrA->nominal_clk_id_sample_pos             = %d", ptrA->nominal_clk_id_sample_pos              ); 
-      FPA_PRINTF("ptrA->fast1_clk_id_sample_pos               = %d", ptrA->fast1_clk_id_sample_pos                ); 
-      FPA_PRINTF("ptrA->fast2_clk_id_sample_pos               = %d", ptrA->fast2_clk_id_sample_pos                ); 
-      // FPA_PRINTF("reference_image_mode_en                     = %d", reference_image_mode_en                      );
-      FPA_PRINTF("ptrA->single_samp_mode_en                   = %d", ptrA->single_samp_mode_en                    ); 
+      FPA_INF("ptrA->fpa_diag_mode                         = %d", ptrA->fpa_diag_mode                          );
+      FPA_INF("ptrA->fpa_diag_type                         = %d", ptrA->fpa_diag_type                          );
+      FPA_INF("ptrA->fpa_pwr_on                            = %d", ptrA->fpa_pwr_on                             );
+      FPA_INF("ptrA->fpa_init_cfg                          = %d", ptrA->fpa_init_cfg                           );
+      FPA_INF("ptrA->fpa_init_cfg_received                 = %d", ptrA->fpa_init_cfg_received                  );
+      FPA_INF("ptrA->fpa_acq_trig_mode                     = %d", ptrA->fpa_acq_trig_mode                      );
+      FPA_INF("ptrA->fpa_acq_trig_ctrl_dly                 = %d", ptrA->fpa_acq_trig_ctrl_dly                  );
+      FPA_INF("ptrA->fpa_xtra_trig_mode                    = %d", ptrA->fpa_xtra_trig_mode                     );
+      FPA_INF("ptrA->fpa_xtra_trig_ctrl_dly                = %d", ptrA->fpa_xtra_trig_ctrl_dly                 );
+      FPA_INF("ptrA->fpa_trig_ctrl_timeout_dly             = %d", ptrA->fpa_trig_ctrl_timeout_dly              );
+      FPA_INF("ptrA->fpa_stretch_acq_trig                  = %d", ptrA->fpa_stretch_acq_trig                   );
+      FPA_INF("ptrA->fpa_intf_data_source                  = %d", ptrA->fpa_intf_data_source                   );
+      FPA_INF("ptrA->roic_xstart                           = %d", ptrA->roic_xstart                            );
+      FPA_INF("ptrA->roic_ystart                           = %d", ptrA->roic_ystart                            );
+      FPA_INF("ptrA->roic_xsize                            = %d", ptrA->roic_xsize                             );
+      FPA_INF("ptrA->roic_ysize                            = %d", ptrA->roic_ysize                             );
+      FPA_INF("ptrA->roic_windcfg_part1                    = %d", ptrA->roic_windcfg_part1                     );
+      FPA_INF("ptrA->roic_windcfg_part2                    = %d", ptrA->roic_windcfg_part2                     );
+      FPA_INF("ptrA->roic_windcfg_part3                    = %d", ptrA->roic_windcfg_part3                     );
+      FPA_INF("ptrA->roic_windcfg_part4                    = %d", ptrA->roic_windcfg_part4                     );
+      FPA_INF("ptrA->roic_uprow_upcol                      = %d", ptrA->roic_uprow_upcol                       );
+      FPA_INF("ptrA->roic_sizea_sizeb                      = %d", ptrA->roic_sizea_sizeb                       );
+      FPA_INF("ptrA->roic_itr                              = %d", ptrA->roic_itr                               );
+      FPA_INF("ptrA->roic_gain                             = %d", ptrA->roic_gain                              );
+      FPA_INF("ptrA->roic_gpol_code                        = %d", ptrA->roic_gpol_code                         );
+      FPA_INF("ptrA->roic_reset_time_mclk                  = %d", ptrA->roic_reset_time_mclk                   );
+      FPA_INF("ptrA->diag_ysize                            = %d", ptrA->diag_ysize                             );
+      FPA_INF("ptrA->diag_xsize_div_tapnum                 = %d", ptrA->diag_xsize_div_tapnum                  );
+      FPA_INF("ptrA->real_mode_active_pixel_dly            = %d", ptrA->real_mode_active_pixel_dly             );
+      FPA_INF("ptrA->adc_quad2_en                          = %d", ptrA->adc_quad2_en                           );
+      FPA_INF("ptrA->chn_diversity_en                      = %d", ptrA->chn_diversity_en                       );
+      FPA_INF("ptrA->raw_area_line_start_num               = %d", ptrA->raw_area_line_start_num                );
+      FPA_INF("ptrA->raw_area_line_end_num                 = %d", ptrA->raw_area_line_end_num                  );
+      FPA_INF("ptrA->raw_area_sof_posf_pclk                = %d", ptrA->raw_area_sof_posf_pclk                 );
+      FPA_INF("ptrA->raw_area_eof_posf_pclk                = %d", ptrA->raw_area_eof_posf_pclk                 );
+      FPA_INF("ptrA->raw_area_sol_posl_pclk                = %d", ptrA->raw_area_sol_posl_pclk                 );
+      FPA_INF("ptrA->raw_area_eol_posl_pclk                = %d", ptrA->raw_area_eol_posl_pclk                 );
+      FPA_INF("ptrA->raw_area_lsync_start_posl_pclk        = %d", ptrA->raw_area_lsync_start_posl_pclk         );
+      FPA_INF("ptrA->raw_area_lsync_end_posl_pclk          = %d", ptrA->raw_area_lsync_end_posl_pclk           );
+      FPA_INF("ptrA->raw_area_lsync_num                    = %d", ptrA->raw_area_lsync_num                     );
+      FPA_INF("ptrA->raw_area_clk_id                       = %d", ptrA->raw_area_clk_id                        );
+      FPA_INF("ptrA->raw_area_line_period_pclk             = %d", ptrA->raw_area_line_period_pclk              );
+      FPA_INF("ptrA->raw_area_readout_pclk_cnt_max         = %d", ptrA->raw_area_readout_pclk_cnt_max          );
+      FPA_INF("ptrA->user_area_line_start_num              = %d", ptrA->user_area_line_start_num               );
+      FPA_INF("ptrA->user_area_line_end_num                = %d", ptrA->user_area_line_end_num                 );
+      FPA_INF("ptrA->user_area_sol_posl_pclk               = %d", ptrA->user_area_sol_posl_pclk                );
+      FPA_INF("ptrA->user_area_eol_posl_pclk               = %d", ptrA->user_area_eol_posl_pclk                );
+      FPA_INF("ptrA->user_area_clk_id                      = %d", ptrA->user_area_clk_id                       );
+      FPA_INF("ptrA->clk_area_a_line_start_num             = %d", ptrA->clk_area_a_line_start_num              );
+      FPA_INF("ptrA->clk_area_a_line_end_num               = %d", ptrA->clk_area_a_line_end_num                );
+      FPA_INF("ptrA->clk_area_a_sol_posl_pclk              = %d", ptrA->clk_area_a_sol_posl_pclk               );
+      FPA_INF("ptrA->clk_area_a_eol_posl_pclk              = %d", ptrA->clk_area_a_eol_posl_pclk               );
+      FPA_INF("ptrA->clk_area_a_clk_id                     = %d", ptrA->clk_area_a_clk_id                      );
+      FPA_INF("ptrA->clk_area_a_spare                      = %d", ptrA->clk_area_a_spare                       );
+      FPA_INF("ptrA->clk_area_b_line_start_num             = %d", ptrA->clk_area_b_line_start_num              );
+      FPA_INF("ptrA->clk_area_b_line_end_num               = %d", ptrA->clk_area_b_line_end_num                ); 
+      FPA_INF("ptrA->clk_area_b_sol_posl_pclk              = %d", ptrA->clk_area_b_sol_posl_pclk               );
+      FPA_INF("ptrA->clk_area_b_eol_posl_pclk              = %d", ptrA->clk_area_b_eol_posl_pclk               );
+      FPA_INF("ptrA->clk_area_b_clk_id                     = %d", ptrA->clk_area_b_clk_id                      );
+      FPA_INF("ptrA->clk_area_b_spare                      = %d", ptrA->clk_area_b_spare                       );
+      FPA_INF("ptrA->hgood_samp_sum_num                    = %d", ptrA->hgood_samp_sum_num                     );
+      FPA_INF("ptrA->hgood_samp_mean_numerator             = %d", ptrA->hgood_samp_mean_numerator              );
+      FPA_INF("ptrA->vgood_samp_sum_num                    = %d", ptrA->vgood_samp_sum_num                     );
+      FPA_INF("ptrA->vgood_samp_mean_numerator             = %d", ptrA->vgood_samp_mean_numerator              );
+      FPA_INF("ptrA->good_samp_first_pos_per_ch            = %d", ptrA->good_samp_first_pos_per_ch             );
+      FPA_INF("ptrA->good_samp_last_pos_per_ch             = %d", ptrA->good_samp_last_pos_per_ch              );
+      FPA_INF("ptrA->adc_clk_source_phase                  = %d", ptrA->adc_clk_source_phase                   );
+      FPA_INF("ptrA->adc_clk_pipe_sel                      = %d", ptrA->adc_clk_pipe_sel                       );
+      FPA_INF("ptrA->cfg_num                               = %d", ptrA->cfg_num                                );
+      FPA_INF("ptrA->int_time_offset_mclk                  = %d", ptrA->int_time_offset_mclk                   );
+      FPA_INF("ptrA->nominal_clk_id_sample_pos             = %d", ptrA->nominal_clk_id_sample_pos              ); 
+      FPA_INF("ptrA->fast1_clk_id_sample_pos               = %d", ptrA->fast1_clk_id_sample_pos                ); 
+      FPA_INF("ptrA->fast2_clk_id_sample_pos               = %d", ptrA->fast2_clk_id_sample_pos                ); 
+      // FPA_INF("reference_image_mode_en                     = %d", reference_image_mode_en                      );
+      FPA_INF("ptrA->single_samp_mode_en                   = %d", ptrA->single_samp_mode_en                    ); 
    }
 }
 
@@ -800,6 +800,18 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->int_to_int_delay_min          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB4);
    Stat->int_to_int_delay_max          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);
    Stat->fast_hder_cnt                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
+}
+
+//--------------------------------------------------------------------------
+// Pour afficher le feedback de FPA_INTF_CFG
+//--------------------------------------------------------------------------
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
 }
 
 

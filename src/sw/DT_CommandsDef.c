@@ -56,6 +56,7 @@
 
 static IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFPACFG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
@@ -99,6 +100,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"RDM", DebugTerminalParseRDM},
    {"WRM", DebugTerminalParseWRM},
    {"FPA", DebugTerminalParseFPA},
+   {"FPACFG", DebugTerminalParseFPACFG},
    {"XRO", DebugTerminalParseXRO},
    {"HDER", DebugTerminalParseHDER},
    {"CAL", DebugTerminalParseCAL},
@@ -649,6 +651,30 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.trig_to_int_delay_max = %d", status.trig_to_int_delay_max);
    DT_PRINTF("fpa.int_to_int_delay_min  = %d", status.int_to_int_delay_min);
    DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Debug terminal get FPA config command parser.
+ * This parser is used to parse and validate get FPA config command arguments and to
+ * execute the command.
+ *
+ * @return IRC_SUCCESS when FPA config command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseFPACFG(circByteBuffer_t *cbuf)
+{
+   extern t_FpaIntf gFpaIntf;
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   FPA_PrintConfig(&gFpaIntf);
 
    return IRC_SUCCESS;
 }
@@ -2780,6 +2806,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
+   DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");

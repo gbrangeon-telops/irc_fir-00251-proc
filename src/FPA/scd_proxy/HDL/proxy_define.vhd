@@ -21,7 +21,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.math_real.all;
 use work.fpa_common_pkg.all;
-use work.fpa_define.all;  
+use work.fpa_define.all;
+use work.tel2000.all;
 
 package Proxy_define is
    
@@ -220,16 +221,28 @@ package Proxy_define is
    ----------------------------------------------
    --type diag_data_ofs_type is array (1 to 9) of natural range 0 to ((2**16)*9)/XSIZE_MAX; -- (1 to 9) pour accommoder 4 ou 8 taps
    
-   
    ----------------------------------------------
-   -- quues fontions                                    
+   -- Functions
    ----------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type;
    --function to_diag_data_ofs return diag_data_ofs_type;
-   --function to_fpa_word_func(a:fpa_intf_cfg_type) return fpa_word_type;
 
 end Proxy_define;
 
 package body Proxy_define is
+   
+   ---------------------------------------------------------------------------------------------------------------
+   -- Fonction utilisée par le module fpa_status_gen pour transférer la FPA_INTF_CFG par AXIL vers le microBlaze
+   ---------------------------------------------------------------------------------------------------------------
+   function fpa_intf_cfg_to_slv_array(FPA_INTF_CFG : fpa_intf_cfg_type) return fpa_intf_cfg_slv_array_type is
+      variable a : fpa_intf_cfg_slv_array_type;
+   begin
+      a := (
+         0 => std_logic_vector(resize(FPA_INTF_CFG.int_time, a(0)'length)),
+         others => (others => '0')     -- champs inutilisés
+      );
+      return a;
+   end fpa_intf_cfg_to_slv_array;
    
    ---
    -- function to_diag_data_ofs return diag_data_ofs_type is

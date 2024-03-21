@@ -43,7 +43,9 @@
 // la structure Command_t a 4 bytes d'overhead(CmdID et CmdCharNum)
 
 // adresse la lecture des statuts VHD
-#define AR_STATUS_BASE_ADD                0x0400    // adresse de base 
+#define AR_STATUS_BASE_ADD                0x0400    // adresse de base
+// adresse FPA_INTF_CFG feedback du module de statuts
+#define AR_FPA_INTF_CFG_BASE_ADD          (AR_STATUS_BASE_ADD + 0x0200)
 
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
@@ -346,6 +348,18 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
       sw_init_done = 1;                       // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser de nouveau 
       sw_init_success = 1;
    }  
+}
+
+//--------------------------------------------------------------------------
+// Pour afficher le feedback de FPA_INTF_CFG
+//--------------------------------------------------------------------------
+void FPA_PrintConfig(const t_FpaIntf *ptrA)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+//   uint32_t idx = 0;
+//
+//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx));
+//   idx += 4;
 }
 
 
