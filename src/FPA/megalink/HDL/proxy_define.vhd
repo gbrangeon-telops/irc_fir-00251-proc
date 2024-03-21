@@ -259,7 +259,7 @@ package body Proxy_define is
       variable a : fpa_intf_cfg_slv_array_type;
    begin
       a := (
-         0 => std_logic_vector(resize(FPA_INTF_CFG.int_time, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.int_time, a(0)'length)),
          others => (others => '0')     -- champs inutilisés
       );
       return a;
