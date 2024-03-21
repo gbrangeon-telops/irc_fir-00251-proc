@@ -34,6 +34,9 @@ build_proc_sw isc0804A 325
 create_proc_sw isc0804A_500Hz
 build_proc_sw isc0804A_500Hz 325
 
+create_proc_sw isc0804A_2k
+build_proc_sw isc0804A_2k 325
+
 create_proc_sw pelicanD
 build_proc_sw pelicanD 160
 
