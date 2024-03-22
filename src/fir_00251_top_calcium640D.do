@@ -15,4 +15,4 @@ do  "$FIR251PROC\src\FPA\calcium640D\HDL\compil_calcium640D.do"
 do  "$FIR251PROC\src\nbits\HDL\compil_nbits_receiver.do"
 
 #TOP_LEVEL
-acom  "$FIR251PROC\src\fir_00251_proc_calcium640D.bde"
+acom -2008 "$FIR251PROC\src\fir_00251_proc_calcium640D.bde"
