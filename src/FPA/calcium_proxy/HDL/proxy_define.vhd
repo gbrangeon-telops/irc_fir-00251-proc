@@ -93,6 +93,19 @@ package Proxy_define is
       xsize_div_per_pixel_num                : unsigned(9 downto 0);
    end record;
    
+   type kpix_reg_type is
+   record     
+      write      : std_logic_vector(31 downto 0);     
+      write_dval : std_logic;     
+      status     : std_logic_vector(31 downto 0);
+   end record;
+   subtype kpix_write_reg_even_range is natural range 31 downto 16;
+   subtype kpix_write_reg_odd_range  is natural range 15 downto  0;
+   subtype kpix_status_reg_addr_range is natural range 31 downto 8;
+   subtype kpix_status_reg_err_range  is natural range  2 downto 2;
+   subtype kpix_status_reg_done_range is natural range  1 downto 1;
+   subtype kpix_status_reg_size_range is natural range  0 downto 0;
+   
    ------------------------------------------------
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------
