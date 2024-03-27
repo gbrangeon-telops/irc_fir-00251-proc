@@ -7,21 +7,24 @@
 \usepackage{enumitem}
 \usepackage[skip=\baselineskip, indent=1.5em]{parskip}
 \usepackage[nottoc]{tocbibind}
-\usepackage{hyperref}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 
 \renewcommand\thesection{\arabic{section}}
-
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=cyan,
-    pdftitle={Overleaf Example},
-    pdfpagemode=FullScreen,
-    }
+\newcommand{\pd}[2]{\frac{\partial{#1}}{\partial{#2}}}
+\newcommand{\fone}{\left(\frac{Y_{R1}^*-Y_{R2}^*}{Y_{R1}-Y_{R2}}\right)}
+\newcommand{\ftwo}{\left(\frac{Ymax_{tar}-Ymin_{tar}}{Ymax_{nom}-Ymin_{nom}}\right)}
+\newcommand{\fthree}{\left(\frac{Y_{R1}^*-Y_{R2}^*}{(Y_{R1}-Y_{R2})^2}\right)}
+\newcommand{\ffour}{\left(\frac{Ymax_{tar}-Ymin_{tar}}{(Ymax_{nom}-Ymin_{nom})^2}\right)}
+\newcommand{\sfone}{\pd{Y_{out}}{Y_{R1}^*}}
+\newcommand{\sftwo}{\pd{Y_{out}}{Y_{R2}^*}}
+\newcommand{\sfthree}{\pd{Y_{out}}{Y_{R1}}}
+\newcommand{\sffour}{\pd{Y_{out}}{Y_{R2}}}
+\newcommand{\sffive}{\pd{Y_{out}}{Ymin_{nom}}}
+\newcommand{\sfsix}{\pd{Y_{out}}{Ymax_{nom}}}
+\newcommand{\sfseven}{\pd{Y_{out}}{Y{pix}}}
+\newcommand{\errqty}[1]{\qty{#1}{\unit{DL0}}}
 
 \title{Algorithme du correcteur électronique}
 \author{Eric Larouche}
@@ -43,7 +46,7 @@ Outre la compensation thermique active, le code du correcteur électronique incl
 L'algorithme de la correction électronique se base sur certaines hypothèses de modélisation raisonnables concernant les caractéristiques de la chaîne analogique de l'électronique instrumentale et l'effet des variations thermiques.
 
 \subsubsection{1. Hypothèse de linéarité}
-On suppose que l'électronique de la chaîne analogique pour un tap donné et le processus de conversion ADC peuvent se modéliser par une relation linéaire du type suivant:
+On suppose que l'électronique analogique pour un tap donné et le processus de conversion ADC peuvent se modéliser par une relation linéaire du type suivant:
 \[y(t) = A(T)\cdot{}x(t) + B(T)\]
 où $x(t)$ est la valeur de la tension (en \unit{mV}) qui sort sur le tap au temps $t$ au début de la chaîne analogique (plage native du ROIC), $y(t)$ est la valeur numérique (en DL0) produite par l'ADC après conversion de la tension analoqique en fin de chaîne (dans la plage différentielle adaptée à l'ADC), $A(T)$ et $B(T)$ sont respectivement le gain et l'offset global dépendant de la température actuelle $T$.
 
@@ -98,14 +101,15 @@ Introduisons une notation simplifiée pour décrire moins lourdement l'implémen
 \end{itemize}
 
 \subsubsection{3. Algèbre de l'algorithme}
-La transformation algébrique de la correction électronique poursuit le double objectif de compenser activement les drifts de gain et d'offset ainsi que de permettre une mise à l'échelle de la plage dynamique de manière arbitaire (selon les consignes des constantes $Ymin/max_{tar}$ données plus haut. L'équation fondamentale est donnée ci-bas:
-\begin{align*}
-Y_{out} &=\left(\frac{Y_{R1}^*-Y_{R2}^*}{Y_{R1}-Y_{R2}}\right) \cdot 
-	    \left(\frac{Ymax_{tar}-Ymin_{tar}}{Ymax_{nom}-Ymin_{nom}}\right) \cdot
-        (Y_{pix}-Y_{R1})\\
-        &- \left(\frac{Ymax_{tar}-Ymin_{tar}}{Ymax_{nom}-Ymin_{nom}}\right) \cdot
+La transformation algébrique de la correction électronique poursuit le double objectif de compenser activement les drifts de gain et d'offset ainsi que de permettre une mise à l'échelle de la plage dynamique de manière arbitaire (selon les consignes des constantes $Ymin/max_{tar}$ données plus haut). L'équation fondamentale est donnée ci-bas:
+\begin{align}
+\begin{split}
+\label{eq:1}
+Y_{out} &= \fone\cdot\ftwo\cdot(Y_{pix}-Y_{R1})\\
+        &- \ftwo\cdot
         (Ymax_{nom}-Y_{R1}^*) + Ymax_{tar}.
-\end{align*}
+\end{split}
+\end{align}
 
 Le facteur de la première parenthèse constitue une correction pour la variation de gain. Les offsets sont quant à eux compensés étant donné qu'on calcule des différences de grandeurs mesurées à une seule et même température commune. Le facteur dans la deuxième parenthèse constitue plutôt un redimensionnement d'échelle de la plage dynamique. Les expressions additives assurent qu'on a le bon décalage désiré avec les constantes-cibles données.
 
@@ -114,12 +118,11 @@ Avec cette algèbre, on aura bien $Y_{out}=Ymin_{tar}$ à $ET_{min}$ et $Y_{out}
 \subsubsection{4. Implémentation firmware}
 L'implémentation firmware est divisée en deux parties. Les calculs de constantes statiques qui ne demandent pas de mesure en temps réel sont faits dans le microBlaze. Plusieurs modes d'opération sont supportés par le firmware. Le code du processeur calcule les bonnes consignes/constantes selon le mode actuel.
 
-La correction électronique proprement dite effectuée en temps réel est plutôt déléguée au datapath se trouvant dans le circuit numérique FPGA. Il traite les pixels selon les consignes d'aiguillage de flot de données et de constantes statiques déterminés par le logiciel microBlaze. Cette flexibilité permet ainsi plusieurs modes d'opération. Notons l'affichage de la REF1 (mode = 1), l'affichage de la REF2 (mode=2), correction d'offset exclusivement (mode=5) et correction de gain/offset (mode=7) tel que décrit dans la mathématique ci-haut.
+La correction électronique proprement dite effectuée en temps réel est plutôt déléguée au datapath se trouvant dans le circuit numérique FPGA. Il traite les pixels selon les consignes d'aiguillage de flot de données et de constantes statiques déterminés par le software microBlaze. Cette flexibilité permet ainsi plusieurs modes d'opération. Notons l'affichage de la REF1 (mode = 1), l'affichage de la REF2 (mode=2), correction d'offset exclusivement (mode=5) et correction de gain/offset (mode=7) tel que décrit dans la mathématique ci-haut.
 
 Pour la correction active, le processeur fournit à la partie FPGA une constante multiplicative et une constante additive calculées ainsi:
 \begin{align*}
-A_{gain} &= (Y_{R1}^*-Y_{R2}^*) \cdot 
-	    \left(\frac{Ymax_{tar}-Ymin_{tar}}{Ymax_{nom}-Ymin_{nom}}\right)\\
+A_{gain} &= (Y_{R1}^*-Y_{R2}^*)\cdot\ftwo\\
 A_{offs} &= Ymax_{tar}-A_{gain}\cdot{}\frac{Ymax_{nom}-Y_{R1}^*}{Y_{R1}^*-Y_{R2}^*}\
 \end{align*}
 
@@ -142,7 +145,142 @@ Pour plus de flexibilité, les opérateurs du datapath reçoivent un sélecteur 
 
 Ainsi, avec la bonne configuration appropriée, on peut demander par exemple au correcteur électronique de passer vers la sortie la REF1 ou la REF2 de manière transparente sans transformation afin de debug. (Cela correspond aux modes \texttt{ELCORR\_MODE\_REF1\_IMG} et \texttt{ELCORR\_MODE\_REF2\_IMG} respectivement.)
 
+\subsubsection{5. Analyse de la propagation d'incertitude}
+Dans cette sous-section, nous analysons la propagation de l'incertitude causée par l'algorithme de la correction électronique et l'impact du changement du niveau nominal de blank (projet M2kUD).
+
+\paragraph{Loi de propagation de l'incertitude}
+Rappelons ici la loi de propagation de l'incertitude d'un mesurande $Y$ de sortie qui dépend de plusieurs autres quantitées $X_i$ selon une relation fonctionnelle déterminée (refs \cite{nist94}, \cite{ea402} et \cite{taylor97}).
+
+Étant donnée la relation fonctionnelle suivante entre les mesurandes:
+\[Y = f(X_1,X_2,\ldots,X_N),\]
+un estimé de la mesure de sortie $y$ est obtenu par substitution direct des estimés des variables d'entrée $x_i$ pour les mesurandes $X_i$:
+\[y=f(x_1,x_2,\ldots,x_n).\]
+
+Dans ce cas, l'incertitude sur le résultat de sortie $u(y)$ se propagera selon la loi suivante:
+\[u^2(y)=\sum_{i=1}^N \left(\pd{f}{x_i}\right)^2 u^2(x_i)
+ +2\sum_{i=1}^{N-1}\sum_{j=i+1}^{N}\pd{f}{x_i}\pd{f}{x_j}u(x_i,x_j),\]
+ où $u(x_i)$ est l'estimé d'incertitude associé à l'entrée $x_i$ et $u(x_i,x_j)$ est l'estimé de covariance associé au couple d'entrées $x_i$ et $x_j$.
+ 
+Dans notre cas, il est raisonnable de supposer qu'il n'y a pas de corrélation entre les différentes variables d'entrée (PixData et les différents REFs) comme l'incertitude de mesure est surtout causée par du bruit électronique blanc additionné d'un bruit de quantification de conversion ADC.
+
+Avec cette hypothèse simplificatrice, la loi de propagation de l'incertitude peut se réécrire ainsi:
+\begin{align}
+u(y)=\sqrt{\sum_{i=1}^N \left(\pd{f}{x_i}\right)^2 u^2(x_i)}.
+\label{eq:2}
+\end{align}
+
+\paragraph{Facteurs de sensibilité}
+Il faut appliquer cette loi à l'équation~\eqref{eq:1} pour obtenir l'erreur en sortie du correcteur électronique. Pour ce faire, il reste à déterminer les différents facteurs de sensibilité $\pd{f}{x_i}$ qui découle de l'équation~\eqref{eq:1}. Après calculs symboliques appropriés, nous obtenons:
+\begin{align*}
+\sfone &= \ftwo\cdot\left(\frac{Y_{pix}-Y_{R2}}{Y_{R1}-Y_{R2}}\right)\\
+\sftwo &= -\ftwo\cdot\left(\frac{Y_{pix}-Y_{R1}}{Y_{R1}-Y_{R2}}\right)\\
+\sfthree &= -\ftwo\cdot\fthree\cdot(Y_{pix}-Y_{R2})\\
+\sffour &= \ftwo\cdot\fthree\cdot(Y_{pix}-Y_{R1})\\
+\sffive &= -\ffour\cdot(Ymax_{nom}-Y_{R1}^*)\\
+		&+\ffour\cdot\fone\cdot(Y_{pix}-Y_{R1})\\
+\sfsix &= -\ftwo\\
+       &+ \ffour\cdot(Ymax_{nom}-Y_{R1}^*)\\
+       &- \ffour\cdot\fone\cdot(Y_{pix}-Y_{R1})\\
+\sfseven &= \fone\cdot\ftwo
+\end{align*}
+
+\paragraph{Évaluation quantitative}
+Avec ces expressions en main, on peut procéder à l'évaluation quantitative. Pour les données de pixels, nous connaissons déjà l'incertitude de notre chaîne analogique: 1.7 DL0 (rms). Les mesures nominales de pixel à $ET_{min}$ et $ET_{max}$ peuvent être moyennées sur plusieurs images avec une séquence. Le script standard GSY utilise 64 images comme compte. Concernant les mesures des références, il faut tenir compte du fait que le correcteur électronique applique une moyenne mobile sur 120 échantillons. L'incertitude pour celles-ci se réduira donc selon la loi de $1/\sqrt{N}$.
+
+\paragraph{Caméra M1k}
+Évaluation d'abord la caméra M1k standard qui constitue le cas de baseline. Nous avons pour les incertitudes d'entrées:
+\[u(Y_{pix})=\errqty{1.7},\]
+\[u(Ymin_{nom})=u(Ymax_{nom})=\frac{\errqty{1.7}}{\sqrt{64}}=\errqty{0.21},\]
+\[u(Y_{R1})=u(Y_{R1})=u(Y_{R2}^*)=u(Y_{R2}^*)=\frac{\errqty{1.7}}{\sqrt{120}}=\errqty{0.16}.\]
+Pour $Ymin_{tar}$ et $Ymax_{tar}$, il n'y a pas d'incertitude car ce sont des constantes fixes de design. Pour les différents paramètres, considérons les valeurs typiques suivantes:
+\[Y_{R1}^*\approx{}Y_{R1}\approx\errqty{7800},\]
+\[Y_{R2}^*\approx{}Y_{R2}\approx\errqty{400},\]
+\[Ymin_{nom}\approx\errqty{1300},\]
+\[Ymax_{nom}\approx\errqty{15500},\]
+\[Ymin_{tar}=\errqty{650}\text{\quad(par design)},\]
+\[Ymax_{tar}=\errqty{16000}\text{\quad(par design)},\]
+\[Y_{pix}=\errqty{15500}\text{\quad(pire cas)},\]
+
+L'évaluation des facteurs de sensibilité donne:
+\[\sfone=2.21,\quad\sftwo=-1.12,\quad\sfthree=-2.21,\quad\sffour=1.13,\]
+\[\sffive=\num{-1.11e-16},\quad\sfsix=-1.08,\quad\sfseven=1.08.\]
+
+En remplaçant les différentes valeurs dans l'équation~\eqref{eq:2}, nous obtenons l'incertitude finale dans le pire cas ($Y_{pix}=15500$): 
+\[u=\errqty{1.9}.\]
+
+Il rest intéressant de faire un graphe de l'évolution de l'incertitude sur toute la plage dynamique des pixels. On peut constater (voir fig.~\ref{fig:Plot_M1k}) qu'elle demeure autour de $\errqty{1.9}$.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=1.0\textwidth]{Plot_M1k}
+  \caption{Évolution de l'incertitude pour la caméra M1k}
+  \label{fig:Plot_M1k}
+\end{figure}
+\pagebreak
+
+\paragraph{Caméra M2kUD}
+Évaluons ici les quantités équivalentes pour la caméra M2kUD. Nous avons pour les incertitudes d'entrées:
+\[u(Y_{pix})=\errqty{1.7},\]
+\[u(Ymin_{nom})=u(Ymax_{nom})=\frac{\errqty{1.7}}{\sqrt{64}}=\errqty{0.21},\]
+\[u(Y_{R1})=u(Y_{R1})=u(Y_{R2}^*)=u(Y_{R2}^*)=\frac{\errqty{1.7}}{\sqrt{120}}=\errqty{0.16}.\]
+Pour les différents paramètres M2kUD, nous avons les valeurs typiques suivantes:
+\[Y_{R1}^*\approx{}Y_{R1}\approx\errqty{4200},\]
+\[Y_{R2}^*\approx{}Y_{R2}\approx\errqty{400},\]
+\[Ymin_{nom}\approx\errqty{1300},\]
+\[Ymax_{nom}\approx\errqty{15500},\]
+\[Ymin_{tar}=\errqty{650}\text{\quad(par design)},\]
+\[Ymax_{tar}=\errqty{16000}\text{\quad(par design)},\]
+\[Y_{pix}=\errqty{8191}\text{\quad(pire cas)},\]
+
+Le projet M2kUD a introduit un changement de la référence 1 qui constitue le nouveau niveau de blank. Également, un module d'écrétage fut ajouté, ce qui implique que le pixel à saturation se situera maintneant à la demie-plage ($\errqty{8191}$).
+
+L'évaluation des facteurs de sensibilité de M2kUD donne:
+\[\sfone=2.22,\quad\sftwo=-1.14,\quad\sfthree=-2.22,\quad\sffour=1.14\]
+\[\sffive=\num{-0.556},\quad\sfsix=-0.525,\quad\sfseven=1.08.\]
+
+En remplaçant les différentes valeurs dans l'équation~\eqref{eq:2}, nous obtenons l'incertitude finale dans le pire cas ($Y_{pix}=8191$): 
+\[u=\errqty{1.9}.\]
+
+Nous pouvons afficher l'évolution de l'erreur pour la caméra M2kUD (voir fig.~\ref{fig:Plot_M2kUD}). Nous constatons encore une fois que l'inceritude demeure autour de $\errqty{1.9}$. Il n'y a donc pas de dégradation significative de l'incertitude. Le déplacement de REF1 semble donc compensé par le fait que les pixels qui arrivent auront également un range dynamique diminué. 
+
+L'évaluation de l'inceritude pour un pixel pleine plage brute ($Y_{pix}=\errqty{15500}$) montre effectivement une erreur théorique acrrue: $u=\errqty{2.2}$. Mais cette situation n'arrivera pas en pratique comme l'écrêteur va forcer le client à ramener le $ET$ à la demie-plage pour éviter des saturations ou sinon ces pixels seraient écrêtés de toute manière.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=1.0\textwidth]{Plot_M2kUD}
+  \caption{Évolution de l'incertitude pour la caméra M2kUD}
+  \label{fig:Plot_M2kUD}
+\end{figure}
+\pagebreak
+
 \section{Conclusion}
 Le correcteur électronique est un module firmware fort utile qui a rendu possible les produits M1k, V500 et M2kUD. Avec sa grande versatilité, il pourra certainement servir pour d'autres détecteurs qui auront besoin d'une compensation active.
+
+
+% Bibliographie
+\begin{thebibliography}{9}
+\bibitem{nist94}
+	Barry N. Taylor and Chris E. Kuyatt,
+	\textit{Guidelines for Evaluating and Expressing the Uncertainty of NIST Measurement Results},
+     NIST Technical Note 1297,
+     1994 Edition,
+     Gaithersburg, MD, 
+     1994.
+
+\bibitem{ea402}
+	European Accreditation Laboratory Committee,
+	\textit{Evaluation of the Uncertainty of Measurement in Calibration},
+     EA-4/02 Technical Publication,
+     2013 Edition,
+     Europe, 
+     2013.
+
+\bibitem{taylor97}
+	John R. Taylor,
+	\textit{Introduction to Error Analysis: The Study of Uncertainties in Physical Measurements},
+	University Science Books, Melville, NY,
+	2nd Edition,
+	1997.
+\end{thebibliography}
 
 \end{document}
