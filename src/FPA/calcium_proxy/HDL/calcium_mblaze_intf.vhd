@@ -38,7 +38,9 @@ entity calcium_mblaze_intf is
       USER_CFG              : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;
       
-      FPA_SOFTW_STAT        : out fpa_firmw_stat_type
+      FPA_SOFTW_STAT        : out fpa_firmw_stat_type;
+      
+      KPIX_REG              : inout kpix_reg_type
    );
 end calcium_mblaze_intf;
 
@@ -99,6 +101,7 @@ architecture rtl of calcium_mblaze_intf is
    signal abs_fpa_int_time_offset_i    : unsigned(USER_CFG.fpa_int_time_offset'length-1 downto 0);
    signal kpix_value                   : std_logic_vector(31 downto 0);
    signal kpix_dval                    : std_logic;
+   signal kpix_status                  : std_logic_vector(31 downto 0);
    
 begin
    
@@ -107,6 +110,11 @@ begin
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
    COOLER_STAT.COOLER_ON <= '1';
+   
+   -- KPIX register mapping
+   KPIX_REG.WRITE      <= kpix_value;
+   KPIX_REG.WRITE_DVAL <= kpix_dval;
+   kpix_status         <= KPIX_REG.STATUS;
    
    -- I/O Connections assignments
    MB_MISO.AWREADY     <= axi_awready;
@@ -375,11 +383,14 @@ begin
    begin
       if rising_edge(MB_CLK) then         
          
-         --if  MB_MOSI.ARADDR(STATUS_BASE_ARADDR_WIDTH) = '1' then    -- adresse de base pour la lecture des statuts
-         axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
-         --else 
-         --axi_rdata <= (others =>'1'); 
-         --end if;
+         if  MB_MOSI.ARADDR(STATUS_BASE_ARADDR_WIDTH) = '1' then    -- adresse de base pour la lecture des statuts
+            axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
+         else 
+            case MB_MOSI.ARADDR(11 downto 0) is
+               when X"000" => axi_rdata <= kpix_status;
+               when others => axi_rdata <= (others => '1'); 
+            end case; 
+         end if;
          
       end if;     
    end process;   
