@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 79431
+ FREEID 79499
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -8980,11 +8980,12 @@ HEADER
     #GENERIC2="IMG_HEIGHT_MAX:integer:=512"
     #GENERIC3="CAL_AOI_ALIGN:boolean:=false"
     #GENERIC4="G_GEN_CAL_CROPPING:std_logic:='0'"
+    #GENERIC5="COMPRESSED:boolean:=false"
     #HDL_ENTRIES=
 "library STD,IEEE,WORK;\n"+
 "use STD.STANDARD.all,ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1690401873"
+    #MODIFIED="1711648405"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ea26efb5-2366-41c6-9fc0-fbd520da1cab"
    }
   }
@@ -23442,11 +23443,12 @@ PAGE ""
    {
     #COMPONENT="calibration"
     #CUSTOM_NAME=""
-    #GENERIC0="G_GEN_CAL_CROPPING : std_logic := G_GEN_CAL_CROPPING"
-    #GENERIC1="CAL_2CH : boolean := CAL_2CH"
-    #GENERIC2="CAL_AOI_ALIGN : boolean := CAL_AOI_ALIGN"
-    #GENERIC3="IMG_WIDTH_MAX : integer := IMG_WIDTH_MAX"
+    #GENERIC0="IMG_WIDTH_MAX : integer := IMG_WIDTH_MAX"
+    #GENERIC1="CAL_AOI_ALIGN : boolean := CAL_AOI_ALIGN"
+    #GENERIC2="G_GEN_CAL_CROPPING : std_logic := G_GEN_CAL_CROPPING"
+    #GENERIC3="COMPRESSED : boolean := COMPRESSED"
     #GENERIC4="IMG_HEIGHT_MAX : integer := IMG_HEIGHT_MAX"
+    #GENERIC5="CAL_2CH : boolean := CAL_2CH"
     #IMPL="sch"
     #LIBRARY="work"
     #NO_CONF="1"
@@ -23476,7 +23478,7 @@ PAGE ""
   TEXT  65451, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (6760,3100,7498,3265)
+   RECT (6760,3100,7498,3298)
    PARENT 65426
   }
   INSTANCE  66296, 0, 0
@@ -31173,6 +31175,7 @@ PAGE ""
    TEXT 
 "CAL_AOI_ALIGN : boolean := false;\n"+
 "G_GEN_CAL_CROPPING : std_logic := '0';\n"+
+"COMPRESSED : boolean := false;\n"+
 ""
    RECT (6760,3340,7360,3500)
    OUTLINE 5,1, (0,0,0)
@@ -31210,7 +31213,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  79414, 0, 0
+  TEXT  79482, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -31221,7 +31224,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79415, 0, 0
+  TEXT  79483, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -31232,7 +31235,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  79416, 0, 0
+  TEXT  79484, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -31242,7 +31245,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79417, 0, 0
+  TEXT  79485, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -31254,7 +31257,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  79418, 0, 0
+  TEXT  79486, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -31267,7 +31270,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  79419, 0, 0
+  TEXT  79487, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -31277,7 +31280,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79420, 0, 0
+  TEXT  79488, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -31289,7 +31292,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  79421, 0, 0
+  TEXT  79489, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -31299,7 +31302,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  79422, 0, 0
+  TEXT  79490, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -31310,7 +31313,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  79423, 0, 0
+  GROUP  79491, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8220,9401,8601)
@@ -31322,7 +31325,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79424, 0, 0
+  GROUP  79492, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8420,9401,8421)
@@ -31334,7 +31337,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79425, 0, 0
+  GROUP  79493, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8360,9401,8361)
@@ -31346,7 +31349,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79426, 0, 0
+  GROUP  79494, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8480,9401,8481)
@@ -31358,7 +31361,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79427, 0, 0
+  GROUP  79495, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8540,9401,8541)
@@ -31370,7 +31373,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  79428, 0, 0
+  GROUP  79496, 0, 0
   {
    PAGEALIGN 10
    RECT (8700,8220,8701,8361)
@@ -31381,7 +31384,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  79429, 0, 0
+  GROUP  79497, 0, 0
   {
    PAGEALIGN 10
    RECT (8700,8360,8701,8601)
@@ -31392,7 +31395,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  79430, 0, 0
+  BMPPICT  79498, 0, 0
   {
    PAGEALIGN 10
    RECT (8540,8280,8679,8325)
