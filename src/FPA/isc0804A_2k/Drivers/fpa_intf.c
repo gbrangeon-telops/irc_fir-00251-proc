@@ -186,7 +186,7 @@
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19
 
 // Déphasage de ligne
-#define ISC0804_DEFAULT_REGF             16
+#define ISC0804_DEFAULT_REGF             15
 
 #define ISC0804_BITSTREAM_FG   53696343  // bitstream ROIC standard de ForrestGump pour M1k
 #define ISC0804_BITSTREAM_FAST 322131831 // bitstream ROIC avec meilleur slew rate (M2k UD)
