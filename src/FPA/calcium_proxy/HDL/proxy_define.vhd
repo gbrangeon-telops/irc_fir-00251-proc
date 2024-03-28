@@ -247,6 +247,7 @@ package body Proxy_define is
          std_logic_vector(resize(FPA_INTF_CFG.clk_frm_pulse_width, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_len, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.compr_ratio_fp32, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.cfg_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(1), a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(2), a(0)'length)),

@@ -23,8 +23,9 @@ set_property "target_language" "VHDL" $obj
 # Add FPA Files
 add_files [concat \
    [glob -nocomplain $FPA_path/HDL/*.vhd] \
-   [glob -nocomplain $root_dir/src/FPA/scd_proxy2/HDL/*.vhd] \
-   [glob -nocomplain $root_dir/src/bb1920_serdes/HDL/*.vhd] \
+   [glob -nocomplain $root_dir/src/FPA/calcium_proxy/HDL/*.vhd] \
+   [glob -nocomplain $root_dir/src/nbits/HDL/*.vhd] \
+   [glob -nocomplain $common251_dir/iserdes/nbits_generic/*.vhd] \
    [glob -nocomplain $common251_dir/iserdes/clink/*.vhd] \
    [glob -nocomplain $common251_dir/iserdes/*.vhd] \
 ]
@@ -33,6 +34,11 @@ add_files [concat \
 
 # Add Fir-00251-Proc project file
 source $script_dir/Base_project.tcl
+
+# VHDL 2008 source files
+set_property FILE_TYPE {VHDL 2008} \
+   [get_files $root_dir/src/FPA/calcium_proxy/HDL/kpix_bramctrl.vhd] \
+   [get_files $aldec_dir/nbits_receiver_nch.vhd]
 
 #Set top level design
 set_property top $top_lvl [current_fileset]
