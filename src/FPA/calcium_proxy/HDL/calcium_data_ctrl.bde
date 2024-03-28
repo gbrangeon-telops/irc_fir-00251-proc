@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 104155
+ FREEID 118390
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -10,12 +10,17 @@ HEADER
   #BLOCKTABLE_INCLUDED="1"
   #DEFAULT_RANGE0="<range<name=\"array54330\"><left=\"1\"><direction=\"to\"><right=\"4\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE1="<range<name=\"array54334\"><left=\"1\"><direction=\"to\"><right=\"4\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE10="<range<name=\"kpix_size\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE11="<range<name=\"kpix_waddr\"><left=\"23\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE12="<range<name=\"rx_data\"><left=\"191\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE2="<range<name=\"array54380\"><left=\"1\"><direction=\"to\"><right=\"4\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE3="<range<name=\"array54384\"><left=\"1\"><direction=\"to\"><right=\"4\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE4="<range<name=\"frame_id\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE5="<range<name=\"int_indx\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE6="<range<name=\"int_time\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE7="<range<name=\"rx_data\"><left=\"191\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE7="<range<name=\"kpix_done\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE8="<range<name=\"kpix_error\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE9="<range<name=\"kpix_in\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #ENTITY="calcium_data_ctrl"
   #LANGUAGE="VHDL"
   AUTHOR="Unknown",BOTH
@@ -4141,7 +4146,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="246c5a6a-c195-4e6b-8793-80b20d54077e"
    }
    COORD (4180,1340)
-   VERTEXES ( (2,86421), (10,95150), (14,86424), (20,85929), (22,86070) )
+   VERTEXES ( (2,86421), (10,95150), (14,86424), (20,85929), (22,86070), (18,106455), (6,106460), (16,106470), (12,106477), (4,106484), (8,106491) )
   }
   TEXT  84952, 0, 0
   {
@@ -4665,6 +4670,297 @@ PAGE ""
     #NAMED="1"
    }
   }
+  TEXT  104155, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (640,891,760,920)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 104170
+  }
+  VTX  104168, 0, 0
+  {
+   COORD (600,920)
+  }
+  VTX  104169, 0, 0
+  {
+   COORD (800,920)
+  }
+  RECORD  104170, 0, 0
+  {
+   NET 104171
+   VTX 104168, 104169
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  104171, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="KPIX_REG"
+    #VHDL_TYPE="kpix_reg_type"
+    FPA_INTF_CFG_TYPE=""
+    RECORD=""
+   }
+  }
+  INSTANCE  105175, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusBidirectional"
+    #IS_UNCONSTRAINED_PORT="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="KPIX_REG"
+    #SYMBOL="BusBidirectional"
+    #VHDL_TYPE="kpix_reg_type"
+    FPA_INTF_CFG_TYPE=""
+    RECORD=""
+   }
+   COORD (600,920)
+   ORIENTATION 2
+   VERTEXES ( (2,104168) )
+  }
+  TEXT  105176, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (393,903,538,938)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 105175
+  }
+  VTX  106455, 0, 0
+  {
+   COORD (4180,1480)
+  }
+  VTX  106456, 0, 0
+  {
+   COORD (3980,1480)
+  }
+  BUS  106458, 0, 0
+  {
+   NET 106513
+   VTX 106455, 106456
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  106460, 0, 0
+  {
+   COORD (4180,1500)
+  }
+  VTX  106461, 0, 0
+  {
+   COORD (3980,1500)
+  }
+  WIRE  106463, 0, 0
+  {
+   NET 106518
+   VTX 106460, 106461
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  106469, 0, 0
+  {
+   COORD (4700,1380)
+  }
+  VTX  106470, 0, 0
+  {
+   COORD (4500,1380)
+  }
+  BUS  106471, 0, 0
+  {
+   NET 106493
+   VTX 106469, 106470
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  106476, 0, 0
+  {
+   COORD (4700,1420)
+  }
+  VTX  106477, 0, 0
+  {
+   COORD (4500,1420)
+  }
+  BUS  106478, 0, 0
+  {
+   NET 106498
+   VTX 106476, 106477
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  106483, 0, 0
+  {
+   COORD (4700,1440)
+  }
+  VTX  106484, 0, 0
+  {
+   COORD (4500,1440)
+  }
+  BUS  106485, 0, 0
+  {
+   NET 106503
+   VTX 106483, 106484
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  106490, 0, 0
+  {
+   COORD (4700,1460)
+  }
+  VTX  106491, 0, 0
+  {
+   COORD (4500,1460)
+  }
+  BUS  106492, 0, 0
+  {
+   NET 106508
+   VTX 106490, 106491
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET BUS  106493, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="kpix_waddr(23:0)"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+  }
+  TEXT  106494, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4508,1350,4693,1379)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 106471
+  }
+  NET BUS  106498, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="kpix_size(0:0)"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+  }
+  TEXT  106499, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4526,1390,4674,1419)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 106478
+  }
+  NET BUS  106503, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="kpix_done(0:0)"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+  }
+  TEXT  106504, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4520,1410,4680,1439)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 106485
+  }
+  NET BUS  106508, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="kpix_error(0:0)"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+  }
+  TEXT  106509, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4522,1430,4678,1459)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 106492
+  }
+  NET BUS  106513, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="kpix_in(31:0)"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+  }
+  TEXT  106514, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4011,1450,4149,1479)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 106458
+  }
+  NET WIRE  106518, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="kpix_dval"
+    #VHDL_TYPE="STD_LOGIC"
+   }
+  }
+  TEXT  106519, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4030,1470,4131,1499)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 106463
+  }
+  SIGNALASSIGN  109056, 0, 0
+  {
+   LABEL "SignalAssignments_1"
+   TEXT 
+"kpix_in <= KPIX_REG.write;\n"+
+"kpix_dval <= KPIX_REG.write_dval;\n"+
+"KPIX_REG.status(kpix_status_reg_addr_range) <= kpix_waddr;\n"+
+"KPIX_REG.status(kpix_status_reg_size_range) <= kpix_size;\n"+
+"KPIX_REG.status(kpix_status_reg_done_range) <= kpix_done;\n"+
+"KPIX_REG.status(kpix_status_reg_err_range) <= kpix_error;"
+   RECT (3900,1060,4780,1300)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
  }
  
 }
@@ -4690,7 +4986,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  104138, 0, 0
+  TEXT  118373, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4701,7 +4997,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  104139, 0, 0
+  TEXT  118374, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -4712,7 +5008,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  104140, 0, 0
+  TEXT  118375, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -4722,7 +5018,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  104141, 0, 0
+  TEXT  118376, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4734,7 +5030,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  104142, 0, 0
+  TEXT  118377, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -4747,7 +5043,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  104143, 0, 0
+  TEXT  118378, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -4757,7 +5053,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  104144, 0, 0
+  TEXT  118379, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4769,7 +5065,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  104145, 0, 0
+  TEXT  118380, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -4779,7 +5075,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  104146, 0, 0
+  TEXT  118381, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -4790,7 +5086,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  104147, 0, 0
+  GROUP  118382, 0, 0
   {
    PAGEALIGN 10
    RECT (6520,2620,7401,3001)
@@ -4802,7 +5098,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  104148, 0, 0
+  GROUP  118383, 0, 0
   {
    PAGEALIGN 10
    RECT (6520,2820,7401,2821)
@@ -4814,7 +5110,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  104149, 0, 0
+  GROUP  118384, 0, 0
   {
    PAGEALIGN 10
    RECT (6520,2760,7401,2761)
@@ -4826,7 +5122,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  104150, 0, 0
+  GROUP  118385, 0, 0
   {
    PAGEALIGN 10
    RECT (6520,2880,7401,2881)
@@ -4838,7 +5134,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  104151, 0, 0
+  GROUP  118386, 0, 0
   {
    PAGEALIGN 10
    RECT (6520,2940,7401,2941)
@@ -4850,7 +5146,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  104152, 0, 0
+  GROUP  118387, 0, 0
   {
    PAGEALIGN 10
    RECT (6700,2620,6701,2761)
@@ -4861,7 +5157,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  104153, 0, 0
+  GROUP  118388, 0, 0
   {
    PAGEALIGN 10
    RECT (6700,2760,6701,3001)
@@ -4872,7 +5168,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  104154, 0, 0
+  BMPPICT  118389, 0, 0
   {
    PAGEALIGN 10
    RECT (6540,2680,6679,2725)
