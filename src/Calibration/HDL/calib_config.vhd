@@ -52,6 +52,9 @@ entity calib_config is
       AOI_PARAM                   : out aoi_param_type;
       AOI_PARAM_DVAL              : out std_logic;
       
+      -- De/Compression                      
+      COM_PARAM                   : out compr_param_type;
+      
       -- XCROPPER
       CAL_XCROPPING_PARAM         : out calib_xcropping_type;
       CAL_XCROPPING_DVAL          : out std_logic;
@@ -119,6 +122,7 @@ architecture rtl of calib_config is
    signal expTimeMult_dval_sync        : std_logic := '0';
    signal config_dval_sync             : std_logic := '0';
    signal aoi_param_i                  : aoi_param_type;
+   signal com_param_i                  : compr_param_type;
    signal cal_xcropping_cfg_i          : calib_xcropping_type;         
    signal exp_time_mult_fp32_i         : std_logic_vector(EXP_TIME_MULT_FP32'range);
    signal cal_block_index_max_i        : cal_block_index_type := CAL_BLOCK_INDEX_7;
@@ -183,6 +187,8 @@ begin
             
             AOI_PARAM               <= aoi_param_i;
             AOI_PARAM_DVAL          <= config_dval_sync;
+            
+            COM_PARAM               <= com_param_i;
             
             CAL_XCROPPING_PARAM     <= cal_xcropping_cfg_i;
             CAL_XCROPPING_DVAL      <= config_dval_sync;
@@ -329,6 +335,9 @@ begin
                when X"5C" => calib_block_array(idx).hder_info.low_cut           <= cfg_wr_data(calib_hder_type.low_cut'range);               
                when X"60" => calib_block_array(idx).hder_info.high_cut          <= cfg_wr_data(calib_hder_type.high_cut'range);
                when X"64" => calib_block_array(idx).hder_info.delta_temp_fp32   <= cfg_wr_data(calib_hder_type.delta_temp_fp32'range);
+                             
+               when X"68" => com_param_i.compr_ratio_fp32                       <= cfg_wr_data;              
+               when X"6C" => com_param_i.dcompr_ratio_fp32                      <= cfg_wr_data;
                              
                -- control du data flow
                when X"A4" => calib_flow_config_i.input_sw            <= cfg_wr_data(calib_flow_config_i.input_sw'range);
