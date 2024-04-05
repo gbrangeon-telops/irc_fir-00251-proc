@@ -41,7 +41,7 @@ package Proxy_define is
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP         : integer   := 1;          -- on doit laisser 1 image dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP                : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
    constant DEFINE_FPA_POWER_ON_WAIT_MS               : integer   := 1_200;      -- en msec, duree d'attente après allumage. Le ramp-up du LT3045 est d'environ 1s
-   constant DEFINE_FPA_OUT_OF_RESET_WAIT_MS           : integer   := 100;        -- en msec, duree d'attente après avoir sorti le roic du reset
+   constant DEFINE_FPA_OUT_OF_RESET_WAIT_MS           : integer   := 10;         -- en msec, duree d'attente après avoir sorti le roic du reset (1ms selon le manufacturier)
    constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 30720;      -- minimum ADC value for power-on : 0.960V de 2N2222 (soit 120K)
    constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 35200;      -- maximum ADC value for power-on : 1.100V de 2N2222 (soit 40K) to protect against ultra low temp
    constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
@@ -52,13 +52,13 @@ package Proxy_define is
    -- \\STARK\DisqueTELOPS\Bibliotheque\Electronique\PCB\EFP-00331-001_Senseeker Proxy\Documentation
    constant DEFINE_DAC_LIMIT : fleg_vdac_limit_array_type   := (
       ( 3373,  5400),      -- limites du DAC1 -> VA1.8 1.5V à 2.1V
-      (    0, 11796),      -- limites du DAC2 -> VPIXRST 0V à 3.6V
+      (    0, 11796),      -- limites du DAC2 -> VPIXRST 0V à 3.6V (mais le LDO ne pourra descendre plus bas que 0.5V)
       ( 3880,  5400),      -- limites du DAC3 -> VDHS1.8 1.65V à 2.1V
       ( 3880,  5400),      -- limites du DAC4 -> VD1.8 1.65V à 2.1V
       ( 8440, 10467),      -- limites du DAC5 -> VA3.3 3.0V à 3.6V
       ( 9830, 11796),      -- limites du DAC6 -> VDETGUARD 3.0V à 3.6V
       ( 8440, 10467),      -- limites du DAC7 -> VDETCOM 3.0V à 3.6V
-      (    0,  5400)       -- limites du DAC8 -> VPIXQNB 0V à 2.1V (mais le LDO ne pourra descendre plus bas que 0.5V)
+      ( 1684,  5400)       -- limites du DAC8 -> VPIXQNB 1.0V à 2.1V
    );
    
    --------------------------------------------
