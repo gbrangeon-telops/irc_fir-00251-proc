@@ -11,6 +11,7 @@ acom -d d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\kpix -incr -nowarn DA
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium640D\HDL\FPA_define.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\proxy_define.vhd \
+ d:\Telops\Common_HDL\Utilities\sync_reset.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_pixelbldr.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_dlypipeline.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\kpix_bramaddr.vhd \
