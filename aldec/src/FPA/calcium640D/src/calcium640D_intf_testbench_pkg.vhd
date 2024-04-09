@@ -131,7 +131,7 @@ package body calcium640D_intf_testbench_pkg is
       fpa_serdes_lval_num     := to_unsigned(user_ysize + 4, 32);
       fpa_serdes_lval_len     := to_unsigned(user_xsize/8, 32);
       
-      compr_ratio_fp32 := unsigned(x"3F321643");   -- 16/23 in float
+      compr_ratio_fp32 := unsigned'(x"3F321643");   -- 16/23 in float
       
       cfg_num := to_unsigned(send_id, 32);
       
