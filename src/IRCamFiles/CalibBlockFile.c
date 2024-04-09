@@ -206,6 +206,12 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr->FileStructureMinorVersion = 5;
 
             case 5:
+               // 2.5.x -> 2.6.x
+               hdr->BinningMode = CalibBlock_BlockFileHeader_default.BinningMode;
+               hdr->KPixDataPresence = CalibBlock_BlockFileHeader_default.KPixDataPresence;
+               hdr->FileStructureMinorVersion = 6;
+
+            case 6:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBBLOCK_FILESUBMINORVERSION;
                break;
@@ -311,6 +317,10 @@ uint32_t CalibBlock_ParsePixelDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 5:
+               // 2.5.x -> 2.6.x
+               // Nothing to do
+
+            case 6:
                // Up to date, nothing to do
                break;
          }
@@ -410,6 +420,10 @@ uint32_t CalibBlock_ParseMaxTKDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 5:
+               // 2.5.x -> 2.6.x
+               // Nothing to do
+
+            case 6:
                // Up to date, nothing to do
                break;
          }
@@ -509,6 +523,10 @@ uint32_t CalibBlock_ParseLUTNLDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 5:
+               // 2.5.x -> 2.6.x
+               // Nothing to do
+
+            case 6:
                // Up to date, nothing to do
                break;
          }
@@ -522,7 +540,7 @@ uint32_t CalibBlock_ParseLUTNLDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
  *
  * @param fd is the calibration block file descriptor.
  * @param fileInfo is a pointer to the calibration block file information data structure.
- * @param hdr is the pointer to the calibration LUTNL data header structure to fill.
+ * @param hdr is the pointer to the calibration LUTRQ data header structure to fill.
  *
  * @return the number of byte read from the file.
  * @return 0 if an error occurred.
@@ -608,6 +626,76 @@ uint32_t CalibBlock_ParseLUTRQDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 5:
+               // 2.5.x -> 2.6.x
+               // Nothing to do
+
+            case 6:
+               // Up to date, nothing to do
+               break;
+         }
+   }
+
+   return headerSize;
+}
+
+/**
+ * KPix data header parser.
+ *
+ * @param fd is the calibration block file descriptor.
+ * @param fileInfo is a pointer to the calibration block file information data structure.
+ * @param hdr is the pointer to the calibration KPix data header structure to fill.
+ *
+ * @return the number of byte read from the file.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_ParseKPixDataHeader(int fd, fileInfo_t *fileInfo, CalibBlock_KPixDataHeader_t *hdr)
+{
+   uint32_t headerSize;
+   uint32_t minorVersion;
+
+   if ((fd == -1) || (fileInfo == NULL) || (fileInfo->type != FT_TSBL) || (hdr == NULL))
+   {
+      return 0;
+   }
+
+   switch (fileInfo->version.major)
+   {
+       case 1:
+          // Error: KPixData was introduced in version 2.6
+          return 0;
+
+       case 2:
+          headerSize = CALIBBLOCK_KPIXDATAHEADER_SIZE_V2;
+          if (FM_ReadFileToTmpFileDataBuffer(fd, headerSize) == headerSize)
+          {
+             if (CalibBlock_ParseKPixDataHeader_v2(tmpFileDataBuffer, headerSize, hdr) == headerSize)
+             {
+                break;
+             }
+          }
+          return 0;
+
+       default:
+          return 0;
+   }
+
+   minorVersion = fileInfo->version.minor;
+   switch (fileInfo->version.major)
+   {
+      case 2:
+         // 2.x.x
+         switch (minorVersion)
+         {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+               // Error: KPixData was introduced in version 2.6
+               return 0;
+
+            case 6:
                // Up to date, nothing to do
                break;
          }

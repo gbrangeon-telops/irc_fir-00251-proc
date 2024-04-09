@@ -146,6 +146,11 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageC
                hdr->FileStructureMinorVersion = 5;
 
             case 5:
+               // 2.5.x -> 2.6.x
+               hdr->BinningMode = CalibImageCorrection_ImageCorrectionFileHeader_default.BinningMode;
+               hdr->FileStructureMinorVersion = 6;
+
+            case 6:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBIMAGECORRECTION_FILESUBMINORVERSION;
                break;
@@ -251,6 +256,10 @@ uint32_t CalibImageCorrection_ParseImageCorrectionDataHeader(int fd, fileInfo_t 
                // Nothing to do
 
             case 5:
+               // 2.5.x -> 2.6.x
+               // Nothing to do
+
+            case 6:
                // Up to date, nothing to do
                break;
          }

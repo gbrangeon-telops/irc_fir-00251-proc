@@ -188,6 +188,11 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
                hdr->FileStructureMinorVersion = 5;
 
             case 5:
+               // 2.5.x -> 2.6.x
+               hdr->BinningMode = CalibCollection_CollectionFileHeader_default.BinningMode;
+               hdr->FileStructureMinorVersion = 6;
+
+            case 6:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBCOLLECTION_FILESUBMINORVERSION;
                break;

@@ -5,7 +5,7 @@
  * This file defines the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.5.0
+ * Generated from the calibration block file structure definition XLS file version 2.6.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -88,6 +88,7 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* HighExtrapolationFactor = */ 0.000000F,
    /* LowValidTemperature = */ -273.15F,
    /* HighValidTemperature = */ -273.15F,
+   /* BinningMode = */ 0,
    /* FOVPosition = */ 255,
    /* FocusPositionRaw = */ 0,
    /* ImageCorrectionFocusPositionRaw = */ 0,
@@ -114,6 +115,7 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* LUTNLDataPresence = */ 0,
    /* LUTRQDataPresence = */ 0,
    /* NumberOfLUTRQ = */ 0,
+   /* KPixDataPresence = */ 0,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -213,6 +215,20 @@ CalibBlock_LUTRQDataHeader_v2_t CalibBlock_LUTRQDataHeader_v2_default = {
    /* B_Signed = */ 0,
    /* LUTRQDataLength = */ 0,
    /* LUTRQDataCRC16 = */ 0,
+   /* DataHeaderCRC16 = */ 0,
+};
+
+/**
+ * KPixDataHeader default values.
+ */
+CalibBlock_KPixDataHeader_v2_t CalibBlock_KPixDataHeader_v2_default = {
+   /* DataHeaderLength = */ 256,
+   /* KPix_Median = */ 32768,
+   /* KPix_Nbits = */ 16,
+   /* KPix_EffectiveBitWidth = */ 13,
+   /* KPix_Signed = */ 1,
+   /* KPixDataLength = */ 0,
+   /* KPixDataCRC16 = */ 0,
    /* DataHeaderCRC16 = */ 0,
 };
 
@@ -322,7 +338,8 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->HighExtrapolationFactor, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->LowValidTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->HighValidTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 3; // Skip FREE space
+   numBytes += 2; // Skip FREE space
+   memcpy(&hdr->BinningMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->FOVPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->FocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
    memcpy(&hdr->ImageCorrectionFocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
@@ -351,7 +368,8 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTRQDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->NumberOfLUTRQ, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 3; // Skip FREE space
+   memcpy(&hdr->KPixDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 2; // Skip FREE space
    memcpy(&hdr->FileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->FileHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
@@ -465,7 +483,8 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->HighExtrapolationFactor, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->LowValidTemperature, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->HighValidTemperature, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
+   memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+   memcpy(&buffer[numBytes], &hdr->BinningMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->FOVPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->FocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
    memcpy(&buffer[numBytes], &hdr->ImageCorrectionFocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
@@ -493,7 +512,8 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTRQDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->NumberOfLUTRQ, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
+   memcpy(&buffer[numBytes], &hdr->KPixDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
 
    hdr->FileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
    memcpy(&buffer[numBytes], &hdr->FileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
@@ -568,6 +588,7 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("HighExtrapolationFactor: " _PCF(3) "\n", _FFMT(hdr->HighExtrapolationFactor, 3));
    FPGA_PRINTF("LowValidTemperature: " _PCF(3) " °C\n", _FFMT(hdr->LowValidTemperature, 3));
    FPGA_PRINTF("HighValidTemperature: " _PCF(3) " °C\n", _FFMT(hdr->HighValidTemperature, 3));
+   FPGA_PRINTF("BinningMode: %u enum\n", hdr->BinningMode);
    FPGA_PRINTF("FOVPosition: %u enum\n", hdr->FOVPosition);
    FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
    FPGA_PRINTF("ImageCorrectionFocusPositionRaw: %d counts\n", hdr->ImageCorrectionFocusPositionRaw);
@@ -594,6 +615,7 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("LUTNLDataPresence: %u 0 / 1\n", hdr->LUTNLDataPresence);
    FPGA_PRINTF("LUTRQDataPresence: %u 0 / 1\n", hdr->LUTRQDataPresence);
    FPGA_PRINTF("NumberOfLUTRQ: %u\n", hdr->NumberOfLUTRQ);
+   FPGA_PRINTF("KPixDataPresence: %u 0 / 1\n", hdr->KPixDataPresence);
    FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);
 }
 
@@ -1341,6 +1363,170 @@ uint32_t CalibBlock_WriteLUTRQData_v2(CalibBlock_LUTRQData_v2_t *data, uint8_t *
    rawData |= ((tmpData << CALIBBLOCK_LUTRQDATA_B_SHIFT_V2) & CALIBBLOCK_LUTRQDATA_B_MASK_V2);
 
    memcpy(buffer, &rawData, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+
+   return numBytes;
+}
+
+/**
+ * KPixDataHeader parser.
+ *
+ * @param buffer is the byte buffer to parse.
+ * @param buflen is the byte buffer length.
+ * @param hdr is the pointer to the header structure to fill.
+ *
+ * @return the number of byte read from the buffer.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_ParseKPixDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_KPixDataHeader_v2_t *hdr)
+{
+   uint32_t numBytes = 0;
+
+   if (buflen < CALIBBLOCK_KPIXDATAHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
+
+   memcpy(&hdr->DataHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+
+   if (hdr->DataHeaderLength != CALIBBLOCK_KPIXDATAHEADER_SIZE_V2)
+   {
+      // Data header length mismatch
+      return 0;
+   }
+
+   memcpy(&hdr->KPix_Median, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->KPix_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->KPix_EffectiveBitWidth, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->KPix_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 237; // Skip FREE space
+   memcpy(&hdr->KPixDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->KPixDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->DataHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   if (hdr->DataHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
+   {
+      // CRC-16 test failed
+      return 0;
+   }
+
+   return numBytes;
+}
+
+/**
+ * KPixDataHeader writer.
+ *
+ * @param hdr is the pointer to the header structure to write.
+ * @param buffer is the byte buffer to write.
+ * @param buflen is the byte buffer length.
+ *
+ * @return the number of byte written to the buffer.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_WriteKPixDataHeader_v2(CalibBlock_KPixDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen)
+{
+   uint32_t numBytes = 0;
+
+   if (buflen < CALIBBLOCK_KPIXDATAHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
+
+
+   hdr->DataHeaderLength = CALIBBLOCK_KPIXDATAHEADER_SIZE_V2;
+
+   memcpy(&buffer[numBytes], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->KPix_Median, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->KPix_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->KPix_EffectiveBitWidth, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->KPix_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 237); numBytes += 237; // FREE space
+   memcpy(&buffer[numBytes], &hdr->KPixDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->KPixDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   hdr->DataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
+   memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   return numBytes;
+}
+
+/**
+ * KPixDataHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void CalibBlock_PrintKPixDataHeader_v2(CalibBlock_KPixDataHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("DataHeaderLength: %u bytes\n", hdr->DataHeaderLength);
+   FPGA_PRINTF("KPix_Median: %u\n", hdr->KPix_Median);
+   FPGA_PRINTF("KPix_Nbits: %u bits\n", hdr->KPix_Nbits);
+   FPGA_PRINTF("KPix_EffectiveBitWidth: %u bits\n", hdr->KPix_EffectiveBitWidth);
+   FPGA_PRINTF("KPix_Signed: %u 0 / 1\n", hdr->KPix_Signed);
+   FPGA_PRINTF("KPixDataLength: %u bytes\n", hdr->KPixDataLength);
+   FPGA_PRINTF("KPixDataCRC16: %u\n", hdr->KPixDataCRC16);
+   FPGA_PRINTF("DataHeaderCRC16: %u\n", hdr->DataHeaderCRC16);
+}
+
+/**
+ * KPixData data parser.
+ *
+ * @param buffer is the byte buffer to parse.
+ * @param buflen is the byte buffer length.
+ * @param data is the pointer to the data structure to fill.
+ *
+ * @return the number of byte read from the buffer.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_ParseKPixData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_KPixData_v2_t *data)
+{
+   uint32_t numBytes = 0;
+   uint16_t rawData;
+
+   if (buflen < CALIBBLOCK_KPIXDATA_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
+
+   memcpy(&rawData, buffer, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   data->KPix_Data = ((rawData & CALIBBLOCK_KPIXDATA_KPIX_DATA_MASK_V2) >> CALIBBLOCK_KPIXDATA_KPIX_DATA_SHIFT_V2);
+   if ((data->KPix_Data & CALIBBLOCK_KPIXDATA_KPIX_DATA_SIGNPOS_V2) == CALIBBLOCK_KPIXDATA_KPIX_DATA_SIGNPOS_V2)
+   {
+      // Sign extension
+      data->KPix_Data |= 0x0000;
+   }
+
+   return numBytes;
+}
+
+/**
+ * KPixData data writer.
+ *
+ * @param data is the pointer to the data structure to write.
+ * @param buffer is the byte buffer to write.
+ * @param buflen is the byte buffer length.
+ *
+ * @return the number of byte written to the buffer.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_WriteKPixData_v2(CalibBlock_KPixData_v2_t *data, uint8_t *buffer, uint32_t buflen)
+{
+   uint32_t numBytes = 0;
+   uint16_t tmpData;
+   uint16_t rawData = 0;
+
+   if (buflen < CALIBBLOCK_KPIXDATA_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
+
+   tmpData = data->KPix_Data;
+   rawData |= ((tmpData << CALIBBLOCK_KPIXDATA_KPIX_DATA_SHIFT_V2) & CALIBBLOCK_KPIXDATA_KPIX_DATA_MASK_V2);
+
+   memcpy(buffer, &rawData, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }

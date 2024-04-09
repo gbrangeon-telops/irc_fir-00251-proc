@@ -5,7 +5,7 @@
  * This file defines the camera calibration collection file structure v2.
  *
  * Auto-generated calibration collection file library.
- * Generated from the calibration collection file structure definition XLS file version 2.5.0
+ * Generated from the calibration collection file structure definition XLS file version 2.6.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -61,6 +61,7 @@ CalibCollection_CollectionFileHeader_v2_t CalibCollection_CollectionFileHeader_v
    /* FluxRatio12 = */ 0.000000F,
    /* FOVPosition = */ 255,
    /* SensorIDMSB = */ 0,
+   /* BinningMode = */ 0,
    /* ExtenderRingSerialNumber = */ 0,
    /* ExtenderRingName = */ "",
    /* Block1ImageShiftX = */ 0,
@@ -172,7 +173,8 @@ uint32_t CalibCollection_ParseCollectionFileHeader_v2(uint8_t *buffer, uint32_t 
    memcpy(&hdr->FluxRatio12, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->FOVPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->SensorIDMSB, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 130; // Skip FREE space
+   memcpy(&hdr->BinningMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 129; // Skip FREE space
    memcpy(&hdr->ExtenderRingSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(hdr->ExtenderRingName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ExtenderRingName[64] = '\0';
@@ -290,7 +292,8 @@ uint32_t CalibCollection_WriteCollectionFileHeader_v2(CalibCollection_Collection
    memcpy(&buffer[numBytes], &hdr->FluxRatio12, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->FOVPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->SensorIDMSB, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 130); numBytes += 130; // FREE space
+   memcpy(&buffer[numBytes], &hdr->BinningMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 129); numBytes += 129; // FREE space
    memcpy(&buffer[numBytes], &hdr->ExtenderRingSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], hdr->ExtenderRingName, 64); numBytes += 64;
    memcpy(&buffer[numBytes], &hdr->Block1ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
@@ -368,6 +371,7 @@ void CalibCollection_PrintCollectionFileHeader_v2(CalibCollection_CollectionFile
    FPGA_PRINTF("FluxRatio12: " _PCF(3) "\n", _FFMT(hdr->FluxRatio12, 3));
    FPGA_PRINTF("FOVPosition: %u enum\n", hdr->FOVPosition);
    FPGA_PRINTF("SensorIDMSB: %u\n", hdr->SensorIDMSB);
+   FPGA_PRINTF("BinningMode: %u enum\n", hdr->BinningMode);
    FPGA_PRINTF("ExtenderRingSerialNumber: %u\n", hdr->ExtenderRingSerialNumber);
    FPGA_PRINTF("ExtenderRingName: %s\n", hdr->ExtenderRingName);
    FPGA_PRINTF("Block1ImageShiftX: %d 0.01 px\n", hdr->Block1ImageShiftX);

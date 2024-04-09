@@ -5,7 +5,7 @@
  * This file declares the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.5.0
+ * Generated from the calibration block file structure definition XLS file version 2.6.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBBLOCK_FILEMAJORVERSION_V2      2
-#define CALIBBLOCK_FILEMINORVERSION_V2      5
+#define CALIBBLOCK_FILEMINORVERSION_V2      6
 #define CALIBBLOCK_FILESUBMINORVERSION_V2   0
 
 #define CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2   512
@@ -61,6 +61,12 @@
 #define CALIBBLOCK_LUTRQDATA_M_SHIFT_V2   0
 #define CALIBBLOCK_LUTRQDATA_B_MASK_V2    (uint32_t)(0xFFFF0000)
 #define CALIBBLOCK_LUTRQDATA_B_SHIFT_V2   16
+
+#define CALIBBLOCK_KPIXDATAHEADER_SIZE_V2   256
+#define CALIBBLOCK_KPIXDATA_SIZE_V2   2
+#define CALIBBLOCK_KPIXDATA_KPIX_DATA_MASK_V2    (uint16_t)(0xFFFF)
+#define CALIBBLOCK_KPIXDATA_KPIX_DATA_SHIFT_V2   0
+#define CALIBBLOCK_KPIXDATA_KPIX_DATA_SIGNPOS_V2 (1 << 15)
 
 /**
  * BlockFileHeader data structure.
@@ -126,6 +132,7 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    float HighExtrapolationFactor;   /**< Extrapolation factor for LUT upper limit */
    float LowValidTemperature;   /**< Lowest valid value of the calibrated radiometric temperature */
    float HighValidTemperature;   /**< Highest valid value of the calibrated radiometric temperature */
+   uint8_t BinningMode;   /**< In binning mode, pixels are joined into a single large pixel */
    uint8_t FOVPosition;   /**< Motorized FOV lens position */
    int32_t FocusPositionRaw;   /**< Motorized focus lens encoder position */
    int32_t ImageCorrectionFocusPositionRaw;   /**< Motorized focus lens encoder position to use for image correction */
@@ -152,6 +159,7 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint8_t LUTNLDataPresence;   /**< Indicates the presence of LUTNL data in calibration block */
    uint8_t LUTRQDataPresence;   /**< Indicates the presence of LUTRQ data in calibration block */
    uint8_t NumberOfLUTRQ;   /**< Number of radiometric quantity lookup tables in calibration block */
+   uint8_t KPixDataPresence;   /**< Indicates the presence of KPix data in calibration block */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 
@@ -168,31 +176,31 @@ struct CalibBlock_PixelDataHeader_v2Struct {
    float Offset_Off;   /**< Offset offset */
    float Offset_Median;   /**< Offset median */
    int8_t Offset_Exp;   /**< Offset exponent */
-   uint8_t Offset_Nbits;   /**< Offset data filed bit width */
+   uint8_t Offset_Nbits;   /**< Offset data field bit width */
    uint8_t Offset_Signed;   /**< Indicates whether the offset data field is signed */
    float Range_Off;   /**< Range offset */
    float Range_Median;   /**< Range median */
    int8_t Range_Exp;   /**< Range exponent */
-   uint8_t Range_Nbits;   /**< Range data filed bit width */
+   uint8_t Range_Nbits;   /**< Range data field bit width */
    uint8_t Range_Signed;   /**< Indicates whether the range data field is signed */
    float Kappa_Off;   /**< Kappa offset */
    float Kappa_Median;   /**< Kappa median */
    int8_t Kappa_Exp;   /**< Kappa exponent */
-   uint8_t Kappa_Nbits;   /**< Kappa data filed bit width */
+   uint8_t Kappa_Nbits;   /**< Kappa data field bit width */
    uint8_t Kappa_Signed;   /**< Indicates whether the kappa data field is signed */
    float Beta0_Off;   /**< Beta0 offset */
    float Beta0_Median;   /**< Beta0 median */
    int8_t Beta0_Exp;   /**< Beta0 exponent */
-   uint8_t Beta0_Nbits;   /**< Beta0 data filed bit width */
+   uint8_t Beta0_Nbits;   /**< Beta0 data field bit width */
    uint8_t Beta0_Signed;   /**< Indicates whether the beta0 data field is signed */
    float Alpha_Off;   /**< Alpha offset */
    float Alpha_Median;   /**< Alpha median */
    int8_t Alpha_Exp;   /**< Alpha exponent */
-   uint8_t Alpha_Nbits;   /**< Alpha data filed bit width */
+   uint8_t Alpha_Nbits;   /**< Alpha data field bit width */
    uint8_t Alpha_Signed;   /**< Indicates whether the alpha data field is signed */
-   uint8_t LUTNLIndex_Nbits;   /**< LUTNLIndex data filed bit width */
+   uint8_t LUTNLIndex_Nbits;   /**< LUTNLIndex data field bit width */
    uint8_t LUTNLIndex_Signed;   /**< Indicates whether the LUTNL index data field is signed */
-   uint8_t BadPixel_Nbits;   /**< Alpha data filed bit width */
+   uint8_t BadPixel_Nbits;   /**< Alpha data field bit width */
    uint8_t BadPixel_Signed;   /**< Indicates whether the bad pixel data field is signed */
    uint32_t PixelDataLength;   /**< Pixel data length */
    uint16_t PixelDataCRC16;   /**< Pixel data CRC-16 */
@@ -255,8 +263,8 @@ struct CalibBlock_LUTNLDataHeader_v2Struct {
    uint16_t LUT_Size;   /**< Number of lookup table elements */
    int8_t M_Exp;   /**< M exponent */
    int8_t B_Exp;   /**< B exponent */
-   uint8_t M_Nbits;   /**< M data filed bit width */
-   uint8_t B_Nbits;   /**< B data filed bit width */
+   uint8_t M_Nbits;   /**< M data field bit width */
+   uint8_t B_Nbits;   /**< B data field bit width */
    uint8_t M_Signed;   /**< Indicates whether the M data field is signed */
    uint8_t B_Signed;   /**< Indicates whether the B data field is signed */
    uint8_t NumberOfLUTNL;   /**< Number of non-linearity correction lookup tables in LUTNL data */
@@ -296,8 +304,8 @@ struct CalibBlock_LUTRQDataHeader_v2Struct {
    float Data_Off;   /**< Data offset */
    int8_t Data_Exp;   /**< Data exponent */
    uint8_t RadiometricQuantityType;   /**< Radiometric quantity type */
-   uint8_t M_Nbits;   /**< M data filed bit width */
-   uint8_t B_Nbits;   /**< B data filed bit width */
+   uint8_t M_Nbits;   /**< M data field bit width */
+   uint8_t B_Nbits;   /**< B data field bit width */
    uint8_t M_Signed;   /**< Indicates whether the M data field is signed */
    uint8_t B_Signed;   /**< Data field is signed */
    uint32_t LUTRQDataLength;   /**< Radiometric quantity lookup table data length */
@@ -323,6 +331,37 @@ struct CalibBlock_LUTRQData_v2Struct {
  */
 typedef struct CalibBlock_LUTRQData_v2Struct CalibBlock_LUTRQData_v2_t;
 
+/**
+ * KPixDataHeader data structure.
+ */
+struct CalibBlock_KPixDataHeader_v2Struct {
+   uint32_t DataHeaderLength;   /**< Data header length */
+   uint32_t KPix_Median;   /**< KPix median */
+   uint8_t KPix_Nbits;   /**< KPix data field bit width */
+   uint8_t KPix_EffectiveBitWidth;   /**< KPix data field effective bit width */
+   uint8_t KPix_Signed;   /**< Indicates whether the KPix data field is signed */
+   uint32_t KPixDataLength;   /**< KPix data length */
+   uint16_t KPixDataCRC16;   /**< KPix data CRC-16 */
+   uint16_t DataHeaderCRC16;   /**< Data header CRC-16 */
+};
+
+/**
+ * KPixDataHeader data type.
+ */
+typedef struct CalibBlock_KPixDataHeader_v2Struct CalibBlock_KPixDataHeader_v2_t;
+
+/**
+ * KPixData data structure.
+ */
+struct CalibBlock_KPixData_v2Struct {
+   int16_t KPix_Data;   /**< KPix constant used for recombining coarse and residue values */
+};
+
+/**
+ * KPixData data type.
+ */
+typedef struct CalibBlock_KPixData_v2Struct CalibBlock_KPixData_v2_t;
+
 uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_BlockFileHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
 void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr);
@@ -344,5 +383,10 @@ uint32_t CalibBlock_WriteLUTRQDataHeader_v2(CalibBlock_LUTRQDataHeader_v2_t *hdr
 void CalibBlock_PrintLUTRQDataHeader_v2(CalibBlock_LUTRQDataHeader_v2_t *hdr);
 uint32_t CalibBlock_ParseLUTRQData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_LUTRQData_v2_t *data);
 uint32_t CalibBlock_WriteLUTRQData_v2(CalibBlock_LUTRQData_v2_t *data, uint8_t *buffer, uint32_t buflen);
+uint32_t CalibBlock_ParseKPixDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_KPixDataHeader_v2_t *hdr);
+uint32_t CalibBlock_WriteKPixDataHeader_v2(CalibBlock_KPixDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibBlock_PrintKPixDataHeader_v2(CalibBlock_KPixDataHeader_v2_t *hdr);
+uint32_t CalibBlock_ParseKPixData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_KPixData_v2_t *data);
+uint32_t CalibBlock_WriteKPixData_v2(CalibBlock_KPixData_v2_t *data, uint8_t *buffer, uint32_t buflen);
 
 #endif // CALIBBLOCKFILE_V2_H
