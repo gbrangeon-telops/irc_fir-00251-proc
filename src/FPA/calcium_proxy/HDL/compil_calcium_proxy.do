@@ -72,5 +72,5 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_data_dispatcher.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_quad_to_axis32.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_data_compression.bde \
- d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_data_ctrl.bde \
+ -2008 d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_data_ctrl.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_intf.bde
