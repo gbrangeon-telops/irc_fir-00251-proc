@@ -100,7 +100,7 @@ architecture rtl of calcium_diag_data_gen is
    signal diag_line_gen_en  : std_logic;
    signal pix_first_value   : std_logic_vector(23 downto 0);
    signal pix_coarse_value  : unsigned(pix_coarse_range_type);
-   signal pix_offset_value  : pix_data_array_type;
+   signal pix_offset_value  : pix_data_array_type(QUAD_DATA.pix_data'RANGE);
    signal incr_value        : std_logic_vector(23 downto 0);
    signal pix_diag_data     : std_logic_vector(23 downto 0);
    signal pix_diag_lval     : std_logic;
