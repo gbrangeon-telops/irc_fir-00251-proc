@@ -10,6 +10,6 @@ acom -incr -nowarn DAGGEN_0523 "D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd" 
  "D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd" \
  "$COMMON_HDL\Utilities\sync_reset.vhd" \
  "$COMMON_HDL\Utilities\sync_resetn.vhd" \
- "$ICU_DIR\ICU_SM.vhd" \
- -relax "$ICU_DIR\ICU_Ctrl.vhd" \
+ "$ICU_DIR\ICU_SM.vhd"
+acom -relax "$ICU_DIR\ICU_Ctrl.vhd" \
  "$ICU_DIR\ICU_toplevel.bde"

@@ -6,11 +6,12 @@
 #__BEGIN BUILD NBITS
 
 # common
-acom -2008 -d d:\Telops\FIR-00251-Proc\src\nbits\Sim -incr -nowarn DAGGEN_0523 \
+acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Utilities\sync_reset.vhd \
  d:\Telops\Common_HDL\Utilities\dcm_reset.vhd \
 #TODO Edit if more than 4 channel are needed
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd \
+ d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd
+acom -incr -nowarn DAGGEN_0523 -2008 \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_serdes_clk_wrapper.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\idelay_wrapper.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\iserdes_wrapper.vhd \
