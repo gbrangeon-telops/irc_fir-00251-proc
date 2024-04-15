@@ -24,7 +24,8 @@ entity calcium_diag_data_gen is
    generic(
       
       DETECTOR_WIDTH  : positive := 640;
-      DETECTOR_HEIGHT : positive := 512
+      DETECTOR_HEIGHT : positive := 512;
+      OCTO_DATA_ENA   : boolean  := FALSE
       
       );
    
@@ -37,7 +38,8 @@ entity calcium_diag_data_gen is
       
       FPA_INT      : in std_logic;
       
-      QUAD_DATA    : out calcium_quad_data_type --! sortie des données deserialisés
+      QUAD_DATA    : out calcium_quad_data_type; --! sortie des données deserialisés
+	  OCTO_DATA    : out calcium_octo_data_type
       
       );
 end calcium_diag_data_gen;
@@ -82,13 +84,23 @@ architecture rtl of calcium_diag_data_gen is
          );
    end component;
    
+   type calcium_data_type is
+   record
+      pix_data       : pix_data_array_type(1 to 4 * (1 + boolean'POS(OCTO_DATA_ENA)));
+      fval           : std_logic;
+      lval           : std_logic;
+      dval           : std_logic;
+      aoi_dval       : std_logic;
+      aoi_last       : std_logic;
+   end record;
+   
    type diag_fsm_type is (idle, x_to_readout_start_dly_st, fval_on_st, fval_re_to_dval_re_dly_st, start_line_gen_st,
    wait_line_gen_end_st, line_pause_st, rst_cnt_st, x_to_next_fsync_re_dly_st);
    type img_change_sm_type is (idle, change_st);
    
    signal diag_fsm          : diag_fsm_type;
    signal img_change_sm     : img_change_sm_type;
-   signal pix_data_i        : calcium_quad_data_type;
+   signal pix_data_i        : calcium_data_type;
    alias  fval_i           is pix_data_i.fval;  
    signal fval_last         : std_logic;
    alias  lval_i           is pix_data_i.lval;
@@ -100,7 +112,7 @@ architecture rtl of calcium_diag_data_gen is
    signal diag_line_gen_en  : std_logic;
    signal pix_first_value   : std_logic_vector(23 downto 0);
    signal pix_coarse_value  : unsigned(pix_coarse_range_type);
-   signal pix_offset_value  : pix_data_array_type(QUAD_DATA.pix_data'RANGE);
+   signal pix_offset_value  : pix_data_array_type(pix_data_i.pix_data'RANGE);
    signal incr_value        : std_logic_vector(23 downto 0);
    signal pix_diag_data     : std_logic_vector(23 downto 0);
    signal pix_diag_lval     : std_logic;
@@ -126,7 +138,22 @@ architecture rtl of calcium_diag_data_gen is
   
 begin
    
-   QUAD_DATA <= pix_data_i;  
+   G0 : if OCTO_DATA_ENA = FALSE generate
+      QUAD_DATA.pix_data <= pix_data_i.pix_data;
+      QUAD_DATA.fval     <= pix_data_i.fval;
+      QUAD_DATA.lval     <= pix_data_i.lval;
+      QUAD_DATA.dval     <= pix_data_i.dval;
+      QUAD_DATA.aoi_dval <= pix_data_i.aoi_dval;
+      QUAD_DATA.aoi_last <= pix_data_i.aoi_last;
+   end generate;
+   G1 : if OCTO_DATA_ENA = TRUE generate
+      OCTO_DATA.pix_data <= pix_data_i.pix_data;
+      OCTO_DATA.fval     <= pix_data_i.fval;
+      OCTO_DATA.lval     <= pix_data_i.lval;
+      OCTO_DATA.dval     <= pix_data_i.dval;
+      OCTO_DATA.aoi_dval <= pix_data_i.aoi_dval;
+      OCTO_DATA.aoi_last <= pix_data_i.aoi_last;
+   end generate;
    
    --------------------------------------------------
    -- synchro reset 
