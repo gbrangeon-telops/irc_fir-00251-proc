@@ -17,6 +17,10 @@ acom D:\Telops\FIR-00251-Proc\IP\325\ip_fp32_axis_mult\ip_fp32_axis_mult_stub.vh
 # FPA module
 do D:\Telops\FIR-00251-Proc\src\FPA\calcium640D\HDL\compil_calcium640D.do
 
+# Serdes module
+do D:\Telops\FIR-00251-Proc\src\nbits\HDL\compil_nbits_receiver.do
+acom -2008 D:\Telops\FIR-00251-Proc\aldec\src\FPA\calcium640D\src\calcium640D_fpa_dummy.vhd
+
 # emulateur
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\monit_adc_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\fpa_temp_dummy.vhd
