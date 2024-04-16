@@ -21,22 +21,26 @@
 
 #include <stdint.h>
 #include "GC_Registers.h"
-#include "IRC_status.h"
 
-#ifndef SCD_PROXY
-   #define SCD_PROXY
+#ifdef FPA_VERBOSE
+   #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+#else
+   #define FPA_PRINTF(fmt, ...)    DUMMY_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 #endif
 
-#define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920"
+#define FPA_ERR(fmt, ...)        FPGA_PRINTF("FPA: Error: " fmt "\n", ##__VA_ARGS__)
+#define FPA_INF(fmt, ...)        FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
-#define FPA_WIDTH_MIN      64   
-#define FPA_WIDTH_MAX      1920
-#define FPA_WIDTH_MULT     4
+#define FPA_DEVICE_MODEL_NAME    "CALCIUM640D"
+
+#define FPA_WIDTH_MIN      64    // camera min is 64 even if FPA can do 8   
+#define FPA_WIDTH_MAX      640
+#define FPA_WIDTH_MULT     8
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
-#define FPA_HEIGHT_MIN     8
-#define FPA_HEIGHT_MAX     1536
-#define FPA_HEIGHT_MULT    4
+#define FPA_HEIGHT_MIN     1
+#define FPA_HEIGHT_MAX     512
+#define FPA_HEIGHT_MULT    1
 #define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
@@ -44,177 +48,115 @@
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 
 #define FPA_OFFSETY_MIN    0
-#define FPA_OFFSETY_MULT   4
-//#define FPA_OFFSETY_MULT_CORR    4
+#define FPA_OFFSETY_MULT   1
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
-#define FPA_FORCE_CENTER   1
+#define FPA_FORCE_CENTER   0
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Blackbird1920DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Calcium640DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
 
-#define FPA_COOLER_TEMP_THRES    -20815   //[cC]
-#define FPA_COOLER_TEMP_TOL      1000     //[cC]
-#ifdef SIM
-   #define FPA_DEFAULT_EXPOSURE     5.0F //[us]
-   #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]
-#else
-   #define FPA_DEFAULT_EXPOSURE     10.0F //[us]
-   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]
-#endif
+#define FPA_COOLER_TEMP_THRES    -19400   // [cC]
+#define FPA_COOLER_TEMP_TOL      1000     // [cC]
+#define FPA_DEFAULT_EXPOSURE     1000.0F  // [us]
+#define FPA_DEFAULT_FRAME_RATE   25.0F    // [Hz]
 
-// TODO Update EHDRI default exposure times.
-#define FPA_EHDRI_EXP_0    23.0F  // Saturation à 395C
+#define FPA_EHDRI_EXP_0    23.0F
 #define FPA_EHDRI_EXP_1    200.0F
 #define FPA_EHDRI_EXP_2    1000.0F
-#define FPA_EHDRI_EXP_3    6893.0F  // Saturation à 28
+#define FPA_EHDRI_EXP_3    6893.0F
 
-#define FPA_CAL_MIN_EXPOSURE  0.5F
-#define FPA_CAL_MAX_EXPOSURE  85000.0F
+// horloges du module FPA et du ROIC
+// les relations entre les horloges sont vérifiées dans la fonction FPA_SpecificParams
+#define VHD_CLK_100M_RATE_HZ        100e6F
+#define CALCIUM_CLK_DDR_HZ          400e6F
+#define CALCIUM_CLK_CORE_HZ         10e6F
+#define CALCIUM_CLK_CTRL_DSM_HZ     CALCIUM_CLK_CORE_HZ
+#define CALCIUM_CLK_COL_HZ          50e6F
 
-#define FPA_MIN_EXPOSURE               0.5F     // [us]
-#define FPA_MAX_EXPOSURE               80000.0F // [us]
+// paramètres du ROIC
+#define CALCIUM_TX_OUTPUTS          8     // nombre d'outputs en parallèle
+#define CALCIUM_BITS_PER_PIX        24    // nombre de bits transmis pour 1 pixel
+#define CALCIUM_bTestRowsEn         1     // désactive (0) ou active (1) les 2 test rows
+#define CALCIUM_bADRstCnt           16    // reset time for the ADC, in ClkCol cycles
+#define CALCIUM_bPixRstHCnt         0     // reset time of hold capacitor, in units of ClkCore
+#define CALCIUM_bPixXferCnt         0     // transfer time of hold capacitor, in units of ClkCore
+#define CALCIUM_bPixOHCnt           0     // overhead time between reset and transfer of hold capacitor, in units of ClkCore
+#define CALCIUM_bPixOH2Cnt          0     // overhead time between transfer of hold capacitor and pixel back-end reset, in units of ClkCore
+#define CALCIUM_bPixRstBECnt        0     // reset time for pixel back-end counters, in units of ClkCore
+#define CALCIUM_bRODelayCnt         0     // readout delay time after reset of pixel back-end counters, in units of ClkCore
+
+#define FPA_EXPOSURE_TIME_RESOLUTION   (1e6F/CALCIUM_CLK_CORE_HZ)     // [us]
+
+#define FPA_MIN_EXPOSURE               1.0F  // [us]
+#define FPA_MAX_EXPOSURE               (1048575.0F * FPA_EXPOSURE_TIME_RESOLUTION)   // [us]  registre bIntcnt est sur 20b
+
+#define FPA_CAL_MIN_EXPOSURE           FPA_MIN_EXPOSURE
+#define FPA_CAL_MAX_EXPOSURE           FPA_MAX_EXPOSURE
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-#define FPA_MCLK_RATE_HZ               70E+6F   // fréquence de l'horloge d'integration
+#define FPA_DATA_RESOLUTION            16
+#define FPA_PIXEL_PITCH                20E-6F
 
-#define FPA_DATA_RESOLUTION            13
-#define FPA_PIXEL_PITCH                10E-6F
+#define FPA_INVALID_TEMP               -32768   // [cC]
 
-#define FPA_INVALID_TEMP               -32768   // cC
-
-#define FPA_PIX_THROUGHPUT_PEAK        338E+6F  // [pix/sec]  avec ou sans reducteur de vitesse, on ne depassera pas virtuellement cette vitesse
-
-#define XTRA_TRIG_MODE_DELAY           100000  // us
-
-#define SCD_MIN_OPER_FPS               (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
+#define FPA_PIX_THROUGHPUT_PEAK        (CALCIUM_TX_OUTPUTS * CALCIUM_CLK_DDR_HZ * 2.0F / CALCIUM_BITS_PER_PIX)  // [pix/sec]  8 canaux à 400MHz DDR à 24b par pixel
 
 
-#define SEND_CONFIG_DELAY              TIME_ONE_SECOND_US
-
-#define FPA_PRINTF(fmt, ...)           FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
-
-#define ROIC_WRITE_CMD_ID              0x8500
-#define ROIC_READ_CMD_ID               0x8501
-#define PROXY_WRITE_CMD_ID             0x8502
-#define PROXY_READ_CMD_ID              0x8503
-
-#define OUTGOING_COM_HDER              0xAA
-#define INCOMING_COM_HDER              0x55
-#define INCOMING_COM_FAIL_ID           0xFFFF
-#define INCOMING_COM_OVH_LEN           6
-#define OUTGOING_COM_OVH_LEN           5
-
-// structure de config envoyée au vhd 
-// c'est la commande operationnelle de scd étendue au vhd complet
+// structure de config envoyée au vhd
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
 {
    uint32_t  SIZE;
    uint32_t  ADD;
    
-   // common   
-   uint32_t  fpa_diag_mode                     ;                                      
-   uint32_t  fpa_diag_type                     ;                                      
-   uint32_t  fpa_pwr_on                        ;                                      
-   uint32_t  fpa_acq_trig_mode                 ;                                      
-   uint32_t  fpa_acq_trig_ctrl_dly             ;                                      
-   uint32_t  fpa_xtra_trig_mode                ;                                      
-   uint32_t  fpa_xtra_trig_ctrl_dly            ;                                      
-   uint32_t  fpa_trig_ctrl_timeout_dly         ;                                      
-   uint32_t  fpa_stretch_acq_trig              ;                                      
-   uint32_t  clk100_to_intclk_conv_numerator   ;                                      
-   uint32_t  intclk_to_clk100_conv_numerator   ;
-   uint32_t  fpa_intf_data_source              ;
-                                              
-   // diag                                     
-   uint32_t  diag_ysize                        ;                                          
-   uint32_t  diag_xsize_div_tapnum             ;                                          
-   uint32_t  diag_lovh_mclk_source             ;                                          
-   uint32_t  real_mode_active_pixel_dly        ;                                          
-                                               
-   uint32_t  spare                             ;
-                                              
-   // aoi                                      
-   uint32_t  aoi_xsize                         ;                                          
-   uint32_t  aoi_ysize                         ;                                          
-   uint32_t  aoi_data_sol_pos                  ;                                          
-   uint32_t  aoi_data_eol_pos                  ;                                          
-   uint32_t  aoi_flag1_sol_pos                 ;                                          
-   uint32_t  aoi_flag1_eol_pos                 ;                                          
-   uint32_t  aoi_flag2_sol_pos                 ;                                          
-   uint32_t  aoi_flag2_eol_pos                 ;                                          
-                                               
-   // op struct cmd                            ;
-   uint32_t  op_xstart                         ;                                          
-   uint32_t  op_ystart                         ;                                          
-   uint32_t  op_xsize                          ;                                          
-   uint32_t  op_ysize                          ;                                          
-   uint32_t  op_frame_time                     ;                                          
-   uint32_t  op_gain                           ;                                          
-   uint32_t  op_int_mode                       ;                                          
-   uint32_t  op_test_mode                      ;                                          
-   uint32_t  op_det_vbias                      ;                                          
-   uint32_t  op_det_ibias                      ;                                          
-   uint32_t  op_binning                        ;                                          
-   uint32_t  op_output_rate                    ;
-   uint32_t  op_mtx_int_low                    ;
-   uint32_t  op_frm_res                        ;
-   uint32_t  op_frm_dat                        ;
-   uint32_t  op_cfg_num                        ;
+   uint32_t  fpa_diag_mode;
+   uint32_t  fpa_diag_type;
+   uint32_t  fpa_pwr_on;
+   uint32_t  fpa_acq_trig_mode;
+   uint32_t  fpa_acq_trig_ctrl_dly;
+   uint32_t  fpa_xtra_trig_mode;
+   uint32_t  fpa_xtra_trig_ctrl_dly;
+   uint32_t  fpa_trig_ctrl_timeout_dly;
+   uint32_t  fpa_stretch_acq_trig;
+   uint32_t  fpa_intf_data_source;
+   uint32_t  fpa_xtra_trig_int_time;
+   uint32_t  fpa_prog_trig_int_time;
+   uint32_t  intclk_to_clk100_conv_numerator;
+   uint32_t  clk100_to_intclk_conv_numerator;
+   uint32_t  offsetx;
+   uint32_t  offsety;
+   uint32_t  width;
+   uint32_t  height;
+   uint32_t  active_line_start_num;
+   uint32_t  active_line_end_num;
+   uint32_t  active_line_width_div4;
+   uint32_t  diag_x_to_readout_start_dly;
+   uint32_t  diag_fval_re_to_dval_re_dly;
+   uint32_t  diag_lval_pause_dly;
+   uint32_t  diag_x_to_next_fsync_re_dly;
+   uint32_t  diag_xsize_div_per_pixel_num;
+   int32_t   fpa_int_time_offset;
+   uint32_t  int_fdbk_dly;
+   uint32_t  kpix_pgen_value;
+   uint32_t  kpix_mean_value;
+   uint32_t  use_ext_pixqnb;
+   uint32_t  clk_frm_pulse_width;
+   uint32_t  fpa_serdes_lval_num;
+   uint32_t  fpa_serdes_lval_len;
+   float     compr_ratio_fp32;
+   uint32_t  cfg_num;
+   
+};
+typedef struct s_FpaIntfConfig t_FpaIntf;
 
-   // roic read serial cmd
-   uint32_t  roic_reg_cmd_id                  ;
-   uint32_t  roic_reg_cmd_data_size           ;
-   uint32_t  roic_reg_cmd_dlen                ;
-   uint32_t  roic_reg_cmd_sof_add             ;
-   uint32_t  roic_reg_cmd_eof_add             ;
-                                              
-   // int cmd                                  
-   uint32_t  int_cmd_id                        ;
-   uint32_t  int_cmd_data_size                 ;  
-   uint32_t  int_cmd_dlen                      ;                                          
-   uint32_t  int_cmd_offs                      ;                                          
-   uint32_t  int_cmd_sof_add                   ;                                          
-   uint32_t  int_cmd_eof_add                   ;                                          
-   uint32_t  int_cmd_sof_add_m1                ;                                          
-   uint32_t  int_checksum_add                  ;                                          
-   uint32_t  frame_dly_cst                     ;                                          
-   uint32_t  int_dly_cst                       ;                                          
-                                              
-   // op serial cmd                            
-   uint32_t  op_cmd_id                         ;
-   uint32_t  op_cmd_data_size                  ;
-   uint32_t  op_cmd_dlen                       ;
-   uint32_t  op_cmd_sof_add                    ;                                          
-   uint32_t  op_cmd_eof_add                    ;                                          
-                                               ;
-   // temp serial cmd                          ;
-   uint32_t  temp_cmd_id                       ;
-   uint32_t  temp_cmd_data_size                ;
-   uint32_t  temp_cmd_dlen                     ;
-   uint32_t  temp_cmd_sof_add                  ;                                          
-   uint32_t  temp_cmd_eof_add                  ;                                          
-                                              
-   // misc                                     
-   uint32_t  outgoing_com_hder                 ;
-   uint32_t  outgoing_com_ovh_len              ;
-   uint32_t  incoming_com_hder                 ;
-   uint32_t  incoming_com_fail_id              ;
-   uint32_t  incoming_com_ovh_len              ;
-   uint32_t  fpa_serdes_lval_num               ;
-   uint32_t  fpa_serdes_lval_len               ;
-   uint32_t  int_clk_period_factor             ;
-   int32_t   int_time_offset                   ;
-   uint32_t  vid_if_bit_en                     ;
-};                                                              
-typedef struct s_FpaIntfConfig t_FpaIntf;                       
-                                                                
-// statuts provenant du vhd                                     
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add}
+
+// statuts provenant du vhd
 struct s_FpaStatus    // 
 {
    // fpa init status (ne provient pas du vhd)
@@ -279,6 +221,7 @@ struct s_FpaStatus    //
    uint32_t  cooler_on_curr_min_mA;       // seuil au dessus duquel considérer que le refroidisseur est allumé
    uint32_t  cooler_off_curr_max_mA;      // seuil en dessous duquel considérer que le refroidisseur est eteint
    
+   // watchdog
    uint32_t  acq_trig_cnt;    
    uint32_t  acq_int_cnt;     
    uint32_t  fpa_readout_cnt; 
@@ -292,11 +235,9 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
-																						  
+
+
 // Function prototypes
-
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
 
 // pour initialiser le module vhd avec les bons parametres de départ
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
@@ -305,10 +246,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 void FPA_ClearErr(const t_FpaIntf *ptrA);
 
 //pour configurer le bloc FPA_interface et le lancer
-void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
-
-//pour configurer la résolution de frame
-void FPA_SetFrameResolution(t_FpaIntf *ptrA);// Not used (needed for BB1280)
+void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs);
 
 //pour calculer le frame rate max se rappportant à une configuration donnée
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs);
@@ -322,35 +260,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA);
 // pour avoir les statuts complets
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 
+// pour afficher le feedback de FPA_INTF_CFG
+void FPA_PrintConfig(const t_FpaIntf *ptrA);
+
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
-
-// pour imposer une séquence d'initialisation particulière
-bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
-
-// pour désactiver l'envoi de commande de temps d'intégration
-void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state);
-
-// pour écrire un registre unique du roic (non testé)
-void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal);
-
-
-/**
- * FPA Initialization state.
- */
-enum fpaInitStateEnum {
-   // Initialization states
-   IDLE = 0,
-   READ_ROIC_REG19,
-   WAIT_RESPONSE,
-   SEND_1ST_CFG,
-   START_SERDES_INITIALIZATION
-};
-
-/**
- * FPA Initialization state data type.
- */
-typedef enum fpaInitStateEnum fpaInitState_t;
-
 
 #endif // __FPA_INTF_H__
