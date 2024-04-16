@@ -23,9 +23,10 @@ entity calcium_diag_data_gen is
    
    generic(
       
-      DETECTOR_WIDTH  : positive := 640;
-      DETECTOR_HEIGHT : positive := 512;
-      OCTO_DATA_ENA   : boolean  := FALSE
+      DETECTOR_WIDTH       : positive := 640;
+      DETECTOR_HEIGHT      : positive := 512;
+      OCTO_DATA_ENA        : boolean  := FALSE;
+      DIAG_DATA_CLK_FACTOR : integer  := DEFINE_DIAG_DATA_CLK_FACTOR
       
       );
    
@@ -168,10 +169,10 @@ begin
    --------------------------------------------------
    -- sampling clk enable
    -------------------------------------------------- 
-   genA: if DEFINE_DIAG_DATA_CLK_FACTOR > 1 generate     
+   genA: if DIAG_DATA_CLK_FACTOR > 1 generate     
       U1: Clk_Divider
       Generic map(
-         Factor => DEFINE_DIAG_DATA_CLK_FACTOR
+         Factor => DIAG_DATA_CLK_FACTOR
          )
       Port map( 
          Clock   => CLK, 
