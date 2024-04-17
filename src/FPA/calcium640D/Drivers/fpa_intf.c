@@ -473,7 +473,7 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
    _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_COL_HZ == 0, "Unsupported ClkDDR/ClkCol ratio");
    
    // Make sure exposure time is rounded to a factor of ClkCore
-   float exposureTime = roundMultiple(exposureTime_usec/1e6F, (double)(1.0F/CALCIUM_CLK_CORE_HZ));
+   float exposureTime = roundf(exposureTime_usec/1e6F * CALCIUM_CLK_CORE_HZ) / CALCIUM_CLK_CORE_HZ;
    
    // Integration signal transmitted by ClkFrm has to be latched to ClkCore
    // domain. Therefore, the delay (and uncertainty) of the integration start
@@ -571,8 +571,11 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    periodMinWithNullExposure_usec = hh.frameTime*1e6F;
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
 
-   // Same formula for ITR/IWR
-   max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   // Calculate exposure time depending on mode ITR/IWR
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+      max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   else
+      max_exposure_usec = (presentPeriod_sec - hh.integrationDelay - hh.readoutDelay)*1e6F;
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);

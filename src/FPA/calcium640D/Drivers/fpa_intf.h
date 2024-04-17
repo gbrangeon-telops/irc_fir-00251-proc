@@ -33,7 +33,7 @@
 
 #define FPA_DEVICE_MODEL_NAME    "CALCIUM640D"
 
-#define FPA_WIDTH_MIN      64    // camera min is 64 even if FPA can do 8   
+#define FPA_WIDTH_MIN      64    // camera min is 64 even if FPA can do 16
 #define FPA_WIDTH_MAX      640
 #define FPA_WIDTH_MULT     8
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
@@ -100,7 +100,7 @@
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-#define FPA_DATA_RESOLUTION            16
+#define FPA_DATA_RESOLUTION            16       // for AEC
 #define FPA_PIXEL_PITCH                20E-6F
 
 #define FPA_INVALID_TEMP               -32768   // [cC]
