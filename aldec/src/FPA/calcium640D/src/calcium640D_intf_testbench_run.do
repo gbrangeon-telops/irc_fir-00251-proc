@@ -30,7 +30,7 @@ acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\b
 
 # Testbench
 acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\calcium640D\src\calcium640D_intf_testbench_pkg.vhd
-acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\calcium640D\src\calcium640D_intf_testbench.bde
+acom -2008 D:\Telops\FIR-00251-Proc\aldec\src\FPA\calcium640D\src\calcium640D_intf_testbench.bde
 acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\calcium640D\src\calcium640D_intf_testbench_stim.vhd
 
 asim -ses calcium640D_intf_testbench_stim
