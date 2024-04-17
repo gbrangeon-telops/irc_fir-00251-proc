@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -129,7 +129,7 @@ begin
     process(FPA_INTF_CFG)
     begin
         fpa_intf_cfg_i <= FPA_INTF_CFG;
-        fpa_intf_cfg_i.diag.xsize_div_per_pixel_num <= (9 => '0', 8 downto 0 => FPA_INTF_CFG.diag.xsize_div_per_pixel_num(9 downto 1));
+        fpa_intf_cfg_i.diag.xsize_div_per_pixel_num <= "0" & FPA_INTF_CFG.diag.xsize_div_per_pixel_num(9 downto 1);
     end process;
     
     pixel_clk_i <= PIXEL_CLK_P and (not PIXEL_CLK_N);
