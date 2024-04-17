@@ -21,6 +21,8 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
          ACQ_TRIG : in STD_LOGIC;
          ARESET : in STD_LOGIC;
          CLK_100M : in STD_LOGIC;
+         CLK_200M : in STD_LOGIC;
+         CLK_PIX  : in STD_LOGIC;
          MB_CLK : in STD_LOGIC;
          ROIC_MISO : in STD_LOGIC;
          XTRA_TRIG : in STD_LOGIC;
@@ -51,6 +53,8 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    end component;
    
    constant CLK_100M_PERIOD         : time := 10 ns;
+   constant CLK_200M_PERIOD         : time :=  5 ns;
+   constant CLK_PIX_PERIOD          : time := 30 ns;
    constant ACQ_TRIG_PERIOD         : time := 4 ms;
    
    constant DIAG_MODE_CFG1          : std_logic := '1';
@@ -75,6 +79,8 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    signal ACQ_TRIG : STD_LOGIC;
    signal ARESET : STD_LOGIC;
    signal CLK_100M : STD_LOGIC := '0';
+   signal CLK_200M : STD_LOGIC := '0';
+   signal CLK_PIX  : STD_LOGIC := '0';
    signal MB_CLK : STD_LOGIC;
    signal ROIC_MISO : STD_LOGIC;       -- À implémenter !!!
    signal XTRA_TRIG : STD_LOGIC := '0';
@@ -120,10 +126,9 @@ begin
    end process;
    
    -- Clk
-   U1 : process(CLK_100M)
-   begin
-      CLK_100M <= not CLK_100M after CLK_100M_PERIOD/2; 
-   end process;
+   CLK_100M <= not CLK_100M after CLK_100M_PERIOD/2; 
+   CLK_200M <= not CLK_200M after CLK_200M_PERIOD/2; 
+   CLK_PIX  <= not CLK_PIX  after CLK_PIX_PERIOD /2;
    
    -- Trig
    U2 : process
@@ -227,6 +232,8 @@ begin
       ACQ_TRIG => ACQ_TRIG,
       ARESET => ARESET,
       CLK_100M => CLK_100M,
+      CLK_200M => CLK_200M,
+      CLK_PIX  =>  CLK_PIX,
       MB_CLK => MB_CLK,
       ROIC_MISO => ROIC_MISO,
       XTRA_TRIG => XTRA_TRIG,
