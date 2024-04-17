@@ -58,6 +58,7 @@ static IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFPACFG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf);
@@ -102,6 +103,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"FPA", DebugTerminalParseFPA},
    {"FPACFG", DebugTerminalParseFPACFG},
    {"XRO", DebugTerminalParseXRO},
+   {"CCM", DebugTerminalParseCCM},
    {"HDER", DebugTerminalParseHDER},
    {"CAL", DebugTerminalParseCAL},
    {"TRIG", DebugTerminalParseTRIG},
@@ -788,6 +790,111 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA LOVH = %d MCLK", gFpaLovh_mclk);
 
    DT_PRINTF("FPA Sub-window mode = %d", gFpaSubWindowMode);
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Debug terminal get CCM status command parser.
+ * This parser is used to parse and validate get CCM status command arguments and to
+ * execute the command.
+ *
+ * @return IRC_SUCCESS when CCM status command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
+{
+   extern t_FpaIntf gFpaIntf;
+   extern uint16_t gFpaVa1p8_mV;
+   extern uint16_t gFpaVPixRst_mV;
+   extern uint16_t gFpaVdhs1p8_mV;
+   extern uint16_t gFpaVd1p8_mV;
+   extern uint16_t gFpaVa3p3_mV;
+   extern uint16_t gFpaVDetGuard_mV;
+   extern uint16_t gFpaVDetCom_mV;
+   extern uint16_t gFpaVPixQNB_mV;
+
+   uint8_t cmdStr[10], argStr[7];
+   uint32_t arglen;
+   uint32_t uValue;
+
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      // Read command value
+      arglen = GetNextArg(cbuf, cmdStr, sizeof(cmdStr) - 1);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid command");
+         return IRC_FAILURE;
+      }
+      cmdStr[arglen++] = '\0'; // Add string terminator
+
+      // Read argument value
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
+            ((uValue < 0) && (uValue > USHRT_MAX)))
+      {
+         DT_ERR("Invalid argument");
+         return IRC_FAILURE;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      // Process command
+      if (strcasecmp((char *)cmdStr, "VA1P8") == 0)
+      {
+         gFpaVa1p8_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VPIXRST") == 0)
+      {
+         gFpaVPixRst_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VDHS1P8") == 0)
+      {
+         gFpaVdhs1p8_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VD1P8") == 0)
+      {
+         gFpaVd1p8_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VA3P3") == 0)
+      {
+         gFpaVa3p3_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VDETGUARD") == 0)
+      {
+         gFpaVDetGuard_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VDETCOM") == 0)
+      {
+         gFpaVDetCom_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VPIXQNB") == 0)
+      {
+         gFpaVPixQNB_mV = (uint16_t)uValue;
+      }
+      else
+      {
+         DT_ERR("Unsupported command");
+         return IRC_FAILURE;
+      }
+
+      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+   }
+
+   DT_PRINTF("FPA VA1P8 voltage = %d mV", gFpaVa1p8_mV);
+   DT_PRINTF("FPA VPIXRST voltage = %d mV", gFpaVPixRst_mV);
+   DT_PRINTF("FPA VDHS1P8 voltage = %d mV", gFpaVdhs1p8_mV);
+   DT_PRINTF("FPA VD1P8 voltage = %d mV", gFpaVd1p8_mV);
+   DT_PRINTF("FPA VA3P3 voltage = %d mV", gFpaVa3p3_mV);
+   DT_PRINTF("FPA VDETGUARD voltage = %d mV", gFpaVDetGuard_mV);
+   DT_PRINTF("FPA VDETCOM voltage = %d mV", gFpaVDetCom_mV);
+   DT_PRINTF("FPA VPIXQNB voltage = %d mV", gFpaVPixQNB_mV);
 
    return IRC_SUCCESS;
 }
@@ -2808,6 +2915,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
+   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
