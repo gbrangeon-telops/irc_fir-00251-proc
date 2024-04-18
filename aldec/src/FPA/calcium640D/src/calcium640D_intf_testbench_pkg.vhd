@@ -107,7 +107,7 @@ package body calcium640D_intf_testbench_pkg is
       width       := to_unsigned(user_xsize, 32);
       height      := to_unsigned(user_ysize, 32);
       
-      active_line_start_num      := to_unsigned(2, 32);
+      active_line_start_num      := to_unsigned(1, 32);
       active_line_end_num        := to_unsigned(to_integer(active_line_start_num) + user_ysize - 1, 32);
       active_line_width_div4     := to_unsigned(user_xsize/4, 32);
       
