@@ -96,7 +96,7 @@ package body calcium640D_intf_testbench_pkg is
       comn_fpa_xtra_trig_ctrl_dly            := to_unsigned(integer(real(readout_end_to_trig_start_delay) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_INTCLK_RATE_KHZ)), 32);
       comn_fpa_trig_ctrl_timeout_dly         := (others => '1');  -- we don't want the timeout to interfere
       comn_fpa_stretch_acq_trig              := (others => '0');
-      comn_fpa_intf_data_source              := (others => DATA_SOURCE_INSIDE_FPGA);
+      comn_fpa_intf_data_source              := (others => DATA_SOURCE_OUTSIDE_FPGA);
       comn_fpa_xtra_trig_int_time            := to_unsigned(100, 32);   -- 1us
       comn_fpa_prog_trig_int_time            := to_unsigned(100, 32);   -- 1us
       comn_intclk_to_clk100_conv_numerator   := to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(C_FPA_INTCLK_RATE_KHZ)), 32);

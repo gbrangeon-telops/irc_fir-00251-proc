@@ -21,6 +21,9 @@ do D:\Telops\FIR-00251-Proc\src\FPA\calcium640D\HDL\compil_calcium640D.do
 do D:\Telops\FIR-00251-Proc\src\nbits\HDL\compil_nbits_receiver.do
 acom -2008 D:\Telops\FIR-00251-Proc\aldec\src\FPA\calcium640D\src\calcium640D_fpa_dummy.vhd
 
+# PGM file builder
+acom D:\Telops\FIR-00251-Common\VHDL\pgm_builder.vhd
+
 # emulateur
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\monit_adc_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\Sim\services_testbench\src\fpa_temp_dummy.vhd
