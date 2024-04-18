@@ -90,6 +90,7 @@ architecture rtl of calcium_rx_data_fifo is
    signal sreset_rx_clk             : std_logic;
    signal sreset_clk                : std_logic;
    signal fifo_wr_i                 : std_logic;
+   signal fifo_din_i                : std_logic_vector(191 downto 0);
    signal fifo_dval_i               : std_logic;
    signal fifo_dout_i               : std_logic_vector(95 downto 0);
    signal fifo_ovfl_i               : std_logic;
@@ -112,6 +113,9 @@ architecture rtl of calcium_rx_data_fifo is
    --   attribute keep of fifo_dout_i : signal is "true";
    
 begin
+   
+   -- Input data mapping
+   fifo_din_i <= RX_DATA(95 downto 0) & RX_DATA(191 downto 96);  -- Reorder fifo din to have pixels 4 downto 1 before pixels 8 downto 5 at fifo dout
    
    -- Error mapping
    ERROR(2) <= data_err_i;
@@ -172,7 +176,7 @@ begin
       rst         => cond_reset,
       wr_clk      => RX_CLK,
       rd_clk      => CLK,
-      din         => RX_DATA,
+      din         => fifo_din_i,
       wr_en       => fifo_wr_i,
       rd_en       => fifo_dval_i,      -- data is read at the same time it is ready
       dout        => fifo_dout_i,
