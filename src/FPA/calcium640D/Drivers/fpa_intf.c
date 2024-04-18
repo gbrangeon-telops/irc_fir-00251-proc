@@ -41,6 +41,7 @@
 
 // informations sur le pilote C. Le vhd s'en sert pour compatibility check (voir fichier fpa_common_pkg.vhd)
 #define FPA_ROIC                                   0x22     // 0x22 -> calcium. Provient du fichier fpa_common_pkg.vhd.
+#define FPA_ROIC_UNKNOWN                           0xFF     // 0xFF -> ROIC inconnu. Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                            0x02     // 0x02 -> output numérique. Provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
 #define FPA_INPUT_TYPE                             0x07     // 0x04 -> input LVCMOS18. Provient du fichier fpa_common_pkg.vhd
 
@@ -173,10 +174,10 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    // sw_init_done = 0;                                                     // ENO: 11-sept 2019: ligne en commentaire pour que plusieurs appels de FPA_init ne créent des bugs de flashsettings.
    sw_init_success = 0;
    
-   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_Reset(ptrA);
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides
+   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
    
@@ -764,6 +765,22 @@ void FPA_SoftwType(const t_FpaIntf *ptrA)
    AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);
    AXI4L_write32(FPA_OUTPUT_TYPE, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);
    AXI4L_write32(FPA_INPUT_TYPE, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
+}
+
+//--------------------------------------------------------------------------
+// Pour activer/désactiver la LED de warning.
+//--------------------------------------------------------------------------
+void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
+{
+   if (enable)
+   {
+      AXI4L_write32(FPA_ROIC_UNKNOWN, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);
+   }
+   else
+   {
+      AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);
+      FPA_ClearErr(ptrA);
+   }
 }
 
 //--------------------------------------------------------------------------

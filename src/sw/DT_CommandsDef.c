@@ -878,6 +878,13 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
       {
          gFpaVPixQNB_mV = (uint16_t)uValue;
       }
+      else if (strcasecmp((char *)cmdStr, "WARNLED") == 0)
+      {
+         if (uValue > 0)
+            FPA_SetWarningLed(&gFpaIntf, true);
+         else
+            FPA_SetWarningLed(&gFpaIntf, false);
+      }
       else
       {
          DT_ERR("Unsupported command");
@@ -2915,7 +2922,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
-   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB value]");
+   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
