@@ -154,6 +154,8 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint32_t ExtenderRingSerialNumber;   /**< Unique Telops 32-bit extender ring serial number */
    char ExtenderRingName[65];   /**< Extender ring name */
    float FNumber;   /**< Sensor FNumber */
+   uint8_t CompressionAlgorithm;   /**< Compression algorithm to be used on data calibrated with this block */
+   float CompressionParameter;   /**< Compression parameter to be used on data calibrated with this block. Parameter usage depends on CompressionAlgorithm */
    uint8_t PixelDataPresence;   /**< Indicates the presence of pixel data in calibration block */
    uint8_t MaxTKDataPresence;   /**< Indicates the presence of MaxTK data in calibration block */
    uint8_t LUTNLDataPresence;   /**< Indicates the presence of LUTNL data in calibration block */

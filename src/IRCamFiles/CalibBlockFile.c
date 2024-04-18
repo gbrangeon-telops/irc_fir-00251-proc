@@ -208,6 +208,8 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
             case 5:
                // 2.5.x -> 2.6.x
                hdr->BinningMode = CalibBlock_BlockFileHeader_default.BinningMode;
+               hdr->CompressionAlgorithm = CalibBlock_BlockFileHeader_default.CompressionAlgorithm;
+               hdr->CompressionParameter = CalibBlock_BlockFileHeader_default.CompressionParameter;
                hdr->KPixDataPresence = CalibBlock_BlockFileHeader_default.KPixDataPresence;
                hdr->FileStructureMinorVersion = 6;
 

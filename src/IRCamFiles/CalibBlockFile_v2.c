@@ -110,6 +110,8 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* ExtenderRingSerialNumber = */ 0,
    /* ExtenderRingName = */ "",
    /* FNumber = */ 0.000000F,
+   /* CompressionAlgorithm = */ 0,
+   /* CompressionParameter = */ 0.000000F,
    /* PixelDataPresence = */ 0,
    /* MaxTKDataPresence = */ 0,
    /* LUTNLDataPresence = */ 0,
@@ -362,7 +364,10 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(hdr->ExtenderRingName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ExtenderRingName[64] = '\0';
    memcpy(&hdr->FNumber, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 26; // Skip FREE space
+   numBytes += 3; // Skip FREE space
+   memcpy(&hdr->CompressionAlgorithm, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CompressionParameter, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   numBytes += 18; // Skip FREE space
    memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -506,7 +511,10 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->ExtenderRingSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], hdr->ExtenderRingName, 64); numBytes += 64;
    memcpy(&buffer[numBytes], &hdr->FNumber, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 26); numBytes += 26; // FREE space
+   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
+   memcpy(&buffer[numBytes], &hdr->CompressionAlgorithm, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CompressionParameter, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 18); numBytes += 18; // FREE space
    memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -610,6 +618,8 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("ExtenderRingSerialNumber: %u\n", hdr->ExtenderRingSerialNumber);
    FPGA_PRINTF("ExtenderRingName: %s\n", hdr->ExtenderRingName);
    FPGA_PRINTF("FNumber: " _PCF(3) "\n", _FFMT(hdr->FNumber, 3));
+   FPGA_PRINTF("CompressionAlgorithm: %u enum\n", hdr->CompressionAlgorithm);
+   FPGA_PRINTF("CompressionParameter: " _PCF(3) "\n", _FFMT(hdr->CompressionParameter, 3));
    FPGA_PRINTF("PixelDataPresence: %u 0 / 1\n", hdr->PixelDataPresence);
    FPGA_PRINTF("MaxTKDataPresence: %u 0 / 1\n", hdr->MaxTKDataPresence);
    FPGA_PRINTF("LUTNLDataPresence: %u 0 / 1\n", hdr->LUTNLDataPresence);
