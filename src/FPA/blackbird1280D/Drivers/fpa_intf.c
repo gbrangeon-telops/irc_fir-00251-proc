@@ -669,6 +669,14 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
    AXI4L_write32(OUTPUT_DIGITAL, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);		     
 }
 
+//--------------------------------------------------------------------------
+// Pour activer/désactiver la LED de warning.
+//--------------------------------------------------------------------------
+void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+}
+
 void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // Consulter le document D15F0002 REV3

@@ -291,6 +291,9 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA);
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
 
+// pour activer/désactiver la LED de warning.
+void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable);
+
 // pour imposer une séquence d'initialisation particulière (seulement utilisé pour BB1280)
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
 

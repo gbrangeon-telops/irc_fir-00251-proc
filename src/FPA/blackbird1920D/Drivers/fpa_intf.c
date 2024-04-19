@@ -1242,6 +1242,14 @@ float FPA_ConvertSecondToFrameTimeResolution(float seconds)
     AXI4L_write32(INPUT_LVDS25, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
  }
 
+//--------------------------------------------------------------------------
+// Pour activer/désactiver la LED de warning.
+//--------------------------------------------------------------------------
+void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
+{
+   FPA_INF("This functionality is not supported for this FPA");
+}
+
  /*
   * Lecture du registre du roic à l'adresse 19.
   * Les bits 0 à 3 du registre 19 sont reservés et les bits 4 à 7 contiennent la config du MTX_INTG_LOW.
