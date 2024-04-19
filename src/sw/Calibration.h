@@ -147,6 +147,8 @@ struct calibBlockInfoStruct {
    int32_t DeviceTemperatureSensor; /**< Device Sensor Temperature during calibration */
    float LowCut;                    /**< Low wavelength at mid-height of the IBR integration start. */
    float HighCut;                   /**< High wavelength at mid-height of the IBR integration start. */
+   uint8_t CompressionAlgorithm;    /**< Compression algorithm to be used on data calibrated with this block */
+   float CompressionParameter;      /**< Compression parameter to be used on data calibrated with this block. Parameter usage depends on CompressionAlgorithm */
    uint8_t PixelDataPresence;       /**< Indicates the presence of pixel data in calibration block */
    struct {
       float Offset_Off;             /**< Offset offset */
@@ -207,6 +209,13 @@ struct calibBlockInfoStruct {
    uint8_t LUTRQDataPresence;       /**< Indicates the presence of LUTRQ data in calibration block */
    uint8_t NumberOfLUTRQ;           /**< Number of radiometric quantity lookup tables in calibration block */
    LUTRQInfo_t lutRQData[LUTRQI_MAX_NUM_OF_LUTRQ];
+   uint8_t KPixDataPresence;        /**< Indicates the presence of KPix data in calibration block */
+   struct {
+      uint32_t KPix_Median;         /**< KPix median */
+      uint8_t KPix_Nbits;           /**< KPix data field bit width */
+      uint8_t KPix_EffectiveBitWidth;   /**< KPix data field effective bit width */
+      uint8_t KPix_Signed;          /**< Indicates whether the KPix data field is signed */
+   } KPixData;
 };
 
 /**

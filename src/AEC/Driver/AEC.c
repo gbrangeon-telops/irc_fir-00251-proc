@@ -26,7 +26,6 @@ static volatile bool gAEC_Data_Ready  = false;
 extern XIntc gProcIntc;
 extern t_AEC gAEC_CTRL;
 extern float FWExposureTime[MAX_NUM_FILTER];
-extern calibrationInfo_t calibrationInfo;
 extern t_Trig gTrig;
 
 static uint32_t AEC_TimeStamps_d1[SFW_FILTER_NB];

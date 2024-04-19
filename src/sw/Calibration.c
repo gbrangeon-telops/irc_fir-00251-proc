@@ -797,6 +797,9 @@ void Calibration_SM()
                calibrationInfo.blocks[blockIndex].CalibrationSource = headerData.blockFile.CalibrationSource;
                calibrationInfo.blocks[blockIndex].LowCut = headerData.blockFile.LowCut;
                calibrationInfo.blocks[blockIndex].HighCut = headerData.blockFile.HighCut;
+               calibrationInfo.blocks[blockIndex].CompressionAlgorithm = headerData.blockFile.CompressionAlgorithm;
+               calibrationInfo.blocks[blockIndex].CompressionParameter = headerData.blockFile.CompressionParameter;
+               calibrationInfo.blocks[blockIndex].KPixDataPresence = headerData.blockFile.KPixDataPresence;
 
                CM_INF("Calibration block file header loaded.");
             }
@@ -1440,6 +1443,7 @@ void Calibration_SM()
  */
 static void Calibration_Init()
 {
+   // Set all calibrationInfo to 0 (including all isValid)
    memset(&calibrationInfo, 0, sizeof(calibrationInfo_t));
    TDCStatusSet(WaitingForCalibrationInitMask);
 

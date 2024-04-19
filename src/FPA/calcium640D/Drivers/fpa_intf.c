@@ -19,6 +19,7 @@
 
 #include "fpa_intf.h"
 #include "flashSettings.h"
+#include "Calibration.h"
 #include "utils.h"
 #include "exposure_time_ctrl.h"
 #include <stdbool.h>
@@ -329,9 +330,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // feedback d'intégration
    ptrA->int_fdbk_dly = (uint32_t)(hh.integrationDelay * VHD_CLK_100M_RATE_HZ) + 3;    // on ajoute 3 clk pour le délai entre FPA_INT et CLK_FRM
    
-   // Kpix TODO valeurs du tsbl
-   ptrA->kpix_pgen_value = 0;
-   ptrA->kpix_mean_value = 0;
+   // Kpix (les KPix sont les mêmes pour tous les blocs)
+   // TODO raffiner les exceptions
+   if (calibrationInfo.isValid && calibrationInfo.blocks[0].KPixDataPresence)
+   {
+      ptrA->kpix_pgen_value = 0;
+      ptrA->kpix_mean_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
+   }
+   else
+   {
+      ptrA->kpix_pgen_value = 0;
+      ptrA->kpix_mean_value = 0;
+   }
    
    // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
    if (sw_init_done == 0)
@@ -353,8 +363,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_serdes_lval_num = hh.numFrRows;
    ptrA->fpa_serdes_lval_len = ptrA->width/8;    // 8 pix de large
    
-   // compression logarithmique TODO valeur à préciser
-   ptrA->compr_ratio_fp32 = (float)(16.0F/23.0F);
+   // compression logarithmique (la compression est la même pour tous les blocs)
+   // TODO raffiner les exceptions
+   if (calibrationInfo.isValid && calibrationInfo.blocks[0].CompressionAlgorithm != 0)
+      ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
+   else
+      ptrA->compr_ratio_fp32 = 1.0F;
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    ptrA->cfg_num = ++cfg_num;
