@@ -241,7 +241,8 @@ proc generateReleaseFile {sensorName fpgaSize} {
     puts $releaseLogFile
     # Update release file
     set fh [open $releaseFile w]
-
+    fconfigure $fh -translation binary
+    
     # Skip release information length field
     incr relInfolength 4
     seek $fh $relInfolength start
