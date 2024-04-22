@@ -64,6 +64,8 @@ enum cmStateEnum {
    CMS_LOAD_LUTNL_DATA,                /**< Load LUTNL data */
    CMS_LOAD_LUTRQ_DATA_HEADER,         /**< Load LUTRQ data header */
    CMS_LOAD_LUTRQ_DATA,                /**< Load LUTRQ data */
+   CMS_LOAD_KPIX_DATA_HEADER,          /**< Load KPIX data header */
+   CMS_LOAD_KPIX_DATA,                 /**< Load KPIX data */
    CMS_FINALIZE_BLOCK_FILE,            /**< Finalize block file data */
    CMS_FINALIZE_COLLECTION_FILE,       /**< Finalize collection file data */
    CMS_ERROR                           /**< Executed when an error occurs while loading calibration data */

@@ -456,6 +456,7 @@ void Calibration_SM()
       CalibBlock_MaxTKDataHeader_t maxTKData;
       CalibBlock_LUTNLDataHeader_t lutNLData;
       CalibBlock_LUTRQDataHeader_t lutRQData;
+      CalibBlock_KPixDataHeader_t  kpixData;
    } headerData;
 
    switch (cmCurrentState)
@@ -1149,7 +1150,7 @@ void Calibration_SM()
          }
          else
          {
-            cmCurrentState = CMS_FINALIZE_BLOCK_FILE;
+            cmCurrentState = CMS_LOAD_KPIX_DATA_HEADER;
          }
          break;
 
@@ -1190,9 +1191,92 @@ void Calibration_SM()
                   }
                   else
                   {
-                     cmCurrentState = CMS_FINALIZE_BLOCK_FILE;
+                     cmCurrentState = CMS_LOAD_KPIX_DATA_HEADER;
                      lutRQCount = 0;   // Reset for next block
                   }
+               }
+            }
+         }
+         break;
+
+      case CMS_LOAD_KPIX_DATA_HEADER:
+         if (calibrationInfo.blocks[blockIndex].KPixDataPresence == 1)
+         {
+            byteCount = CalibBlock_ParseKPixDataHeader(fdCalib, &fileInfo, &headerData.kpixData);
+            if (byteCount == 0)
+            {
+               CM_ERR("Failed to parse KPix data header.");
+               cmCurrentState = CMS_ERROR;
+            }
+            else
+            {
+               calibrationInfo.blocks[blockIndex].KPixData.KPix_Median = headerData.kpixData.KPix_Median;
+               calibrationInfo.blocks[blockIndex].KPixData.KPix_Nbits = headerData.kpixData.KPix_Nbits;
+               calibrationInfo.blocks[blockIndex].KPixData.KPix_EffectiveBitWidth = headerData.kpixData.KPix_EffectiveBitWidth;
+               calibrationInfo.blocks[blockIndex].KPixData.KPix_Signed = headerData.kpixData.KPix_Signed;
+
+               dataLength = headerData.kpixData.KPixDataLength;
+               dataCRC16 = headerData.kpixData.KPixDataCRC16;
+               dataOffset = 0;
+               crc16 = 0xFFFF;
+
+               CM_INF("KPIX data header loaded.");
+               cmCurrentState = CMS_LOAD_KPIX_DATA;
+
+#ifdef AR_KPIX_STATUS
+               if (calibrationInfo.blocks[blockIndex].KPixData.KPix_Nbits != (*(uint32_t *)(XPAR_FPA_CTRL_BASEADDR + AR_KPIX_STATUS) & 0x01 ? 13 : 12)) {
+                  CM_ERR("KPIX width mismatch between file and BRAM.");
+                  cmCurrentState = CMS_ERROR;
+               }
+#else
+               CM_ERR("Failed to read KPIX status register, register not present.");
+               cmCurrentState = CMS_ERROR;
+#endif
+            }
+         }
+         else
+         {
+            cmCurrentState = CMS_FINALIZE_BLOCK_FILE;
+         }
+         break;
+
+      case CMS_LOAD_KPIX_DATA:
+         length = MIN(FM_TEMP_FILE_DATA_BUFFER_SIZE, dataLength - dataOffset);
+         length -= length % sizeof(uint32_t);
+
+         byteCount = FM_ReadFileToTmpFileDataBuffer(fdCalib, length);
+         if (byteCount != length)
+         {
+            CM_ERR("Failed to read KPIX data.");
+            cmCurrentState = CMS_ERROR;
+         }
+         else
+         {
+            // Compute CRC-16 value
+            crc16 = CRC16(crc16, tmpFileDataBuffer, length);
+
+#ifdef AW_KPIX_VALUE
+            for(uint32_t i = 0; i < (length / 4); i += 1) {
+               *(uint32_t *)(XPAR_FPA_CTRL_BASEADDR + AW_KPIX_VALUE) = ((uint32_t *)tmpFileDataBuffer)[i];
+            }
+#else
+            CM_ERR("Failed to write KPIX data, BRAM not present.");
+            cmCurrentState = CMS_ERROR;
+            break;
+#endif
+
+            dataOffset += length;
+            if (dataOffset == dataLength)
+            {
+               // Test KPIX data CRC-16
+               if (crc16 != dataCRC16)
+               {
+                  CM_ERR("KPIX data CRC-16 mismatch (computed:0x%04X, file:0x%04X).", crc16, dataCRC16);
+                  cmCurrentState = CMS_ERROR;
+               }
+               else
+               {
+                  cmCurrentState = CMS_FINALIZE_BLOCK_FILE;
                }
             }
          }
