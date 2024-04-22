@@ -68,14 +68,14 @@ architecture rtl of calcium_data_dispatcher is
       );
    end component;
    
-   component fwft_sfifo_w76_d16
+   component fwft_sfifo_w72_d16
       port (
          clk       : in std_logic;
          srst      : in std_logic;
-         din       : in std_logic_vector(75 downto 0);
+         din       : in std_logic_vector(71 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
-         dout      : out std_logic_vector(75 downto 0);
+         dout      : out std_logic_vector(71 downto 0);
          valid     : out std_logic;
          full      : out std_logic;
          overflow  : out std_logic;
@@ -90,10 +90,10 @@ architecture rtl of calcium_data_dispatcher is
    signal fast_hder_sm                 : fast_hder_sm_type;
    signal frame_fsm                    : frame_fsm_type;
    signal sreset                       : std_logic;
-   signal acq_hder_fifo_din            : std_logic_vector(75 downto 0);
+   signal acq_hder_fifo_din            : std_logic_vector(71 downto 0);
    signal acq_hder_fifo_wr             : std_logic;
    signal acq_hder_fifo_rd             : std_logic;
-   signal acq_hder_fifo_dout           : std_logic_vector(75 downto 0);
+   signal acq_hder_fifo_dout           : std_logic_vector(71 downto 0);
    signal acq_hder_fifo_dval           : std_logic;
    signal acq_hder_fifo_ovfl           : std_logic;
    signal readout_i                    : std_logic;
@@ -110,7 +110,7 @@ architecture rtl of calcium_data_dispatcher is
    signal int_indx_i                   : std_logic_vector(7 downto 0);
    signal pause_cnt                    : unsigned(7 downto 0);
    signal acq_data                     : std_logic;
-   signal fpa_int_last                 : std_logic;
+   signal acq_int_last                 : std_logic;
    
    
 begin
@@ -134,7 +134,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour acq header info
    --------------------------------------------------
-   U2 : fwft_sfifo_w76_d16  
+   U2 : fwft_sfifo_w72_d16  
    port map (
       srst => sreset,
       clk => CLK,
@@ -161,16 +161,16 @@ begin
             acq_hder <= '0';
             acq_data <= '0';
             readout_i <= '0';
-            fpa_int_last <= '0';
+            acq_int_last <= '0';
             
          else
             
-            fpa_int_last <= FPA_INT;
+            acq_int_last <= ACQ_INT;
             
-            -- On écrit dans le fifo les infos du header et le genre d'intégration (acq ou non).
-            -- Donc toutes les images ont une valeur associée dans le fifo.
-            acq_hder_fifo_din <= resize(ACQ_INT & INT_INDX & INT_TIME & FRAME_ID, acq_hder_fifo_din'length);
-            acq_hder_fifo_wr <= not fpa_int_last and FPA_INT;
+            -- On écrit dans le fifo les infos du header.
+            -- Seules les images acq int ont une valeur associée dans le fifo.
+            acq_hder_fifo_din <= resize(INT_INDX & INT_TIME & FRAME_ID, acq_hder_fifo_din'length);
+            acq_hder_fifo_wr <= not acq_int_last and ACQ_INT;
             
             -- generation de acq_hder et readout_i
             case frame_fsm is 
@@ -183,12 +183,12 @@ begin
                   -- acq_hder est utilisé par fast_hder_sm pour envoyer le header, donc on 
                   -- lance l'écriture du header dès qu'on sait que la prochaine image reçue
                   -- correspond à une acq int.
-                  acq_hder <= acq_hder_fifo_dout(72);
+                  acq_hder <= acq_hder_fifo_dval;
                   int_indx_i <= acq_hder_fifo_dout(71 downto 64);
                   int_time_i <= unsigned(acq_hder_fifo_dout(63 downto 32));
                   frame_id_i <= acq_hder_fifo_dout(31 downto 0);
                   if RX_QUAD_DATA.FVAL = '1' then     -- en quittant idle, frame_id_i et acq_hder sont implicitement latchés, donc pas besoin de latchs explicites
-                     acq_hder_fifo_rd <= acq_hder_fifo_dval; -- mise à jour de la sortie du fwft pour le prochain frame
+                     acq_hder_fifo_rd <= acq_hder_fifo_dval; -- mise à jour de la sortie du fwft pour la prochaine acq int
                      readout_i <= '1';                 -- signal de readout, à sortir même en mode xtra_trig
                      acq_data <= acq_hder;            -- les données sortiront si elles correspondent à une acq int
                      frame_fsm <= wait_fval_st;
