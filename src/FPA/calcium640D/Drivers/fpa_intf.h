@@ -107,6 +107,11 @@
 
 #define FPA_PIX_THROUGHPUT_PEAK        (CALCIUM_TX_OUTPUTS * CALCIUM_CLK_DDR_HZ * 2.0F / CALCIUM_BITS_PER_PIX)  // [pix/sec]  8 canaux à 400MHz DDR à 24b par pixel
 
+// adresse d'écriture des valeurs de kpix dans la BRAM
+#define AW_KPIX_VALUE                              0xB00
+// adresse de lecture du status d'écriture de kpix dans la BRAM
+#define AR_KPIX_STATUS                             0x000
+
 
 // structure de config envoyée au vhd
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF

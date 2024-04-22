@@ -66,9 +66,6 @@
  // adresse d'écriture du registre du reset du module FPA
 #define AW_CTRLED_RESET                            0xAF0
 
- // adresse d'écriture des valeurs de kpix dans la BRAM
-#define AW_KPIX_VALUE                              0xB00
-
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
 #define TELOPS_DIAG_CNST                           0xD1     // mode diag constant (patron de test generé par la carte d'acquisition : tous les pixels à la même valeur)
 #define TELOPS_DIAG_DEGR                           0xD2     // mode diag dégradé linéaire(patron de test dégradé linéairement et généré par la carte d'acquisition).Requis en production
