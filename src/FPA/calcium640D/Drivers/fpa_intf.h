@@ -112,6 +112,14 @@
 // adresse de lecture du status d'écriture de kpix dans la BRAM
 #define AR_KPIX_STATUS                             0x000
 
+typedef struct
+{
+   uint32_t size    : 1;
+   uint32_t done    : 1;
+   uint32_t error   : 1;
+   uint32_t         : 5;
+   uint32_t address : 24;
+} t_KPixStatus;
 
 // structure de config envoyée au vhd
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF

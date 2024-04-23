@@ -1224,7 +1224,9 @@ void Calibration_SM()
                cmCurrentState = CMS_LOAD_KPIX_DATA;
 
 #ifdef AR_KPIX_STATUS
-               if (calibrationInfo.blocks[blockIndex].KPixData.KPix_Nbits != (*(uint32_t *)(XPAR_FPA_CTRL_BASEADDR + AR_KPIX_STATUS) & 0x01 ? 13 : 12)) {
+               t_KPixStatus *kpixStatus = (t_KPixStatus *)(XPAR_FPA_CTRL_BASEADDR + AR_KPIX_STATUS);
+
+               if (calibrationInfo.blocks[blockIndex].KPixData.KPix_EffectiveBitWidth != (kpixStatus->size ? 13 : 12)) {
                   CM_ERR("KPIX width mismatch between file and BRAM.");
                   cmCurrentState = CMS_ERROR;
                }
