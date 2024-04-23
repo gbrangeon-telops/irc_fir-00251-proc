@@ -39,7 +39,8 @@ source $script_dir/Base_project.tcl
 set_property FILE_TYPE {VHDL 2008} \
    [get_files $root_dir/src/FPA/calcium_proxy/HDL/kpix_bramctrl.vhd] \
    [get_files $aldec_dir/calcium_data_ctrl.vhd] \
-   [get_files $aldec_dir/nbits_receiver_nch.vhd]
+   [get_files $aldec_dir/nbits_receiver_nch.vhd] \
+   [get_files $aldec_dir/fir_00251_proc_calcium640D.vhd]
 
 #Set top level design
 set_property top $top_lvl [current_fileset]
