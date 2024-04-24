@@ -186,9 +186,6 @@
 #define ELCORR_MODE_FREE_WHEELING_CORR                9
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19
 
-// Déphasage de ligne
-#define ISC0804_DEFAULT_REGF             15
-
 #define ISC0804_BITSTREAM_FG   53696343  // bitstream ROIC standard de ForrestGump pour M1k
 #define ISC0804_BITSTREAM_FAST 322131831 // bitstream ROIC avec meilleur slew rate (M2k UD)
 
@@ -394,6 +391,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaADCQuad2FinePhase;                // ajustement fin phase adc_clk du quad2 provenant des FS
    extern uint16_t gFpaADCQuad3FinePhase;                // ajustement fin phase adc_clk du quad3 provenant des FS
    extern uint16_t gFpaADCQuad4FinePhase;                // ajustement fin phase adc_clk du quad4 provenant des FS
+   extern uint8_t  gFpaActivePixelDelay;                 // ajustement de délai de début de ligne
    uint32_t elcorr_reg;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
@@ -579,9 +577,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0){
-      gFpaDebugRegF = ISC0804_DEFAULT_REGF;    //
-      if (ptrA->pix_samp_num_per_ch > 1)
-         gFpaDebugRegF = ISC0804_DEFAULT_REGF;
+      gFpaDebugRegF = gFpaActivePixelDelay;
    }   
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
      
@@ -595,7 +591,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDebugRegH = gFpaADCQuad2CoarsePhase;
       gFpaDebugRegJ = gFpaADCQuad3CoarsePhase;
       gFpaDebugRegL = gFpaADCQuad4CoarsePhase;
-   }       
+   }
    ptrA->adc_clk_pipe_sel1 = (uint32_t)gFpaDebugRegC;
    ptrA->adc_clk_pipe_sel2 = (uint32_t)gFpaDebugRegH;
    ptrA->adc_clk_pipe_sel3 = (uint32_t)gFpaDebugRegJ;
@@ -612,7 +608,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->adc_clk_source_phase2 = (uint32_t)gFpaDebugRegI;
    ptrA->adc_clk_source_phase3 = (uint32_t)gFpaDebugRegK;
    ptrA->adc_clk_source_phase4 = (uint32_t)gFpaDebugRegM;
-         
+
    // autres
    ptrA->lsydel_mclk  = (uint32_t)(hh.lsydel_mclk - 1.0F);  // ajustement tenant compte des delais de chaine vhd   
    
