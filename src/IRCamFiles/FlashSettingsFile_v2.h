@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.15.0
+ * Generated from the flash settings file structure definition XLS file version 2.16.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      15
+#define FLASHSETTINGS_FILEMINORVERSION_V2      16
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -113,6 +113,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float ExternalFanSpeedSetpoint;   /**< Default external fan speed setpoint. */
    uint8_t BPDetectionEnabled;   /**< Indicates whether the bad pixel detection is enabled. */
    uint16_t BPNumSamples;   /**< Number of images to acquire. */
+   uint8_t FpaActivePixelDelay;   /**< Delay for the beginning of active pixels in a line */
    float BPFlickerThreshold;   /**< Threshold for tagging a pixel as flicker  (abs(T) > threshold). */
    float BPNoiseThreshold;   /**< Threshold for tagging a pixel as flicker (T > threshold). */
    uint32_t BPDuration;   /**< Duration of the acquisition. */

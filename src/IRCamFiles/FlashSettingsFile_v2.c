@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.15.0
+ * Generated from the flash settings file structure definition XLS file version 2.16.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -107,6 +107,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ExternalFanSpeedSetpoint = */ 50.000000F,
    /* BPDetectionEnabled = */ 0,
    /* BPNumSamples = */ 500,
+   /* FpaActivePixelDelay = */ 0,
    /* BPFlickerThreshold = */  0.346486F,
    /* BPNoiseThreshold = */ 1.333147F,
    /* BPDuration = */ 60000,
@@ -340,7 +341,7 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ExternalFanSpeedSetpoint, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->BPDetectionEnabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->BPNumSamples, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-      numBytes += 1; // Skip FREE space
+      memcpy(&hdr->FpaActivePixelDelay, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->BPFlickerThreshold, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->BPNoiseThreshold, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->BPDuration, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
@@ -608,7 +609,7 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ExternalFanSpeedSetpoint, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->BPDetectionEnabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->BPNumSamples, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-      memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+      memcpy(&buffer[numBytes], &hdr->FpaActivePixelDelay, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->BPFlickerThreshold, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->BPNoiseThreshold, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->BPDuration, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
@@ -828,6 +829,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ExternalFanSpeedSetpoint: " _PCF(3) " %%\n", _FFMT(hdr->ExternalFanSpeedSetpoint, 3));
    FPGA_PRINTF("BPDetectionEnabled: %u\n", hdr->BPDetectionEnabled);
    FPGA_PRINTF("BPNumSamples: %u frames\n", hdr->BPNumSamples);
+   FPGA_PRINTF("FpaActivePixelDelay: %u counts\n", hdr->FpaActivePixelDelay);
    FPGA_PRINTF("BPFlickerThreshold: " _PCF(3) "\n", _FFMT(hdr->BPFlickerThreshold, 3));
    FPGA_PRINTF("BPNoiseThreshold: " _PCF(3) "\n", _FFMT(hdr->BPNoiseThreshold, 3));
    FPGA_PRINTF("BPDuration: %u ms\n", hdr->BPDuration);
@@ -888,8 +890,8 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("LensFOV5DeltaFocusPositionMax: %d counts\n", hdr->LensFOV5DeltaFocusPositionMax);
    FPGA_PRINTF("AcquisitionFrameRateMaxDivider: " _PCF(3) "\n", _FFMT(hdr->AcquisitionFrameRateMaxDivider, 3));
    FPGA_PRINTF("ExposureTimeOffset: %d e-8 s\n", hdr->ExposureTimeOffset);
-   FPGA_PRINTF("FWReferenceTemperatureGain: " _PCF(3) " °C/RPM\n", _FFMT(hdr->FWReferenceTemperatureGain, 3));
-   FPGA_PRINTF("FWReferenceTemperatureOffset: " _PCF(3) " °C\n", _FFMT(hdr->FWReferenceTemperatureOffset, 3));
+   FPGA_PRINTF("FWReferenceTemperatureGain: " _PCF(3) " Â°C/RPM\n", _FFMT(hdr->FWReferenceTemperatureGain, 3));
+   FPGA_PRINTF("FWReferenceTemperatureOffset: " _PCF(3) " Â°C\n", _FFMT(hdr->FWReferenceTemperatureOffset, 3));
    FPGA_PRINTF("ExposureTimeMin: " _PCF(3) " us\n", _FFMT(hdr->ExposureTimeMin, 3));
    FPGA_PRINTF("ClConfiguration: %u\n", hdr->ClConfiguration);
    FPGA_PRINTF("SaveConfigurationEnabled: %u\n", hdr->SaveConfigurationEnabled);

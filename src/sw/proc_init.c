@@ -110,6 +110,7 @@ uint16_t gFpaADCQuad1FinePhase;
 uint16_t gFpaADCQuad2FinePhase;
 uint16_t gFpaADCQuad3FinePhase;
 uint16_t gFpaADCQuad4FinePhase;
+uint8_t  gFpaActivePixelDelay;
 bool gFpaLovhFlag = false;
 uint8_t gFpaSubWindowMode = 1;
 uint16_t gFpaVa1p8_mV = 0;

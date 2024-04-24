@@ -244,6 +244,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern uint16_t gFpaADCQuad2FinePhase;
    extern uint16_t gFpaADCQuad3FinePhase;
    extern uint16_t gFpaADCQuad4FinePhase;
+   extern uint8_t  gFpaActivePixelDelay;
    extern bool gDisableFilterWheel;
    extern flashSettings_t flashSettings_default;
    extern t_bufferManager gBufManager;
@@ -409,6 +410,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gFpaADCQuad2FinePhase =  p_flashSettings->ADCQuad2FinePhase;
    gFpaADCQuad3FinePhase =  p_flashSettings->ADCQuad3FinePhase;
    gFpaADCQuad4FinePhase =  p_flashSettings->ADCQuad4FinePhase;
+   gFpaActivePixelDelay = p_flashSettings->FpaActivePixelDelay;
 
    // Update external fan speed setpoint
    gcRegsData.ExternalFanSpeedSetpoint = p_flashSettings->ExternalFanSpeedSetpoint;
