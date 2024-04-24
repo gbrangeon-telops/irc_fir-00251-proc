@@ -83,7 +83,7 @@ architecture rtl of calcium_data_dispatcher is
       );
    end component;
    
-   type frame_fsm_type is (idle, wait_fval_st);
+   type frame_fsm_type is (idle, img_start_st, img_end_st);
    type fast_hder_sm_type is (idle, exp_info_dval_st, send_hder_st, wait_acq_hder_st);
    
    signal exp_dval_pipe                : std_logic_vector(2 downto 0) := (others => '0');
@@ -167,10 +167,24 @@ begin
             
             acq_int_last <= ACQ_INT;
             
-            -- On écrit dans le fifo les infos du header.
+            -- Au début de l'intégration, on écrit dans le fifo les infos du header.
             -- Seules les images acq int ont une valeur associée dans le fifo.
             acq_hder_fifo_din <= resize(INT_INDX & INT_TIME & FRAME_ID, acq_hder_fifo_din'length);
             acq_hder_fifo_wr <= not acq_int_last and ACQ_INT;
+            
+            -- Dès que la sortie du fifo est valide on latche les infos du header.
+            -- acq_hder est utilisé par fast_hder_sm pour envoyer le header, donc on 
+            -- lance l'écriture du header dès qu'on sait que la prochaine image reçue
+            -- correspond à une acq int.
+            -- acq_data est utilisé pour masquer la sortie des pixels quand l'image
+            -- n'est pas une acq int.
+            if acq_hder_fifo_dval = '1' then
+               int_indx_i <= acq_hder_fifo_dout(71 downto 64);
+               int_time_i <= unsigned(acq_hder_fifo_dout(63 downto 32));
+               frame_id_i <= acq_hder_fifo_dout(31 downto 0);
+               acq_hder <= '1';
+               acq_data <= '1';
+            end if;
             
             -- generation de acq_hder et readout_i
             case frame_fsm is 
@@ -178,28 +192,24 @@ begin
                when idle =>
                   acq_hder_fifo_rd <= '0';
                   readout_i <= '0';
-                  acq_data <= '0';
-                  -- On latche la sortie du fifo
-                  -- acq_hder est utilisé par fast_hder_sm pour envoyer le header, donc on 
-                  -- lance l'écriture du header dès qu'on sait que la prochaine image reçue
-                  -- correspond à une acq int.
-                  acq_hder <= acq_hder_fifo_dval;
-                  int_indx_i <= acq_hder_fifo_dout(71 downto 64);
-                  int_time_i <= unsigned(acq_hder_fifo_dout(63 downto 32));
-                  frame_id_i <= acq_hder_fifo_dout(31 downto 0);
-                  if RX_QUAD_DATA.FVAL = '1' then     -- en quittant idle, frame_id_i et acq_hder sont implicitement latchés, donc pas besoin de latchs explicites
+                  -- On attend le début du frame
+                  if RX_QUAD_DATA.FVAL = '1' then
                      acq_hder_fifo_rd <= acq_hder_fifo_dval; -- mise à jour de la sortie du fwft pour la prochaine acq int
                      readout_i <= '1';                 -- signal de readout, à sortir même en mode xtra_trig
-                     acq_data <= acq_hder;            -- les données sortiront si elles correspondent à une acq int
-                     frame_fsm <= wait_fval_st;
+                     frame_fsm <= img_start_st;
                   end if;
                
-               when wait_fval_st =>
+               when img_start_st =>
                   acq_hder_fifo_rd <= '0';
-                  -- On attend la fin du frame pour redescendre les signaux de acq_hder, acq_data et de readout
+                  -- acq_hder redescend à 0 dès que le frame correspondant à l'acq int a commencé.
+                  -- Comme ça on est prêt à recevoir la prochaine acq int avant la fin du frame (mode IWR). 
+                  acq_hder <= '0';
+                  frame_fsm <= img_end_st;
+               
+               when img_end_st =>
+                  -- On attend la fin du frame pour redescendre les signaux de acq_data et de readout
                   if RX_QUAD_DATA.FVAL = '0' then
                      readout_i <= '0';
-                     acq_hder <= '0';
                      acq_data <= '0';
                      frame_fsm <= idle;
                   end if;
