@@ -160,11 +160,13 @@ begin
             end loop;
             
             for i in DATA_WIDTH downto 1 loop
+                wait for BIT_CLK_PERIOD/2;
+            
                 for j in 1 to 8 loop
                     bit_dout_i(j) <= octo_serial_i(j)(i);
                 end loop;
                 
-                wait for BIT_CLK_PERIOD;
+                wait for BIT_CLK_PERIOD/2;
             end loop;
         end loop;
     end process;

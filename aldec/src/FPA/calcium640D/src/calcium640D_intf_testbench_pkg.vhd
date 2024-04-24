@@ -20,8 +20,10 @@ use work.fpa_define.all;
 
 package calcium640D_intf_testbench_pkg is
    
-   constant USER_CFG_VECTOR_SIZE             : natural := 36;  -- number of variables to write in the USER_CFG
-   constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;
+   constant USER_CFG_VECTOR_SIZE             : natural := 36;        -- number of variables to write in the USER_CFG
+   constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;    -- ClkCore is 10 MHz
+   constant C_FPA_PIXCLK_RATE_KHZ            : integer := 33_333;    -- Pixel clk is 400 MHz DDR / 24 bits per pixel
+   constant C_FPA_EXPOSURE_TIME_MIN          : integer := 100;       -- 1us in clk_100M
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
    
@@ -74,7 +76,7 @@ package body calcium640D_intf_testbench_pkg is
       
       -- Working variables
       variable int_end_to_trig_start_delay : integer;    -- [in ClkCore]
-      variable readout_end_to_trig_start_delay : integer;   -- [in ClkCore]
+      variable diag_readout_time : integer;              -- [in Pixel clk]
       variable s_fpa_int_time_offset : signed(31 downto 0);
       
    begin
@@ -83,22 +85,21 @@ package body calcium640D_intf_testbench_pkg is
       --                    delay  = (bPixRstHCnt + 1) + (bPixXferCnt + 1) + 2*(bPixOHCnt + 1) + (bPixOH2Cnt + 1) + (bPixRstBECnt + 1) + (bRODelayCnt + 1) [in ClkCore]
       int_end_to_trig_start_delay := (0 + 1)           + (0 + 1)           + 2*(0 + 1)         + (0 + 1)          + (0 + 1)            + (0 + 1);
       
-      -- Minimum time to wait for readout_end_to_trig_start_delay is in ITR
-      --                        delay  = (bPixRstBECnt + 1) [in ClkCore]
-      readout_end_to_trig_start_delay := (0 + 1);
+      -- Readout time of the diag pattern gen in FPA Dummy [in Pixel clk]
+      diag_readout_time := (user_xsize/8 + 8) * user_ysize;
       
       comn_fpa_diag_mode                     := (others => diag_mode);
       comn_fpa_diag_type                     := resize(unsigned(TELOPS_DIAG_DEGR), 32);
       comn_fpa_pwr_on                        := (others => '1');
       comn_fpa_acq_trig_mode                 := resize(unsigned(MODE_INT_END_TO_TRIG_START), 32);  -- to support IWR
       comn_fpa_acq_trig_ctrl_dly             := to_unsigned(integer(real(int_end_to_trig_start_delay) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_INTCLK_RATE_KHZ)), 32);
-      comn_fpa_xtra_trig_mode                := resize(unsigned(MODE_READOUT_END_TO_TRIG_START), 32);    -- use ITR for PROG and XTRA trigs
-      comn_fpa_xtra_trig_ctrl_dly            := to_unsigned(integer(real(readout_end_to_trig_start_delay) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_INTCLK_RATE_KHZ)), 32);
-      comn_fpa_trig_ctrl_timeout_dly         := comn_fpa_acq_trig_ctrl_dly;
+      comn_fpa_xtra_trig_mode                := resize(unsigned(MODE_TRIG_START_TO_TRIG_START), 32);    -- use ITR for PROG and XTRA trigs
+      comn_fpa_xtra_trig_ctrl_dly            := to_unsigned(C_FPA_EXPOSURE_TIME_MIN + integer(real(diag_readout_time) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_PIXCLK_RATE_KHZ)), 32);
+      comn_fpa_trig_ctrl_timeout_dly         := comn_fpa_xtra_trig_ctrl_dly;
       comn_fpa_stretch_acq_trig              := (others => '0');
-      comn_fpa_intf_data_source              := (others => DATA_SOURCE_OUTSIDE_FPGA);
-      comn_fpa_xtra_trig_int_time            := to_unsigned(100, 32);   -- 1us
-      comn_fpa_prog_trig_int_time            := to_unsigned(100, 32);   -- 1us
+      comn_fpa_intf_data_source              := (others => DATA_SOURCE_INSIDE_FPGA);
+      comn_fpa_xtra_trig_int_time            := to_unsigned(C_FPA_EXPOSURE_TIME_MIN, 32);
+      comn_fpa_prog_trig_int_time            := to_unsigned(C_FPA_EXPOSURE_TIME_MIN, 32);
       comn_intclk_to_clk100_conv_numerator   := to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(C_FPA_INTCLK_RATE_KHZ)), 32);
       comn_clk100_to_intclk_conv_numerator   := to_unsigned(integer(real(C_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), 32);
       
@@ -126,7 +127,7 @@ package body calcium640D_intf_testbench_pkg is
       kpix_mean_value   := to_unsigned(0, 32);
       
       use_ext_pixqnb          := (others => '1');
-      clk_frm_pulse_width     := to_unsigned(50, 32);
+      clk_frm_pulse_width     := to_unsigned(0, 32);    -- CLK_FRM is a copy of FPA_INT 
       
       fpa_serdes_lval_num     := to_unsigned(user_ysize, 32);
       fpa_serdes_lval_len     := to_unsigned(user_xsize/8, 32);

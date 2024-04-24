@@ -55,11 +55,11 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_200M_PERIOD         : time :=  5 ns;
    constant CLK_PIX_PERIOD          : time := 30 ns;
-   constant ACQ_TRIG_PERIOD         : time := 4 ms;
+   constant ACQ_TRIG_PERIOD         : time := 105 us;
    
-   constant DIAG_MODE_CFG1          : std_logic := '1';
-   constant XSIZE_CFG1              : natural := 64;
-   constant YSIZE_CFG1              : natural := 2;
+   constant DIAG_MODE_CFG1          : std_logic := '0';
+   constant XSIZE_CFG1              : natural := 640;
+   constant YSIZE_CFG1              : natural := 4;
    signal user_cfg_vector1          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG1, XSIZE_CFG1, YSIZE_CFG1, 1);
    
    constant DIAG_MODE_CFG2          : std_logic := '1';
