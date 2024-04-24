@@ -90,6 +90,7 @@
    #define FPA_PIX_THROUGHPUT_PEAK        340E+6F // force camera link full @ 85MHz for startup 4DDR only
 #else
    #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR)
+#endif
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
