@@ -93,9 +93,9 @@ package body calcium640D_intf_testbench_pkg is
       comn_fpa_pwr_on                        := (others => '1');
       comn_fpa_acq_trig_mode                 := resize(unsigned(MODE_INT_END_TO_TRIG_START), 32);  -- to support IWR
       comn_fpa_acq_trig_ctrl_dly             := to_unsigned(integer(real(int_end_to_trig_start_delay) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_INTCLK_RATE_KHZ)), 32);
-      comn_fpa_xtra_trig_mode                := resize(unsigned(MODE_TRIG_START_TO_TRIG_START), 32);    -- use ITR for PROG and XTRA trigs
-      comn_fpa_xtra_trig_ctrl_dly            := to_unsigned(C_FPA_EXPOSURE_TIME_MIN + integer(real(diag_readout_time) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_PIXCLK_RATE_KHZ)), 32);
-      comn_fpa_trig_ctrl_timeout_dly         := comn_fpa_xtra_trig_ctrl_dly;
+      comn_fpa_xtra_trig_mode                := resize(unsigned(MODE_INT_END_TO_TRIG_START), 32);    -- use ITR for PROG and XTRA trigs
+      comn_fpa_xtra_trig_ctrl_dly            := to_unsigned(integer(real(diag_readout_time) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_PIXCLK_RATE_KHZ)), 32);
+      comn_fpa_trig_ctrl_timeout_dly         := to_unsigned(C_FPA_EXPOSURE_TIME_MIN + integer(real(diag_readout_time) * real(DEFINE_FPA_100M_CLK_RATE_KHZ) / real(C_FPA_PIXCLK_RATE_KHZ)), 32);
       comn_fpa_stretch_acq_trig              := (others => '0');
       comn_fpa_intf_data_source              := (others => DATA_SOURCE_INSIDE_FPGA);
       comn_fpa_xtra_trig_int_time            := to_unsigned(C_FPA_EXPOSURE_TIME_MIN, 32);
@@ -114,7 +114,7 @@ package body calcium640D_intf_testbench_pkg is
       
       diag_x_to_readout_start_dly      := to_unsigned(0, 32);
       diag_fval_re_to_dval_re_dly      := to_unsigned(0, 32);
-      diag_lval_pause_dly              := to_unsigned(1, 32);
+      diag_lval_pause_dly              := to_unsigned(6, 32);  -- min value
       diag_x_to_next_fsync_re_dly      := to_unsigned(0, 32);
       diag_xsize_div_per_pixel_num     := to_unsigned(user_xsize/4, 32);
       

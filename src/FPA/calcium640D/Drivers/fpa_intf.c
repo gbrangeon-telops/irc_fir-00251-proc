@@ -133,15 +133,20 @@ typedef struct s_ProximCfgConfig ProximCfg_t;
 // structure interne pour les parametres du calcium
 struct calcium_param_s
 {
+   uint32_t diag_x_to_readout_start_dly;
+   uint32_t diag_fval_re_to_dval_re_dly;
+   uint32_t diag_lval_pause_dly;
+   uint32_t diag_x_to_next_fsync_re_dly;
+   uint32_t diag_xsize_div_per_pixel_num;
    float integrationDelay;
-   float ADCConvTime;
-   float serializerTxTime;
+   float itrReadoutDelay;
+   float iwrReadoutDelay;
    float readoutRowTime;
    uint16_t numFrRows;
    float readoutTime;
-   float readoutDelay;
    float frameTime;
    float frameRateMax;
+   float itr_int_end_to_trig_start_dly;
    float int_end_to_trig_start_dly;
 };
 typedef struct calcium_param_s calcium_param_t;
@@ -273,10 +278,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_acq_trig_mode          = (uint32_t)MODE_INT_END_TO_TRIG_START;   // même mode pour ITR/IWR mais le délai est calculé différemment
+   // On utilise toujours MODE_INT_END_TO_TRIG_START pour s'affranchir du ET variable.
+   // En ACQ trig le délai est calculé en fonction du mode Diag et du mode ITR/IWR.
+   // En XTRA et PROG trig le délai est calculé en fonction du mode Diag mais on force le mode ITR pour garantir un délai sécuritaire pendant les PROG trig.
+   // Le timeout commence avec le trig donc il doit être d'une durée d'un frame complet avant de permettre le prochain trig.
+   ptrA->fpa_acq_trig_mode          = (uint32_t)MODE_INT_END_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)(hh.int_end_to_trig_start_dly * VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_xtra_trig_mode         = ptrA->fpa_acq_trig_mode;
-   ptrA->fpa_xtra_trig_ctrl_dly     = ptrA->fpa_acq_trig_ctrl_dly;
+   ptrA->fpa_xtra_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
+   ptrA->fpa_xtra_trig_ctrl_dly     = (uint32_t)(hh.itr_int_end_to_trig_start_dly * VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly  = (uint32_t)(hh.frameTime * VHD_CLK_100M_RATE_HZ);
    
    // Élargit le pulse de trig
@@ -314,12 +323,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->active_line_end_num = ptrA->active_line_start_num + ptrA->height - 1;
    ptrA->active_line_width_div4 = ptrA->width/4;    // 4 pix de large
    
-   // diag (délais les plus courts)
-   ptrA->diag_x_to_readout_start_dly = 0;
-   ptrA->diag_fval_re_to_dval_re_dly = 0;
-   ptrA->diag_lval_pause_dly = 1;
-   ptrA->diag_x_to_next_fsync_re_dly = 0;
-   ptrA->diag_xsize_div_per_pixel_num = ptrA->width/4;    // 4 pix de large
+   // diag
+   ptrA->diag_x_to_readout_start_dly = hh.diag_x_to_readout_start_dly;
+   ptrA->diag_fval_re_to_dval_re_dly = hh.diag_fval_re_to_dval_re_dly;
+   ptrA->diag_lval_pause_dly = hh.diag_lval_pause_dly;
+   ptrA->diag_x_to_next_fsync_re_dly = hh.diag_x_to_next_fsync_re_dly;
+   ptrA->diag_xsize_div_per_pixel_num = hh.diag_xsize_div_per_pixel_num;
    
    // offset du signal d'intégration
    ptrA->fpa_int_time_offset = gFpaExposureTimeOffset;   // aucune conversion puisqu'il est appliqué directement sur la commande venant du module Exp_Ctrl
@@ -337,7 +346,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    else
    {
       ptrA->kpix_pgen_value = 0;
-      ptrA->kpix_mean_value = 0;
+      ptrA->kpix_mean_value = 32768;
    }
    
    // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
@@ -487,62 +496,81 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
    // Make sure exposure time is rounded to a factor of ClkCore
    float exposureTime = roundf(exposureTime_usec/1e6F * CALCIUM_CLK_CORE_HZ) / CALCIUM_CLK_CORE_HZ;
    
+   // Diag config with shortest possible delays
+   ptrH->diag_x_to_readout_start_dly = 0;
+   ptrH->diag_fval_re_to_dval_re_dly = 0;
+   ptrH->diag_lval_pause_dly = 6;         // min possible value
+   ptrH->diag_x_to_next_fsync_re_dly = 0;
+   ptrH->diag_xsize_div_per_pixel_num = pGCRegs->Width/4;   // 4 pix wide
+
    // Integration signal transmitted by ClkFrm has to be latched to ClkCore
    // domain. Therefore, the delay (and uncertainty) of the integration start
    // is one clock cycle of ClkCore.
    ptrH->integrationDelay = 1.0F / CALCIUM_CLK_CORE_HZ;
+
+   // Readout delay.
+   // - In ITR mode, the readout delay is the overhead time. The back-end reset is done between the
+   //       readout end and the integration start so we have to add it to the readout delay.
+   // - In IWR mode, the readout delay is the sum of all delays. The overhead time is also multiplied by 2.
+   ptrH->itrReadoutDelay = ((CALCIUM_bPixOHCnt + 1.0F) + (CALCIUM_bPixRstBECnt + 1.0F)) / CALCIUM_CLK_CORE_HZ;
+   ptrH->iwrReadoutDelay =
+      ((CALCIUM_bPixRstHCnt + 1.0F) + (CALCIUM_bPixXferCnt + 1.0F) + 2.0F*(CALCIUM_bPixOHCnt + 1.0F) +
+      (CALCIUM_bPixOH2Cnt + 1.0F) + (CALCIUM_bPixRstBECnt + 1.0F) + (CALCIUM_bRODelayCnt + 1.0F)) / CALCIUM_CLK_CORE_HZ;
    
    // Residue ADC conversion time is 130 ClkCol cycles and ADC reset time.
-   ptrH->ADCConvTime = (130.0F + CALCIUM_bADRstCnt) / CALCIUM_CLK_COL_HZ;
+   float ADCConvTime = (130.0F + CALCIUM_bADRstCnt) / CALCIUM_CLK_COL_HZ;
    
    // Serializer transmission time.
    // 1st line is the transmission of a row and is done on both edges of ClkDDR.
    // 2nd line is an overhead time on ClkCol.
-   ptrH->serializerTxTime = 8.0F * (pGCRegs->Width/8.0F + 4.0F) * CALCIUM_BITS_PER_PIX / (2.0F * CALCIUM_CLK_DDR_HZ * CALCIUM_TX_OUTPUTS)
+   float serializerTxTime = 8.0F * (pGCRegs->Width/8.0F + 4.0F) * CALCIUM_BITS_PER_PIX / (2.0F * CALCIUM_CLK_DDR_HZ * CALCIUM_TX_OUTPUTS)
       + 6.0F / CALCIUM_CLK_COL_HZ;
    
    // Readout row time must be longer than the ADC conversion time and the serializer transmission time.
    // We use floor() + 1 to make sure calculated time is longer and not equal to the other delays.
-   ptrH->readoutRowTime = (floorf(MAX(ptrH->ADCConvTime, ptrH->serializerTxTime) * CALCIUM_CLK_COL_HZ) + 1.0F) / CALCIUM_CLK_COL_HZ;
+   ptrH->readoutRowTime = (floorf(MAX(ADCConvTime, serializerTxTime) * CALCIUM_CLK_COL_HZ) + 1.0F) / CALCIUM_CLK_COL_HZ;
    
-   // Frame has image rows, 2 overhead rows and 2 test rows.
+   // Frame has image rows, 2 overhead rows and 2 test rows if enabled.
    ptrH->numFrRows = pGCRegs->Height + 2 + 2*CALCIUM_bTestRowsEn;
    
    // Total readout time.
    // 2 overhead rows are generated but not transmitted.
    // Readout begins on the next ClkRow so there is a 1 ClkRow jitter to add.
    ptrH->readoutTime = (ptrH->numFrRows + 2.0F + 1.0F) * ptrH->readoutRowTime;
-   
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+
+   // Diag mode
+   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade ||
+       pGCRegs->TestImageSelector == TIS_TelopsDynamicShade ||
+       pGCRegs->TestImageSelector == TIS_TelopsConstantValue1)
    {
-      // In ITR mode, the readout delay is the overhead time. The back-end reset is done between the readout end and
-      // the integration start so we have to add it to the readout delay.
-      ptrH->readoutDelay = ((CALCIUM_bPixOHCnt + 1.0F) + (CALCIUM_bPixRstBECnt + 1.0F)) / CALCIUM_CLK_CORE_HZ;
-      
-      // In ITR mode, we add the delays, the readout and the integration.
-      ptrH->frameTime = ptrH->integrationDelay + ptrH->readoutDelay + ptrH->readoutTime + exposureTime;
-      
-      // Trig controller delay between integration end and next trig.
-      ptrH->int_end_to_trig_start_dly = ptrH->readoutDelay + ptrH->readoutTime;
+      // The Diag module readout delay is the sum of the config delays before DVAL and an overhead of 9 clk cycles.
+      // It transmits the config width 1 out of 2 clk cycles and waits for the config pause at the end of each row.
+      // The image rows are transmitted without overhead rows and there is a config delay at the end.
+      float diagReadoutDelay = (ptrH->diag_x_to_readout_start_dly + ptrH->diag_fval_re_to_dval_re_dly + 9.0F) / VHD_CLK_100M_RATE_HZ;
+      float diagReadoutRowTime = (ptrH->diag_xsize_div_per_pixel_num * 2.0F + ptrH->diag_lval_pause_dly) / VHD_CLK_100M_RATE_HZ;
+      float diagReadoutTime = pGCRegs->Height * diagReadoutRowTime + ptrH->diag_x_to_next_fsync_re_dly / VHD_CLK_100M_RATE_HZ;
+
+      // Replace ROIC parameters with diag values
+      ptrH->readoutTime = diagReadoutTime;
+      ptrH->itrReadoutDelay = diagReadoutDelay;
+      ptrH->iwrReadoutDelay = diagReadoutDelay;
    }
-   else
-   {
-      // In IWR mode, the readout delay is the sum of all delays. 
-      // The overhead time is also multiplied by 2.
-      ptrH->readoutDelay = 
-         ((CALCIUM_bPixRstHCnt + 1.0F) + (CALCIUM_bPixXferCnt + 1.0F) + 2.0F*(CALCIUM_bPixOHCnt + 1.0F) + 
-         (CALCIUM_bPixOH2Cnt + 1.0F) + (CALCIUM_bPixRstBECnt + 1.0F) + (CALCIUM_bRODelayCnt + 1.0F)) / CALCIUM_CLK_CORE_HZ;
-      
-      // In IWR mode, we add the integration delay to the longer time between readout and integration.
-      // Readout delay is applied to the integration of N during the readout of N-1.
-      ptrH->frameTime = ptrH->integrationDelay + MAX(ptrH->readoutTime, ptrH->readoutDelay + exposureTime);
-      
-      // Trig controller delay between integration end and next trig.
-      ptrH->int_end_to_trig_start_dly = ptrH->readoutDelay;
-   }
-   
-   // Maximum frame rate
+
+   // Total frame time.
+   // - In ITR mode, we add the delays, the readout and the integration.
+   // - In IWR mode, we add the integration delay to the longer time between readout and integration.
+   //       Readout delay is applied to the integration of N during the readout of N-1.
+   float itrFrameTime = ptrH->integrationDelay + exposureTime + ptrH->itrReadoutDelay + ptrH->readoutTime;
+   float iwrFrameTime = ptrH->integrationDelay + MAX(exposureTime + ptrH->iwrReadoutDelay, ptrH->readoutTime);
+   ptrH->frameTime = (pGCRegs->IntegrationMode == IM_IntegrateThenRead) ? itrFrameTime : iwrFrameTime;
    ptrH->frameRateMax = 1.0F / ptrH->frameTime;
+
+   // Trig controller delay between integration end and next trig.
+   // - In ITR mode, we wait for the readout to end.
+   // - In IWR mode, we wait for the readout to start.
+   ptrH->itr_int_end_to_trig_start_dly = ptrH->itrReadoutDelay + ptrH->readoutTime;
+   float iwr_int_end_to_trig_start_dly = ptrH->iwrReadoutDelay;
+   ptrH->int_end_to_trig_start_dly = (pGCRegs->IntegrationMode == IM_IntegrateThenRead) ? ptrH->itr_int_end_to_trig_start_dly : iwr_int_end_to_trig_start_dly;
 }
 
 //--------------------------------------------------------------------------
@@ -570,7 +598,6 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    calcium_param_t hh;
-   float periodMinWithNullExposure_usec;
    float presentPeriod_sec;
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
@@ -580,14 +607,10 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
-   periodMinWithNullExposure_usec = hh.frameTime*1e6F;
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
 
    // Calculate exposure time depending on mode ITR/IWR
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
-      max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
-   else
-      max_exposure_usec = (presentPeriod_sec - hh.integrationDelay - hh.readoutDelay)*1e6F;
+   max_exposure_usec = (presentPeriod_sec - hh.integrationDelay - hh.int_end_to_trig_start_dly)*1e6F;
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
