@@ -41,6 +41,8 @@
 #define AW_CAL_BLOCK_INFO_VALID  0x44
 #define AW_BLOCK_OFFSET          0x48
 #define AW_DELTA_TEMP_FP32       0x64
+#define AW_COMPR_RATIO_FP32      0x68
+#define AW_DCOMPR_RATIO_FP32     0x6C
 
 #define AW_FLUSHPIPE             0xD0
 #define AW_RESET_ERR             0xD4
@@ -348,6 +350,17 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
 
    WriteStruct(pA);
    AXI4L_write32(1, pA->ADD + AW_CAL_BLOCK_INFO_VALID);
+
+   if (calibrationInfo.isValid && calibrationInfo.blocks[0].CompressionAlgorithm != 0)
+   {
+      AXI4L_write32(calibrationInfo.blocks[0].CompressionParameter, pA->ADD + AW_COMPR_RATIO_FP32);
+      AXI4L_write32(1.0F / calibrationInfo.blocks[0].CompressionParameter, pA->ADD + AW_DCOMPR_RATIO_FP32);
+   }
+   else
+   {
+      AXI4L_write32(1.0F, pA->ADD + AW_COMPR_RATIO_FP32);
+      AXI4L_write32(1.0F, pA->ADD + AW_DCOMPR_RATIO_FP32);
+   }
 
    // on reconfigure les switches
    CAL_configSwitchesAndHoles(pA, calib_mode, pGCRegs);
