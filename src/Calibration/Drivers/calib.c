@@ -196,6 +196,9 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    cal_mode_t calib_mode;
    enum lutRQIndexEnum lutRQIndex;
    uint32_t blockIndex;
+   float compr_ratio;
+   float dcompr_ratio;
+   uint32_t *p_Float = NULL;  // pour écrire les float en AXIL
 
    switch (pGCRegs->CalibrationMode)
    {
@@ -351,16 +354,21 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    WriteStruct(pA);
    AXI4L_write32(1, pA->ADD + AW_CAL_BLOCK_INFO_VALID);
 
+   // on écrit les valeurs de compression et de decompression
    if (calibrationInfo.isValid && calibrationInfo.blocks[0].CompressionAlgorithm != 0)
    {
-      AXI4L_write32(calibrationInfo.blocks[0].CompressionParameter, pA->ADD + AW_COMPR_RATIO_FP32);
-      AXI4L_write32(1.0F / calibrationInfo.blocks[0].CompressionParameter, pA->ADD + AW_DCOMPR_RATIO_FP32);
+      compr_ratio = calibrationInfo.blocks[0].CompressionParameter;
+      dcompr_ratio = 1.0F / calibrationInfo.blocks[0].CompressionParameter;
    }
    else
    {
-      AXI4L_write32(1.0F, pA->ADD + AW_COMPR_RATIO_FP32);
-      AXI4L_write32(1.0F, pA->ADD + AW_DCOMPR_RATIO_FP32);
+      compr_ratio = 1.0F;
+      dcompr_ratio = 1.0F;
    }
+   p_Float = (uint32_t *)(&compr_ratio);
+   AXI4L_write32(*p_Float, pA->ADD + AW_COMPR_RATIO_FP32);
+   p_Float = (uint32_t *)(&dcompr_ratio);
+   AXI4L_write32(*p_Float, pA->ADD + AW_DCOMPR_RATIO_FP32);
 
    // on reconfigure les switches
    CAL_configSwitchesAndHoles(pA, calib_mode, pGCRegs);
