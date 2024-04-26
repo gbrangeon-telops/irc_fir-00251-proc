@@ -878,7 +878,7 @@ begin
             FPA_ASSUMP_ERR <= '0'; 
             
             -- difference de config
-            CFG_MISMATCH <= int_time_mismatch or  ysize_mismatch or ysize_mismatch or xsize_mismatch or gain_mismatch;
+            CFG_MISMATCH <= int_time_mismatch or ysize_mismatch or xsize_mismatch or gain_mismatch;
             
             -- errer de fifo
             FIFO_ERR <= fpa_ch1_fifo_ovfl_sync or fpa_ch2_fifo_ovfl_sync or diag_ch1_fifo_ovfl or diag_ch2_fifo_ovfl or fringe_fifo_ovfl;

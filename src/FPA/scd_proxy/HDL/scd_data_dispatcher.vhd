@@ -1184,7 +1184,7 @@ begin
             FPA_ASSUMP_ERR <= '0'; -- tant que le lien CLINK_IN ne sera pas fiable 100%, les données du header SCD sont pas fiables. Donc aucune erreur à generer.
             
             -- difference de config
-            CFG_MISMATCH <= int_time_mismatch or  ysize_mismatch or ysize_mismatch or xsize_mismatch or gain_mismatch;
+            CFG_MISMATCH <= int_time_mismatch or ysize_mismatch or xsize_mismatch or gain_mismatch;
             
             -- errer de fifo
             FIFO_ERR <= fpa_ch1_fifo_ovfl_sync or fpa_ch2_fifo_ovfl_sync or fpa_ch3_fifo_ovfl_sync or diag_ch1_fifo_ovfl or diag_ch2_fifo_ovfl or diag_ch3_fifo_ovfl or acq_hder_fifo_ovfl;
