@@ -592,10 +592,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDebugRegJ = gFpaADCQuad3CoarsePhase;
       gFpaDebugRegL = gFpaADCQuad4CoarsePhase;
    }
-   ptrA->adc_clk_pipe_sel1 = (uint32_t)gFpaDebugRegC;
-   ptrA->adc_clk_pipe_sel2 = (uint32_t)gFpaDebugRegH;
-   ptrA->adc_clk_pipe_sel3 = (uint32_t)gFpaDebugRegJ;
-   ptrA->adc_clk_pipe_sel4 = (uint32_t)gFpaDebugRegL;
+   else {
+      ptrA->adc_clk_pipe_sel1 = (uint32_t)gFpaDebugRegC;
+      ptrA->adc_clk_pipe_sel2 = (uint32_t)gFpaDebugRegH;
+      ptrA->adc_clk_pipe_sel3 = (uint32_t)gFpaDebugRegJ;
+      ptrA->adc_clk_pipe_sel4 = (uint32_t)gFpaDebugRegL;
+   }
    
    // adc clk source phase
    if (sw_init_done == 0){         
@@ -604,11 +606,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDebugRegK = gFpaADCQuad3FinePhase;
       gFpaDebugRegM = gFpaADCQuad4FinePhase;
    }
-   ptrA->adc_clk_source_phase1 = (uint32_t)gFpaDebugRegD;
-   ptrA->adc_clk_source_phase2 = (uint32_t)gFpaDebugRegI;
-   ptrA->adc_clk_source_phase3 = (uint32_t)gFpaDebugRegK;
-   ptrA->adc_clk_source_phase4 = (uint32_t)gFpaDebugRegM;
-
+   else {
+      ptrA->adc_clk_source_phase1 = (uint32_t)gFpaDebugRegD;
+      ptrA->adc_clk_source_phase2 = (uint32_t)gFpaDebugRegI;
+      ptrA->adc_clk_source_phase3 = (uint32_t)gFpaDebugRegK;
+      ptrA->adc_clk_source_phase4 = (uint32_t)gFpaDebugRegM;
+   }
+         
    // autres
    ptrA->lsydel_mclk  = (uint32_t)(hh.lsydel_mclk - 1.0F);  // ajustement tenant compte des delais de chaine vhd   
    
@@ -1257,8 +1261,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
   
   // generation de sw_init_done et sw_init_success
    if ((gStat.hw_init_done == 1) && (sw_init_done == 0)){
+      sw_init_done = 1;                       // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser de nouveau
       FPA_SendConfigGC(ptrA, &gcRegsData);    // cet envoi permet de reinitialiser le vhd avec les params requis puisque le type de hw présent est conniu maintenant (Stat->hw_init_done == 1).
-      sw_init_done = 1;                       // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser de nouveau 
       sw_init_success = 1;
    } 
 }
