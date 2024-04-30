@@ -111,6 +111,8 @@
 #define AW_KPIX_VALUE                              0xB00
 // adresse de lecture du status d'écriture de kpix dans la BRAM
 #define AR_KPIX_STATUS                             0x000
+// adresse de lecture des erreurs du module de compression
+#define AR_COMPR_ERR                               0x004
 
 typedef struct
 {

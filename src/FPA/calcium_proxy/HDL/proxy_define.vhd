@@ -106,6 +106,9 @@ package Proxy_define is
    subtype kpix_status_reg_done_range is natural range  1 downto 1;
    subtype kpix_status_reg_size_range is natural range  0 downto 0;
    
+   -- compression
+   type compr_err_ary_type is array (natural range <>) of std_logic_vector(4 downto 0);
+   
    ------------------------------------------------
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------

@@ -46,7 +46,7 @@
 #define FPA_OUTPUT_TYPE                            0x02     // 0x02 -> output numérique. Provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
 #define FPA_INPUT_TYPE                             0x07     // 0x04 -> input LVCMOS18. Provient du fichier fpa_common_pkg.vhd
 
-// adresse la lecture des statuts VHD
+// adresse de lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                         0x0400   // adresse de base
 #define AR_FPA_TEMPERATURE                         0x002C   // adresse temperature
 // adresse FPA_INTF_CFG feedback du module de statuts

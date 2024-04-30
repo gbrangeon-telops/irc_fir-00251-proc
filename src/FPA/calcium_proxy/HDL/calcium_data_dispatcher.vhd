@@ -46,9 +46,6 @@ entity calcium_data_dispatcher is
       FPA_TEMP_STAT     : in fpa_temp_stat_type;
       
       FIFO_ERR          : out std_logic;
-      SPEED_ERR         : out std_logic;
-      CFG_MISMATCH      : out std_logic;
-      ASSUMP_ERR        : out std_logic;
       DONE              : out std_logic
    );
 end calcium_data_dispatcher;
@@ -357,10 +354,7 @@ begin
    begin          
       if rising_edge(CLK) then
          if sreset = '1' then
-            SPEED_ERR <= '0';
-            CFG_MISMATCH <= '0';
             FIFO_ERR <= '0';
-            ASSUMP_ERR <= '0';
             DONE <= '0';
             
          else

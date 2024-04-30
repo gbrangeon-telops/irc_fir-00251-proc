@@ -40,6 +40,8 @@ entity calcium_mblaze_intf is
       
       FPA_SOFTW_STAT        : out fpa_firmw_stat_type;
       
+      COMPR_ERR             : in std_logic_vector(4 downto 0);
+      
       KPIX_REG              : inout kpix_reg_type
    );
 end calcium_mblaze_intf;
@@ -102,6 +104,7 @@ architecture rtl of calcium_mblaze_intf is
    signal kpix_value                   : std_logic_vector(31 downto 0);
    signal kpix_dval                    : std_logic;
    signal kpix_status                  : std_logic_vector(31 downto 0);
+   signal compr_err_latch              : std_logic_vector(COMPR_ERR'range);
    
 begin
    
@@ -170,9 +173,35 @@ begin
    end process;
    
    --------------------------------------------------
+   -- gestion des erreurs
+   --------------------------------------------------
+   U3 : process(MB_CLK) 
+   begin
+      if rising_edge(MB_CLK) then
+         if sreset = '1' then
+            compr_err_latch <= (others => '0');
+         else 
+            
+            -- latch des erreurs
+            for i in COMPR_ERR'range loop
+               if COMPR_ERR(i) = '1' then  
+                  compr_err_latch(i) <= '1';
+               end if;                                 
+            end loop;
+            
+            -- gestion du reset
+            if reset_err_i = '1' then 
+               compr_err_latch <= (others => '0');
+            end if;
+            
+         end if;
+      end if;
+   end process;
+   
+   --------------------------------------------------
    -- reception Config
    --------------------------------------------------
-   U3 : process(MB_CLK)
+   U4 : process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
@@ -286,7 +315,7 @@ begin
    --------------------------------------------------
    -- calcul du temps d'integration
    --------------------------------------------------
-   U4 : process(MB_CLK)
+   U5 : process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
          
@@ -345,7 +374,7 @@ begin
    -- CFG MB AXI RD : contrôle du flow
    ---------------------------------------------------------------------------- 
    -- (pour l'instant transaction se fait à au max 1 CLK sur 2   
-   U5: process (MB_CLK)
+   U6: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
@@ -379,7 +408,7 @@ begin
    ---------------------------------------------------------------------------- 
    -- CFG MB AXI RD : données vers µBlaze                                       
    ---------------------------------------------------------------------------- 
-   U6: process(MB_CLK)
+   U7: process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then         
          
@@ -387,7 +416,8 @@ begin
             axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
          else 
             case MB_MOSI.ARADDR(11 downto 0) is
-               when X"000" => axi_rdata <= kpix_status;
+               when X"000" => axi_rdata <= resize(kpix_status, axi_rdata'length);
+               when X"004" => axi_rdata <= resize(compr_err_latch, axi_rdata'length);
                when others => axi_rdata <= (others => '1'); 
             end case; 
          end if;
@@ -399,7 +429,7 @@ begin
    -- CFG MB AXI WR : contrôle du flow 
    ---------------------------------------------------------------------------- 
    -- (pour l'instant transaction se fait à au max 1 CLK sur 2 
-   U7: process (MB_CLK)
+   U8: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
@@ -429,7 +459,7 @@ begin
    -----------------------------------------------------
    -- CFG MB AXI WR  : WR feedback envoyé au MB
    -----------------------------------------------------
-   U8: process (MB_CLK)
+   U9: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
