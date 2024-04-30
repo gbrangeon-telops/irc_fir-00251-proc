@@ -62,8 +62,8 @@ package body calcium640D_intf_testbench_pkg is
       variable diag_xsize_div_per_pixel_num : unsigned(31 downto 0);
       variable u_fpa_int_time_offset : unsigned(31 downto 0);
       variable int_fdbk_dly : unsigned(31 downto 0);
-      variable kpix_pgen_value : unsigned(31 downto 0);
-      variable kpix_mean_value : unsigned(31 downto 0);
+      variable kpix_pgen_en : unsigned(31 downto 0);
+      variable kpix_median_value : unsigned(31 downto 0);
       variable use_ext_pixqnb : unsigned(31 downto 0);
       variable clk_frm_pulse_width : unsigned(31 downto 0);
       variable fpa_serdes_lval_num : unsigned(31 downto 0);
@@ -123,8 +123,8 @@ package body calcium640D_intf_testbench_pkg is
       
       int_fdbk_dly := to_unsigned(3, 32);    -- 3 clk_100M entre FPA_INT et CLK_FRM
       
-      kpix_pgen_value   := to_unsigned(0, 32);
-      kpix_mean_value   := to_unsigned(0, 32);
+      kpix_pgen_en         := (others => '1');
+      kpix_median_value    := to_unsigned(32768, 32);
       
       use_ext_pixqnb          := (others => '1');
       clk_frm_pulse_width     := to_unsigned(0, 32);    -- CLK_FRM is a copy of FPA_INT 
@@ -166,8 +166,8 @@ package body calcium640D_intf_testbench_pkg is
       & diag_xsize_div_per_pixel_num
       & u_fpa_int_time_offset
       & int_fdbk_dly
-      & kpix_pgen_value
-      & kpix_mean_value
+      & kpix_pgen_en
+      & kpix_median_value
       & use_ext_pixqnb
       & clk_frm_pulse_width
       & fpa_serdes_lval_num

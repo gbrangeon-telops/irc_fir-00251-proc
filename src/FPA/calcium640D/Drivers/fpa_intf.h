@@ -157,8 +157,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t diag_xsize_div_per_pixel_num;
    int32_t  fpa_int_time_offset;
    uint32_t int_fdbk_dly;
-   int32_t  kpix_pgen_value;
-   uint32_t kpix_mean_value;
+   uint32_t kpix_pgen_en;
+   uint32_t kpix_median_value;
    uint32_t use_ext_pixqnb;
    uint32_t clk_frm_pulse_width;
    uint32_t fpa_serdes_lval_num;

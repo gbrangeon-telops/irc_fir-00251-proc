@@ -49,10 +49,11 @@ architecture Behavioral of kpix_pixelbldr is
     type kpix_data_array_type is array (1 to 4) of signed(pix_data_range_type);
     signal kpix_data : kpix_data_array_type;
     
-    alias pgen_en   is cfg.comn.fpa_diag_mode;
-    alias pgen_kpix is cfg.kpix_pgen_value;
-    
-    alias kpix_mean is cfg.kpix_mean_value;
+    -- pgen_en activates a debug mode where pgen_kpix replaces kpix values coming from the BRAM.
+    -- With pgen_kpix = 0, only kpix_median is used. 
+    alias pgen_en   is cfg.kpix_pgen_en;
+    signal pgen_kpix : signed(pix_data_range_type) := (others => '0');
+    alias kpix_median is cfg.kpix_median_value;
     
     type compute_pipeline_type is array (0 to 2, 1 to 4) of unsigned(pix_data_range_type);
     constant COMPUTE_PIPELINE_RESET : compute_pipeline_type := (others => (others => (others => '0')));
@@ -64,7 +65,7 @@ architecture Behavioral of kpix_pixelbldr is
     signal data_pipeline : data_pipeline_type := DATA_PIPELINE_RESET;
 begin
     kpix_gen : for i in 1 to 4 generate
-        kpix_data(i) <= resize(signed(pgen_kpix), kpix_data(i)'LENGTH) when pgen_en = '1' else resize(signed(kpix(i*KPIX_LENGTH-1 downto (i-1)*KPIX_LENGTH)), kpix_data(i)'LENGTH);
+        kpix_data(i) <= pgen_kpix when pgen_en = '1' else resize(signed(kpix(i*KPIX_LENGTH-1 downto (i-1)*KPIX_LENGTH)), kpix_data(i)'LENGTH);
     end generate;
     
     process(clk)
@@ -76,7 +77,7 @@ begin
                 pix_out          <= DATA_RESET;
             else
                 for i in 1 to 4 loop
-                    compute_pipeline(0, i) <= resize(unsigned(kpix_data(i)) + unsigned(kpix_mean), compute_pipeline(0, i)'LENGTH);
+                    compute_pipeline(0, i) <= resize(unsigned(kpix_data(i)) + unsigned(kpix_median), compute_pipeline(0, i)'LENGTH);
                     compute_pipeline(1, i) <= resize(compute_pipeline(0, i) * unsigned(data_pipeline(0).pix_data(i)(pix_coarse_range_type)), compute_pipeline(1, i)'LENGTH);
                     compute_pipeline(2, i) <= resize(compute_pipeline(1, i) + unsigned(data_pipeline(1).pix_data(i)(pix_residue_range_type)), compute_pipeline(2, i)'LENGTH);
                 end loop;

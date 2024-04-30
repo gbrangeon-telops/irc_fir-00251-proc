@@ -120,6 +120,8 @@
 #define CALCIUM_DEFAULT_REGF                       2     // AOI commence à la ligne 2
 #define CALCIUM_DEFAULT_REGH                       1     // le LDO de VPIXQNB est activé
 
+#define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
+
 #define TOTAL_DAC_NUM                              8
 
 struct s_ProximCfgConfig
@@ -233,7 +235,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //extern int32_t gFpaDebugRegB;                       // reservé
    //extern int32_t gFpaDebugRegC;                       // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
    //extern int32_t gFpaDebugRegD;                       // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
-   extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
+   //extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                       // reservé active_line_start_num pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                       // reservé pour le contrôle interne/externe du temps d'intégration
    extern int32_t gFpaDebugRegH;                       // reservé pour l'activation du LDO de VPIXQNB
@@ -253,14 +255,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static uint16_t presentFpaVDetCom_mV = CALCIUM_VDETCOM_DEFAULT_mV;
    extern uint16_t gFpaVPixQNB_mV;
    static uint16_t presentFpaVPixQNB_mV = CALCIUM_VPIXQNB_DEFAULT_mV;
+   extern uint16_t gFpaDebugKPix;
+   extern bool gFpaDebugKPixEnable;
    static uint8_t cfg_num;
 
    // on bâtit les parametres specifiques
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);
 
-   // diag mode and diagType
+   // diag mode, diag type et data source
    ptrA->fpa_diag_mode = 0;                 // par defaut
    ptrA->fpa_diag_type = 0;                 // par defaut
+   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
    if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade) {              // mode diagnostique degradé lineaire
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR;
@@ -272,6 +277,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade) {
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
+   }
+   else if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage) {
+      ptrA->fpa_diag_mode = 1;
+      ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
 
    // allumage du détecteur
@@ -290,13 +299,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
-
-   // gFpaDebugRegE: mode diag vrai et fake
-   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
-   if (ptrA->fpa_diag_mode == 1){
-      if ((int32_t)gFpaDebugRegE != 0)
-         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
-   }
    
    // intégration des prog
    ptrA->fpa_xtra_trig_int_time = (uint32_t)(FPA_MIN_EXPOSURE/1e6F * VHD_CLK_100M_RATE_HZ);
@@ -336,17 +338,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // feedback d'intégration
    ptrA->int_fdbk_dly = (uint32_t)(hh.integrationDelay * VHD_CLK_100M_RATE_HZ) + 3;    // on ajoute 3 clk pour le délai entre FPA_INT et CLK_FRM
    
-   // Kpix (les KPix sont les mêmes pour tous les blocs)
-   // TODO raffiner les exceptions
-   if (calibrationInfo.isValid && calibrationInfo.blocks[0].KPixDataPresence)
+   // KPix
+   if (sw_init_done == 0 || gFpaDebugKPix > CALCIUM_DEBUG_KPIX_MAX)
    {
-      ptrA->kpix_pgen_value = 0;
-      ptrA->kpix_mean_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
+      gFpaDebugKPix = CALCIUM_DEBUG_KPIX_MAX;   // valeur max est la valeur par défaut
+      gFpaDebugKPixEnable = false;
+   }
+   if (ptrA->fpa_diag_mode ||
+         gFpaDebugKPixEnable ||
+         !calibrationInfo.isValid ||
+         !calibrationInfo.blocks[0].KPixDataPresence)
+   {
+      // On force le KPix par défaut ou transmis par l'usager
+      ptrA->kpix_pgen_en = 1;
+      ptrA->kpix_median_value = gFpaDebugKPix;
    }
    else
    {
-      ptrA->kpix_pgen_value = 0;
-      ptrA->kpix_mean_value = 32768;
+      // On utilise la médiane disponible dans le bloc (les KPix sont les mêmes pour tous les blocs)
+      ptrA->kpix_pgen_en = 0;
+      ptrA->kpix_median_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
    }
    
    // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
@@ -767,8 +778,8 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
    FPA_INF("diag.xsize_div_per_pixel_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("fpa_int_time_offset = %d", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("int_fdbk_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("kpix_pgen_value = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("kpix_mean_value = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
+   FPA_INF("kpix_pgen_en = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
+   FPA_INF("kpix_median_value = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("use_ext_pixqnb = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("clk_frm_pulse_width = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("fpa_serdes_lval_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;

@@ -138,8 +138,8 @@ package Proxy_define is
       
       int_fdbk_dly                     : unsigned(3 downto 0);             -- delai en CLK_100MHz avant generation du feedback d'integration
       
-      kpix_pgen_value                  : std_logic_vector(15 downto 0);    --
-      kpix_mean_value                  : std_logic_vector(15 downto 0);    --
+      kpix_pgen_en                     : std_logic;                        --
+      kpix_median_value                : std_logic_vector(15 downto 0);    --
       
       use_ext_pixqnb                   : std_logic;                        -- indique s'il faut activer le bias externe vTstPixQNB. S'il est désactivé, le bias interne doit être configuré
       clk_frm_pulse_width              : unsigned(7 downto 0);             -- durée fixe du pulse CLK_FRM en CLK_100MHz lorsque le temps d'intégration est contrôlé à l'interne du ROIC (configuré par registres).
@@ -264,8 +264,8 @@ package body Proxy_define is
          std_logic_vector(resize(FPA_INTF_CFG.diag.xsize_div_per_pixel_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.fpa_int_time_offset, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.int_fdbk_dly, a(0)'length)),
-         std_logic_vector(resize(FPA_INTF_CFG.kpix_pgen_value, a(0)'length)),
-         std_logic_vector(resize(FPA_INTF_CFG.kpix_mean_value, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.kpix_pgen_en, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.kpix_median_value, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.use_ext_pixqnb, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.clk_frm_pulse_width, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_num, a(0)'length)),

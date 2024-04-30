@@ -818,6 +818,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    extern uint16_t gFpaVDetGuard_mV;
    extern uint16_t gFpaVDetCom_mV;
    extern uint16_t gFpaVPixQNB_mV;
+   extern uint16_t gFpaDebugKPix;
+   extern bool gFpaDebugKPixEnable;
 
    uint8_t cmdStr[10], argStr[7];
    uint32_t arglen;
@@ -890,6 +892,11 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
          else
             FPA_SetWarningLed(&gFpaIntf, false);
       }
+      else if (strcasecmp((char *)cmdStr, "KPIX") == 0)
+      {
+         gFpaDebugKPix = (uint16_t)uValue;
+         gFpaDebugKPixEnable = true;
+      }
       else
       {
          DT_ERR("Unsupported command");
@@ -899,14 +906,17 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
 
-   DT_PRINTF("FPA VA1P8 voltage = %d mV", gFpaVa1p8_mV);
-   DT_PRINTF("FPA VPIXRST voltage = %d mV", gFpaVPixRst_mV);
-   DT_PRINTF("FPA VDHS1P8 voltage = %d mV", gFpaVdhs1p8_mV);
-   DT_PRINTF("FPA VD1P8 voltage = %d mV", gFpaVd1p8_mV);
-   DT_PRINTF("FPA VA3P3 voltage = %d mV", gFpaVa3p3_mV);
-   DT_PRINTF("FPA VDETGUARD voltage = %d mV", gFpaVDetGuard_mV);
-   DT_PRINTF("FPA VDETCOM voltage = %d mV", gFpaVDetCom_mV);
-   DT_PRINTF("FPA VPIXQNB voltage = %d mV", gFpaVPixQNB_mV);
+   DT_PRINTF("FPA VA1P8 voltage = %u mV", gFpaVa1p8_mV);
+   DT_PRINTF("FPA VPIXRST voltage = %u mV", gFpaVPixRst_mV);
+   DT_PRINTF("FPA VDHS1P8 voltage = %u mV", gFpaVdhs1p8_mV);
+   DT_PRINTF("FPA VD1P8 voltage = %u mV", gFpaVd1p8_mV);
+   DT_PRINTF("FPA VA3P3 voltage = %u mV", gFpaVa3p3_mV);
+   DT_PRINTF("FPA VDETGUARD voltage = %u mV", gFpaVDetGuard_mV);
+   DT_PRINTF("FPA VDETCOM voltage = %u mV", gFpaVDetCom_mV);
+   DT_PRINTF("FPA VPIXQNB voltage = %u mV", gFpaVPixQNB_mV);
+
+   DT_PRINTF("FPA Debug KPix = %u", gFpaDebugKPix);
+   DT_PRINTF("FPA Debug KPix Enable = %u", gFpaDebugKPixEnable);
 
    return IRC_SUCCESS;
 }
@@ -2927,7 +2937,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
-   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED value]");
+   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
