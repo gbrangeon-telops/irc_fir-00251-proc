@@ -297,93 +297,49 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       argStr[arglen++] = '\0'; // Add string terminator
 
       if (strcasecmp((char *)argStr, "POL") == 0)
-      {
          cmd = 1;
-      }
       else if (strcasecmp((char *)argStr, "REF") == 0)
-      {
          cmd = 2;
-      }
       else if (strcasecmp((char *)argStr, "OFF") == 0)
-      {
          cmd = 3;
-      }
       else if (strcasecmp((char *)argStr, "ETOFF") == 0)
-      {
          cmd = 4;
-      }
       else if (strcasecmp((char *)argStr, "REGA") == 0)
-      {
          cmd = 5;
-      }
       else if (strcasecmp((char *)argStr, "REGB") == 0)
-      {
          cmd = 6;
-      }
       else if (strcasecmp((char *)argStr, "REGC") == 0)
-      {
          cmd = 7;
-      }
       else if (strcasecmp((char *)argStr, "REGD") == 0)
-      {
          cmd = 8;
-      }
       else if (strcasecmp((char *)argStr, "REGE") == 0)
-      {
          cmd = 9;
-      }
       else if (strcasecmp((char *)argStr, "REGF") == 0)
-      {
          cmd = 10;
-      }
       else if (strcasecmp((char *)argStr, "REGG") == 0)
-      {
          cmd = 11;
-      }
       else if (strcasecmp((char *)argStr, "REGH") == 0)
-      {
          cmd = 12;
-      }
       else if (strcasecmp((char *)argStr, "STAR") == 0)
-      {
          cmd = 13;
-      }
       else if (strcasecmp((char *)argStr, "SATU") == 0)
-      {
          cmd = 14;
-      }
       else if (strcasecmp((char *)argStr, "REF1") == 0)
-      {
          cmd = 15;
-      }
       else if (strcasecmp((char *)argStr, "REF2") == 0)
-      {
          cmd = 16;
-      }
       else if (strcasecmp((char *)argStr, "BIAS") == 0)
-      {
          cmd = 17;
-      }
       else if (strcasecmp((char *)argStr, "REGI") == 0)
-      {
          cmd = 18;
-      }
       else if (strcasecmp((char *)argStr, "REGJ") == 0)
-      {
          cmd = 19;
-      }
       else if (strcasecmp((char *)argStr, "REGK") == 0)
-      {
          cmd = 20;
-      }
       else if (strcasecmp((char *)argStr, "REGL") == 0)
-      {
          cmd = 21;
-      }
       else if (strcasecmp((char *)argStr, "REGM") == 0)
-      {
          cmd = 22;
-      }
       else
       {
          DT_ERR("Unsupported command arguments");
@@ -819,11 +775,16 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    extern uint16_t gFpaVDetCom_mV;
    extern uint16_t gFpaVPixQNB_mV;
    extern uint16_t gFpaDebugKPix;
-   extern bool gFpaDebugKPixEnable;
+   extern bool gFpaDebugKPixForced;
+   extern float gFpaDebugComprRatio;
+   extern bool gFpaDebugComprRatioForced;
+   extern t_calib gCal;
 
-   uint8_t cmdStr[10], argStr[7];
+   uint8_t cmdStr[10], argStr[9];
    uint32_t arglen;
+   uint32_t cmd;
    uint32_t uValue;
+   float fValue = 0.0F;
 
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
@@ -835,14 +796,65 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
          return IRC_FAILURE;
       }
       cmdStr[arglen++] = '\0'; // Add string terminator
+      
+      // Identify command
+      if (strcasecmp((char *)cmdStr, "VA1P8") == 0)
+         cmd = 1;
+      else if (strcasecmp((char *)cmdStr, "VPIXRST") == 0)
+         cmd = 2;
+      else if (strcasecmp((char *)cmdStr, "VDHS1P8") == 0)
+         cmd = 3;
+      else if (strcasecmp((char *)cmdStr, "VD1P8") == 0)
+         cmd = 4;
+      else if (strcasecmp((char *)cmdStr, "VA3P3") == 0)
+         cmd = 5;
+      else if (strcasecmp((char *)cmdStr, "VDETGUARD") == 0)
+         cmd = 6;
+      else if (strcasecmp((char *)cmdStr, "VDETCOM") == 0)
+         cmd = 7;
+      else if (strcasecmp((char *)cmdStr, "VPIXQNB") == 0)
+         cmd = 8;
+      else if (strcasecmp((char *)cmdStr, "WARNLED") == 0)
+         cmd = 9;
+      else if (strcasecmp((char *)cmdStr, "KPIX") == 0)
+         cmd = 10;
+      else if (strcasecmp((char *)cmdStr, "COMPR") == 0)
+         cmd = 11;
+      else
+      {
+         DT_ERR("Unsupported command");
+         return IRC_FAILURE;
+      }
 
       // Read argument value
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-      if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
-            ((uValue < 0) && (uValue > USHRT_MAX)))
+      switch (cmd)
       {
-         DT_ERR("Invalid argument");
-         return IRC_FAILURE;
+         case 1:  // VA1P8
+         case 2:  // VPIXRST
+         case 3:  // VDHS1P8
+         case 4:  // VD1P8
+         case 5:  // VA3P3
+         case 6:  // VDETGUARD
+         case 7:  // VDETCOM
+         case 8:  // VPIXQNB
+         case 9:  // WARNLED
+         case 10: // KPIX
+            if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
+                  ((uValue < 0) && (uValue > USHRT_MAX)))
+            {
+               DT_ERR("Invalid uint16 argument");
+               return IRC_FAILURE;
+            }
+            break;
+         
+         case 11: // COMPR
+            if (ParseFloatNumDec((char *)argStr, arglen, &fValue) != IRC_SUCCESS)
+            {
+               DT_ERR("Invalid float argument");
+               return IRC_FAILURE;
+            }
+            break;
       }
 
       // There is supposed to be no remaining bytes in the buffer
@@ -853,57 +865,60 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
       }
 
       // Process command
-      if (strcasecmp((char *)cmdStr, "VA1P8") == 0)
+      switch (cmd)
       {
-         gFpaVa1p8_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VPIXRST") == 0)
-      {
-         gFpaVPixRst_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VDHS1P8") == 0)
-      {
-         gFpaVdhs1p8_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VD1P8") == 0)
-      {
-         gFpaVd1p8_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VA3P3") == 0)
-      {
-         gFpaVa3p3_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VDETGUARD") == 0)
-      {
-         gFpaVDetGuard_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VDETCOM") == 0)
-      {
-         gFpaVDetCom_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "VPIXQNB") == 0)
-      {
-         gFpaVPixQNB_mV = (uint16_t)uValue;
-      }
-      else if (strcasecmp((char *)cmdStr, "WARNLED") == 0)
-      {
-         if (uValue > 0)
-            FPA_SetWarningLed(&gFpaIntf, true);
-         else
-            FPA_SetWarningLed(&gFpaIntf, false);
-      }
-      else if (strcasecmp((char *)cmdStr, "KPIX") == 0)
-      {
-         gFpaDebugKPix = (uint16_t)uValue;
-         gFpaDebugKPixEnable = true;
-      }
-      else
-      {
-         DT_ERR("Unsupported command");
-         return IRC_FAILURE;
+         case 1:  // VA1P8
+            gFpaVa1p8_mV = (uint16_t)uValue;
+            break;
+         
+         case 2:  // VPIXRST
+            gFpaVPixRst_mV = (uint16_t)uValue;
+            break;
+         
+         case 3:  // VDHS1P8
+            gFpaVdhs1p8_mV = (uint16_t)uValue;
+            break;
+         
+         case 4:  // VD1P8
+            gFpaVd1p8_mV = (uint16_t)uValue;
+            break;
+         
+         case 5:  // VA3P3
+            gFpaVa3p3_mV = (uint16_t)uValue;
+            break;
+         
+         case 6:  // VDETGUARD
+            gFpaVDetGuard_mV = (uint16_t)uValue;
+            break;
+         
+         case 7:  // VDETCOM
+            gFpaVDetCom_mV = (uint16_t)uValue;
+            break;
+         
+         case 8:  // VPIXQNB
+            gFpaVPixQNB_mV = (uint16_t)uValue;
+            break;
+         
+         case 9:  // WARNLED
+            if (uValue > 0)
+               FPA_SetWarningLed(&gFpaIntf, true);
+            else
+               FPA_SetWarningLed(&gFpaIntf, false);
+            break;
+         
+         case 10:  // KPIX
+            gFpaDebugKPix = (uint16_t)uValue;
+            gFpaDebugKPixForced = true;
+            break;
+         
+         case 11:  // COMPR
+            gFpaDebugComprRatio = fValue;
+            gFpaDebugComprRatioForced = true;
+            break;
       }
 
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+      CAL_ConfigComprRatio(&gCal);
    }
 
    DT_PRINTF("FPA VA1P8 voltage = %u mV", gFpaVa1p8_mV);
@@ -916,7 +931,10 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA VPIXQNB voltage = %u mV", gFpaVPixQNB_mV);
 
    DT_PRINTF("FPA Debug KPix = %u", gFpaDebugKPix);
-   DT_PRINTF("FPA Debug KPix Enable = %u", gFpaDebugKPixEnable);
+   DT_PRINTF("FPA Debug KPix Forced = %u", gFpaDebugKPixForced);
+
+   DT_PRINTF("FPA Debug Compression Ratio = " _PCF(6), _FFMT(gFpaDebugComprRatio, 6));
+   DT_PRINTF("FPA Debug Compression Ratio Forced = %u", gFpaDebugComprRatioForced);
 
    return IRC_SUCCESS;
 }
@@ -2937,7 +2955,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
-   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX value]");
+   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX|COMPR value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");

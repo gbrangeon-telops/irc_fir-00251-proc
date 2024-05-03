@@ -256,7 +256,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaVPixQNB_mV;
    static uint16_t presentFpaVPixQNB_mV = CALCIUM_VPIXQNB_DEFAULT_mV;
    extern uint16_t gFpaDebugKPix;
-   extern bool gFpaDebugKPixEnable;
+   extern bool gFpaDebugKPixForced;
+   extern float gFpaDebugComprRatio;
+   extern bool gFpaDebugComprRatioForced;
    static uint8_t cfg_num;
 
    // on bâtit les parametres specifiques
@@ -342,10 +344,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (sw_init_done == 0 || gFpaDebugKPix > CALCIUM_DEBUG_KPIX_MAX)
    {
       gFpaDebugKPix = CALCIUM_DEBUG_KPIX_MAX;   // valeur max est la valeur par défaut
-      gFpaDebugKPixEnable = false;
+      gFpaDebugKPixForced = false;
    }
    if (ptrA->fpa_diag_mode ||
-         gFpaDebugKPixEnable ||
+         gFpaDebugKPixForced ||
          !calibrationInfo.isValid ||
          !calibrationInfo.blocks[0].KPixDataPresence)
    {
@@ -359,6 +361,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->kpix_pgen_en = 0;
       ptrA->kpix_median_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
    }
+   gFpaDebugKPix = (uint16_t)ptrA->kpix_median_value;
    
    // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
    if (sw_init_done == 0)
@@ -380,12 +383,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_serdes_lval_num = hh.numFrRows;
    ptrA->fpa_serdes_lval_len = ptrA->width/8;    // 8 pix de large
    
-   // compression logarithmique (la compression est la même pour tous les blocs)
-   // TODO raffiner les exceptions
-   if (calibrationInfo.isValid && calibrationInfo.blocks[0].CompressionAlgorithm != 0)
-      ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
+   // compression logarithmique
+   if (sw_init_done == 0 || gFpaDebugComprRatio == 0.0F)
+   {
+      gFpaDebugComprRatio = 1.0F;   // valeur max est la valeur par défaut
+      gFpaDebugComprRatioForced = false;
+   }
+   if (ptrA->fpa_diag_mode ||
+         gFpaDebugComprRatioForced ||
+         !calibrationInfo.isValid ||
+         calibrationInfo.blocks[0].CompressionAlgorithm == 0)
+   {
+      // On force le compression ratio par défaut ou transmis par l'usager
+      ptrA->compr_ratio_fp32 = gFpaDebugComprRatio;
+   }
    else
-      ptrA->compr_ratio_fp32 = 1.0F;
+   {
+      // On utilise le compression ratio disponible dans le bloc (la compression est la même pour tous les blocs)
+      ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
+   }
+   gFpaDebugComprRatio = ptrA->compr_ratio_fp32;
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    ptrA->cfg_num = ++cfg_num;
@@ -785,7 +802,7 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
    FPA_INF("fpa_serdes_lval_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("fpa_serdes_lval_len = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    temp_u32 = AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx); idx += 4;
-   FPA_INF("compr_ratio_fp32 = " _PCF(3), _FFMT(*p_temp_fp32, 3));
+   FPA_INF("compr_ratio_fp32 = " _PCF(6), _FFMT(*p_temp_fp32, 6));
    FPA_INF("cfg_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("vdac_value(1) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
    FPA_INF("vdac_value(2) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;

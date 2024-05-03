@@ -181,5 +181,6 @@ void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 void CAL_UpdateCalibBprMode(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 void CAL_ConfigureNlcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMode);
 void CAL_ConfigureRqcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMode);
+void CAL_ConfigComprRatio(const t_calib *pA);
 
 #endif // __calib_H__

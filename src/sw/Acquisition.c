@@ -123,9 +123,9 @@ void Acquisition_Arm()
 
    EXP_SendConfigGC(&gExposureTime, &gcRegsData);
 
-   CAL_SendConfigGC(&gCal, &gcRegsData);
+   FPA_SendConfigGC(&gFpaIntf, &gcRegsData);       // must be called before CAL_SendConfigGC
 
-   FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+   CAL_SendConfigGC(&gCal, &gcRegsData);
 
    HDER_SendConfigGC(&gHderInserter, &gcRegsData);
    HDER_SendHeaderGC(&gHderInserter, &gcRegsData);
