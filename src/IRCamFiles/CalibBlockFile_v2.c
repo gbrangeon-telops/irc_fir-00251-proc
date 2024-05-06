@@ -597,7 +597,6 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("LowValidTemperature: " _PCF(3) " °C\n", _FFMT(hdr->LowValidTemperature, 3));
    FPGA_PRINTF("HighValidTemperature: " _PCF(3) " °C\n", _FFMT(hdr->HighValidTemperature, 3));
    FPGA_PRINTF("BinningMode: %u enum\n", hdr->BinningMode);
-   FPGA_PRINTF("BinningMode: %u enum\n", hdr->BinningMode);
    FPGA_PRINTF("FOVPosition: %u enum\n", hdr->FOVPosition);
    FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
    FPGA_PRINTF("ImageCorrectionFocusPositionRaw: %d counts\n", hdr->ImageCorrectionFocusPositionRaw);

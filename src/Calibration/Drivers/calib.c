@@ -41,8 +41,8 @@
 #define AW_CAL_BLOCK_INFO_VALID  0x4C
 #define AW_BLOCK_OFFSET          0x50
 #define AW_DELTA_TEMP_FP32       0x6C
-#define AW_COMPR_RATIO_FP32      0x68
-#define AW_DCOMPR_RATIO_FP32     0x6C
+#define AW_COMPR_RATIO_FP32      0x70
+#define AW_DCOMPR_RATIO_FP32     0x74
 
 #define AW_FLUSHPIPE             0xD0
 #define AW_RESET_ERR             0xD4
