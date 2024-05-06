@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include "GC_Registers.h"
+#include "FPABinningConfig.h"
 
 #ifdef FPA_VERBOSE
    #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
@@ -37,7 +38,7 @@
 #define FPA_HEIGHT_MIN     4
 #define FPA_HEIGHT_MAX     512
 #define FPA_HEIGHT_MULT    4
-#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
+#define FPA_HEIGHT_INC     8 // lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT) //plus possible de le faire avec une structure
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   16
@@ -46,6 +47,8 @@
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   4
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
+
+#define FPA_MAX_NUMBER_CONFIG_MODE 1U
 
 #define FPA_FORCE_CENTER   0
 #define FPA_FLIP_LR        0
@@ -88,6 +91,8 @@
 #define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
+
+#define FPA_MAX_NUMBER_BINNING_CONFIG 1
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
@@ -261,7 +266,9 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
-																						  
+
+extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
+
 // Function prototypes
 
 // pour initialiser le module vhd avec les bons parametres de départ

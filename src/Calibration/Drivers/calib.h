@@ -144,6 +144,8 @@ typedef struct
    uint32_t offsety;
    uint32_t width_aligned;
    uint32_t offsetx_aligned;
+   uint32_t xsize_max;
+   uint32_t ysize_max;
    uint32_t full_width;
    uint32_t aoi_fli_pos;
    uint32_t aoi_lli_pos;

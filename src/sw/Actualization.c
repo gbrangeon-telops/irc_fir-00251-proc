@@ -259,7 +259,7 @@ IRC_Status_t startActualization()
    }
 
    /* Check space availability for an actualization file */
-   numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+   numDataToProcess = FPA_CONFIG_GET(width_max) * FPA_CONFIG_GET(height_max);
    spaceAct = CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
               CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
               numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
@@ -417,9 +417,9 @@ IRC_Status_t Actualization_SM()
    IRC_Status_t writeStatus, detectionStatus;
    fileRecord_t* icuCalibFileRec;
 
-   static const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
-   static const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
-   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static uint32_t frameSize ;//= (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
+   static uint32_t imageDataOffset;// = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
+   static uint32_t numPixels;// = FPA_HEIGHT_MAX  * FPA_WIDTH_MAX;
    const uint32_t age_increment = 10; // [s]
 
    extern float FWExposureTime[MAX_NUM_FILTER];
@@ -719,8 +719,9 @@ IRC_Status_t Actualization_SM()
          ACT_INF("Configuring camera for block index %d", blockIdx);
 
          // Prepare acquisition -> full width
-         GC_SetWidth(gcRegsData.SensorWidth);
-         GC_SetHeight(gcRegsData.SensorHeight);
+         GC_SetBinningMode(calibrationInfo.collection.BinningMode);
+         GC_SetWidth(calibrationInfo.collection.Width);
+         GC_SetHeight(calibrationInfo.collection.Height);
          GC_SetOffsetX(0);
          GC_SetOffsetY(0);
 
@@ -1006,7 +1007,8 @@ IRC_Status_t Actualization_SM()
 
       case ACT_InitComputation:
          // fill the accumulator buffer with zeros
-         memset(mu_buffer, 0, frameSize * sizeof(uint32_t));
+         frameSize = ( calibrationInfo.collection.Height + 2) *  calibrationInfo.collection.Width;
+         memset(mu_buffer, 0, MAX_FRAME_SIZE * sizeof(uint32_t));
 
          // Info on the block being actualized (re-assigned if blockIdx has changed)
          blockInfo = &calibrationInfo.blocks[blockIdx];
@@ -1048,13 +1050,14 @@ IRC_Status_t Actualization_SM()
          }
 
          dataOffset = 0; // position of the pointer for running average [bytes]
-         pixelOffset = imageDataOffset; // offset of the current computing block within a frame [pixels]
+         pixelOffset = 2* calibrationInfo.collection.Width; // offset of the current computing block within a frame [pixels]
 
          setActState(&state, ACT_ComputeAveragedImage);
          break;
 
       case ACT_ComputeAveragedImage:
       {
+         numPixels =  calibrationInfo.collection.Height  *  calibrationInfo.collection.Width;
          const uint32_t numPixelsToProcess = numPixels * coaddData.NCoadd;
 
          // Verify we compute pixels from an image corresponding to the block index
@@ -1181,8 +1184,9 @@ IRC_Status_t Actualization_SM()
          }
 
          // Initialize number of data to process and data pointers
+         imageDataOffset = 2* calibrationInfo.collection.Width;
          p_PixData = mu_buffer + imageDataOffset; // skip the header lines (2 rows)
-         p_Data = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE)); // adresse des données de calibration
+         p_Data = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE)); // adresse des données de calibration
 
          if (currentDeltaBeta->dbEntry->info.discardOffset)
          {
@@ -1385,7 +1389,7 @@ IRC_Status_t Actualization_SM()
          for (i=0, k=blockContext.startIndex; i<blockContext.blockLength; ++i, ++k)
          {
             if (gActBPMapAvailable)
-               badPixelTag = badPixelMap[k + 2*FPA_WIDTH_MAX];
+               badPixelTag = badPixelMap[k + 2* calibrationInfo.collection.Width];
             else
                badPixelTag = 0;
             quantizeDeltaBeta(deltaBetaLSB, currentDeltaBeta->deltaBeta[k] - offset, &d[k], badPixelTag);
@@ -1546,9 +1550,9 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
    static deltabeta_t* currentDeltaBeta = NULL;
 
-   static const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
-   static const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
-   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static uint32_t frameSize ;//= (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
+   static uint32_t imageDataOffset ;//= 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
+   static uint32_t numPixels ;//= FPA_HEIGHT_MAX  * FPA_WIDTH_MAX;
    uint32_t numFramesToSkip;// number of frames to skip at the beginning, corresponding to the AEC transient -> a number of time constants
    static int intBufSeqSize;
 
@@ -1572,11 +1576,14 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
          dataOffset = 0; // position of the pointer for running average [bytes]
 
          sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR;
+         frameSize = (calibrationInfo.collection.Height + 2) * calibrationInfo.collection.Width;
+         imageDataOffset = 2* calibrationInfo.collection.Width;
+         numPixels = calibrationInfo.collection.Height *  calibrationInfo.collection.Width;
 
-         memset(mu_buffer, 0, frameSize * sizeof(uint32_t));
-         memset(max_buffer, 0, frameSize * sizeof(uint16_t));
-         memset(min_buffer, UINT16_MAX, frameSize * sizeof(uint16_t));
-         memset(badPixelMap, 0, frameSize * sizeof(uint8_t));
+         memset(mu_buffer, 0, MAX_FRAME_SIZE * sizeof(uint32_t));
+         memset(max_buffer, 0, MAX_FRAME_SIZE * sizeof(uint16_t));
+         memset(min_buffer, UINT16_MAX, MAX_FRAME_SIZE * sizeof(uint16_t));
+         memset(badPixelMap, 0, MAX_FRAME_SIZE * sizeof(uint8_t));
 
          numberOfBadPixels = 0;
          numberOfNoisy = 0;
@@ -1665,7 +1672,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
    case BPD_UpdateBeta:
       {
-         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE)); // CR_TRICKY the pointer is in 32-bit elements (64 bits per pixel data)
+         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE)); // CR_TRICKY the pointer is in 32-bit elements (64 bits per pixel data)
 
          ACT_updateCurrentCalibration(&calibrationInfo.blocks[blockIdx], &calAddr[blockContext.startIndex*2], currentDeltaBeta, blockContext.startIndex, blockContext.blockLength);
          calibrationInfo.blocks[blockIdx].CalibrationSource = CS_ACTUALIZED;
@@ -1693,8 +1700,8 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
          float frameRate;
 
          // Prepare acquisition -> full width
-         GC_SetWidth(gcRegsData.SensorWidth);
-         GC_SetHeight(gcRegsData.SensorHeight);
+         GC_SetWidth(calibrationInfo.collection.Width);
+         GC_SetHeight(calibrationInfo.collection.Height );
          GC_SetOffsetX(0);
          GC_SetOffsetY(0);
 
@@ -2803,6 +2810,7 @@ static fileRecord_t* findIcuReferenceBlock()
 
       if (refBlockFileHdr.CalibrationType == CALT_ICU &&
             refBlockFileHdr.PixelDataResolution == calibrationInfo.collection.PixelDataResolution &&
+            refBlockFileHdr.BinningMode == calibrationInfo.collection. BinningMode  &&
             refBlockFileHdr.SensorWellDepth == calibrationInfo.collection.SensorWellDepth &&
             refBlockFileHdr.IntegrationMode == calibrationInfo.collection.IntegrationMode &&
             refBlockFileHdr.POSIXTime == calibrationInfo.collection.ReferencePOSIXTime)
@@ -2931,8 +2939,8 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       actFileHeader.DeviceSerialNumber = gcRegsData.DeviceSerialNumber;
       actFileHeader.POSIXTime = privateActualisationPosixTime;
       strcpy(actFileHeader.FileDescription, "");
-      actFileHeader.Width = gcRegsData.SensorWidth;
-      actFileHeader.Height = gcRegsData.SensorHeight;
+      actFileHeader.Width = calibrationInfo.collection.Width;
+      actFileHeader.Height = calibrationInfo.collection.Height ;
       actFileHeader.OffsetX = 0;
       actFileHeader.OffsetY = 0;
       actFileHeader.ReferencePOSIXTime = currentDeltaBeta->dbEntry->info.referencePOSIXTime;
@@ -2974,7 +2982,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       }
 
       dataOffset = 0;
-      numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+      numDataToProcess = calibrationInfo.collection.Width * calibrationInfo.collection.Height;
       dataCRC = 0xFFFF; // init with Modbus CRC-16 starting value. It will be updated as the data is computed
 
       state = FWR_BETA_PARAMS;
@@ -3024,7 +3032,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       actDataHeader.Beta0_Nbits = DELTA_BETA_NUM_BITS;
       actDataHeader.Beta0_Signed = 1;
       actDataHeader.ImageCorrectionDataCRC16 = dataCRC;
-      actDataHeader.ImageCorrectionDataLength = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE * gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+      actDataHeader.ImageCorrectionDataLength = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE * calibrationInfo.collection.Width *calibrationInfo.collection.Height;
 
       // write file data header
       numBytes = CalibImageCorrection_WriteImageCorrectionDataHeader(&actDataHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);
@@ -3052,7 +3060,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       }
 
       dataOffset = 0;
-      numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+      numDataToProcess = calibrationInfo.collection.Width * calibrationInfo.collection.Height;
 
       state = FWR_DATA;
 
@@ -3293,7 +3301,10 @@ static deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calib
             ACT_PRINTF("SensorWellDepth %d, %d\n", p->info.SensorWellDepth, calibInfo->collection.SensorWellDepth);
             ACT_PRINTF("IntegrationMode %d, %d\n", p->info.IntegrationMode, calibInfo->collection.IntegrationMode);
             ACT_PRINTF("ReferencePOSIXTime %d, %d, (current block posixtime) %d\n", p->info.referencePOSIXTime, calibInfo->collection.ReferencePOSIXTime, blockInfo->POSIXTime);
+            ACT_PRINTF("BinningMode %d, %d\n", p->info.BinningMode, calibInfo->collection.BinningMode);
+
             if ((p->info.PixelDataResolution == calibInfo->collection.PixelDataResolution &&
+                  p->info.BinningMode == calibInfo->collection.BinningMode  &&
                   p->info.SensorWellDepth == calibInfo->collection.SensorWellDepth &&
                   p->info.IntegrationMode == calibInfo->collection.IntegrationMode &&
                   p->info.referencePOSIXTime == calibrationInfo.collection.ReferencePOSIXTime) ||
@@ -3577,6 +3588,7 @@ static bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo,
       newData->info.IntegrationMode = calibInfo->collection.IntegrationMode;
       newData->info.PixelDataResolution = calibInfo->collection.PixelDataResolution;
       newData->info.SensorWellDepth = calibInfo->collection.SensorWellDepth;
+      newData->info.BinningMode = calibInfo->collection.BinningMode;
       if (actTypeICU)
       {
          newData->info.type = ACT_ICU;
@@ -3837,7 +3849,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
    uint32_t i, k;
    IRC_Status_t rtnStatus = IRC_NOT_DONE;
 
-   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static uint32_t numPixels ;//= FPA_HEIGHT_MAX  * FPA_WIDTH_MAX;
 
    float* betaArray = (float*)mu_buffer; // buffer recycling
 
@@ -3861,6 +3873,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
          {
             GETTIME(&tic_TotalDuration);
             tic_RT_Duration = 0;
+            numPixels = calibrationInfo.collection.Height *  calibrationInfo.collection.Width;
             ctxtInit(&blockContext, 0, numPixels, ACT_MAX_PIX_DATA_TO_PROCESS);
             setBqState(&state, BQ_UpdateBeta);
          }
@@ -3870,7 +3883,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
    case BQ_UpdateBeta:
       {
          // decode beta and update it with deltaBeta into betaArray
-         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
+         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE));
 
          GETTIME(&t0);
 
@@ -3930,7 +3943,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
 
    case BQ_QuantizeBeta:
       {
-         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
+         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE));
          uint8_t nbits = calibrationInfo.blocks[blockIdx].pixelData.Beta0_Nbits;
          const float beta_offset = 0; // CR_WARNING beta offset is currently always 0 (the calibration chain does not support other values)
          int8_t newExponent;

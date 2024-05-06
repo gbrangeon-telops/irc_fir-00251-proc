@@ -240,6 +240,7 @@ static uint32_t sw_init_success = 0;
 static float gIntg_dly = 0.0F;
 static float gFr_dly = 0.0F;
 static bool gFpaInit;
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);

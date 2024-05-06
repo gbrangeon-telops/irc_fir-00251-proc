@@ -45,7 +45,7 @@
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   4
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
-
+#define FPA_MAX_NUMBER_CONFIG_MODE 1U
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
@@ -314,6 +314,8 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
+
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] ;
 																						  
 // Function prototypes
 

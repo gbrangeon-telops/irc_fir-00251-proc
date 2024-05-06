@@ -37,13 +37,39 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\bb1920_serdes\src\bb1920_deserializer_tb
 acom d:\Telops\FIR-00251-Proc\aldec\src\bb1920_serdes\src\TestBench\bb1920_deserializer_tb_TB.vhd
 
 asim bb1920_deserializer_tb_TB
-
+add wave -named_row "------------------------Test bench-------------------------------------" 
+wave UUT/* 
+add wave -named_row "------------------------fpa data cnt-------------------------------------" 
+wave UUT/U7/* 
+add wave -named_row "------------------------afpa diag gen-------------------------------------" 
+wave UUT/U4/* 
+add wave -named_row "------------------------gen dispatcher-------------------------------------" 
+wave UUT/U3/* 
+add wave -named_row "------------------------dual seralizer-------------------------------------" 
+wave UUT/U1/*
+add wave -named_row "------------------------bb1920 deserializer CH1-------------------------------------" 
+wave UUT/U5/CH1/* 
+add wave -named_row "------------------------CH1 SERDES-------------------------------------" 
+wave UUT/U5/CH1/U32/*   
+add wave -named_row "------------------------CH1 proxy dout-------------------------------------" 
+wave UUT/U5/CH1/U6/*   
+add wave -named_row "------------------------clink calibration-------------------------------------" 
+wave UUT/U5/CH1/U74/*		  
+add wave -named_row "------------------------clink calibration delay-------------------------------------" 
+wave UUT/U5/CH1/U74/U1/*		  
+add wave -named_row "------------------------clink calibration bitslip-------------------------------------" 
+wave UUT/U5/CH1/U74/U4/*		  
+add wave -named_row "------------------------clink delay-------------------------------------" 
+wave UUT/U5/CH1/U75/*
+add wave -named_row "------------------------clink delay validator-------------------------------------" 
+wave UUT/U5/CH1/U75/U8/U2/*
+add wave -named_row "------------------------bb1920 deserializer-------------------------------------" 
+wave UUT/U5/* 
+add wave -named_row "------------------------bb1920 deserializer even-------------------------------------" 
+wave UUT/U5/U1/*
 wave UUT/U5/U2/*
-wave UUT/U7/*
-wave UUT/U4/*
-wave UUT/U5/CH1/*
-wave UUT/U5/*
-wave UUT/U5/U7/*
-
+add wave -named_row "------------------------bb1920 deserializer odd-------------------------------------" 
+wave UUT/U5/U11/*
+wave UUT/U5/U8/*
 
 run 50 ms

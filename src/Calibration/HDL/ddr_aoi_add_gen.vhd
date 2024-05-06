@@ -75,7 +75,8 @@ architecture RTL of ddr_aoi_add_gen is
    signal img_offsetx  : integer range 0 to IMG_WIDTH_MAX;
    signal img_offsety  : integer range 0 to IMG_HEIGHT_MAX;
    signal img_width    : integer range 0 to IMG_WIDTH_MAX;
-   signal img_height   : integer range 0 to IMG_HEIGHT_MAX;
+   signal img_height   : integer range 0 to IMG_HEIGHT_MAX;	 
+   signal img_xsize_max   : integer ; 
    signal add_offset_u : unsigned(ADD_OFFSET'range);
    
 begin                      
@@ -120,7 +121,8 @@ begin
                         img_width   <= to_integer(AOI_PARAM.WIDTH);
                         img_height  <= to_integer(AOI_PARAM.HEIGHT);
                         img_offsetx <= to_integer(AOI_PARAM.OFFSETX);
-                        img_offsety <= to_integer(AOI_PARAM.OFFSETY);                        
+                        img_offsety <= to_integer(AOI_PARAM.OFFSETY);
+						img_xsize_max <= to_integer(AOI_PARAM.XSIZE_MAX);
                      end if;
                      if NEW_IMG = '1' then            -- generer les adresses seulement si une image est entrain de rentrer dans la chaine
                         add_offset_u <= unsigned(ADD_OFFSET);
@@ -128,7 +130,7 @@ begin
                      end if;
                   
                   when init_st1 =>
-                     add <= img_offsety * IMG_WIDTH_MAX; 
+                     add <= img_offsety * img_xsize_max; 
                      add_gen_fsm <= init_st2;
                   
                   when init_st2 =>
@@ -136,11 +138,11 @@ begin
                      add_gen_fsm <= init_st3;
                   
                   when init_st3 =>
-                     add <= add - IMG_WIDTH_MAX;    -- pour tenir compte de l'ajout de IMG_WIDTH_MAX dans le prochain etat 
+                     add <= add - img_xsize_max;    -- pour tenir compte de l'ajout de img_xsize_max dans le prochain etat 
                      add_gen_fsm <= line_addgen_st;
                   
                   when line_addgen_st =>
-                     add <= add + IMG_WIDTH_MAX;
+                     add <= add + img_xsize_max;
                      add_dval <= '1';
                      if line_cnt = img_height then
                         add_eof <= '1';

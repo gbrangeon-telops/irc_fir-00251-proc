@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 1475
+ FREEID 1532
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -18,6 +18,160 @@ HEADER
   CREATIONDATE="2/11/2021"
   PAGECOUNT="2"
   TITLE="dual_data_serializer"
+ }
+ SYMBOL "kintex7" "OBUFDS" "OBUFDS"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #BLACK_BOX="0"
+    #CUSTOM_NAME=""
+    #DESCRIPTION="Output Buffer"
+    #GENERIC0="IOSTANDARD:STRING:=\"DEFAULT\""
+    #GENERIC1="CAPACITANCE:STRING:=\"DONT_CARE\""
+    #GENERIC2="SLEW:STRING:=\"SLOW\""
+    #LANGUAGE="VHDL"
+    #MODIFIED="1301492959"
+    #NO_SYMBOL_NAME="1"
+    #NO_SYMBOL_REFERENCE="1"
+    #PRAGMED_GENERICS=""
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1d7645e4-69cb-4fd1-98d1-8c60a3c7d0de"
+    LEVEL="XILINX"
+    LIBVER="2.0.0"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,140,40)
+    FREEID 12
+   }
+   
+   BODY
+   {
+    TEXT  2, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (0,-7,6,20)
+     ALIGN 8
+     COLOR (0,0,255)
+     PARENT 1
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    TEXT  4, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (121,-27,140,0)
+     ALIGN 10
+     COLOR (0,0,255)
+     PARENT 3
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    TEXT  6, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (92,13,127,40)
+     ALIGN 8
+     COLOR (0,0,255)
+     PARENT 5
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    LINE  7, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     POINTS ( (80,40), (68,34) )
+     FILL (1,(0,0,0),0)
+    }
+    LINE  8, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     POINTS ( (80,0), (60,10) )
+     FILL (1,(0,0,0),0)
+    }
+    ELLIPSE  9, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     AREA (60,28,68,36)
+     FILL (1,(0,0,0),0)
+    }
+    LINE  10, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     POINTS ( (40,0), (40,40), (80,20), (40,0) )
+     FILL (1,(0,0,0),0)
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "OBUFDS"
+     RECT (20,44,100,66)
+     ALIGN 4
+     COLOR (191,0,191)
+     FONT (8,0,0,400,0,0,0,"Arial")
+    }
+    PIN  1, 0, 0
+    {
+     COORD (0,20)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="I"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="IN"
+      PORT_ID="2"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (40,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+    PIN  3, 0, 0
+    {
+     COORD (140,0)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="O"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="OUT"
+      PORT_ID="1"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (-60,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+    PIN  5, 0, 0
+    {
+     COORD (140,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="OB"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="OUT"
+      PORT_ID="6"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (-60,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+   }
+  }
  }
  SYMBOL "#default" "LL8_to_serial" "LL8_to_serial"
  {
@@ -336,160 +490,6 @@ HEADER
      LINE  2, 0, 0
      {
       POINTS ( (20,0), (0,0) )
-     }
-    }
-   }
-  }
- }
- SYMBOL "kintex7" "OBUFDS" "OBUFDS"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #BLACK_BOX="0"
-    #CUSTOM_NAME=""
-    #DESCRIPTION="Output Buffer"
-    #GENERIC0="IOSTANDARD:STRING:=\"DEFAULT\""
-    #GENERIC1="CAPACITANCE:STRING:=\"DONT_CARE\""
-    #GENERIC2="SLEW:STRING:=\"SLOW\""
-    #LANGUAGE="VHDL"
-    #MODIFIED="1301492959"
-    #NO_SYMBOL_NAME="1"
-    #NO_SYMBOL_REFERENCE="1"
-    #PRAGMED_GENERICS=""
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1d7645e4-69cb-4fd1-98d1-8c60a3c7d0de"
-    LEVEL="XILINX"
-    LIBVER="2.0.0"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (0,0,140,40)
-    FREEID 12
-   }
-   
-   BODY
-   {
-    TEXT  2, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (0,-7,6,20)
-     ALIGN 8
-     COLOR (0,0,255)
-     PARENT 1
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    TEXT  4, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (121,-27,140,0)
-     ALIGN 10
-     COLOR (0,0,255)
-     PARENT 3
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    TEXT  6, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (92,13,127,40)
-     ALIGN 8
-     COLOR (0,0,255)
-     PARENT 5
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    LINE  7, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     POINTS ( (80,40), (68,34) )
-     FILL (1,(0,0,0),0)
-    }
-    LINE  8, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     POINTS ( (80,0), (60,10) )
-     FILL (1,(0,0,0),0)
-    }
-    ELLIPSE  9, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     AREA (60,28,68,36)
-     FILL (1,(0,0,0),0)
-    }
-    LINE  10, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     POINTS ( (40,0), (40,40), (80,20), (40,0) )
-     FILL (1,(0,0,0),0)
-    }
-    TEXT  11, 0, 0
-    {
-     TEXT "OBUFDS"
-     RECT (20,44,100,66)
-     ALIGN 4
-     COLOR (191,0,191)
-     FONT (8,0,0,400,0,0,0,"Arial")
-    }
-    PIN  1, 0, 0
-    {
-     COORD (0,20)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="I"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="IN"
-      PORT_ID="2"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (40,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-    PIN  3, 0, 0
-    {
-     COORD (140,0)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="O"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="OUT"
-      PORT_ID="1"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (-60,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-    PIN  5, 0, 0
-    {
-     COORD (140,40)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="OB"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="OUT"
-      PORT_ID="6"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (-60,0), (0,0) )
-      FILL (1,(0,0,0),0)
      }
     }
    }
@@ -1912,11 +1912,11 @@ PAGE ""
 "\n"+
 "\n"+
 "\n"+
-"library bb1920_serdes;\n"+
-"library bb1920_serdes;\n"+
-"use bb1920_serdes.fpa_common_pkg.all;\n"+
-"use bb1920_serdes.fpa_common_pkg.all;"
-   RECT (200,200,740,440)
+"--library bb1920_serdes;\n"+
+"--library bb1920_serdes;\n"+
+"--use bb1920_serdes.fpa_common_pkg.all;\n"+
+"--use bb1920_serdes.fpa_common_pkg.all;"
+   RECT (200,200,620,700)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(239,235,255),0)
    MARGINS (20,20)
@@ -2038,7 +2038,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  1458, 0, 0
+  TEXT  1515, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2049,7 +2049,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1459, 0, 0
+  TEXT  1516, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -2060,7 +2060,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  1460, 0, 0
+  TEXT  1517, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -2070,7 +2070,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1461, 0, 0
+  TEXT  1518, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2082,7 +2082,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  1462, 0, 0
+  TEXT  1519, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -2095,7 +2095,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  1463, 0, 0
+  TEXT  1520, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -2105,7 +2105,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1464, 0, 0
+  TEXT  1521, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2117,7 +2117,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  1465, 0, 0
+  TEXT  1522, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -2127,7 +2127,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  1466, 0, 0
+  TEXT  1523, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -2138,7 +2138,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  1467, 0, 0
+  GROUP  1524, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,2820,2001,3201)
@@ -2150,7 +2150,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1468, 0, 0
+  GROUP  1525, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,3020,2001,3021)
@@ -2162,7 +2162,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1469, 0, 0
+  GROUP  1526, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,2960,2001,2961)
@@ -2174,7 +2174,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1470, 0, 0
+  GROUP  1527, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,3080,2001,3081)
@@ -2186,7 +2186,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1471, 0, 0
+  GROUP  1528, 0, 0
   {
    PAGEALIGN 10
    RECT (1120,3140,2001,3141)
@@ -2198,7 +2198,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  1472, 0, 0
+  GROUP  1529, 0, 0
   {
    PAGEALIGN 10
    RECT (1300,2820,1301,2961)
@@ -2209,7 +2209,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  1473, 0, 0
+  GROUP  1530, 0, 0
   {
    PAGEALIGN 10
    RECT (1300,2960,1301,3201)
@@ -2220,7 +2220,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  1474, 0, 0
+  BMPPICT  1531, 0, 0
   {
    PAGEALIGN 10
    RECT (1140,2880,1279,2925)

@@ -409,13 +409,13 @@ begin
                   
                   -- cmd_data: int_time
                   elsif (byte_cnt = 13 and mb_struct_cfg.enable_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');                   
-                  elsif (byte_cnt = 13 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(7 downto 0));                    
+                  elsif (byte_cnt = 13 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_signal_high_time(7 downto 0));                    
 
                   elsif (byte_cnt = 14 and mb_struct_cfg.enable_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');            
-                  elsif (byte_cnt = 14 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(15 downto 8));              
+                  elsif (byte_cnt = 14 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_signal_high_time(15 downto 8));              
 
                   elsif (byte_cnt = 15 and mb_struct_cfg.enable_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');    
-                  elsif (byte_cnt = 15 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_time(19 downto 16));     
+                  elsif (byte_cnt = 15 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_signal_high_time(19 downto 16));     
    
                      -- checksum
                   elsif byte_cnt = 19 then
@@ -492,7 +492,7 @@ begin
       if rising_edge(MB_CLK) then 
          
          abs_int_time_offset_i <= to_integer(abs(user_cfg_i.int_time_offset));         
-         if int_time_pipe(3) > to_integer(user_cfg_i.int_time_offset) then 
+         if int_time_pipe(3) > abs_int_time_offset_i then 
             subtraction_possible <= '1';
          else
             subtraction_possible <= '0';
@@ -531,7 +531,7 @@ begin
          int_dval_pipe(7)     <= int_dval_pipe(6);
          
          -- mapping de int_cfg_i        
-         int_cfg_i.int_time               <= int_time_pipe(3)(int_cfg_i.int_time'length-1 downto 0); -- temps d'integration convertie en MCLK
+         int_cfg_i.int_time               <= int_time_pipe(3)(int_cfg_i.int_time'length-1 downto 0); -- temps d'integration convertie en MCLK 
          int_cfg_i.int_signal_high_time   <= int_time_pipe(4)(int_cfg_i.int_signal_high_time'length-1 downto 0); -- temps d'integration que le detecteur doit faire en tenant compte de son offset de temps interne.
          int_cfg_i.int_dly                <= mb_struct_cfg.int_dly_cst;
          int_cfg_i.int_indx               <= int_indx_pipe(4);
@@ -654,7 +654,7 @@ begin
                when X"DC" =>  axi_rdata <= std_logic_vector(to_unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS          , 32)); 
                when X"E0" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.frame_dly                                  , 32)); 
                when X"E4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
-               when X"E8" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
+               when X"E8" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_signal_high_time                       , 32));              
                when X"EC" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
                when X"F0" =>  axi_rdata <= resize('0' & roic_read_reg_i                                                       , 32);
 

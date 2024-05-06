@@ -253,6 +253,7 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint8_t init_done = 0;
 ProximCfg_t ProximCfg = {{4518, 4518, 4518, 1046,  5738, 6075, 8507, 4518}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 // definition et activation des accelerateurs
 uint8_t speedup_lsydel         = 0;      // les speed_up n'ont que deux valeurs : 0 ou 1

@@ -17,7 +17,9 @@ architecture TB_ARCHITECTURE of bb1920_deserializer_tb_tb is
    -- Component declaration of the tested unit
    component bb1920_deserializer_tb
       port(
-         ACQ_INT        : in STD_LOGIC;
+	  	ACQ_INT        : in STD_LOGIC;	
+	  	EN_0        	: in STD_LOGIC;
+	  	EN_1        	: in STD_LOGIC;
          ARESET         : in STD_LOGIC;
          CLK200         : in STD_LOGIC;
          DCLK_1X        : in STD_LOGIC;
@@ -28,9 +30,14 @@ architecture TB_ARCHITECTURE of bb1920_deserializer_tb_tb is
    end component;
    
    
-   constant XSIZE            : integer := 320;
-   constant YSIZE            : integer := 256;  
-   
+   constant XSIZE            : integer := 960;
+   constant YSIZE            : integer := 768;  
+   constant AOI_FLAG1_SOL_POS   : integer := 1;	
+   constant AOI_FLAG1_EOL_POS   : integer := 479; 
+   constant AOI_FLAG2_SOL_POS   : integer := 480;	
+   constant AOI_FLAG2_EOL_POS   : integer := 480;
+   constant DIAG_YSIZE   		: integer := 192;
+   constant DIAG_XSIZE   		: integer := 480 ;
    constant CLK200_PERIOD    : time := 5 ns;
    constant DOUT_CLK_PERIOD  : time := 10 ns;
    constant DCLK_1X_PERIOD   : time := 14.288 ns;
@@ -48,6 +55,9 @@ architecture TB_ARCHITECTURE of bb1920_deserializer_tb_tb is
    signal DOUT_CLK      : STD_LOGIC := '0';
    signal MCLK_SOURCE   : STD_LOGIC := '0';
    signal FPA_INTF_CFG  : fpa_intf_cfg_type;
+   signal EN_0 			: STD_LOGIC := '0';
+   signal EN_1 			: STD_LOGIC := '0';	 
+   signal binning_mode  : std_logic_vector(1 downto 0) := "00";	
    -- Observed signals - signals mapped to the output ports of tested entity
    
    -- Add your code here ...
@@ -64,14 +74,28 @@ begin
    end process;
    
    -- ACQ_INT
-   U01: process(ACQ_INTi)
+   --U01: process(ACQ_INTi)	 
+   U01: process
    begin
-      ACQ_INTi <= not ACQ_INTi after ACQ_INT_PERIOD/2; 
+      --ACQ_INTi <= not ACQ_INTi after ACQ_INT_PERIOD/2; 
+	  -- config 
+   	  binning_mode <= "00";
+	  wait for 1 ms;
+	  ACQ_INTi <= '1';
+	  wait for 1000 ns;
+	  ACQ_INTi <= '0';
+	  wait for 10 ms;
+	  binning_mode <= "01";
+	  wait for 100 ns;
+	  ACQ_INTi <= '1';
+	  wait for 1000 ns;
+	  ACQ_INTi <= '0'; 
+	  wait for 15 ms;
    end process;
-   ACQ_INTii <= transport ACQ_INTi after 5000 ns;
+   --ACQ_INTii <= transport ACQ_INTi after 1000 ns;
    
-   ACQ_INT <= ACQ_INTi and not ACQ_INTii;
-   
+   --ACQ_INT <= ACQ_INTi and not ACQ_INTii;
+   ACQ_INT <= ACQ_INTi ;
    -- CLK200
    U1: process(CLK200)
    begin
@@ -97,24 +121,38 @@ begin
       DCLK_8X <= not DCLK_8X after DCLK_8X_PERIOD/2; 
    end process; 
    
-   -- config
-   FPA_INTF_CFG.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_CNST;
+   EN_0 <= '1' ;
+   EN_1 <= '1' ;
+   
+   FPA_INTF_CFG.OP.BINNING <= binning_mode;
+   
+   --FPA_INTF_CFG.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_CNST;	 
+   FPA_INTF_CFG.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR_DYN;
    FPA_INTF_CFG.COMN.fpa_diag_mode            <= '1';
    FPA_INTF_CFG.COMN.fpa_diag_type            <= DEFINE_TELOPS_DIAG_DEGR;
+   FPA_INTF_CFG.AOI_FLAG1.SOL_POS                   <= to_unsigned(AOI_FLAG1_SOL_POS,  FPA_INTF_CFG.AOI_FLAG1.SOL_POS'LENGTH);                 
+   FPA_INTF_CFG.AOI_FLAG1.EOL_POS          <= to_unsigned(AOI_FLAG1_EOL_POS, FPA_INTF_CFG.AOI_FLAG1.EOL_POS'LENGTH);  
+   FPA_INTF_CFG.AOI_FLAG2.SOL_POS                    <= to_unsigned(AOI_FLAG2_SOL_POS, FPA_INTF_CFG.AOI_FLAG2.SOL_POS'LENGTH);                 
+   FPA_INTF_CFG.AOI_FLAG2.EOL_POS         <= to_unsigned(AOI_FLAG2_SOL_POS, FPA_INTF_CFG.AOI_FLAG2.EOL_POS'LENGTH);
    
-   FPA_INTF_CFG.DIAG.YSIZE                    <= to_unsigned(YSIZE, FPA_INTF_CFG.DIAG.YSIZE'LENGTH);                 
-   FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM         <= to_unsigned(XSIZE/4, FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM'LENGTH);
+   FPA_INTF_CFG.DIAG.YSIZE                    <= to_unsigned(DIAG_YSIZE, FPA_INTF_CFG.DIAG.YSIZE'LENGTH);                 
+   FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM         <= to_unsigned(DIAG_XSIZE, FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM'LENGTH);
    FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE         <= to_unsigned(3, FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE'LENGTH);
    FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY    <= to_unsigned(8, FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY'LENGTH);
    
    FPA_INTF_CFG.fpa_serdes_lval_num           <= to_unsigned(YSIZE, FPA_INTF_CFG.fpa_serdes_lval_num'LENGTH);
    FPA_INTF_CFG.fpa_serdes_lval_len           <= to_unsigned(XSIZE/4, FPA_INTF_CFG.fpa_serdes_lval_len'LENGTH);
    
+   --FPA_INTF_CFG.vid_if_bit_en		 			<= '1' ; 
+   FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY <= to_unsigned(8, 16);
    
+   -- -- FPA_INTF_CFG.OP.BINNING <= transport "01" after 8000 ns;
    -- Unit Under Test port map
    UUT : bb1920_deserializer_tb
    port map (
-      ACQ_INT        => ACQ_INT,
+   	  ACQ_INT        => ACQ_INT,
+      EN_0           => EN_0,
+      EN_1           => EN_1,
       ARESET         => ARESET,
       CLK200         => CLK200,
       DCLK_1X        => DCLK_1X,

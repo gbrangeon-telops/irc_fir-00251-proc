@@ -47,7 +47,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
          DET_CC_P3      : out STD_LOGIC;
          DET_CC_P4      : out STD_LOGIC;
          DET_FPA_ON     : out STD_LOGIC;
-         DOUT_MOSI      : out t_axi4_stream_mosi64;
+         DOUT_MOSI      : out t_axi4_stream_mosi128;
          ERR_FOUND      : out STD_LOGIC;
          FSYNC_N        : out STD_LOGIC;
          FSYNC_P        : out STD_LOGIC;
@@ -132,6 +132,12 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    signal user_ysize2 : natural;
    signal user_xsize3 : natural;
    signal user_ysize3 : natural;
+   signal user_xsize4 : natural;
+   signal user_ysize4 : natural;
+   signal user_bin1   : natural;
+   signal user_bin2   : natural;
+   signal user_bin3   : natural;
+   signal user_bin4   : natural;
    signal cnt         : integer := 0;
    
    signal enable_serdes_init : STD_LOGIC := '1';
@@ -143,7 +149,8 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    
    signal user_cfg_vector1              : unsigned(QWORDS_NUM*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
-   signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
+   signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);	
+   signal user_cfg_vector4              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
    signal vdac_value_2                  : unsigned(31 downto  0);
    signal vdac_value_3                  : unsigned(31 downto  0);
@@ -243,7 +250,32 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
-         
+         -- ptrA->op_binning
+  --    if(!ptrA->op_binning){
+  --  ptrA->aoi_flag2_sol_pos         = (uint32_t)FULL_ROW_SIZE/4;           // quand � la seconde partie des flags, elle se resume au EOL qui se retrouve toujours � la fin de la ligne compl�te (pleine ligne)
+  --  ptrA->aoi_flag2_eol_pos         = (uint32_t)FULL_ROW_SIZE/4;
+  --  }else{
+  --   ptrA->aoi_flag2_sol_pos         = (uint32_t)FULL_ROW_SIZE/8;           // quand � la seconde partie des flags, elle se resume au EOL qui se retrouve toujours � la fin de la ligne compl�te (pleine ligne)
+  --   ptrA->aoi_flag2_eol_pos         = (uint32_t)FULL_ROW_SIZE/8;
+  -- }   
+  
+--     //Test pattern Telops
+--   if(!ptrA->op_binning){
+--       ptrA->diag_xsize_div_tapnum           = (uint32_t)FULL_ROW_SIZE/4 ;            // toujours diviser par 4 m�me si on a 8 pixels/clk
+--       ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au m�me moment
+--
+--   } else {
+--       ptrA->diag_xsize_div_tapnum           = (uint32_t)FULL_ROW_SIZE/8 ;            // toujours diviser par 4 m�me si on a 8 pixels/clk
+--       ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au m�me moment
+--   }
+
+--
+--   if(!ptrA->op_binning){
+--      ptrA->fpa_serdes_lval_len          = (uint32_t)FULL_ROW_SIZE/4 ;
+--    }else{
+--       ptrA->fpa_serdes_lval_len           = (uint32_t)FULL_ROW_SIZE/8 ;
+--    }
+    
          fpa_softw_stat_i.fpa_roic     <= FPA_ROIC_BLACKBIRD1920;
          fpa_softw_stat_i.fpa_output   <= OUTPUT_DIGITAL;    
          fpa_softw_stat_i.fpa_input    <= LVDS25;        
@@ -254,19 +286,30 @@ begin
          enable_failure_resp_management <= '0';
          enable_external_int_ctrl <= '0';
 
-         -- cfg usager
-         user_xsize1 <= 1920;
-         user_ysize1 <= 1536;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
+         -- cfg usager   
+         user_bin1 <= 1; -- binning mode
          
-         user_xsize2 <= 320;
-         user_ysize2 <= 128;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         user_xsize1 <= 480;
+         user_ysize1 <= 768;
+         --user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, user_bin1, 1); 
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, user_bin1, 1); 		 --diag mode
+
+         user_xsize2 <= 480;
+         user_ysize2 <= 768; 
+         user_bin2 <= 1; 
          
-         user_xsize3 <= 64;
-         user_ysize3 <= 64;
-         user_cfg_vector3 <= to_intf_cfg('1', user_xsize3, user_ysize3, 3);
+         user_cfg_vector2 <= to_intf_cfg('1', user_xsize2, user_ysize2, user_bin2, 2);
          
+         user_xsize3 <= 480;
+         user_ysize3 <= 768;   
+         user_bin3 <= 1;
+         user_cfg_vector3 <= to_intf_cfg('1', user_xsize3, user_ysize3, user_bin3, 3);
+
+         user_xsize4 <= 960;
+         user_ysize4 <= 768;   
+         user_bin4 <= 0;
+         user_cfg_vector4 <= to_intf_cfg('1', user_xsize4, user_ysize4, user_bin4, 4);
+		 
          -- dac       
          vdac_value_1               	<= to_unsigned(0, 32); 
          vdac_value_2               	<= to_unsigned(0, 32); 
@@ -274,7 +317,8 @@ begin
          vdac_value_4               	<= to_unsigned(0, 32); 
          vdac_value_5               	<= to_unsigned(0, 32); 
          vdac_value_6               	<= to_unsigned(0, 32); 
-         vdac_value_7               	<= to_unsigned(0, 32); 
+         vdac_value_7               	<= to_unsigned(0, 32); 		  	 
+		 
          vdac_value_8               	<= to_unsigned(11630, 32); 
          -- fleg dac
          dac_cfg_vector <= vdac_value_1               
@@ -316,7 +360,7 @@ begin
       --wait until rising_edge(MB_CLK); 
       ARESETN <= '1'; 
       
-      wait for 350 ns;
+      wait for 1000 ns;
       ACQ_TRIG <= '1';
       XTRA_TRIG <= '0';
    
@@ -324,7 +368,8 @@ begin
       wait for 500 ns; 
       --      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
       --      wait for 30 ns;      
-      
+       ACQ_TRIG <= '0'; 
+	  
       write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
       write_axi_lite (MB_CLK, resize(X"AE4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
@@ -344,7 +389,7 @@ begin
       write_axi_lite (MB_CLK, resize(X"AB0",32), resize('0'&enable_external_int_ctrl, 32), MB_MISO,  MB_MOSI);
       
       wait for 500 ns;
-      
+
       -- la cfg des dacs fait office ici de cfg serielle operationnelle
       for ii in 0 to 8-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -352,9 +397,11 @@ begin
          end_pos   := start_pos - 31;
          write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(AW_SERIAL_OP_CMD_RAM_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
-      end loop;      
-      
-      
+      end loop;
+
+      -- 3435 ns
+      wait for 1 ms;
+
       for ii in 0 to QWORDS_NUM-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
@@ -364,37 +411,66 @@ begin
       end loop; 
       
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;
+      wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000404", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;
+      wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;  
+      wait for 50 ns; 
+	  FPA_EXP_INFO.exp_dval <= '1';  
+	  wait for 500 ns; 
+	  FPA_EXP_INFO.exp_dval <= '0'; 
+      ACQ_TRIG <= '1';
+      XTRA_TRIG <= '0';	
+	  wait for 5 ms ; 
+	  for ii in 0 to QWORDS_NUM-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector1'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
+      FPA_EXP_INFO.exp_dval <= '1';
+	  ACQ_TRIG <= '0';
+      XTRA_TRIG <= '0';
+	  wait for 1 ms	;
+	  FPA_EXP_INFO.exp_dval <= '0'; 
+	  ACQ_TRIG <= '1';
+      XTRA_TRIG <= '0';
+      wait for 10 ms;
       
+      for ii in 0 to QWORDS_NUM-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector2'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;	  
+	  FPA_EXP_INFO.exp_dval <= '1';
+	  wait for 500 ns	; 
+	  FPA_EXP_INFO.exp_dval <= '0';
+      wait for 30 ms;
+      -- 
+      for ii in 0 to QWORDS_NUM-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector4'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
+      --      
+      wait for 20 ms;
+      --      
+      for ii in 0 to QWORDS_NUM-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector1'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector4(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;      
       
---      wait for 3.5 ms;
---      ACQ_TRIG <= '0';
---      XTRA_TRIG <= '1';
-      
---      
---      for ii in 0 to QWORDS_NUM-1 loop 
---         wait until rising_edge(MB_CLK);      
---         start_pos := user_cfg_vector2'length -1 - 32*ii;
---         end_pos   := start_pos - 31;
---         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
---         wait for 30 ns;
---      end loop; 
---      --      
---      wait for 2 ms;
---      --      
---      for ii in 0 to QWORDS_NUM-1 loop 
---         wait until rising_edge(MB_CLK);      
---         start_pos := user_cfg_vector3'length -1 - 32*ii;
---         end_pos   := start_pos - 31;
---         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
---         wait for 30 ns;
---      end loop;      
-      
-      
+      wait for 20 ms;
+      --      
+	  
       report "FCR written"; 
       
       report "END OF SIMULATION" 

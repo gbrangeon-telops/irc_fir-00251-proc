@@ -36,7 +36,7 @@
 #endif
 
 
-// adresse du registre de contrôle
+// adresse du registre de contrÃ´le
 #define A_BASE_HEADER         0x200    // pour faire la commutation entre le domaine du header et de la config
 #define AR_STATUS             0x50
 #define AW_RESET_ERR          0xC0
@@ -135,11 +135,11 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 // AXI4L_write8 AXI4L_write16 ou AXI4L_write32 dependamment de la taille du champ.
 // ne pas faire de concatenation
 // Les adresses doit etre exactement ceux decrit dans le fichier excel/xml du header
-// si jamais un mot de 24 bits doit etre envoyé, il faut le convertir en 32 bits et l'envoyer avec AXI4L_write32
+// si jamais un mot de 24 bits doit etre envoyÃ©, il faut le convertir en 32 bits et l'envoyer avec AXI4L_write32
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 13.3
+// Generated from the IRCam header definition XLS file version 13.4
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -209,6 +209,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write32(data32, a->ADD + A_BASE_HEADER + ExternalBlackBodyTemperatureHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_Sensor] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureSensorHdrAddr);
    AXI4L_write8((uint8_t)((pGCRegs->SensorID >> 8) & 0xFF), a->ADD + A_BASE_HEADER + SensorIDMSBHdrAddr);
+   AXI4L_write8((uint8_t)(pGCRegs->BinningMode), a->ADD + A_BASE_HEADER + BinningModeHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_InternalLens] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureInternalLensHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_ExternalLens] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureExternalLensHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_InternalCalibrationUnit] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureInternalCalibrationUnitHdrAddr);

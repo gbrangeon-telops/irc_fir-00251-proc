@@ -78,7 +78,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 13.3.1
+// Generated from XML camera definition file version 13.4.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -109,6 +109,7 @@ void GC_Callback_Init()
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].callback =                        &GC_AutomaticExternalFanSpeedModeCallback;
    gcRegsDef[AvailabilityFlagsIdx].callback =                                    &GC_AvailabilityFlagsCallback;
    gcRegsDef[BadPixelReplacementIdx].callback =                                  &GC_BadPixelReplacementCallback;
+   gcRegsDef[BinningModeIdx].callback =                                          &GC_BinningModeCallback;
    gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx].callback =            &GC_CalibrationCollectionActiveBlockPOSIXTimeCallback;
    gcRegsDef[CalibrationCollectionActivePOSIXTimeIdx].callback =                 &GC_CalibrationCollectionActivePOSIXTimeCallback;
    gcRegsDef[CalibrationCollectionActiveTypeIdx].callback =                      &GC_CalibrationCollectionActiveTypeCallback;
@@ -746,6 +747,50 @@ void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
 
       // Update BadPixelReplacement image header field
       HDER_UpdateBadPixelReplacementHeader(&gHderInserter, &gcRegsData);
+   }
+}
+
+/**
+ * BinningMode GenICam register callback function.
+ *
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_BinningModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   static uint32_t prevBinningMode = BM_NoBinning;
+   if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
+   {
+      prevBinningMode = gcRegsData.BinningMode;
+   }
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // Update GC only if binning mode is valid, should be at this point?
+      if((TDCFlags2Tst(Binning2x2IsImplementedMask) && ( gcRegsData.BinningMode == BM_Mode2x2)) ||
+            (gcRegsData.BinningMode == BM_NoBinning) ||
+            (TDCFlags2Tst(Binning4x4IsImplementedMask) && (gcRegsData.BinningMode == BM_Mode4x4)) ){
+
+         // In the case, binning is changed with the raw0
+         GC_SetWidthMax(FPA_CONFIG_GET(width_max));
+         GC_SetHeightMax(FPA_CONFIG_GET(height_max));
+
+       }
+      else {
+         BIN_ERR("Failed to update binning mode,%s is not implemented.",BinningModeToString(gcRegsData.BinningMode));
+         gcRegsData.BinningMode = prevBinningMode;
+      }
+
+      GC_UpdateImageLimits();
+      GC_DeviceRegistersVerification() ;
+
+      //update AEC with the new resolution
+      AEC_Init(&gcRegsData,&gAEC_Ctrl) ;
+
+      BIN_DBG("binning mode %s, update gc:",BinningModeToString(gcRegsData.BinningMode));
+      BIN_DBG("widthmax %d heightmax %d offsetXmax %d offsetYmax %d",gcRegsData.WidthMax,gcRegsData.HeightMax,gcRegsData.OffsetXMax,gcRegsData.OffsetYMax);
+
+
    }
 }
 
@@ -3008,7 +3053,7 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       GC_UpdateImageLimits();   // must be called first
 
       SFW_HeightChanged(&gcRegsData);
-      GC_UpdateParameterLimits();
+      GC_DeviceRegistersVerification(); //must be called to clear error set after binning mode validation
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
@@ -4572,7 +4617,8 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       GC_UpdateImageLimits();   // must be called first
 
       SFW_WidthChanged(&gcRegsData);
-      GC_UpdateParameterLimits();
+      GC_DeviceRegistersVerification(); //must be called to clear error set after binning mode validation
+      
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);

@@ -208,6 +208,7 @@ float gFpaPeriodMinMargin = 0.0F;
 uint32_t speedup_unused_area = 0;        // les speed_up n'ont que deux valeurs : 0 ou 1
 uint8_t init_done = 0;
 ProximCfg_t ProximCfg = {{12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -822,8 +823,8 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    // fenetre qui sera demandée au ROIC du FPA
    ptrH->roic_xsize     = (float)pGCRegs->Width;
    ptrH->roic_ysize     = (float)pGCRegs->Height;
-   ptrH->roic_xstart    = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage
-   ptrH->roic_ystart    = ((float)FPA_HEIGHT_MAX - ptrH->roic_ysize)/2.0F;         // à cause du centrage
+   ptrH->roic_xstart    = ((float)FPA_CONFIG_GET(width_max) - ptrH->roic_xsize)/2.0F;          // ï¿½ cause du centrage
+   ptrH->roic_ystart    = ((float)FPA_CONFIG_GET(height_max) - - ptrH->roic_ysize)/2.0F;         // ï¿½ cause du centrage
       
    // readout time
    //readout part1 (zone en slow_clock)

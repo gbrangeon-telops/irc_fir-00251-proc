@@ -52,10 +52,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 13.3.1
+// Generated from XML camera definition file version 13.4.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 13) || (GC_XMLMINORVERSION != 3) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 13) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -141,6 +141,7 @@ struct gcRegistersDataStruct {
    uint32_t AutomaticExternalFanSpeedMode;
    uint32_t AvailabilityFlags;
    uint32_t BadPixelReplacement;
+   uint32_t BinningMode;
    uint32_t CalibrationCollectionActiveBlockPOSIXTime;
    uint32_t CalibrationCollectionActivePOSIXTime;
    uint32_t CalibrationCollectionActiveType;
@@ -508,6 +509,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetTestImageSelector(val) GC_RegisterWriteUI32(&gcRegsDef[TestImageSelectorIdx], val)
 #define GC_SetSensorWellDepth(val) GC_RegisterWriteUI32(&gcRegsDef[SensorWellDepthIdx], val)
 #define GC_SetIntegrationMode(val) GC_RegisterWriteUI32(&gcRegsDef[IntegrationModeIdx], val)
+#define GC_SetBinningMode(val) GC_RegisterWriteUI32(&gcRegsDef[BinningModeIdx], val)
 #define GC_SetAcquisitionStartAtStartup(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionStartAtStartupIdx], val)
 #define GC_SetExternalBlackBodyTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[ExternalBlackBodyTemperatureIdx], val)
 #define GC_SetBadPixelReplacement(val) GC_RegisterWriteUI32(&gcRegsDef[BadPixelReplacementIdx], val)

@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 #include "IRC_status.h"
+#include "FPABinningConfig.h"
 
 #ifndef SCD_PROXY
    #define SCD_PROXY
@@ -38,7 +39,8 @@
 
 #define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920"
 
-#define FPA_WIDTH_MIN      64   
+/*Standard*/
+#define FPA_WIDTH_MIN      64
 #define FPA_WIDTH_MAX      1920
 #define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
@@ -46,7 +48,7 @@
 #define FPA_HEIGHT_MIN     8
 #define FPA_HEIGHT_MAX     1536
 #define FPA_HEIGHT_MULT    4
-#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
+#define FPA_HEIGHT_INC     8 // lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT) //plus possible de le faire avec une structure
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   8
@@ -57,6 +59,28 @@
 //#define FPA_OFFSETY_MULT_CORR    4
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
+#define FPA_MAX_NUMBER_CONFIG_MODE 2U
+
+/*Binning 960x768*/
+#define FPA_BIN1_WIDTH_MIN      64
+#define FPA_BIN1_WIDTH_MAX      960
+#define FPA_BIN1_WIDTH_MULT     4
+#define FPA_BIN1_WIDTH_INC      FPA_BIN1_WIDTH_MULT
+
+#define FPA_BIN1_HEIGHT_MIN     8
+#define FPA_BIN1_HEIGHT_MAX     768 //Note: in binning mode there are 767 active image rows. Added to these 767 rows, in full rate video + binning the last (768) row is invalid due to matrix architecture.
+#define FPA_BIN1_HEIGHT_MULT    4
+#define FPA_BIN1_HEIGHT_INC     8 // lcm(FPA_BIN1_HEIGHT_MULT, 2 * FPA_BIN1_OFFSETY_MULT) //plus possible de le faire avec une structure
+
+#define FPA_BIN1_OFFSETX_MIN    0
+#define FPA_BIN1_OFFSETX_MULT   8
+#define FPA_BIN1_OFFSETX_MAX    (FPA_BIN1_WIDTH_MAX-FPA_BIN1_WIDTH_MIN) // lors d'un changement mettre à jour aussi les regitres
+
+#define FPA_BIN1_OFFSETY_MIN    0
+#define FPA_BIN1_OFFSETY_MULT   4
+#define FPA_BIN1_OFFSETY_MAX    (FPA_BIN1_HEIGHT_MAX-FPA_BIN1_HEIGHT_MIN) // lors d'un changement mettre à jour aussi les regitres
+
+
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
@@ -64,7 +88,7 @@
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (Blackbird1920DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
-#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
+#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask | Binning2x2IsImplementedMask)
 
 #define FPA_COOLER_TEMP_THRES    -20815   //[cC]
 #define FPA_COOLER_TEMP_TOL      1000     //[cC]
@@ -300,7 +324,9 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
-																						  
+
+extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
+
 // Function prototypes
 
 #define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -348,6 +374,7 @@ void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 // pour écrire un registre unique du roic (non testé)
 void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal);
 
+void FPA_ReadRoicReg(t_FpaIntf *ptrA, uint8_t regAdd);
 
 /**
  * FPA Initialization state.

@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 #include "IRC_status.h"
+#include "FPABinningConfig.h"
 
 #ifdef FPA_VERBOSE
    #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
@@ -37,7 +38,7 @@
 #define FPA_HEIGHT_MIN     4
 #define FPA_HEIGHT_MAX     512
 #define FPA_HEIGHT_MULT    4
-#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
+#define FPA_HEIGHT_INC     8 // lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT) //plus possible de le faire avec une structure
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   32 
@@ -45,7 +46,7 @@
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   4
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
-
+#define FPA_MAX_NUMBER_CONFIG_MODE 1U
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
@@ -313,7 +314,9 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
-																						  
+
+extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
+
 // Function prototypes
 
 // pour initialiser le module vhd avec les bons parametres de départ

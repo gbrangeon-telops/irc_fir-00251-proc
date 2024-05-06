@@ -93,9 +93,13 @@ architecture rtl of scd_proxy2_dummy_dispatcher is
    signal naoi_stop                    : std_logic;
    signal naoi_ref_valid               : std_logic_vector(1 downto 0);
    signal aoi_acq_data                 : std_logic;
-
+   signal pix_debug_dispatcher               : std_logic_vector(63 downto 0);
 begin
-   
+  
+-- pragma translate_off
+   pix_debug_dispatcher             <= "00" & data(55 downto 42) & "00" & data(41 downto 28) & "00" & data(27 downto 14) & "00" & data(13 downto 0); 
+-- pragma translate_on
+
    DATA_MOSI <= data_mosi_i;
 
    U0: sync_reset

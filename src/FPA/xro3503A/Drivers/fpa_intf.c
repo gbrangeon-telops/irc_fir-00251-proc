@@ -161,6 +161,7 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint8_t sw_init_done = 0;
 ProximCfg_t ProximCfg;
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 
 // Prototypes fonctions internes
@@ -320,7 +321,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (gFpaSubWindowMode > 1)
    {
       // valeur invalide, on utilise le défaut
-      if ((roicWidth == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
+      if ((roicWidth == FPA_CONFIG_GET(width_max)) && (pGCRegs->Height == FPA_CONFIG_GET(height_max)))
          ptrA->sub_window_mode = 0;
       else
          ptrA->sub_window_mode = 1;
@@ -544,7 +545,7 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->delay_mclk                 = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;
    if (FPA_MCLK_RATE_HZ <= 27E+6F)
    {
-      if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
+      if ((pGCRegs->Width == FPA_CONFIG_GET(width_max)) && (pGCRegs->Height == FPA_CONFIG_GET(height_max)))
          ptrH->lovh_mclk            = 12.0F;
       else
          ptrH->lovh_mclk            = 15.0F;
@@ -558,7 +559,7 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->min_time_between_int_usec  = MAX(1.0F, 10.0F * ptrH->mclk_period_usec);
 
    // readout time
-   if (pGCRegs->Width == FPA_WIDTH_MAX)
+   if (pGCRegs->Width == FPA_CONFIG_GET(width_max))
       readoutWidth = pGCRegs->Width;
    else
       // Pour corriger la calibration en sous-fenetre on lit 16 colonnes de plus.

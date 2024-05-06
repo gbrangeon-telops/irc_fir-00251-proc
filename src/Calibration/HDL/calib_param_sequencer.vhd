@@ -40,6 +40,10 @@ entity calib_param_sequencer is
       PIXEL_DATA_BASE_ADDR        : in std_logic_vector(31 downto 0);
       CAL_BLOCK_INDEX_MAX         : in cal_block_index_type;
       
+	  -- AOI param
+	  AOI_PARAM                   : in aoi_param_type;
+	  AOI_PARAM_DVAL              : in std_logic;
+	  
       -- DDR
       DDR_ADDR_OFFSET             : out std_logic_vector(31 downto 0);  --in bytes
       DDR_READ_START              : out std_logic;
@@ -110,7 +114,7 @@ architecture rtl of calib_param_sequencer is
    constant RAM_INFO_LAST_INDEX                 : ram_info_index_type   := POW2_LSB_FP32_INDEX;
    
    constant RAM_INFO_READ_LATENCY : ram_info_index_type := to_unsigned(2, ram_info_index_type'length);   --Read latency is 2 clock cycles
-   constant DDR_BLOCK_OFFSET : unsigned(28 downto 0) := to_unsigned(IMG_WIDTH_MAX * IMG_HEIGHT_MAX * 8, 29);   --PIXEL DATA is 8 bytes/pixel
+   --constant DDR_BLOCK_OFFSET : unsigned(28 downto 0) := to_unsigned(IMG_WIDTH_MAX * IMG_HEIGHT_MAX * 8, 29);   --PIXEL DATA is 8 bytes/pixel
    
    type read_state_type is (STANDBY, VERIFY_INDEX, READ_RAM);
    
@@ -130,8 +134,7 @@ architecture rtl of calib_param_sequencer is
    signal ram_info : std_logic_vector(RAM_RD_DATA'range);
    signal output_en : std_logic;
    signal read_state : read_state_type;
-   
-   
+   signal ddr_block_offset : unsigned(28 downto 0) ; --PIXEL DATA is 8 bytes/pixel, block set devient dynamique 
 begin
   
    
@@ -170,6 +173,7 @@ begin
             output_en <= '0';
             ERR <= '0';
             read_state <= STANDBY;
+			ddr_block_offset <= to_unsigned(IMG_WIDTH_MAX * IMG_HEIGHT_MAX * 8, ddr_block_offset'length);
          else
             
             extracted_info_valid_prev <= extracted_info_valid_i;
@@ -181,6 +185,10 @@ begin
                   ram_info_data_index <= (others => '0');
                   output_en <= '0';
                   ERR <= '0';
+				  -- Wait for Dval to set ddr_block_offset
+				  if AOI_PARAM_DVAL = '1' then
+                  	 ddr_block_offset <= resize(AOI_PARAM.XSIZE_MAX * AOI_PARAM.YSIZE_MAX * 8,ddr_block_offset'length); 
+				  end if;	 
                   -- Wait for rising edge of EXTRACTED_INFO_VALID
                   if extracted_info_valid_i = '1' and extracted_info_valid_prev = '0' then
                      extracted_block_index_i <= EXTRACTED_BLOCK_INDEX;
@@ -190,11 +198,11 @@ begin
                when VERIFY_INDEX =>
                   if extracted_block_index_i <= cal_block_index_max_i then
                      calib_block_index <= extracted_block_index_i;
-                     ddr_addr_offset_i <= resize(extracted_block_index_i * DDR_BLOCK_OFFSET, ddr_addr_offset_i'length);
+                     ddr_addr_offset_i <= resize(extracted_block_index_i * ddr_block_offset, ddr_addr_offset_i'length);
                      ram_info_base_addr <= resize(extracted_block_index_i * ram_block_offset_i, ram_info_base_addr'length);
                   else
                      calib_block_index <= CAL_BLOCK_INDEX_0;
-                     ddr_addr_offset_i <= resize(CAL_BLOCK_INDEX_0 * DDR_BLOCK_OFFSET, ddr_addr_offset_i'length);
+                     ddr_addr_offset_i <= resize(CAL_BLOCK_INDEX_0 * ddr_block_offset, ddr_addr_offset_i'length);
                      ram_info_base_addr <= resize(CAL_BLOCK_INDEX_0 * ram_block_offset_i, ram_info_base_addr'length);
                      ERR <= '1';
                   end if;

@@ -54,7 +54,7 @@ extern float SFW_ExposureTimeMax;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 13.3.1
+// Generated from XML camera definition file version 13.4.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -139,6 +139,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AutomaticExternalFanSpeedMode = */ AEFSM_Off,
    /* AvailabilityFlags = */ 0,
    /* BadPixelReplacement = */ 0,
+   /* BinningMode = */ BM_NoBinning,
    /* CalibrationCollectionActiveBlockPOSIXTime = */ 0,
    /* CalibrationCollectionActivePOSIXTime = */ 0,
    /* CalibrationCollectionActiveType = */ 0,
@@ -521,6 +522,7 @@ void GC_Registers_Init()
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].p_data = &gcRegsData.AutomaticExternalFanSpeedMode;
    gcRegsDef[AvailabilityFlagsIdx].p_data = &gcRegsData.AvailabilityFlags;
    gcRegsDef[BadPixelReplacementIdx].p_data = &gcRegsData.BadPixelReplacement;
+   gcRegsDef[BinningModeIdx].p_data = &gcRegsData.BinningMode;
    gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx].p_data = &gcRegsData.CalibrationCollectionActiveBlockPOSIXTime;
    gcRegsDef[CalibrationCollectionActivePOSIXTimeIdx].p_data = &gcRegsData.CalibrationCollectionActivePOSIXTime;
    gcRegsDef[CalibrationCollectionActiveTypeIdx].p_data = &gcRegsData.CalibrationCollectionActiveType;
@@ -833,6 +835,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[TestImageSelectorIdx], (((gcRegsData.DevicePowerState == DPS_PowerInTransition) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[SensorWellDepthIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[IntegrationModeIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[BinningModeIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[TriggerModeIdx], ((GC_AcquisitionStartTriggerIsLocked || GC_FlaggingTriggerIsLocked || GC_GatingTriggerIsLocked) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[TriggerSourceIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerActivationIdx], GC_AcquisitionStarted);
@@ -892,12 +895,20 @@ void GC_UpdateCalibrationRegisters()
          case CCT_TelopsNDF:
          case CCT_TelopsFOV:
             GC_SetFWMode(FWM_Fixed);
+            //revert potential modifications during raw mode
+            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
+            GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
+            GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
             break;
 
          case CCT_MultipointFW:
             GC_SetExposureMode(EM_Timed);
             GC_SetExposureAuto(EA_Off);
             GC_SetEHDRINumberOfExposures(1);
+            //revert potential modifications during raw mode
+            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
+            GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
+            GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
             // Configure ExposureTime for FW module
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
             {
@@ -912,6 +923,10 @@ void GC_UpdateCalibrationRegisters()
             GC_SetExposureMode(EM_Timed);
             GC_SetExposureAuto(EA_Off);
             GC_SetFWMode(FWM_Fixed);
+            //revert potential modifications during raw mode
+            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
+            GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
+            GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
             // Configure and activate EHDRI
             GC_SetEHDRIMode(EHDRIM_Advanced);
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
@@ -1029,14 +1044,14 @@ void GC_UpdateParameterLimits()
  */
 IRC_Status_t GC_DeviceRegistersVerification()
 {
-   uint32_t heightMax = FPA_HEIGHT_MAX;
-   uint32_t widthMax = FPA_WIDTH_MAX;
+   uint32_t heightMax = FPA_CONFIG_GET(height_max);
+   uint32_t widthMax = FPA_CONFIG_GET(width_max);
    uint8_t error = 0;
    uint32_t idx;
 
    GC_UpdateParameterLimits();
 
-   if ((gcRegsData.Height != FPA_HEIGHT_MAX) || (gcRegsData.Width != FPA_WIDTH_MAX))
+   if ((gcRegsData.Height != heightMax) || (gcRegsData.Width != widthMax))
    {
       // Sub window
 #ifdef FPA_SUBWINDOW_HEIGHT_MAX
@@ -1260,6 +1275,14 @@ IRC_Status_t GC_DeviceRegistersVerification()
       error = 1;
    }
 
+   if(((gcRegsData.BinningMode == BM_Mode2x2)  && !TDCFlags2Tst(Binning2x2IsImplementedMask)) ||
+      ((gcRegsData.BinningMode == BM_Mode4x4)  && !TDCFlags2Tst(Binning4x4IsImplementedMask)))
+   {
+      GC_ERR("Binning mode is not available.");
+      GC_GenerateEventError(EECD_BinningModeNotAvailable);
+      error = 1;
+   }
+
    if (error)
    {
       gcRegsData.DeviceRegistersValid = 0;
@@ -1284,15 +1307,15 @@ void GC_UpdateImageLimits()
    if (gcRegsData.CenterImage)
    {
       // Offset X limits
-      GC_SetOffsetX((FPA_WIDTH_MAX - gcRegsData.Width) / 2);
+      GC_SetOffsetX((FPA_CONFIG_GET(width_max) - gcRegsData.Width) / 2);
       gcRegsData.OffsetXMin = gcRegsData.OffsetX;
       gcRegsData.OffsetXMax = gcRegsData.OffsetX;
 
       // Offset Y limits
 #ifdef FPA_OFFSETY_MULT_CORR
-      GC_SetOffsetY(roundDown((FPA_HEIGHT_MAX - gcRegsData.Height) / 2, FPA_OFFSETY_MULT_CORR));
+      GC_SetOffsetY(roundDown((FPA_CONFIG_GET(height_max) - gcRegsData.Height) / 2, FPA_OFFSETY_MULT_CORR));
 #else
-      GC_SetOffsetY((FPA_HEIGHT_MAX - gcRegsData.Height) / 2);
+      GC_SetOffsetY((FPA_CONFIG_GET(height_max) - gcRegsData.Height) / 2);
 #endif
       gcRegsData.OffsetYMin = gcRegsData.OffsetY;
       gcRegsData.OffsetYMax = gcRegsData.OffsetY;
@@ -1300,7 +1323,7 @@ void GC_UpdateImageLimits()
    else
    {
       // Offset X limits
-      gcRegsData.OffsetXMin = FPA_OFFSETX_MIN;
+      gcRegsData.OffsetXMin =FPA_CONFIG_GET(offsetx_min);
 #ifdef FPA_SUBWINDOW_WIDTH_MAX
       if (gcRegsData.Width <= FPA_SUBWINDOW_WIDTH_MAX)
       {
@@ -1308,16 +1331,16 @@ void GC_UpdateImageLimits()
       }
       else
       {
-         gcRegsData.OffsetXMax = FPA_WIDTH_MAX - gcRegsData.Width;
+         gcRegsData.OffsetXMax = FPA_CONFIG_GET(width_max) - gcRegsData.Width;
       }
 #else
-      gcRegsData.OffsetXMax = FPA_WIDTH_MAX - gcRegsData.Width;
+      gcRegsData.OffsetXMax = FPA_CONFIG_GET(offsetx_max);
 #endif
       if (gcRegsData.OffsetX > gcRegsData.OffsetXMax)
          GC_SetOffsetX(gcRegsData.OffsetXMax);
 
       // Offset Y limits
-      gcRegsData.OffsetYMin = FPA_OFFSETY_MIN;
+      gcRegsData.OffsetYMin = FPA_CONFIG_GET(offsety_min);
 #ifdef FPA_SUBWINDOW_HEIGHT_MAX
       if (gcRegsData.Height <= FPA_SUBWINDOW_HEIGHT_MAX)
       {
@@ -1325,14 +1348,18 @@ void GC_UpdateImageLimits()
       }
       else
       {
-         gcRegsData.OffsetYMax = FPA_HEIGHT_MAX - gcRegsData.Height;
+         gcRegsData.OffsetYMax = FPA_CONFIG_GET(height_max) - gcRegsData.Height;
       }
 #else
-      gcRegsData.OffsetYMax = FPA_HEIGHT_MAX - gcRegsData.Height;
+      gcRegsData.OffsetYMax = FPA_CONFIG_GET(height_max) - gcRegsData.Height;
 #endif
       if (gcRegsData.OffsetY > gcRegsData.OffsetYMax)
          GC_SetOffsetY(gcRegsData.OffsetYMax);
    }
+
+   gcRegsData.HeightInc = FPA_CONFIG_GET(height_inc);
+   gcRegsData.WidthInc = FPA_CONFIG_GET(width_inc);
+
 }
 
 /**
@@ -1833,12 +1860,12 @@ void GC_UpdateJumboFrameHeight(gcRegistersData_t *pGCRegs, bool heightChanged)
    if (pGCRegs->MemoryBufferSequenceDownloadSuggestedFrameImageCount > 1)
    {
          GC_SetHeightInc(1);
-         GC_SetHeightMax(MAX(MAX(suggestedJumboFrameHeight, NTxMiniHeight), FPA_HEIGHT_MAX));
+         GC_SetHeightMax(MAX(MAX(suggestedJumboFrameHeight, NTxMiniHeight), FPA_CONFIG_GET(height_max)));
    }
    else
    {
-        GC_SetHeightInc(FPA_HEIGHT_INC);
-        GC_SetHeightMax(FPA_HEIGHT_MAX);
+        GC_SetHeightInc(FPA_CONFIG_GET(height_inc));
+        GC_SetHeightMax(FPA_CONFIG_GET(height_max));
    }
 
 

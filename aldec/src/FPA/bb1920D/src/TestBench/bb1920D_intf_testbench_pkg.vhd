@@ -30,16 +30,17 @@ package BB1920D_intf_testbench_pkg is
    constant AW_SERIAL_INT_CMD_RAM_ADD      : integer :=  64;
    constant AW_SERIAL_TEMP_CMD_RAM_ADD     : integer :=  96;
                                                    
-   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
+   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; user_bin:natural; send_id:natural) return unsigned;
    
    
 end BB1920D_intf_testbench_pkg;
 
 package body BB1920D_intf_testbench_pkg is
    
-   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned is 
+   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; user_bin:natural; send_id:natural) return unsigned is 
       
-      constant FPA_WIDTH_MAX : integer := 1920;
+   	constant FPA_WIDTH_MAX : integer := 1920;
+      constant BIN1_FPA_WIDTH_MAX : integer := 960;
       constant FPA_MCLK_RATE_MHZ : real := real(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ)/1000.0;
       
       variable  comn_fpa_diag_mode                     : unsigned(31 downto 0);
@@ -79,9 +80,9 @@ package body BB1920D_intf_testbench_pkg is
       variable  op_det_ibias                           : unsigned(31 downto 0);
       variable  op_binning                             : unsigned(31 downto 0); 
       variable  op_output_rate                         : unsigned(31 downto 0);
-      variable  op_mtx_int_low                            : unsigned(31 downto 0); 
-      variable  op_frm_res                                : unsigned(31 downto 0); 
-      variable  op_frm_dat                                : unsigned(31 downto 0); 
+      variable  op_mtx_int_low                         : unsigned(31 downto 0); 
+      variable  op_frm_res                             : unsigned(31 downto 0); 
+      variable  op_frm_dat                             : unsigned(31 downto 0); 
       variable  op_cfg_num                             : unsigned(31 downto 0);
       variable  roic_reg_cmd_id                        : unsigned(31 downto 0);
       variable  roic_reg_cmd_data_size                 : unsigned(31 downto 0);
@@ -133,9 +134,18 @@ package body BB1920D_intf_testbench_pkg is
       
       
    begin
-      
+   -- in binning 4 rows in one conversion
+     if user_bin > 0 then 
+      number_of_conversions := real(user_ysize) / 4.0 +  2.0;
+     else
       number_of_conversions := real(user_ysize) / 2.0 +  2.0;
-      Line_Readout := (2.0 * real(FPA_WIDTH_MAX) + 18.0) / 2.0 / 4.0 / FPA_MCLK_RATE_MHZ; -- in us
+     end if; 
+     -- pourquoi /2/4 et pas /8 ? 4 * width car 4 lignes
+	  if user_bin > 0 then
+      	Line_Readout := (4.0 * real(BIN1_FPA_WIDTH_MAX) + 18.0) / 8.0 / FPA_MCLK_RATE_MHZ; -- in us
+	  else 
+		   Line_Readout := (2.0 * real(FPA_WIDTH_MAX) + 18.0) / 8.0 / FPA_MCLK_RATE_MHZ; -- in us
+	  end if; 
       Line_Conversion :=  (55.0 + 50.0 + 40.0 + 255.0 + 70.0 + 30.0 + 190.0) / FPA_MCLK_RATE_MHZ; -- in us
       if Line_Readout > Line_Conversion then
          Frame_Read :=  number_of_conversions * Line_Readout; -- in us
@@ -154,34 +164,61 @@ package body BB1920D_intf_testbench_pkg is
       comn_fpa_pwr_on               := (others =>'1');
       comn_fpa_acq_trig_mode        := resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
       comn_fpa_xtra_trig_mode       := resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
-      --      if (diag_mode = '1') then 
-      --         comn_fpa_acq_trig_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
-      --      end if;   
+      
+      comn_fpa_intf_data_source      := resize(unsigned('0'&DATA_SOURCE_OUTSIDE_FPGA), 32);
+      if (diag_mode = '1') then 
+         comn_fpa_acq_trig_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);          
+         comn_fpa_intf_data_source      := resize(unsigned('0'&DATA_SOURCE_INSIDE_FPGA), 32);
+      end if;   
       
       comn_fpa_acq_trig_ctrl_dly    := to_unsigned(integer(Frame_Time * real(DEFINE_FPA_100M_CLK_RATE_KHZ)*1000.0), comn_fpa_acq_trig_ctrl_dly'length);
       comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(integer(Frame_Time * real(DEFINE_FPA_100M_CLK_RATE_KHZ)*1000.0), comn_fpa_xtra_trig_ctrl_dly'length);
       comn_fpa_trig_ctrl_timeout_dly:= resize(comn_fpa_xtra_trig_ctrl_dly, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
-      diag_ysize                    := to_unsigned(user_ysize/2, 32);                 
-      diag_xsize_div_tapnum         := to_unsigned(FPA_WIDTH_MAX/4, 32);
+      if user_bin > 0 then
+         diag_ysize                    := to_unsigned(user_ysize/4, 32);
+         diag_xsize_div_tapnum         := to_unsigned(BIN1_FPA_WIDTH_MAX/2, 32);  
+         -- en binning c'est deux fois moins de colonne
+         aoi_flag2_sol_pos             := to_unsigned(BIN1_FPA_WIDTH_MAX/4, 32); -- on va chercher le dernier flag (eol/eof)
+         aoi_flag2_eol_pos             := to_unsigned(BIN1_FPA_WIDTH_MAX/4, 32); -- on va chercher le dernier flag (eol/eof)
+         
+         aoi_data_sol_pos              := to_unsigned(((BIN1_FPA_WIDTH_MAX - user_xsize)/2)/4 + 1, 32); -- /2 a cause du centrage
+         aoi_data_eol_pos              := to_unsigned(((BIN1_FPA_WIDTH_MAX - user_xsize)/2)/4 + user_xsize/4 , 32);
+         aoi_flag1_sol_pos             := to_unsigned(1, 32);
+         if user_xsize > 4 then 
+            aoi_flag1_eol_pos             := to_unsigned(user_xsize/4 - 1, 32);
+         end if;
+
+         op_xsize                      := to_unsigned(BIN1_FPA_WIDTH_MAX, 32);  
+      else
+         diag_ysize                    := to_unsigned(user_ysize/2, 32);
+         diag_xsize_div_tapnum         := to_unsigned(FPA_WIDTH_MAX/4, 32); 
+         
+         aoi_flag2_sol_pos             := to_unsigned(FPA_WIDTH_MAX/4, 32); -- on va chercher le dernier flag (eol/eof)
+         aoi_flag2_eol_pos             := to_unsigned(FPA_WIDTH_MAX/4, 32); -- on va chercher le dernier flag (eol/eof)
+     
+         aoi_data_sol_pos              := to_unsigned(((FPA_WIDTH_MAX - user_xsize)/2)/4 + 1, 32); -- /2 a cause du centrage
+         aoi_data_eol_pos              := to_unsigned(((FPA_WIDTH_MAX - user_xsize)/2)/4 + user_xsize/4 , 32);
+         aoi_flag1_sol_pos             := to_unsigned(1, 32);
+         if user_xsize > 4 then 
+            aoi_flag1_eol_pos          := to_unsigned(user_xsize/4 - 1, 32);
+         end if;
+
+         op_xsize                      := to_unsigned(FPA_WIDTH_MAX, 32);  
+      end if;
+      
+      aoi_xsize                     := to_unsigned(user_xsize, 32);
+      aoi_ysize                     := to_unsigned(user_ysize, 32);              
+      
       diag_lovh_mclk_source         := to_unsigned(0, 32);
       real_mode_active_pixel_dly    := to_unsigned(8, 32);
       
-      aoi_xsize                     := to_unsigned(user_xsize, 32);
-      aoi_ysize                     := to_unsigned(user_ysize, 32);
-      aoi_data_sol_pos              := to_unsigned(((FPA_WIDTH_MAX - user_xsize)/2)/4 + 1, 32); -- /2 a cause du centrage
-      aoi_data_eol_pos              := to_unsigned(((FPA_WIDTH_MAX - user_xsize)/2)/4 + user_xsize/4 , 32);
-      aoi_flag1_sol_pos             := to_unsigned(1, 32);
-      if user_xsize > 4 then 
-         aoi_flag1_eol_pos             := to_unsigned(user_xsize/4 - 1, 32);
-      end if;
-      aoi_flag2_sol_pos             := to_unsigned(FPA_WIDTH_MAX/4, 32); -- on va chercher le dernier flag (eol/eof)
-      aoi_flag2_eol_pos             := to_unsigned(FPA_WIDTH_MAX/4, 32); -- on va chercher le dernier flag (eol/eof)
+
       
       op_xstart                     := to_unsigned(0, 32);
       op_ystart                     := to_unsigned(0, 32); 
-      op_xsize                      := to_unsigned(FPA_WIDTH_MAX, 32);  
+      
       op_ysize                      := to_unsigned(user_ysize, 32);  
       op_frame_time                 := to_unsigned(10, 32);  
       op_gain                       := to_unsigned(1, 32);   
@@ -189,7 +226,7 @@ package body BB1920D_intf_testbench_pkg is
       op_test_mode	               := to_unsigned(0, 32);     
       op_det_vbias                  := to_unsigned(0, 32);    
       op_det_ibias                  := to_unsigned(0, 32);       
-      op_binning                    := to_unsigned(0, 32);    
+      op_binning                    := to_unsigned(user_bin, 32);    
       op_output_rate                := to_unsigned(3, 32);
       op_mtx_int_low               := to_unsigned(9, 32);
       op_frm_res                    := to_unsigned(7, 32);
@@ -230,9 +267,15 @@ package body BB1920D_intf_testbench_pkg is
       incoming_com_fail_id          := resize(x"FFFF", 32);
       incoming_com_ovh_len          := resize(x"5", 32);          
       fpa_serdes_lval_num           := resize(x"5", 32); 
-      fpa_serdes_lval_len           := resize(x"5", 32); 
-      int_time_offset               := to_unsigned(0, 32); 
-      
+      fpa_serdes_lval_len           := resize(x"5", 32); 	
+	  if send_id = 2 then  
+		int_time_offset            := to_unsigned(28,32); 
+	  end if;	
+	  if send_id = 1 then
+      	int_time_offset               := to_unsigned(14,32); 
+      else 
+		 int_time_offset               := to_unsigned(0,32); 
+	  end if;	
       spare                         := to_unsigned(0, 32);   
       
       int_clk_period_factor         := to_unsigned(DEFINE_INT_CLK_SOURCE_RATE_KHZ/C_FPA_INTCLK_RATE_KHZ, 32);
@@ -240,8 +283,8 @@ package body BB1920D_intf_testbench_pkg is
       comn_clk100_to_intclk_conv_numerator  := to_unsigned(integer(real(C_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), 32);
       comn_intclk_to_clk100_conv_numerator  := to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**26)/real(C_FPA_INTCLK_RATE_KHZ)), 32);  
       
-      comn_fpa_intf_data_source      := resize(unsigned('0'&DATA_SOURCE_OUTSIDE_FPGA), 32);
-      
+
+       
       vid_if_bit_en                  := to_unsigned(1, 32);  
       
       

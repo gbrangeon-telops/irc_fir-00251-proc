@@ -293,6 +293,7 @@ uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
 ProximCfg_t ProximCfg = {{4518, 4518, 4518, 1046,  5738, 6075, 8507, 4518}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 t_FpaStatus gStat;
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 
 // definition et activation des accelerateurs

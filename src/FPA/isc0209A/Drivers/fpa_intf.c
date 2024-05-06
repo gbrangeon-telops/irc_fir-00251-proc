@@ -201,6 +201,7 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint8_t init_done = 0;
 ProximCfg_t ProximCfg = {{0, 0, 0, 0, 0, 0, 0, 9163}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 
 // Prototypes fonctions internes

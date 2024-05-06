@@ -166,6 +166,7 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint8_t init_done = 0;
 ProximCfg_t ProximCfg = {{0, 0, 0, 0,  0, 0, 0, 2200}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -311,9 +312,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // nous avons fait un ajustement (patch de soustraction de 1 et 4 sur la formule de R et C)pour tenir compte des decalages de sous-fenetres observés par PTR lors des tests du Hawk.
    // Toutefois, cela crée un autre problème sur les fenetres pleines. Nous avons donc effectué un second patch qui se matérialise par les IF qu'on retrouve sur a->FPA_Mpos et a->FPA_Kpos
-   if ((uint32_t)pGCRegs->Height != (uint32_t)FPA_HEIGHT_MAX)   
+   if ((uint32_t)pGCRegs->Height != (uint32_t)FPA_CONFIG_GET(height_max))   
       R = (float)pGCRegs->OffsetY;            // sub frame pixel row start index  
-   if ((uint32_t)pGCRegs->Width != (uint32_t)FPA_WIDTH_MAX)
+   if ((uint32_t)pGCRegs->Width != (uint32_t)FPA_CONFIG_GET(width_max))
       C = (float)pGCRegs->OffsetX - 3;        // sub frame pixel column start index 
       
    ptrA->jpos = (uint32_t)(2.0F * Nr + Nc/No + floorf((C - 1.0F)/No) + 1.0F); 
@@ -327,10 +328,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->cbit_en = 0;
    
    // longueur du registre wdr
-   ptrA->wdr_len = (uint32_t)(2.0F * (float)FPA_HEIGHT_MAX	+ (float)FPA_WIDTH_MAX/2.0F);
+   ptrA->wdr_len = (uint32_t)(2.0F * (float)FPA_CONFIG_GET(height_max)	+ (float)FPA_CONFIG_GET(width_max)/2.0F);
    
    // mode windowing ou non
-   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_CONFIG_GET(width_max)) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_CONFIG_GET(height_max)))
       ptrA->full_window = 1;
    else
       ptrA->full_window = 0;

@@ -374,7 +374,7 @@ void File_Manager_SM()
                                        dev = uffs_GetDeviceFromMountPoint(gflashIntfCtrl.mount_points[0]);
                                     }
                                     long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-                                    uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+                                    uint32_t numDataToProcess = FPA_CONFIG_GET(width_max) * FPA_CONFIG_GET(height_max);
                                     long tsfsLen, tsdvLen, tsicLen;
 
                                     /* Reserve space for flash settings, flash dynamic values and

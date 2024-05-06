@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 #include "IRC_status.h"
+#include "FPABinningConfig.h"
 
 #ifndef SCD_PROXY
    #define SCD_PROXY
@@ -50,7 +51,7 @@
 #define FPA_HEIGHT_MIN     8
 #define FPA_HEIGHT_MAX     1024
 #define FPA_HEIGHT_MULT    4
-#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
+#define FPA_HEIGHT_INC     8 // lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT) //plus possible de le faire avec une structure
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   4
@@ -60,6 +61,8 @@
 #define FPA_OFFSETY_MULT         4
 //#define FPA_OFFSETY_MULT_CORR    4   // Inutile pour BB1280.
 #define FPA_OFFSETY_MAX          (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
+
+#define FPA_MAX_NUMBER_CONFIG_MODE 1U
 
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
@@ -250,7 +253,10 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
-																						  
+
+extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
+
+
 // Function prototypes
 #define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 

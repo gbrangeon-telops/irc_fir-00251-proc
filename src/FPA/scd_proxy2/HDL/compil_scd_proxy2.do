@@ -59,7 +59,11 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_real_data.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_dummy_dispatcher.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_bridge.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_line_mux.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mux_std_core.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mux_binning_core.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mux_input_sw.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mux_output_sw.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mux.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_pos.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_sel.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_cropping_core.vhd \

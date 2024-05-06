@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "GC_Registers.h"
+#include "FPABinningConfig.h"
 
 #ifdef FPA_VERBOSE
    #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
@@ -41,7 +42,7 @@
 #define FPA_HEIGHT_MIN     1
 #define FPA_HEIGHT_MAX     512
 #define FPA_HEIGHT_MULT    1
-#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
+#define FPA_HEIGHT_INC     2//lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   8
@@ -52,6 +53,7 @@
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   0
+#define FPA_MAX_NUMBER_CONFIG_MODE 1U
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
 
@@ -251,6 +253,8 @@ struct s_FpaStatus    //
 };
 typedef struct s_FpaStatus t_FpaStatus;
 
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
+						
 
 // Function prototypes
 

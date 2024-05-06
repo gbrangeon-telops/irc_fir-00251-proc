@@ -80,12 +80,12 @@ IRC_Status_t AEC_Init(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    XIntc * InterruptController = &gProcIntc;
 
    pAEC_CTRL->AEC_Mode = AEC_OFF;
-   pAEC_CTRL->AEC_ImageFraction = (uint32_t)  (pGCRegs->SensorWidth * pGCRegs->SensorHeight * 0.5f); // 50% of the pixel by default
+   pAEC_CTRL->AEC_ImageFraction = (uint32_t)  (FPA_CONFIG_GET(width_max) *FPA_CONFIG_GET(height_max) * 0.5f); // 50% of the pixel by default
    pAEC_CTRL->AEC_MSB_Pos = AEC_GetMsbPos();
    pAEC_CTRL->AEC_clearmem = 1;
    pAEC_CTRL->AEC_NB_Bin = AEC_NB_BIN;
    pAEC_CTRL->AEC_NewConfigFlag = 0;
-   pAEC_CTRL->AEC_DecimatorInputWidth = pGCRegs->SensorWidth;
+   pAEC_CTRL->AEC_DecimatorInputWidth = FPA_CONFIG_GET(width_max);
    pAEC_CTRL->AEC_DecimatorEnable &= DECIMATOR_DESACTIVATED_MASK;
 
    memset(AEC_TimeStamps_d1, 0, sizeof(AEC_TimeStamps_d1));
@@ -103,7 +103,7 @@ IRC_Status_t AEC_Init(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    AEC_UpdateImageFraction(pGCRegs,pAEC_CTRL);
    AEC_UpdateMode(pGCRegs, pAEC_CTRL );
 
-   AEC_NbPixelTotal = pGCRegs->SensorWidth * pGCRegs->SensorHeight;
+   AEC_NbPixelTotal = FPA_CONFIG_GET(width_max) *FPA_CONFIG_GET(height_max);
 
    StartTimer(&AECPlusDataPrintf, 1000);
 

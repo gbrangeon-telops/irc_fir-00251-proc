@@ -310,6 +310,7 @@ struct s_FpaPrivateStatus
    };
 typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
  
+
 // Global variables
 t_FpaStatus gStat;
 t_FpaPrivateStatus gPrivateStat;
@@ -322,6 +323,7 @@ static float gFr_dly = 0.0F;
 static bool gFpaInit = true;
 static bool gExtIntCtrl = false;
 static uint8_t gRoicReg19 = 0xFF;
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);

@@ -39,6 +39,9 @@
 
 #define CM_CALIB_BLOCK_PIXEL_DATA_SIZE       (FPA_WIDTH_MAX * FPA_HEIGHT_MAX * sizeof(uint64_t))
 
+//#define CM_COMPUTE_PIXEL_DATA_SIZE(width,height)       MIN(CM_CALIB_BLOCK_PIXEL_DATA_SIZE,(width * height * sizeof(uint64_t)))
+#define CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE       (calibrationInfo.collection.Width* calibrationInfo.collection.Height* sizeof(uint64_t))
+
 #define CM_CALIB_MAXTK_TVSINT_MAX_FITORDER   7
 #define CM_CALIB_MAXTK_TVSINT_MAX_SIZE       (2 * (CM_CALIB_MAXTK_TVSINT_MAX_FITORDER + 1))
 #define CM_CALIB_MAXTK_INTVST_MAX_FITORDER   7
@@ -255,6 +258,7 @@ struct calibCollectionInfoStruct {
    float FluxRatio12;                  /**< Ratio de flux entre NDF1 et NDF2 */
    uint8_t NumberOfBlocks;             /**< Number of calibration blocks in collection file */
    uint32_t BlockPOSIXTime[CALIB_MAX_NUM_OF_BLOCKS]; /**< List of collection calibration blocks POSIX time */
+   uint8_t BinningMode;                /**< BinningMode : see enum BinningMode_t*/
 };
 
 /**

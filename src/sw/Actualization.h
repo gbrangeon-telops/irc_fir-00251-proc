@@ -226,6 +226,7 @@ typedef struct
    float AcquisitionFrameRate;
    uint8_t FWMode;
    int32_t FocusPositionRaw;
+   uint8_t BinningMode;
 } actualisationInfo_t;
 
 typedef struct

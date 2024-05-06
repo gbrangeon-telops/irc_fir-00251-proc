@@ -64,7 +64,14 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
    SFW_ClearanceRadius = flashSettings.FWMountingHoleRadius - flashSettings.FWBeamMarging;
    SFW_INF("SFW_ClearanceRadius *1000 = %d",(int32_t)(SFW_ClearanceRadius*1000));
    
-   SFW_PixelRadius_To_RealRadius = (flashSettings.FWCenterPixRadius-flashSettings.FWCornerPixRadius) / sqrtf((float)(FPA_WIDTH_MAX*FPA_WIDTH_MAX + FPA_HEIGHT_MAX*FPA_HEIGHT_MAX));
+   //On perd deux lignes (une en haut et une en bas lors du passage en mode binné) Est-ce qu'on veut prendre cette différence en considération ?
+   //if(pGCRegs->BinningMode == BM_Mode2x2) {
+      //SFW_PixelRadius_To_RealRadius = (flashSettings.FWCenterPixRadius-flashSettings.FWCornerPixRadius) / sqrtf((float)(FPA_WIDTH_MAX*FPA_WIDTH_MAX + (FPA_HEIGHT_MAX-2)*(FPA_HEIGHT_MAX-2)));
+   //} else
+   {
+      SFW_PixelRadius_To_RealRadius = (flashSettings.FWCenterPixRadius-flashSettings.FWCornerPixRadius) / sqrtf((float)(FPA_WIDTH_MAX*FPA_WIDTH_MAX + FPA_HEIGHT_MAX*FPA_HEIGHT_MAX));
+   }
+
    SFW_INF("SFW_PixelRadius_To_RealRadius *1000 = %d",(int32_t)(SFW_PixelRadius_To_RealRadius*1000));
    
    // Init SFW actualization limits with ETmin to have absolute max
@@ -121,9 +128,16 @@ void SFW_CalculExposureTimeMax(gcRegistersData_t *pGCRegs)
 void SFW_CalculFilterRange(gcRegistersData_t *pGCRegs, SFW_ChangedParameterEnum changedParameter)
    {
    //SFW_INF("CalculFilterRange");
-
-      ConvertSizeToDeltaAndTarget(pGCRegs->Width, pGCRegs->Height, changedParameter, &SFW_dX, &SFW_dY, &SFW_CurrentParameters_Target);
-      SFW_INF("Width = %d, Height = %d, SFW_dX = %d, SFW_dY=%d, SFW_CurrentParameters_Target=%d\n",pGCRegs->Width,pGCRegs->Height,(int32_t)(SFW_dX*1000.0f) ,(int32_t)(SFW_dY*1000.0f),(int32_t)(SFW_CurrentParameters_Target*1000.0f));
+      //We always want non binning parameters
+      uint32_t nobinWidth = pGCRegs->Width;
+      uint32_t nobinHeight = pGCRegs->Height;
+      if(pGCRegs->BinningMode != BM_NoBinning) {
+         //CUrrently 2x2 = 1 and 4x4 = 2
+         nobinWidth = pGCRegs->Width << pGCRegs->BinningMode;
+         nobinHeight =  pGCRegs->Height << pGCRegs->BinningMode;
+      }
+      ConvertSizeToDeltaAndTarget(nobinWidth, nobinHeight, changedParameter, &SFW_dX, &SFW_dY, &SFW_CurrentParameters_Target);
+      SFW_INF("Width = %d, Height = %d, SFW_dX = %d, SFW_dY=%d, SFW_CurrentParameters_Target=%d\n",nobinWidth,nobinHeight,(int32_t)(SFW_dX*1000.0f) ,(int32_t)(SFW_dY*1000.0f),(int32_t)(SFW_CurrentParameters_Target*1000.0f));
 
 	   //Calculate the beam intersect to get the filter ranges and angular speed parameter limit (for exposure and frame rate max)
 	   BeamIntersect(SFW_dX, SFW_dY, SFW_CurrentParameters_Target, &SFW_CurrentParameters_MaxTheta1, &SFW_CurrentParameters_MaxTheta2);
@@ -277,11 +291,16 @@ void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, float* m
 
 void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius)
 {
-   if(changedParameter != HEIGHT_CHANGED)
+   if(changedParameter != HEIGHT_CHANGED) {
+      //On veut max en fonction de la résolution native
       *dX = (float)width / FPA_WIDTH_MAX * flashSettings.FWCornerPixDistX;
+   }
 
-   if(changedParameter != WIDTH_CHANGED)
+   if(changedParameter != WIDTH_CHANGED) {
+      //On veut max en fonction de la résolution native
       *dY = (float)height / FPA_HEIGHT_MAX * flashSettings.FWCornerPixDistY;
+  }
+
 
    *cornerPixelPositionRadius = SFW_ClearanceRadius - (sqrtf((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
 }

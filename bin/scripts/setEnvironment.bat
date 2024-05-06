@@ -54,10 +54,14 @@ set svn_subwcrev=%tortoiseSVNDir%\bin\SubWCRev.exe
 
 set xDir=C:\Xilinx
 if exist D:\Xilinx\SDK\2018.3\*.* set xDir=D:\Xilinx
-@echo Xilinx directory: %xDir%
+@echo SDK Xilinx directory: %xDir%
 
 set x_mb-objcopy=%xDir%\SDK\2018.3\gnu\microblaze\nt\bin\mb-objcopy.exe
 set x_xsct=%xDir%\SDK\2018.3\bin\xsct.bat
+
+set xDir=C:\Xilinx
+if exist D:\Xilinx\Vivado\2018.3\*.* set xDir=D:\Xilinx
+@echo Vivado Xilinx directory: %xDir%
 
 copy %versionFile% %versionFile:.txt=.bat%
 call %versionFile:.txt=.bat%

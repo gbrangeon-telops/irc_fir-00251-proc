@@ -144,6 +144,7 @@
 #define FRAME_RESOLUTION_DEFAULT           7  // 0.1us
 
 #define FULL_ROW_SIZE                      1920
+#define CURRENT_ROW_SIZE                   gFpaResolutionCfg[(gcRegsData.BinningMode)].width_max
 #define FRAME_TIME_CLKS_MARGIN             10  // en frame time resolution
 
 // "Photo-diode bias" parameter (and anti-blooming control)
@@ -315,6 +316,11 @@ t_FpaStatus gStat;
 t_FpaPrivateStatus gPrivateStat;
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
+//limiter la taille du tableau au nombre de binning possible mais s'assurer que l'idx ne dépasse jamais
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION,FPA_BINNING_1_RESOLUTION};
+
+
+//private
 static uint32_t sw_init_done = 0;
 static uint32_t sw_init_success = 0;
 static float gIntg_dly = 0.0F;
@@ -441,7 +447,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float frame_period, fpaAcquisitionFrameRate;
    uint8_t det_vbias_idx;
    static uint8_t cfg_num = 0;
-   extern int32_t gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegG, gFpaDebugRegH;
+   extern int32_t gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegG, gFpaDebugRegF, gFpaDebugRegH;
    extern uint8_t gFpaScdDiodeBiasEnum;
 
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
@@ -474,7 +480,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vid_if_bit_en  = 1;
 
    ptrA->fpa_pwr_on     = 1;     // allumage du détecteur, le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
-   ptrA->op_binning     = 0;     // binning ou non
+
+   //Can't be configured,only for debug
+   ptrA->op_xsize = CURRENT_ROW_SIZE;
    ptrA->op_output_rate = 3;     // vitesse de sortie : full rate (2 simultaneous lines)
    ptrA->op_frm_res     = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2 et la résolution maximale supportée par le vhdl est 44 (0.63us).
 
@@ -549,16 +557,50 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    ptrA->aoi_xsize                 = (uint32_t)pGCRegs->Width;     
    ptrA->aoi_ysize                 = (uint32_t)pGCRegs->Height; 
+
+   if ((BinningMode_t)pGCRegs->BinningMode != BM_Mode2x2) {
+    //  parametres de la commande opérationnelle
+      ptrA->op_ystart  = pGCRegs->OffsetY/2;
+      ptrA->op_ysize  = pGCRegs->Height/2;
+      //TODO: Est-il necessaire d'utilise normal size pour l'initialisation des serdes?
+
+      // Configuration des SERDES (independante du nombre du canaux)
+      ptrA->fpa_serdes_lval_len = (uint32_t)CURRENT_ROW_SIZE / 4; // toujours diviser par 4 même si on a 8 pixels/clk (en réalité on a 2 lignes simultannés à 4 pixels/clk).
+      ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
+      ptrA->fpa_serdes_lval_num >>= 1;
+
+      ptrA->op_binning     = 0;
+      BIN_DBG("No Binning mode:");
+   }
+   else {
+
+      // In binning STROW range is 0:768 but only even and 768 is invalid
+      ptrA->op_ystart  = pGCRegs->OffsetY;
+      ptrA->op_ysize  = pGCRegs->Height;
+      //TODO: Est-il necessaire d'utilise normal size pour l'initialisation des serdes?
+
+      // Configuration des SERDES (independante du nombre du canaux)
+      // TBD Retrouver l'utilisation de ces variables
+      ptrA->fpa_serdes_lval_len = (uint32_t)CURRENT_ROW_SIZE /2; // toujours diviser par 2 même si on a 8 pixels/clk (en réalité on a 4 lignes simultannés à 2 pixels/clk).
+      ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
+      ptrA->fpa_serdes_lval_num >>= 2;
+
+      ptrA->op_binning     = 1;
+      BIN_DBG("Binning mode 2x2:");
+
+   }
+   //Note: En binning on sort deux pixels par ligne sur 4 lignes, cependant le cropping se passe après le processing de réalignement qui sort 4 pixels par ligne comme le non binning.
    ptrA->aoi_data_sol_pos          = (uint32_t)pGCRegs->OffsetX/4 + 1;    // Cropping: + 1 car le generateur de position dans le vhd a pour valeur d'origine 1. Et division par 4 car le bus dudit generateur est de largeur 4 pix
-   ptrA->aoi_data_eol_pos          =  ptrA->aoi_data_sol_pos - 1 + (uint32_t)pGCRegs->Width/4; // En effet,  (ptrA->aoi_data_eol_pos - ptrA->aoi_data_sol_pos) + 1  = pGCRegs->Width/4 
+   ptrA->aoi_data_eol_pos          =  ptrA->aoi_data_sol_pos - 1 + (uint32_t)pGCRegs->Width/4; // En effet,  (ptrA->aoi_data_eol_pos - ptrA->aoi_data_sol_pos) + 1  = pGCRegs->Width/4
+
    ptrA->aoi_flag1_sol_pos         =  1;
    ptrA->aoi_flag1_eol_pos         = (uint32_t)pGCRegs->Width/4 - 1;      // ainsi, on considère la premiere partie des flags qui vont du premier pixel (SOL) jusqu'à l'avant-dernier pixel de la ligne.
-   ptrA->aoi_flag2_sol_pos         = (uint32_t)FULL_ROW_SIZE/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
-   ptrA->aoi_flag2_eol_pos         = (uint32_t)FULL_ROW_SIZE/4;
-      
-   //  parametres de la commande opérationnelle
-   ptrA->op_ystart  = pGCRegs->OffsetY/2;      // TODO : En binning, mettre un FPA_HEIGHT_INC = 8
-   ptrA->op_ysize  = pGCRegs->Height/2;
+
+   ptrA->aoi_flag2_sol_pos         = (uint32_t)CURRENT_ROW_SIZE/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
+   ptrA->aoi_flag2_eol_pos         = (uint32_t)CURRENT_ROW_SIZE/4;
+
+
+
 
    // polarisation et saturation 
    if (gFpaScdDiodeBiasEnum >= SCD_IDET_BIAS_VALUES_NUM)      // Photo-diode bias (Idet)
@@ -585,8 +627,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->op_mtx_int_low = 0xD;
 
    //Test pattern Telops
-   ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au même moment
-   ptrA->diag_xsize_div_tapnum           = (uint32_t)FULL_ROW_SIZE/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
+   if(!ptrA->op_binning) {
+          ptrA->diag_ysize = ptrA->aoi_ysize/2;      // pour tenir compte de la seconde ligne qui sort aussi au même moment
+          ptrA->diag_xsize_div_tapnum           = (uint32_t)CURRENT_ROW_SIZE/4 ;            // toujours diviser par4 même si on a 8 pixels/clk
+   }
+   else {
+         //Dans le cas 2x2 du bb1920
+          ptrA->diag_ysize = ptrA->aoi_ysize/4;      // En binning 4 lignes sortent simultanément.
+          ptrA->diag_xsize_div_tapnum           = (uint32_t)CURRENT_ROW_SIZE/2 ;            // toujours diviser par 2 même si on a 8 pixels/clk
+   }
+
    ptrA->diag_lovh_mclk_source           = 287;                                   // à reviser si necessaire
    ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
    ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset
@@ -655,11 +705,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->incoming_com_fail_id            = 0xFFFF;
    ptrA->incoming_com_ovh_len            = 6;
 
-   // Configuration des SERDES (independante du nombre du canaux)
-   ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
-      ptrA->fpa_serdes_lval_num >>= 1;
-   ptrA->fpa_serdes_lval_len = (uint32_t)FULL_ROW_SIZE / 4; // toujours diviser par 4 même si on a 8 pixels/clk (en réalité on a 2 lignes simultannés à 4 pixels/clk).
-
    ptrA->int_clk_period_factor           = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 1);
    ptrA->int_time_offset                 = (int32_t)(hh.fpa_intg_clk_rate_hz * hh.int_time_offset_usec*1e-6F);
 
@@ -692,17 +737,22 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->int_time_offset_usec               = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
    ptrH->exposure_time                      = exposureTime_usec*1E-6F;
    ptrH->Frame_read_Init_3                  = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
-   ptrH->number_of_Columns                  = (float)FULL_ROW_SIZE;
+   ptrH->number_of_Columns                  = (float)CURRENT_ROW_SIZE;
    ptrH->number_of_Rows                     = (float)pGCRegs->Height;
    ptrH->number_of_Ref_Rows                 = 0.0F;
    ptrH->number_of_pixel_per_clk_per_output = 4.0f; // Full rate par défaut
 
-   //if (ptrA->op_binning == 0)
-      ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;
-   // else
-   //   ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 8.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 4.0F;
+   //In 2x2 binning mode, pixels are received on two columns and 4 rows
+   if ((BinningMode_t)pGCRegs->BinningMode != BM_Mode2x2) {
 
-   ptrH->Line_Readout = (2.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk_per_output / ptrH->Fclock_MHz;
+      ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;
+      ptrH->Line_Readout = (2.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk_per_output / ptrH->Fclock_MHz;
+   } else {
+      ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 4.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 4.0F;
+      ptrH->Line_Readout = (4.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk_per_output / ptrH->Fclock_MHz;
+
+  }
+
    ptrH->Line_Conversion =  (ptrH->Pch1 + ptrH->Pch2 + ptrH->Ramp1_Start + ptrH->Ramp1_Count + ptrH->No_Ramp + ptrH->ramp2_Start + ptrH->ramp2_Count) / ptrH->Fclock_MHz;
    ptrH->Frame_Read      =  ptrH->number_of_conversions *  MAX(ptrH->Line_Readout, ptrH->Line_Conversion);
 
@@ -715,7 +765,8 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
       ptrH->intg_dly                           = gIntg_dly;                // in second
       ptrH->Frame_Time = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_FR_CORR_FACTOR_ITR; // en seconde
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
-      ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->Frame_Time + ptrH->x_to_next_fsync;
+      ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time +  ptrH->Frame_Time + ptrH->x_to_next_fsync ;
+
    }
    else{
       ptrH->intg_dly         = gIntg_dly + MODEL_EXPTIME_CORR_FACTOR_IWR_US;                // in second
@@ -723,6 +774,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
       ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->Frame_Time, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
    }
+
 }
 
 /* Cette fonction calcule le frame rate maximal associé à une configuration donnée. */
@@ -898,8 +950,8 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    }
    else
    {
-      strow = (uint16_t)(ptrA->op_ystart & 0x000003F8);
-      wsize = (uint16_t)(ptrA->op_ysize & 0x000003FE);
+      strow = (uint16_t)(ptrA->op_ystart & 0x000003F8); //3 lsb to 0
+      wsize = (uint16_t)(ptrA->op_ysize & 0x000003FE); //only even
    }
 
    // on bâtit la commande

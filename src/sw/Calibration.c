@@ -241,24 +241,35 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       CM_ERR("Invalid sensor well depth (%d).", collectionFileHeader.SensorWellDepth);
       error = 1;
    }
-
-   if (((collectionFileHeader.OffsetX + collectionFileHeader.Width) > FPA_WIDTH_MAX) ||
-         ((collectionFileHeader.OffsetY + collectionFileHeader.Height) > FPA_HEIGHT_MAX))
+   //Note: Can be an error if calibration load before the sensor init
+   if ((collectionFileHeader.BinningMode == BM_Mode2x2) && (!TDCFlags2Tst(Binning2x2IsImplementedMask)))
    {
-      CM_ERR("Calibrated area is outside FPA sensor area (OffsetX = %d, OffsetY = %d, Width = %d, Height = %d).",
-            collectionFileHeader.OffsetX, collectionFileHeader.OffsetY,
+      CM_ERR("Invalid binning mode (%s).",BinningModeToString((BinningMode_t)collectionFileHeader.BinningMode));
+      error = 1;
+   }
+   else {
+      BIN_DBG("Binning mode is valid (%s).",BinningModeToString((BinningMode_t)collectionFileHeader.BinningMode));
+
+   }
+
+   if (((collectionFileHeader.OffsetX + collectionFileHeader.Width) > FPA_CONFIG_GET_SPECIFIC(width_max,collectionFileHeader.BinningMode)) ||
+         ((collectionFileHeader.OffsetY + collectionFileHeader.Height) >  FPA_CONFIG_GET_SPECIFIC(height_max,collectionFileHeader.BinningMode)))
+   {
+      CM_ERR("Calibrated area is outside FPA sensor area (WidthMax = %d, HeightMax = %d, Width = %d, Height = %d).",
+            FPA_CONFIG_GET_SPECIFIC(width_max,collectionFileHeader.BinningMode), FPA_CONFIG_GET_SPECIFIC(height_max,collectionFileHeader.BinningMode),
             collectionFileHeader.Width, collectionFileHeader.Height);
       error = 1;
    }
 
-   // Do not allow sub-window calibrations
-   if ((collectionFileHeader.OffsetX > 0) || (collectionFileHeader.Width < FPA_WIDTH_MAX) ||
-         (collectionFileHeader.OffsetY > 0) || (collectionFileHeader.Height < FPA_HEIGHT_MAX))
+   // Do not allow sub-window calibrations, expect for binning
+   if ((collectionFileHeader.OffsetX > 0) || (collectionFileHeader.Width < FPA_CONFIG_GET_SPECIFIC(width_max,collectionFileHeader.BinningMode)) ||
+         (collectionFileHeader.OffsetY > 0) || (collectionFileHeader.Height < FPA_CONFIG_GET_SPECIFIC(height_max,collectionFileHeader.BinningMode)))
    {
-      CM_ERR("Sub-window calibrations are not supported (OffsetX = %d, OffsetY = %d, Width = %d, Height = %d).",
-            collectionFileHeader.OffsetX, collectionFileHeader.OffsetY,
-            collectionFileHeader.Width, collectionFileHeader.Height);
-      error = 1;
+         CM_ERR("Sub-window calibrations are not supported (OffsetX = %d, OffsetY = %d, Width = %d, Height = %d).",
+               collectionFileHeader.OffsetX, collectionFileHeader.OffsetY,
+               collectionFileHeader.Width, collectionFileHeader.Height);
+         error = 1;
+
    }
 
    if (collectionFileHeader.PixelDataResolution != flashSettings.PixelDataResolution)
@@ -337,7 +348,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    collectionInfo->FluxRatio01 = collectionFileHeader.FluxRatio01;
    collectionInfo->FluxRatio12 = collectionFileHeader.FluxRatio12;
    collectionInfo->NumberOfBlocks = collectionFileHeader.NumberOfBlocks;
-
+   collectionInfo->BinningMode = collectionFileHeader.BinningMode;
    CM_INF("Collection file header loaded.");
 
    byteCount = FM_ReadFileToTmpFileDataBuffer(fd, collectionFileHeader.CollectionDataLength);
@@ -740,6 +751,11 @@ void Calibration_SM()
                      headerData.blockFile.POSIXTime, headerData.blockFile.SensorPixelPitch, fpa_pixel_pitch_um);
                cmCurrentState = CMS_ERROR;
             }
+            if (headerData.blockFile.BinningMode != calibrationInfo.collection.BinningMode)
+            {
+               CM_ERR("Block %d: Binning mode mismatch (C: %d, B: %d).",    headerData.blockFile.POSIXTime,    calibrationInfo.collection. BinningMode, headerData.blockFile. BinningMode);
+               cmCurrentState = CMS_ERROR;
+            }
 
             if (cmCurrentState != CMS_ERROR)
             {
@@ -768,6 +784,7 @@ void Calibration_SM()
                   calibrationInfo.collection.FluxRatio01 = 0;
                   calibrationInfo.collection.FluxRatio12 = 0;
                   calibrationInfo.collection.isValid = 1;
+                  calibrationInfo.collection.BinningMode = headerData.blockFile.BinningMode;
                }
 
                calibrationInfo.collection.DeviceTemperatureSensor += headerData.blockFile.DeviceTemperatureSensor;
@@ -818,7 +835,7 @@ void Calibration_SM()
             }
             else
             {
-               if (headerData.pixelData.PixelDataLength > CM_CALIB_BLOCK_PIXEL_DATA_SIZE)  //memory for one block
+               if (headerData.pixelData.PixelDataLength > CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE)  //memory for one block
                {
                   CM_ERR("Pixel data length exceeds DDR memory pixel data buffer size.");
                   cmCurrentState = CMS_ERROR;
@@ -874,7 +891,9 @@ void Calibration_SM()
       case CMS_LOAD_PIXEL_DATA:
          length = MIN(CM_MAX_FILE_READ_SIZE, dataLength - dataOffset);
 
-         byteCount = uffs_read(fdCalib, (void *) PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE) + dataOffset, length);
+         byteCount = uffs_read(fdCalib,
+               (void *) PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE) + dataOffset,
+               length);
          if (byteCount != length)
          {
             CM_ERR("Failed to read pixel data.");
@@ -883,7 +902,9 @@ void Calibration_SM()
          else
          {
             // Compute CRC-16 value
-            crc16 = CRC16(crc16, (void *) PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE) + dataOffset, length);
+            crc16 = CRC16(crc16,
+                  (void *) PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex *  CM_CALIB_CURRENT_BLOCK_PIXEL_DATA_SIZE) + dataOffset,
+                  length);
 
             dataOffset += length;
 
@@ -1381,6 +1402,9 @@ void Calibration_SM()
             // GC_SetOffsetY(calibrationInfo.collection.OffsetY);
             GC_SetReverseX(flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
             GC_SetReverseY(flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
+            GC_SetWidthMax(calibrationInfo.collection.Width);
+            GC_SetHeightMax(calibrationInfo.collection.Height);
+            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
 
             // Update active calibration collection registers
             gcRegsData.CalibrationCollectionActivePOSIXTime = calibrationInfo.collection.POSIXTime;

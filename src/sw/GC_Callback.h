@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 13.3.1
+// Generated from XML camera definition file version 13.4.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -48,6 +48,7 @@ void GC_AutofocusROICallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 void GC_AutomaticExternalFanSpeedModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AvailabilityFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_BinningModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActiveBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActivePOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActiveTypeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

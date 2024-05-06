@@ -36,11 +36,11 @@
 
 
 // ADRESSES
-#define AW_BLOCK_SEL_MODE        0x3C
-#define AW_BLOCK_IDX_ADDR        0x40
-#define AW_CAL_BLOCK_INFO_VALID  0x44
-#define AW_BLOCK_OFFSET          0x48
-#define AW_DELTA_TEMP_FP32       0x64
+#define AW_BLOCK_SEL_MODE        0x44
+#define AW_BLOCK_IDX_ADDR        0x48
+#define AW_CAL_BLOCK_INFO_VALID  0x4C
+#define AW_BLOCK_OFFSET          0x50
+#define AW_DELTA_TEMP_FP32       0x6C
 #define AW_COMPR_RATIO_FP32      0x68
 #define AW_DCOMPR_RATIO_FP32     0x6C
 
@@ -235,6 +235,8 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
 
    pA->width = pGCRegs->Width;
    pA->height = pGCRegs->Height;
+   pA->xsize_max = pGCRegs->WidthMax;
+   pA->ysize_max = pGCRegs->HeightMax;
    pA->offsetx = pGCRegs->OffsetX;
    pA->offsety = pGCRegs->OffsetY;
    pA->exposure_time_mult_fp32 = (1.0F / EXPOSURE_TIME_FACTOR);  // facteur de multiplication pour avoir le temps d'exposition en µsec
@@ -259,7 +261,7 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    else
    {
       uint32_t width_aligned = (pGCRegs->Width/8 + 1)*8;
-      uint32_t offsetx_aligned = (FPA_WIDTH_MAX - width_aligned)/2;
+      uint32_t offsetx_aligned = (FPA_CONFIG_GET(width_max) - width_aligned)/2;
       uint32_t extra_width = width_aligned - pGCRegs->Width;
 
       // Config de cal_aoi_align
