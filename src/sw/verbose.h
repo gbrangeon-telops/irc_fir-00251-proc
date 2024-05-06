@@ -25,6 +25,8 @@
 // #define ACQ_VERBOSE
 // #define ACT_VERBOSE
 // #define ATR_VERBOSE
+// #define AUTO_VERBOSE
+// #define BIN_VERBOSE
 // #define BUFFERING_VERBOSE
 // #define CAL_VERBOSE
 // #define CI_VERBOSE
@@ -33,6 +35,7 @@
 // #define DT_VERBOSE
 // #define EHDRI_VERBOSE
 // #define F1F2_VERBOSE
+// #define FB_VERBOSE
 // #define FDV_VERBOSE
 // #define FH_VERBOSE
 // #define FH_RX_VERBOSE
@@ -55,13 +58,10 @@
 // #define PLEORA_VERBOSE
 // #define PM_VERBOSE
 // #define QSPI_VERBOSE
+// #define RP_VERBOSE
 // #define SFW_VERBOSE
+// #define SL_VERBOSE
 // #define SREC_VERBOSE
 // #define TM_VERBOSE
 // #define XADC_VERBOSE
-// #define RP_VERBOSE
-// #define SL_VERBOSE
-// #define AUTO_VERBOSE
-// #define FB_VERBOSE
-// #define BIN_VERBOSE
 #endif // VERBOSE_H
