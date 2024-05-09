@@ -43,14 +43,6 @@ architecture rtl of calcium_clks_gen is
          ORST        : out std_logic   
       );
    end component;
-   
-   component sync_reset
-      port (
-         ARESET : in std_logic;
-         CLK    : in std_logic;
-         SRESET : out std_logic := '1'
-      );
-   end component;
 
    component calciumD_clks_mmcm
       port (
@@ -88,7 +80,6 @@ architecture rtl of calcium_clks_gen is
       );
    end component;
    
-   signal sreset              : std_logic;
    signal cond_reset_in       : std_logic;
    signal mmcm_locked_i       : std_logic;
    
@@ -107,14 +98,7 @@ begin
       SLOWEST_CLK => CLK_100M,
       ORST        => GLOBAL_RST
    );
-   cond_reset_in <= (not mmcm_locked_i) or sreset;
-   
-   U1B : sync_reset
-   port map (
-      ARESET => ARESET,
-      CLK    => CLK_100M,
-      SRESET => sreset
-   );
+   cond_reset_in <= (not mmcm_locked_i) or ARESET;
    
    --------------------------------------------------
    -- Clock Wizard
@@ -125,7 +109,7 @@ begin
          s_axi_aclk    => AXI_CLK,
          s_axi_aresetn => AXI_RSTN,
          -- AXI Write address channel signals
-         s_axi_awaddr  => AXI_MOSI.awaddr,
+         s_axi_awaddr  => AXI_MOSI.awaddr(10 downto 0),
          s_axi_awvalid => AXI_MOSI.awvalid,
          s_axi_awready => AXI_MISO.awready,
          -- AXI Write data channel signals
@@ -138,7 +122,7 @@ begin
          s_axi_bvalid  => AXI_MISO.bvalid,
          s_axi_bready  => AXI_MOSI.bready,
          -- AXI Read address channel signals
-         s_axi_araddr  => AXI_MOSI.araddr,
+         s_axi_araddr  => AXI_MOSI.araddr(10 downto 0),
          s_axi_arvalid => AXI_MOSI.arvalid,
          s_axi_arready => AXI_MISO.arready,
          -- AXI Read address channel signals
