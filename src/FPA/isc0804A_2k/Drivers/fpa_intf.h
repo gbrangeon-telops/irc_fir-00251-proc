@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 #include "IRC_status.h"
+#include "FPABinningConfig.h"
 
 #ifdef FPA_VERBOSE
    #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
@@ -37,7 +38,7 @@
 #define FPA_HEIGHT_MIN     8     // 
 #define FPA_HEIGHT_MAX     512
 #define FPA_HEIGHT_MULT    4
-#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
+#define FPA_HEIGHT_INC     8 // lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT) //plus possible de le faire avec une structurelcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   32 
