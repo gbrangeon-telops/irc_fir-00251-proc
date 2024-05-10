@@ -156,6 +156,8 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    float FNumber;   /**< Sensor FNumber */
    uint8_t CompressionAlgorithm;   /**< Compression algorithm to be used on data calibrated with this block */
    float CompressionParameter;   /**< Compression parameter to be used on data calibrated with this block. Parameter usage depends on CompressionAlgorithm */
+   float CalibrationROI;   /**< Region of interest used to calibrate the camera */
+   uint8_t CalibrationMethod;   /**< Method used to calibrate the camera */
    uint8_t PixelDataPresence;   /**< Indicates the presence of pixel data in calibration block */
    uint8_t MaxTKDataPresence;   /**< Indicates the presence of MaxTK data in calibration block */
    uint8_t LUTNLDataPresence;   /**< Indicates the presence of LUTNL data in calibration block */

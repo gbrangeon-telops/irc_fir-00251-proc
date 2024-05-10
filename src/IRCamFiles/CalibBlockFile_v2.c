@@ -112,6 +112,8 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* FNumber = */ 0.000000F,
    /* CompressionAlgorithm = */ 0,
    /* CompressionParameter = */ 0.000000F,
+   /* CalibrationROI = */ 100.000000F,
+   /* CalibrationMethod = */ 0,
    /* PixelDataPresence = */ 0,
    /* MaxTKDataPresence = */ 0,
    /* LUTNLDataPresence = */ 0,
@@ -367,7 +369,9 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    numBytes += 3; // Skip FREE space
    memcpy(&hdr->CompressionAlgorithm, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->CompressionParameter, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 18; // Skip FREE space
+   memcpy(&hdr->CalibrationROI, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->CalibrationMethod, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 13; // Skip FREE space
    memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -514,7 +518,9 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
    memcpy(&buffer[numBytes], &hdr->CompressionAlgorithm, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->CompressionParameter, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 18); numBytes += 18; // FREE space
+   memcpy(&buffer[numBytes], &hdr->CalibrationROI, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->CalibrationMethod, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 13); numBytes += 13; // FREE space
    memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -586,16 +592,16 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("LensID: %u\n", hdr->LensID);
    FPGA_PRINTF("LowCut: " _PCF(3) " um\n", _FFMT(hdr->LowCut, 3));
    FPGA_PRINTF("HighCut: " _PCF(3) " um\n", _FFMT(hdr->HighCut, 3));
-   FPGA_PRINTF("LowReferenceTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->LowReferenceTemperature, 3));
-   FPGA_PRINTF("HighReferenceTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->HighReferenceTemperature, 3));
-   FPGA_PRINTF("LowExtrapolationTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->LowExtrapolationTemperature, 3));
-   FPGA_PRINTF("HighExtrapolationTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->HighExtrapolationTemperature, 3));
+   FPGA_PRINTF("LowReferenceTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->LowReferenceTemperature, 3));
+   FPGA_PRINTF("HighReferenceTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->HighReferenceTemperature, 3));
+   FPGA_PRINTF("LowExtrapolationTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->LowExtrapolationTemperature, 3));
+   FPGA_PRINTF("HighExtrapolationTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->HighExtrapolationTemperature, 3));
    FPGA_PRINTF("FluxOffset: " _PCF(3) " DL/us\n", _FFMT(hdr->FluxOffset, 3));
    FPGA_PRINTF("FluxSaturation: " _PCF(3) " DL/us\n", _FFMT(hdr->FluxSaturation, 3));
    FPGA_PRINTF("LowExtrapolationFactor: " _PCF(3) "\n", _FFMT(hdr->LowExtrapolationFactor, 3));
    FPGA_PRINTF("HighExtrapolationFactor: " _PCF(3) "\n", _FFMT(hdr->HighExtrapolationFactor, 3));
-   FPGA_PRINTF("LowValidTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->LowValidTemperature, 3));
-   FPGA_PRINTF("HighValidTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->HighValidTemperature, 3));
+   FPGA_PRINTF("LowValidTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->LowValidTemperature, 3));
+   FPGA_PRINTF("HighValidTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->HighValidTemperature, 3));
    FPGA_PRINTF("BinningMode: %u enum\n", hdr->BinningMode);
    FPGA_PRINTF("FOVPosition: %u enum\n", hdr->FOVPosition);
    FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
@@ -606,7 +612,7 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("CalibrationReferenceSourceID: %u\n", hdr->CalibrationReferenceSourceID);
    FPGA_PRINTF("CalibrationReferenceSourceEmissivity: " _PCF(3) "\n", _FFMT(hdr->CalibrationReferenceSourceEmissivity, 3));
    FPGA_PRINTF("CalibrationReferenceSourceDistance: " _PCF(3) " m\n", _FFMT(hdr->CalibrationReferenceSourceDistance, 3));
-   FPGA_PRINTF("CalibrationChamberTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->CalibrationChamberTemperature, 3));
+   FPGA_PRINTF("CalibrationChamberTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->CalibrationChamberTemperature, 3));
    FPGA_PRINTF("CalibrationChamberRelativeHumidity: " _PCF(3) " %%\n", _FFMT(hdr->CalibrationChamberRelativeHumidity, 3));
    FPGA_PRINTF("CalibrationChamberCO2MixingRatio: " _PCF(3) " ppm\n", _FFMT(hdr->CalibrationChamberCO2MixingRatio, 3));
    FPGA_PRINTF("SSEParameter1: " _PCF(3) "\n", _FFMT(hdr->SSEParameter1, 3));
@@ -620,6 +626,8 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("FNumber: " _PCF(3) "\n", _FFMT(hdr->FNumber, 3));
    FPGA_PRINTF("CompressionAlgorithm: %u enum\n", hdr->CompressionAlgorithm);
    FPGA_PRINTF("CompressionParameter: " _PCF(3) "\n", _FFMT(hdr->CompressionParameter, 3));
+   FPGA_PRINTF("CalibrationROI: " _PCF(3) " %%\n", _FFMT(hdr->CalibrationROI, 3));
+   FPGA_PRINTF("CalibrationMethod: %u enum\n", hdr->CalibrationMethod);
    FPGA_PRINTF("PixelDataPresence: %u 0 / 1\n", hdr->PixelDataPresence);
    FPGA_PRINTF("MaxTKDataPresence: %u 0 / 1\n", hdr->MaxTKDataPresence);
    FPGA_PRINTF("LUTNLDataPresence: %u 0 / 1\n", hdr->LUTNLDataPresence);
