@@ -82,6 +82,7 @@ struct gcRegistersDataStruct {
    float DeviceDetectorElectricalRefOffset;
    float DeviceDetectorElectricalTapsRef;
    float DeviceDetectorPolarizationVoltage;
+   float DeviceStabilizationDeltaTemperature;
    float DeviceTemperature;
    float DeviceVoltage;
    float EHDRIExpectedTemperatureMax;
@@ -190,6 +191,7 @@ struct gcRegistersDataStruct {
    uint32_t DeviceSerialPortBaudRate;
    uint32_t DeviceSerialPortFunction;
    uint32_t DeviceSerialPortSelector;
+   uint32_t DeviceStabilizationTime;
    uint32_t DeviceTemperatureSelector;
    uint32_t DeviceVoltageSelector;
    uint32_t DeviceXMLMajorVersion;
@@ -632,6 +634,8 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetDeviceCoolerRunningTime(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceCoolerRunningTimeIdx], val)
 #define GC_SetDevicePowerOnCycles(val) GC_RegisterWriteUI32(&gcRegsDef[DevicePowerOnCyclesIdx], val)
 #define GC_SetDeviceCoolerPowerOnCycles(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceCoolerPowerOnCyclesIdx], val)
+#define GC_SetDeviceStabilizationTime(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceStabilizationTimeIdx], val)
+#define GC_SetDeviceStabilizationDeltaTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceStabilizationDeltaTemperatureIdx], val)
 #define GC_SetDeviceDetectorPolarizationVoltage(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceDetectorPolarizationVoltageIdx], val)
 #define GC_SetDeviceDetectorElectricalTapsRef(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceDetectorElectricalTapsRefIdx], val)
 #define GC_SetDeviceDetectorElectricalRefOffset(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceDetectorElectricalRefOffsetIdx], val)

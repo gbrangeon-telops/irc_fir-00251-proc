@@ -106,6 +106,8 @@ void GC_DeviceSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
 void GC_DeviceSerialPortBaudRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceSerialPortFunctionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceSerialPortSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_DeviceStabilizationDeltaTemperatureCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_DeviceStabilizationTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceTemperatureCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceTemperatureSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceVendorNameCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

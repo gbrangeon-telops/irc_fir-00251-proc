@@ -64,6 +64,7 @@
 #include "HwRevision.h"
 #include "GC_Store.h"
 #include "FrameBuffer.h"
+#include "Calibration.h"
 
 
 #include <string.h>
@@ -123,8 +124,9 @@ uint16_t gFpaVDetCom_mV = 0;
 uint16_t gFpaVPixQNB_mV = 0;
 uint16_t gFpaDebugKPix = 0;
 bool gFpaDebugKPixForced = false;
-float gFpaDebugComprRatio = 0.0F;
-bool gFpaDebugComprRatioForced = false;
+CompressionAlgorithm_t gCompressionAlgorithm = CA_NoCompression;
+float gCompressionParameter = 0.0F;
+bool gCompressionParameterForced = false;
 t_HderInserter gHderInserter = HderInserter_Ctor(XPAR_HEADER_CTRL_BASEADDR);
 t_fan gFan = FAN_Ctor(XPAR_FAN_CTRL_BASEADDR);
 t_calib gCal = CAL_Config_Ctor(XPAR_CALIBCONFIG_AXI_BASEADDR);

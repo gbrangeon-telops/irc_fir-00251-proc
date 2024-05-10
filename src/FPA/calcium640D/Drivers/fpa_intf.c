@@ -122,6 +122,8 @@
 
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
+#define CALCIUM_COMPRESSION_PARAM_DEFAULT          1.0F
+
 #define TOTAL_DAC_NUM                              8
 
 struct s_ProximCfgConfig
@@ -259,8 +261,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static uint16_t presentFpaVPixQNB_mV = CALCIUM_VPIXQNB_DEFAULT_mV;
    extern uint16_t gFpaDebugKPix;
    extern bool gFpaDebugKPixForced;
-   extern float gFpaDebugComprRatio;
-   extern bool gFpaDebugComprRatioForced;
+   extern CompressionAlgorithm_t gCompressionAlgorithm;
+   extern float gCompressionParameter;
+   extern bool gCompressionParameterForced;
    static uint8_t cfg_num;
 
    // on bâtit les parametres specifiques
@@ -385,26 +388,27 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_serdes_lval_num = hh.numFrRows;
    ptrA->fpa_serdes_lval_len = ptrA->width/8;    // 8 pix de large
    
-   // compression logarithmique
-   if (sw_init_done == 0 || gFpaDebugComprRatio == 0.0F)
+   // compression loi de puissance
+   gCompressionAlgorithm = CA_PowerLaw;
+   if (sw_init_done == 0 || gCompressionParameter == 0.0F)
    {
-      gFpaDebugComprRatio = 1.0F;   // valeur max est la valeur par défaut
-      gFpaDebugComprRatioForced = false;
+      gCompressionParameter = CALCIUM_COMPRESSION_PARAM_DEFAULT;
+      gCompressionParameterForced = false;
    }
    if (ptrA->fpa_diag_mode ||
-         gFpaDebugComprRatioForced ||
+         gCompressionParameterForced ||
          !calibrationInfo.isValid ||
-         calibrationInfo.blocks[0].CompressionAlgorithm == 0)
+         calibrationInfo.blocks[0].CompressionAlgorithm != CA_PowerLaw)
    {
-      // On force le compression ratio par défaut ou transmis par l'usager
-      ptrA->compr_ratio_fp32 = gFpaDebugComprRatio;
+      // On force le compression parameter par défaut ou transmis par l'usager
+      ptrA->compr_ratio_fp32 = gCompressionParameter;
    }
    else
    {
-      // On utilise le compression ratio disponible dans le bloc (la compression est la même pour tous les blocs)
+      // On utilise le compression parameter disponible dans le bloc (la compression est la même pour tous les blocs)
       ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
    }
-   gFpaDebugComprRatio = ptrA->compr_ratio_fp32;
+   gCompressionParameter = ptrA->compr_ratio_fp32;
    
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    ptrA->cfg_num = ++cfg_num;

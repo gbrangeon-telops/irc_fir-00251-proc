@@ -855,15 +855,19 @@ void CAL_ConfigComprRatio(const t_calib *pA)
 {
    float compr_ratio;
    float dcompr_ratio;
-   uint32_t *p_Float = NULL;  // pour écrire les float en AXIL
-   extern float gFpaDebugComprRatio;
+   uint32_t *p_compr_ratio = (uint32_t *)(&compr_ratio);  // pour écrire un float en AXIL
+   uint32_t *p_dcompr_ratio = (uint32_t *)(&dcompr_ratio);  // pour écrire un float en AXIL
+   extern float gCompressionParameter;
 
-   // On utilise le compression ratio déterminé dans FPA_SendConfigGC
-   compr_ratio = gFpaDebugComprRatio;
-   dcompr_ratio = 1.0F / gFpaDebugComprRatio;
+   // On utilise le compression parameter déterminé dans FPA_SendConfigGC
+   compr_ratio = gCompressionParameter;
+   if (gCompressionParameter != 0.0F)     // pour éviter la division par 0
+      dcompr_ratio = 1.0F / gCompressionParameter;
+   else
+      dcompr_ratio = 0.0F;
 
-   p_Float = (uint32_t *)(&compr_ratio);
-   AXI4L_write32(*p_Float, pA->ADD + AW_COMPR_RATIO_FP32);
-   p_Float = (uint32_t *)(&dcompr_ratio);
-   AXI4L_write32(*p_Float, pA->ADD + AW_DCOMPR_RATIO_FP32);
+   // On écrit toujours les paramètres dans le module de calibration. Si la compression est
+   // désactivée ou n'est pas implémentée, les paramètres seront inutilisés.
+   AXI4L_write32(*p_compr_ratio, pA->ADD + AW_COMPR_RATIO_FP32);
+   AXI4L_write32(*p_dcompr_ratio, pA->ADD + AW_DCOMPR_RATIO_FP32);
 }

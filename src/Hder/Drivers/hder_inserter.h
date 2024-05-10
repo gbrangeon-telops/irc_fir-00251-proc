@@ -65,6 +65,9 @@ uint32_t HDER_GetStatus(const t_HderInserter *a);
 //pour reset des registres d'erreurs
 void HDER_ResetErr(const t_HderInserter *a);
 
+// Pour update de la configuration de compression
+void HDER_UpdateCompressionConfig(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
+
 // Pour update du NDF dans le Header
 void HDER_UpdateNDFPositionHeader(const t_HderInserter *a, uint8_t position);
 

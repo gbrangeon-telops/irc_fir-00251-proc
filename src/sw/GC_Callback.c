@@ -167,6 +167,8 @@ void GC_Callback_Init()
    gcRegsDef[DeviceSerialPortBaudRateIdx].callback =                             &GC_DeviceSerialPortBaudRateCallback;
    gcRegsDef[DeviceSerialPortFunctionIdx].callback =                             &GC_DeviceSerialPortFunctionCallback;
    gcRegsDef[DeviceSerialPortSelectorIdx].callback =                             &GC_DeviceSerialPortSelectorCallback;
+   gcRegsDef[DeviceStabilizationDeltaTemperatureIdx].callback =                  &GC_DeviceStabilizationDeltaTemperatureCallback;
+   gcRegsDef[DeviceStabilizationTimeIdx].callback =                              &GC_DeviceStabilizationTimeCallback;
    gcRegsDef[DeviceTemperatureIdx].callback =                                    &GC_DeviceTemperatureCallback;
    gcRegsDef[DeviceTemperatureSelectorIdx].callback =                            &GC_DeviceTemperatureSelectorCallback;
    gcRegsDef[DeviceVendorNameIdx].callback =                                     &GC_DeviceVendorNameCallback;
@@ -1738,6 +1740,28 @@ void GC_DeviceSerialPortFunctionCallback(gcCallbackPhase_t phase, gcCallbackAcce
  * @param access indicates whether the operation is read or write.
  */
 void GC_DeviceSerialPortSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+}
+
+/**
+ * DeviceStabilizationDeltaTemperature GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceStabilizationDeltaTemperatureCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+}
+
+/**
+ * DeviceStabilizationTime GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceStabilizationTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
 }
 

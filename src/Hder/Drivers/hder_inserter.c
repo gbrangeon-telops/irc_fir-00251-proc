@@ -186,6 +186,8 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(pGCRegs->FWMode), a->ADD + A_BASE_HEADER + FWModeHdrAddr);
    AXI4L_write16((uint16_t)(pGCRegs->FWSpeedSetpoint), a->ADD + A_BASE_HEADER + FWSpeedSetpointHdrAddr);
    AXI4L_write16((uint16_t)(pGCRegs->FWSpeed), a->ADD + A_BASE_HEADER + FWSpeedHdrAddr);
+   AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + CompressionParameterHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + POSIXTimeHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + SubSecondTimeHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->TimeSource), a->ADD + A_BASE_HEADER + TimeSourceHdrAddr);
@@ -241,6 +243,32 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write32((uint32_t)(pGCRegs->CalibrationCollectionActivePOSIXTime), a->ADD + A_BASE_HEADER + CalibrationCollectionPOSIXTimeHdrAddr);
 
 /* AUTO-CODE END */
+
+   // Manage special case of compression configuration
+   HDER_UpdateCompressionConfig(a, pGCRegs);
+}
+
+/**
+ * Update compression configuration fields.
+ *
+ * @param a is a pointer to the header inserter structure.
+ * @param pGCRegs is a pointer to registers data.
+ */
+void HDER_UpdateCompressionConfig(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
+{
+   extern CompressionAlgorithm_t gCompressionAlgorithm;
+   extern float gCompressionParameter;
+   uint32_t *p_gCompressionParameter = (uint32_t *)(&gCompressionParameter);  // to write float over AXIL
+
+   if (pGCRegs->CalibrationMode == CM_RT || pGCRegs->CalibrationMode == CM_IBR || pGCRegs->CalibrationMode == CM_IBI)
+      // Deactivate compression for radiometric quantity data
+      AXI4L_write8((uint8_t)(CA_NoCompression), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+   else
+      // Write the compression algorithm as determined in FPA_SendConfigGC
+      AXI4L_write8((uint8_t)(gCompressionAlgorithm), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+
+   // We always write the compression parameter as determined in FPA_SendConfigGC
+   AXI4L_write32(*p_gCompressionParameter, a->ADD + A_BASE_HEADER + CompressionParameterHdrAddr);
 }
 
 //-------------------------------------------------------------------------

@@ -776,9 +776,10 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    extern uint16_t gFpaVPixQNB_mV;
    extern uint16_t gFpaDebugKPix;
    extern bool gFpaDebugKPixForced;
-   extern float gFpaDebugComprRatio;
-   extern bool gFpaDebugComprRatioForced;
+   extern float gCompressionParameter;
+   extern bool gCompressionParameterForced;
    extern t_calib gCal;
+   extern t_HderInserter gHderInserter;
 
    uint8_t cmdStr[10], argStr[9];
    uint32_t arglen;
@@ -912,13 +913,14 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
             break;
          
          case 11:  // COMPR
-            gFpaDebugComprRatio = fValue;
-            gFpaDebugComprRatioForced = true;
+            gCompressionParameter = fValue;
+            gCompressionParameterForced = true;
             break;
       }
 
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
       CAL_ConfigComprRatio(&gCal);
+      HDER_UpdateCompressionConfig(&gHderInserter, &gcRegsData);
    }
 
    DT_PRINTF("FPA VA1P8 voltage = %u mV", gFpaVa1p8_mV);
@@ -933,8 +935,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA Debug KPix = %u", gFpaDebugKPix);
    DT_PRINTF("FPA Debug KPix Forced = %u", gFpaDebugKPixForced);
 
-   DT_PRINTF("FPA Debug Compression Ratio = " _PCF(6), _FFMT(gFpaDebugComprRatio, 6));
-   DT_PRINTF("FPA Debug Compression Ratio Forced = %u", gFpaDebugComprRatioForced);
+   DT_PRINTF("FPA Compression Parameter = " _PCF(6), _FFMT(gCompressionParameter, 6));
+   DT_PRINTF("FPA Compression Parameter Forced = %u", gCompressionParameterForced);
 
    return IRC_SUCCESS;
 }

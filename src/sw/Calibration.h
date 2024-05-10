@@ -79,6 +79,9 @@ enum cmStateEnum {
  */
 typedef enum cmStateEnum cmState_t;
 
+/**
+ * Calibration source enumeration values
+ */
 typedef enum {
    CS_REFERENCED = 0,
    CS_INTERPOLATED = 1,
@@ -125,6 +128,14 @@ struct LUTRQInfoStruct {
 typedef struct LUTRQInfoStruct LUTRQInfo_t;
 
 /**
+ * Compression algorithm enumeration values
+ */
+typedef enum {
+   CA_NoCompression = 0,
+   CA_PowerLaw = 1
+} CompressionAlgorithm_t;
+
+/**
  * Calibration block information structure.
  */
 struct calibBlockInfoStruct {
@@ -152,7 +163,7 @@ struct calibBlockInfoStruct {
    int32_t DeviceTemperatureSensor; /**< Device Sensor Temperature during calibration */
    float LowCut;                    /**< Low wavelength at mid-height of the IBR integration start. */
    float HighCut;                   /**< High wavelength at mid-height of the IBR integration start. */
-   uint8_t CompressionAlgorithm;    /**< Compression algorithm to be used on data calibrated with this block */
+   CompressionAlgorithm_t CompressionAlgorithm; /**< Compression algorithm to be used on data calibrated with this block */
    float CompressionParameter;      /**< Compression parameter to be used on data calibrated with this block. Parameter usage depends on CompressionAlgorithm */
    uint8_t PixelDataPresence;       /**< Indicates the presence of pixel data in calibration block */
    struct {
