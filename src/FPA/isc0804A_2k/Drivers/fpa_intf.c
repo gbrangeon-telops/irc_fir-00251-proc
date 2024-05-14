@@ -524,11 +524,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->user_area_eol_posl_pclk          = ptrA->user_area_sol_posl_pclk + ((uint32_t)pGCRegs->Width/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk - 1;
    ptrA->user_area_clk_id                 = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    
-   // Stretching of the user area by one mclk cycle to account for fpa pipe delay.
+   // Stretching of the user area by two mclk cycles to account for FPA pipe delay.
    ptrA->clk_area_a_line_start_num        = ptrA->user_area_line_start_num;
    ptrA->clk_area_a_line_end_num          = ptrA->user_area_line_end_num;
-   ptrA->clk_area_a_sol_posl_pclk         = MIN( ptrA->user_area_eol_posl_pclk + 1 , ptrA->raw_area_line_period_pclk - 1);
-   ptrA->clk_area_a_eol_posl_pclk         = ptrA->clk_area_a_sol_posl_pclk + 1;
+   ptrA->clk_area_a_sol_posl_pclk         = ptrA->user_area_eol_posl_pclk + 1;
+   ptrA->clk_area_a_eol_posl_pclk         = MAX(ptrA->clk_area_a_sol_posl_pclk + 3, ptrA->raw_area_line_period_pclk);
    ptrA->clk_area_a_clk_id                = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    ptrA->clk_area_a_spare                 = 0;
    
