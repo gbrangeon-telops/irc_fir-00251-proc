@@ -1299,6 +1299,7 @@ void Calibration_SM()
                }
                else
                {
+                  CM_INF("KPIX data loaded.");
                   cmCurrentState = CMS_FINALIZE_BLOCK_FILE;
                }
             }
