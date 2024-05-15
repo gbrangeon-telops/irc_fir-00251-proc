@@ -60,7 +60,7 @@
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (ScorpiolwDIsImplemented | ITRIsImplementedMask)
-#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
+#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask | AECIsImplementedMask | CalibrationFileStorageIsImplementedMask)
 #define FPA_NB_PIX_CLK     1
 
 

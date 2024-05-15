@@ -69,7 +69,7 @@
 #else
 #define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 #endif
-#define FPA_TDC_FLAGS2           0
+#define FPA_TDC_FLAGS2           (AECIsImplementedMask | CalibrationFileStorageIsImplementedMask)
 
 #define FPA_MAX_GAIN       3
 #define FPA_NUMTAPS        4  // [taps]

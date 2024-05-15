@@ -56,7 +56,7 @@
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (Isc0207A_3kIsImplemented | ITRIsImplementedMask | \
                                  HighGainSWDIsImplementedMask | BurstModeIsImplementedMask)
-#define FPA_TDC_FLAGS2           0
+#define FPA_TDC_FLAGS2           (AECIsImplementedMask | CalibrationFileStorageIsImplementedMask)
 
 #define FPA_MAX_GAIN       1
 #define FPA_NUMTAPS        16  // [taps]
