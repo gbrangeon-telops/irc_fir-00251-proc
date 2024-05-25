@@ -228,6 +228,14 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  dynrange_clipping_level               ;
    int32_t   dynrange_global_offset                ;
    uint32_t  dynrange_op_sel                       ;
+
+   uint32_t  clk_area_c_line_start_num             ;
+   uint32_t  clk_area_c_line_end_num               ;
+   uint32_t  clk_area_c_sol_posl_pclk              ;
+   uint32_t  clk_area_c_eol_posl_pclk              ;
+   uint32_t  clk_area_c_spare                      ;
+   uint32_t  clk_area_c_clk_id                     ;
+
 };                                  
 typedef struct s_FpaIntfConfig t_FpaIntf;
 

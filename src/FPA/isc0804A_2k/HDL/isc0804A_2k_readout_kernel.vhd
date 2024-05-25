@@ -450,32 +450,32 @@ begin
             readout_info_i.aoi.samp_pulse    <= adc_ref_fe_pipe(0) and AREA_FIFO_DATA.USER.FVAL and readout_info_valid;
             readout_info_i.aoi.spare(0)      <= acq_data_o;                     
             
-            if FPA_INTF_CFG.SINGLE_SAMP_MODE_EN = '1' then 
-               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_NOMINAL_MCLK_ID then
-                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.NOMINAL_CLK_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
-                     readout_info_i.aoi.dval    <= '0';
-                  end if;
-               end if;
-               
-               
-               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_MCLK1_ID then
-                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.MCLK1_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
-                     readout_info_i.aoi.dval    <= '0';
-                  end if;
-               end if;
-               
-               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_MCLK2_ID then
-                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.MCLK2_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
-                     readout_info_i.aoi.dval    <= '0';
-                  end if;
-               end if;
-               
-               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_MCLK3_ID then
-                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.MCLK3_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
-                     readout_info_i.aoi.dval    <= '0';
-                  end if;
-               end if;
-            end if;
+--            if FPA_INTF_CFG.SINGLE_SAMP_MODE_EN = '1' then 
+--               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_NOMINAL_MCLK_ID then
+--                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.NOMINAL_CLK_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
+--                     readout_info_i.aoi.dval    <= '0';
+--                  end if;
+--               end if;
+--               
+--               
+--               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_MCLK1_ID then
+--                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.MCLK1_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
+--                     readout_info_i.aoi.dval    <= '0';
+--                  end if;
+--               end if;
+--               
+--               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_MCLK2_ID then
+--                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.MCLK2_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
+--                     readout_info_i.aoi.dval    <= '0';
+--                  end if;
+--               end if;
+--               
+--               if AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_MCLK3_ID then
+--                  if (AREA_FIFO_DATA.USER.ADC_SAMPLE_NUM /= FPA_INTF_CFG.MCLK3_ID_SAMPLE_POS) then     -- on ne considere que le dernier echantillon 
+--                     readout_info_i.aoi.dval    <= '0';
+--                  end if;
+--               end if;
+--            end if;
             
             -- naoi (contenu aussi dans readout_info)
             readout_info_i.naoi.ref_valid(1) <= ELCORR_REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)

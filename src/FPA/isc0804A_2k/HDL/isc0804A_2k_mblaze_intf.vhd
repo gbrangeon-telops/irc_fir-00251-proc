@@ -298,7 +298,7 @@ begin
                   when X"0B8" =>    user_cfg_i.clk_area_b.sol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_b.sol_posl_pclk'length-1 downto 0));                                
                   when X"0BC" =>    user_cfg_i.clk_area_b.eol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_b.eol_posl_pclk'length-1 downto 0));
                   when X"0C0" =>    user_cfg_i.clk_area_b.spare                        <= unsigned(data_i(user_cfg_i.clk_area_b.spare'length-1 downto 0)); 
-                  when X"0C4" =>    user_cfg_i.clk_area_b.clk_id                       <= unsigned(data_i(user_cfg_i.clk_area_a.clk_id'length-1 downto 0));
+                  when X"0C4" =>    user_cfg_i.clk_area_b.clk_id                       <= unsigned(data_i(user_cfg_i.clk_area_b.clk_id'length-1 downto 0));
                      
                   -- configs diverses                                                 
                   when X"0C8" =>    user_cfg_i.pix_samp_num_per_ch                     <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));                                                                                                                                      
@@ -385,7 +385,15 @@ begin
                   when X"1B4" =>    user_cfg_i.dynrange_scaling_numerator              <= unsigned(data_i(22 downto 0));
                   when X"1B8" =>    user_cfg_i.dynrange_clipping_level                 <= unsigned(data_i(13 downto 0)); 
                   when X"1BC" =>    user_cfg_i.dynrange_global_offset                  <= signed(data_i(user_cfg_i.dynrange_global_offset'length-1  downto 0)); 
-                  when X"1C0" =>    user_cfg_i.dynrange_op_sel                         <= std_logic_vector(data_i(user_cfg_i.dynrange_op_sel'length-1 downto 0)); 
+                  when X"1C0" =>    user_cfg_i.dynrange_op_sel                         <= std_logic_vector(data_i(user_cfg_i.dynrange_op_sel'length-1 downto 0));
+				  
+                  -- clk_area_c                                                                                                                                                                           
+                  when X"1C4" =>    user_cfg_i.clk_area_c.line_start_num               <= unsigned(data_i(user_cfg_i.clk_area_c.line_start_num'length-1 downto 0));                               
+                  when X"1C8" =>    user_cfg_i.clk_area_c.line_end_num                 <= unsigned(data_i(user_cfg_i.clk_area_c.line_end_num'length-1 downto 0));                                 
+                  when X"1CC" =>    user_cfg_i.clk_area_c.sol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_c.sol_posl_pclk'length-1 downto 0));                                
+                  when X"1D0" =>    user_cfg_i.clk_area_c.eol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_c.eol_posl_pclk'length-1 downto 0));
+                  when X"1D4" =>    user_cfg_i.clk_area_c.spare                        <= unsigned(data_i(user_cfg_i.clk_area_c.spare'length-1 downto 0)); 
+                  when X"1D8" =>    user_cfg_i.clk_area_c.clk_id                       <= unsigned(data_i(user_cfg_i.clk_area_c.clk_id'length-1 downto 0));
                   user_cfg_in_progress <= '0';
                                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation

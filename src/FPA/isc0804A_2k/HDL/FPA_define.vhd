@@ -70,7 +70,7 @@ package FPA_define is
    constant DEFINE_FPA_NOMINAL_MCLK_RATE_HZ       : integer   := 17_500_000;  -- vitesse nominale
    constant DEFINE_FPA_MCLK1_RATE_HZ              : integer   := integer(8.0/12.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 1ere cadence non-nominale d'opération 
    constant DEFINE_FPA_MCLK2_RATE_HZ              : integer   := integer(8.0/6.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 2e   cadence non-nominale d'opération
-   constant DEFINE_FPA_MCLK3_RATE_HZ              : integer   := integer(1.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 3e   cadence non-nominale d'opération
+   constant DEFINE_FPA_MCLK3_RATE_HZ              : integer   := integer(8.0/10.0*real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- 3e   cadence non-nominale d'opération
    constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ  : integer   := DEFINE_FPA_MASTER_CLK_SOURCE_FACTOR*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ;  -- choisi judicieusement en fonction du ppcm des horloges
    constant DEFINE_FPA_FAST_MCLK_RATE_HZ          : integer   := DEFINE_FPA_MCLK2_RATE_HZ;  -- vitesse fast
   
@@ -253,6 +253,7 @@ package FPA_define is
       user_area                           : area_cfg_type; -- zone AOI demandée par l'usager
       clk_area_a                          : area_cfg_type; -- zone d'horloge 
       clk_area_b                          : area_cfg_type; -- zone d'horloge 
+	  clk_area_c                          : area_cfg_type; -- zone d'horloge 
       
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch                 : unsigned(3 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
