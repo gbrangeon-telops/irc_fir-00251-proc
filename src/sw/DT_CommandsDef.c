@@ -611,7 +611,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
 
 #ifdef AR_COMPR_ERR
-   // bus d'erreurs spécifiques au calciumD
+   // bus d'erreurs spï¿½cifiques au calciumD
    DT_PRINTF("compr_err_latch = 0x%08X", AXI4L_read32(gFpaIntf.ADD + AR_COMPR_ERR));
 #endif
 
@@ -776,6 +776,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    extern uint16_t gFpaVPixQNB_mV;
    extern uint16_t gFpaDebugKPix;
    extern bool gFpaDebugKPixForced;
+   extern float gFpaActualFreq_MHz;
+   extern float gFpaDesiredFreq_MHz;
    extern float gCompressionParameter;
    extern bool gCompressionParameterForced;
    extern t_calib gCal;
@@ -821,6 +823,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
          cmd = 10;
       else if (strcasecmp((char *)cmdStr, "COMPR") == 0)
          cmd = 11;
+      else if (strcasecmp((char *)cmdStr, "FREQ") == 0)
+         cmd = 12;
       else
       {
          DT_ERR("Unsupported command");
@@ -850,6 +854,7 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
             break;
          
          case 11: // COMPR
+         case 12: // FREQ
             if (ParseFloatNumDec((char *)argStr, arglen, &fValue) != IRC_SUCCESS)
             {
                DT_ERR("Invalid float argument");
@@ -916,6 +921,15 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
             gCompressionParameter = fValue;
             gCompressionParameterForced = true;
             break;
+         
+         case 12:  // FREQ
+            if(fValue > 0.0f) {
+               gFpaDesiredFreq_MHz = fValue;
+               DT_PRINTF("New frequency will be applied on next FPA power on");
+            } else {
+               DT_ERR("New frequency must be greater than 0.0");
+            }
+            break;
       }
 
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
@@ -937,6 +951,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
 
    DT_PRINTF("FPA Compression Parameter = " _PCF(6), _FFMT(gCompressionParameter, 6));
    DT_PRINTF("FPA Compression Parameter Forced = %u", gCompressionParameterForced);
+
+   DT_PRINTF("FPA actual frequency = %f MHz", gFpaActualFreq_MHz);
 
    return IRC_SUCCESS;
 }
@@ -2957,7 +2973,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
-   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX|COMPR value]");
+   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX|COMPR|FREQ value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
