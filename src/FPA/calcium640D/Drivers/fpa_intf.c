@@ -67,7 +67,7 @@
  // adresse d'écriture du registre du reset du module FPA
 #define AW_CTRLED_RESET                            0xAF0
 
-// adresse de base de l'IP Clock Wizzard
+// adresse de base de l'IP Clock Wizard
 #define ARW_CLK_WIZ_BASE_ADD                       0x8000
 
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
@@ -195,9 +195,9 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
          extern float gFpaActualFreq_MHz;
          gFpaActualFreq_MHz = clkFreq[0];
          axil_clk_wiz_doReconfig((void *)(ptrA->ADD + ARW_CLK_WIZ_BASE_ADD), FALSE);
-         FPA_PRINTF("FPA Clock Wizzard have been configured with the desired frequency");
+         FPA_PRINTF("FPA Clock Wizard have been configured with the desired frequency");
       } else {
-         FPA_ERR("FPA Clock Wizzard cannot be configured with the desired frequency");
+         FPA_ERR("FPA Clock Wizard cannot be configured with the desired frequency");
       }
       lastDesiredFreq = gFpaDesiredFreq_MHz;
    }

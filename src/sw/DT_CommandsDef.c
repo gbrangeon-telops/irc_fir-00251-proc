@@ -952,7 +952,7 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA Compression Parameter = " _PCF(6), _FFMT(gCompressionParameter, 6));
    DT_PRINTF("FPA Compression Parameter Forced = %u", gCompressionParameterForced);
 
-   DT_PRINTF("FPA actual frequency = %f MHz", gFpaActualFreq_MHz);
+   DT_PRINTF("FPA actual frequency = "_PCF(6)" MHz", _FFMT(gFpaActualFreq_MHz, 6));
 
    return IRC_SUCCESS;
 }
