@@ -611,7 +611,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
 
 #ifdef AR_COMPR_ERR
-   // bus d'erreurs sp�cifiques au calciumD
+   // bus d'erreurs spécifiques au calciumD
    DT_PRINTF("compr_err_latch = 0x%08X", AXI4L_read32(gFpaIntf.ADD + AR_COMPR_ERR));
 #endif
 

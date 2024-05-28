@@ -29,22 +29,22 @@
 #include "axil_clk_wiz.h"
  
 
-// Mode d'operation choisi pour le contr�leur de trig (voir fichier fpa_common_pkg.vhd)
+// Mode d'operation choisi pour le contrôleur de trig (voir fichier fpa_common_pkg.vhd)
 #define MODE_READOUT_END_TO_TRIG_START             0x00     // delai pris en compte = fin du readout jusqu'au prochain trig d'integration 
 #define MODE_TRIG_START_TO_TRIG_START              0x01     // delai pris en compte = periode entre le trig actuel et le prochain
 #define MODE_INT_END_TO_TRIG_START                 0x02     // delai pris en compte = fin de l'integration jusqu'au prochain trig d'integration 
-#define MODE_ITR_TRIG_START_TO_TRIG_START          0x03     // delai pris en compte = periode entre le trig actuel et le prochain. Une fois ce delai observ�, on s'assure que le readout est termin� avant de considerer le prochain trig.
-#define MODE_ITR_INT_END_TO_TRIG_START             0x04     // delai pris en compte = fin de l'integration jusqu'au prochain trig d'integration. Une fois ce delai observ�, on s'assure que le readout est termin� avant de considerer le prochain trig.
+#define MODE_ITR_TRIG_START_TO_TRIG_START          0x03     // delai pris en compte = periode entre le trig actuel et le prochain. Une fois ce delai observé, on s'assure que le readout est terminé avant de considerer le prochain trig.
+#define MODE_ITR_INT_END_TO_TRIG_START             0x04     // delai pris en compte = fin de l'integration jusqu'au prochain trig d'integration. Une fois ce delai observé, on s'assure que le readout est terminé avant de considerer le prochain trig.
 #define MODE_ALL_END_TO_TRIG_START                 0x05     // delai pris en compte = fin de l'integration / readout (selon le plus long des deux) jusqu'au prochain trig d'integration. 
 
-// identification des sources de donn�es (voir fichier fpa_common_pkg.vhd)
-#define DATA_SOURCE_INSIDE_FPGA                    0        // source de donn�es est interne au FPGA (mode patron de tests Telops)
-#define DATA_SOURCE_OUTSIDE_FPGA                   1        // source de donn�es est externe au FPGA (ADc par exemple))
+// identification des sources de données (voir fichier fpa_common_pkg.vhd)
+#define DATA_SOURCE_INSIDE_FPGA                    0        // source de données est interne au FPGA (mode patron de tests Telops)
+#define DATA_SOURCE_OUTSIDE_FPGA                   1        // source de données est externe au FPGA (ADc par exemple))
 
 // informations sur le pilote C. Le vhd s'en sert pour compatibility check (voir fichier fpa_common_pkg.vhd)
 #define FPA_ROIC                                   0x22     // 0x22 -> calcium. Provient du fichier fpa_common_pkg.vhd.
 #define FPA_ROIC_UNKNOWN                           0xFF     // 0xFF -> ROIC inconnu. Provient du fichier fpa_common_pkg.vhd.
-#define FPA_OUTPUT_TYPE                            0x02     // 0x02 -> output num�rique. Provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
+#define FPA_OUTPUT_TYPE                            0x02     // 0x02 -> output numérique. Provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
 #define FPA_INPUT_TYPE                             0x07     // 0x04 -> input LVCMOS18. Provient du fichier fpa_common_pkg.vhd
 
 // adresse de lecture des statuts VHD
@@ -53,40 +53,40 @@
 // adresse FPA_INTF_CFG feedback du module de statuts
 #define AR_FPA_INTF_CFG_BASE_ADD                   (AR_STATUS_BASE_ADD + 0x0200)
 
-// adresse d'�criture du registre du type du pilote C
-#define AW_FPA_ROIC_SW_TYPE                        0xAE0    // adresse � laquelle on dit au VHD quel type de roic de fpa le pilote en C est con�u pour.
-#define AW_FPA_OUTPUT_SW_TYPE                      0xAE4    // adresse � laquelle on dit au VHD quel type de sortie de fpa le pilote en C est con�u pour.
+// adresse d'écriture du registre du type du pilote C
+#define AW_FPA_ROIC_SW_TYPE                        0xAE0    // adresse à laquelle on dit au VHD quel type de roic de fpa le pilote en C est conçu pour.
+#define AW_FPA_OUTPUT_SW_TYPE                      0xAE4    // adresse à laquelle on dit au VHD quel type de sortie de fpa le pilote en C est conçu pour.
 #define AW_FPA_INPUT_SW_TYPE                       0xAE8    // obligatoire pour les detecteurs analogiques
 
 // adresse d'ecriture de la cfg des Dacs
 #define AW_DAC_CFG_BASE_ADD                        0x0D00
 
-// adresse d'�criture du registre du reset des erreurs
+// adresse d'écriture du registre du reset des erreurs
 #define AW_RESET_ERR                               0xAEC
 
- // adresse d'�criture du registre du reset du module FPA
+ // adresse d'écriture du registre du reset du module FPA
 #define AW_CTRLED_RESET                            0xAF0
 
 // adresse de base de l'IP Clock Wizzard
 #define ARW_CLK_WIZ_BASE_ADD                       0x8000
 
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
-#define TELOPS_DIAG_CNST                           0xD1     // mode diag constant (patron de test gener� par la carte d'acquisition : tous les pixels � la m�me valeur)
-#define TELOPS_DIAG_DEGR                           0xD2     // mode diag d�grad� lin�aire(patron de test d�grad� lin�airement et g�n�r� par la carte d'acquisition).Requis en production
-#define TELOPS_DIAG_DEGR_DYN                       0xD3     // mode diag d�grad� lin�aire dynamique(patron de test d�grad� lin�airement et variant d'image en image et g�n�r� par la carte d'acquisition)
+#define TELOPS_DIAG_CNST                           0xD1     // mode diag constant (patron de test generé par la carte d'acquisition : tous les pixels à la même valeur)
+#define TELOPS_DIAG_DEGR                           0xD2     // mode diag dégradé linéaire(patron de test dégradé linéairement et généré par la carte d'acquisition).Requis en production
+#define TELOPS_DIAG_DEGR_DYN                       0xD3     // mode diag dégradé linéaire dynamique(patron de test dégradé linéairement et variant d'image en image et généré par la carte d'acquisition)
 
-// conversion temps d'int�gration
+// conversion temps d'intégration
 #define EXP_TIME_CONV_DENOMINATOR_BIT_POS          26       // ne pas changer cette valeur sans changer le proxy_define
 
-// lecture de temp�rature FPA
-#define FPA_TEMP_READER_ADC_DATA_RES               16       // la donn�e de temperature est sur 16 bits
+// lecture de température FPA
+#define FPA_TEMP_READER_ADC_DATA_RES               16       // la donnée de temperature est sur 16 bits
 #define FPA_TEMP_READER_FULL_SCALE_mV              2048     // plage dynamnique de l'ADC
 #define FPA_TEMP_READER_GAIN                       1        // gain du canal de lecture de temperature sur la carte ADC
 
 // fleg
-#define FLEG_DAC_RESOLUTION_BITS                   14       // le DAC est � 14 bits
+#define FLEG_DAC_RESOLUTION_BITS                   14       // le DAC est à 14 bits
 #define FLEG_DAC_REF_VOLTAGE_V                     2.5      // on utilise la reference interne de 2.5V du DAC
-#define FLEG_DAC_REF_GAIN                          2.0      // gain de r�f�rence du DAC
+#define FLEG_DAC_REF_GAIN                          2.0      // gain de référence du DAC
 
 
 #define CALCIUM_VA1P8_DEFAULT_mV                   1800
@@ -109,7 +109,7 @@
 #define CALCIUM_VA3P3_MIN_mV                       3000
 #define CALCIUM_VA3P3_MAX_mV                       3600
 
-#define CALCIUM_VDETGUARD_DEFAULT_mV               3300  //TODO d�terminer la valeur par d�faut
+#define CALCIUM_VDETGUARD_DEFAULT_mV               3300  //TODO déterminer la valeur par défaut
 #define CALCIUM_VDETGUARD_MIN_mV                   3000
 #define CALCIUM_VDETGUARD_MAX_mV                   3600
 
@@ -117,12 +117,12 @@
 #define CALCIUM_VDETCOM_MIN_mV                     3000
 #define CALCIUM_VDETCOM_MAX_mV                     3600
 
-#define CALCIUM_VPIXQNB_DEFAULT_mV                 1750  //TODO d�terminer la valeur par d�faut
+#define CALCIUM_VPIXQNB_DEFAULT_mV                 1750  //TODO déterminer la valeur par défaut
 #define CALCIUM_VPIXQNB_MIN_mV                     1000
 #define CALCIUM_VPIXQNB_MAX_mV                     2100
 
-#define CALCIUM_DEFAULT_REGF                       2     // AOI commence � la ligne 2
-#define CALCIUM_DEFAULT_REGH                       1     // le LDO de VPIXQNB est activ�
+#define CALCIUM_DEFAULT_REGF                       2     // AOI commence à la ligne 2
+#define CALCIUM_DEFAULT_REGH                       1     // le LDO de VPIXQNB est activé
 
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
@@ -180,11 +180,11 @@ void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 
 
 //--------------------------------------------------------------------------
-// pour initialiser le module vhd avec les bons parametres de d�part
+// pour initialiser le module vhd avec les bons parametres de départ
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {
-   // sw_init_done = 0;                                                     // ENO: 11-sept 2019: ligne en commentaire pour que plusieurs appels de FPA_init ne cr�ent des bugs de flashsettings.
+   // sw_init_done = 0;                                                     // ENO: 11-sept 2019: ligne en commentaire pour que plusieurs appels de FPA_init ne créent des bugs de flashsettings.
    sw_init_success = 0;
 
    static float lastDesiredFreq = 0.0f;
@@ -204,8 +204,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    
    FPA_Reset(ptrA);
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides
-   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est con�u pour.
-   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoy�e au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
+   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
    
@@ -225,7 +225,7 @@ void FPA_ClearErr(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 // pour reset du module
 //--------------------------------------------------------------------------
-// retenir qu'apr�s reset, les IO sont en 'Z' apr�s cela puisqu'on desactive le SoftwType dans le vhd. (voir vhd pour plus de details)
+// retenir qu'après reset, les IO sont en 'Z' après cela puisqu'on desactive le SoftwType dans le vhd. (voir vhd pour plus de details)
 void FPA_Reset(const t_FpaIntf *ptrA)
 {
    uint8_t ii;
@@ -254,14 +254,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    calcium_param_t hh;
    extern int32_t gFpaExposureTimeOffset;
-   //extern int32_t gFpaDebugRegA;                       // reserv� ELCORR pour correction �lectronique (gain et/ou offset)
-   //extern int32_t gFpaDebugRegB;                       // reserv�
-   //extern int32_t gFpaDebugRegC;                       // reserv� adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
-   //extern int32_t gFpaDebugRegD;                       // reserv� adc_clk_source_phase pour ajustement fin phase adc_clk
-   //extern int32_t gFpaDebugRegE;                       // reserv� fpa_intf_data_source pour sortir les donn�es des ADCs m�me lorsque le d�tecteur/flegX est absent
-   extern int32_t gFpaDebugRegF;                       // reserv� active_line_start_num pour ajustement du d�but AOI
-   extern int32_t gFpaDebugRegG;                       // reserv� pour le contr�le interne/externe du temps d'int�gration
-   extern int32_t gFpaDebugRegH;                       // reserv� pour l'activation du LDO de VPIXQNB
+   //extern int32_t gFpaDebugRegA;                       // reservé ELCORR pour correction électronique (gain et/ou offset)
+   //extern int32_t gFpaDebugRegB;                       // reservé
+   //extern int32_t gFpaDebugRegC;                       // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
+   //extern int32_t gFpaDebugRegD;                       // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
+   //extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
+   extern int32_t gFpaDebugRegF;                       // reservé active_line_start_num pour ajustement du début AOI
+   extern int32_t gFpaDebugRegG;                       // reservé pour le contrôle interne/externe du temps d'intégration
+   extern int32_t gFpaDebugRegH;                       // reservé pour l'activation du LDO de VPIXQNB
    extern uint16_t gFpaVa1p8_mV;
    static uint16_t presentFpaVa1p8_mV = CALCIUM_VA1P8_DEFAULT_mV;
    extern uint16_t gFpaVPixRst_mV;
@@ -285,14 +285,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern bool gCompressionParameterForced;
    static uint8_t cfg_num;
 
-   // on b�tit les parametres specifiques
+   // on bâtit les parametres specifiques
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);
 
    // diag mode, diag type et data source
    ptrA->fpa_diag_mode = 0;                 // par defaut
    ptrA->fpa_diag_type = 0;                 // par defaut
-   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilis�/regard� par le vhd que lorsque fpa_diag_mode = 1
-   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade) {              // mode diagnostique degrad� lineaire
+   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
+   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade) {              // mode diagnostique degradé lineaire
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR;
    }
@@ -309,28 +309,28 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
 
-   // allumage du d�tecteur
-   ptrA->fpa_pwr_on = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas r�unies
+   // allumage du détecteur
+   ptrA->fpa_pwr_on = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
-   // config du contr�leur de trigs
+   // config du contrôleur de trigs
    // On utilise toujours MODE_INT_END_TO_TRIG_START pour s'affranchir du ET variable.
-   // En ACQ trig le d�lai est calcul� en fonction du mode Diag et du mode ITR/IWR.
-   // En XTRA et PROG trig le d�lai est calcul� en fonction du mode Diag mais on force le mode ITR pour garantir un d�lai s�curitaire pendant les PROG trig.
-   // Le timeout commence avec le trig donc il doit �tre d'une dur�e d'un frame complet avant de permettre le prochain trig.
+   // En ACQ trig le délai est calculé en fonction du mode Diag et du mode ITR/IWR.
+   // En XTRA et PROG trig le délai est calculé en fonction du mode Diag mais on force le mode ITR pour garantir un délai sécuritaire pendant les PROG trig.
+   // Le timeout commence avec le trig donc il doit être d'une durée d'un frame complet avant de permettre le prochain trig.
    ptrA->fpa_acq_trig_mode          = (uint32_t)MODE_INT_END_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)(hh.int_end_to_trig_start_dly * VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_xtra_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
    ptrA->fpa_xtra_trig_ctrl_dly     = (uint32_t)(hh.itr_int_end_to_trig_start_dly * VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly  = (uint32_t)(hh.frameTime * VHD_CLK_100M_RATE_HZ);
    
-   // �largit le pulse de trig
+   // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
-   // int�gration des prog
+   // intégration des prog
    ptrA->fpa_xtra_trig_int_time = (uint32_t)(FPA_MIN_EXPOSURE/1e6F * VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_prog_trig_int_time = (uint32_t)(FPA_MIN_EXPOSURE/1e6F * VHD_CLK_100M_RATE_HZ);
    
-   // conversion du temps d'int�gration
+   // conversion du temps d'intégration
    ptrA->intclk_to_clk100_conv_numerator = (uint32_t)roundf(VHD_CLK_100M_RATE_HZ * exp2f((float)EXP_TIME_CONV_DENOMINATOR_BIT_POS) / CALCIUM_CLK_CORE_HZ);
    ptrA->clk100_to_intclk_conv_numerator = (uint32_t)roundf(CALCIUM_CLK_CORE_HZ * exp2f((float)EXP_TIME_CONV_DENOMINATOR_BIT_POS) / VHD_CLK_100M_RATE_HZ);
    
@@ -340,7 +340,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->width    = pGCRegs->Width;
    ptrA->height   = pGCRegs->Height;
    
-   // Registre F : ajustement des lignes conserv�es
+   // Registre F : ajustement des lignes conservées
    if (sw_init_done == 0)
       gFpaDebugRegF = CALCIUM_DEFAULT_REGF;
    if (gFpaDebugRegF < 1)
@@ -358,16 +358,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->diag_x_to_next_fsync_re_dly = hh.diag_x_to_next_fsync_re_dly;
    ptrA->diag_xsize_div_per_pixel_num = hh.diag_xsize_div_per_pixel_num;
    
-   // offset du signal d'int�gration
-   ptrA->fpa_int_time_offset = gFpaExposureTimeOffset;   // aucune conversion puisqu'il est appliqu� directement sur la commande venant du module Exp_Ctrl
+   // offset du signal d'intégration
+   ptrA->fpa_int_time_offset = gFpaExposureTimeOffset;   // aucune conversion puisqu'il est appliqué directement sur la commande venant du module Exp_Ctrl
    
-   // feedback d'int�gration
-   ptrA->int_fdbk_dly = (uint32_t)(hh.integrationDelay * VHD_CLK_100M_RATE_HZ) + 3;    // on ajoute 3 clk pour le d�lai entre FPA_INT et CLK_FRM
+   // feedback d'intégration
+   ptrA->int_fdbk_dly = (uint32_t)(hh.integrationDelay * VHD_CLK_100M_RATE_HZ) + 3;    // on ajoute 3 clk pour le délai entre FPA_INT et CLK_FRM
    
    // KPix
    if (sw_init_done == 0 || gFpaDebugKPix > CALCIUM_DEBUG_KPIX_MAX)
    {
-      gFpaDebugKPix = CALCIUM_DEBUG_KPIX_MAX;   // valeur max est la valeur par d�faut
+      gFpaDebugKPix = CALCIUM_DEBUG_KPIX_MAX;   // valeur max est la valeur par défaut
       gFpaDebugKPixForced = false;
    }
    if (ptrA->fpa_diag_mode ||
@@ -375,19 +375,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          !calibrationInfo.isValid ||
          !calibrationInfo.blocks[0].KPixDataPresence)
    {
-      // On force le KPix par d�faut ou transmis par l'usager
+      // On force le KPix par défaut ou transmis par l'usager
       ptrA->kpix_pgen_en = 1;
       ptrA->kpix_median_value = gFpaDebugKPix;
    }
    else
    {
-      // On utilise la m�diane disponible dans le bloc (les KPix sont les m�mes pour tous les blocs)
+      // On utilise la médiane disponible dans le bloc (les KPix sont les mêmes pour tous les blocs)
       ptrA->kpix_pgen_en = 0;
       ptrA->kpix_median_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
    }
    gFpaDebugKPix = (uint16_t)ptrA->kpix_median_value;
    
-   // activation du LDO de VPIXQNB (s'il est d�sactiv� c'est la valeur du registre b3PixQNB qui est utilis�e par le ROIC)
+   // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
    if (sw_init_done == 0)
       gFpaDebugRegH = CALCIUM_DEFAULT_REGH;
    if (gFpaDebugRegH < 0)
@@ -396,11 +396,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDebugRegH = 1;
    ptrA->use_ext_pixqnb = (uint32_t)gFpaDebugRegH;
    
-   // largeur du pulse de CLK_FRM en clk_100M pour un contr�le interne du temps d'int�gration (registre bIntCnt)
+   // largeur du pulse de CLK_FRM en clk_100M pour un contrôle interne du temps d'intégration (registre bIntCnt)
    if (gFpaDebugRegG == 0)
       ptrA->clk_frm_pulse_width = (uint32_t)(0.5e-6F * VHD_CLK_100M_RATE_HZ); // pulse < ETMin
    else
-      // 0 -> CLK_FRM est la r�plique de FPA_INT pour un contr�le externe du temps d'int�gration
+      // 0 -> CLK_FRM est la réplique de FPA_INT pour un contrôle externe du temps d'intégration
       ptrA->clk_frm_pulse_width = 0;
 
    // serdes
@@ -419,20 +419,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          !calibrationInfo.isValid ||
          calibrationInfo.blocks[0].CompressionAlgorithm != CA_PowerLaw)
    {
-      // On force le compression parameter par d�faut ou transmis par l'usager
+      // On force le compression parameter par défaut ou transmis par l'usager
       ptrA->compr_ratio_fp32 = gCompressionParameter;
    }
    else
    {
-      // On utilise le compression parameter disponible dans le bloc (la compression est la m�me pour tous les blocs)
+      // On utilise le compression parameter disponible dans le bloc (la compression est la même pour tous les blocs)
       ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
    }
    gCompressionParameter = ptrA->compr_ratio_fp32;
    
-   // changement de cfg_num des qu'une nouvelle cfg est envoy�e au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
+   // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    ptrA->cfg_num = ++cfg_num;
    
-   // les DACs (1 � 8)
+   // les DACs (1 à 8)
    ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)presentFpaVa1p8_mV, 1);       // DAC1 -> VA1P8
    ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)presentFpaVPixRst_mV, 2);     // DAC2 -> VPIXRST
    ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)presentFpaVdhs1p8_mV, 3);     // DAC3 -> VDHS1P8
@@ -444,7 +444,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    if (sw_init_done == 0)
    {
-      // valeurs par d�faut pour les champs qui ne viennent pas des flash settings
+      // valeurs par défaut pour les champs qui ne viennent pas des flash settings
       gFpaVa1p8_mV = CALCIUM_VA1P8_DEFAULT_mV;
       gFpaVPixRst_mV = CALCIUM_VPIXRST_DEFAULT_mV;
       gFpaVdhs1p8_mV = CALCIUM_VDHS1P8_DEFAULT_mV;
@@ -511,7 +511,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaVDetGuard_mV = presentFpaVDetGuard_mV;
 
    // VDETCOM
-   // TODO ajouter protection VDETCOM > VA3P3 - b3PixPDIBias pour �viter polarisation positive des photodiodes
+   // TODO ajouter protection VDETCOM > VA3P3 - b3PixPDIBias pour éviter polarisation positive des photodiodes
    if (gFpaVDetCom_mV != presentFpaVDetCom_mV)
    {
       if (gFpaVDetCom_mV >= CALCIUM_VDETCOM_MIN_mV && gFpaVDetCom_mV <= CALCIUM_VDETCOM_MAX_mV)
@@ -529,7 +529,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    presentFpaVPixQNB_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);
    gFpaVPixQNB_mV = presentFpaVPixQNB_mV;
    
-   // envoi de la configuration de l'�lectronique de proximit� (les DACs en l'occurrence) par un autre canal 
+   // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
     
    // envoi du reste de la config 
@@ -627,7 +627,7 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
 }
 
 //--------------------------------------------------------------------------
-// Pour avoir le frameRateMax avec une config donn�e
+// Pour avoir le frameRateMax avec une config donnée
 //--------------------------------------------------------------------------
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
@@ -646,7 +646,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 }
 
 //--------------------------------------------------------------------------
-// Pour avoir le ExposureMax avec une config donn�e
+// Pour avoir le ExposureMax avec une config donnée
 //--------------------------------------------------------------------------
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
@@ -655,11 +655,11 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
 
-   // ENO: 10 sept 2016: d'entr�e de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
+   // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
 
-   // ENO: 10 sept 2016: tout reste inchang�
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition �tait nulle
+   // ENO: 10 sept 2016: tout reste inchangé
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
 
    // Calculate exposure time depending on mode ITR/IWR
@@ -675,7 +675,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 }
 
 //--------------------------------------------------------------------------                                                                            
-// Pour avoir la temp�rature du FPA
+// Pour avoir la température du FPA
 //--------------------------------------------------------------------------
 int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 {
@@ -683,10 +683,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    float diode_voltage;
    float temperature;
    
-   raw_temp = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_TEMPERATURE);  // lit le registre de temperature (fort probablement pas le pr�sent mais le pass�) 
+   raw_temp = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_TEMPERATURE);  // lit le registre de temperature (fort probablement pas le présent mais le passé) 
    raw_temp = (raw_temp & 0x0000FFFF);
 
-   if (raw_temp == 0 || raw_temp == 0xFFFF)  // la diode est court-circuit�e ou ouverte
+   if (raw_temp == 0 || raw_temp == 0xFFFF)  // la diode est court-circuitée ou ouverte
    {
       return FPA_INVALID_TEMP;
    }
@@ -701,16 +701,16 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
       temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
       temperature += flashSettings.FPATemperatureConversionCoef0;
 
-      // Si flashsettings non programm�s alors on utilise les valeurs par defaut
+      // Si flashsettings non programmés alors on utilise les valeurs par defaut
       if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
           (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
           (flashSettings.FPATemperatureConversionCoef0 == 0))
       {
-         // courbe de conversion de Sofradir pour une polarisation de 100�A   
+         // courbe de conversion de Sofradir pour une polarisation de 100µA   
          temperature  =  -170.50F * powf(diode_voltage,4);
          temperature +=   173.45F * powf(diode_voltage,3);
          temperature +=   137.86F * powf(diode_voltage,2);
-         temperature += (-667.07F * diode_voltage) + 623.1F;  // 625 remplac� par 623 en guise de calibration de la diode
+         temperature += (-667.07F * diode_voltage) + 623.1F;  // 625 remplacé par 623 en guise de calibration de la diode
       }	
 
       return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
@@ -845,7 +845,7 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
 //////////////////////////////////////////////////////////////////////////////
 
 //--------------------------------------------------------------------------
-// Informations sur les drivers C utilis�s.
+// Informations sur les drivers C utilisés.
 //--------------------------------------------------------------------------
 void FPA_SoftwType(const t_FpaIntf *ptrA)
 {
@@ -855,7 +855,7 @@ void FPA_SoftwType(const t_FpaIntf *ptrA)
 }
 
 //--------------------------------------------------------------------------
-// Pour activer/d�sactiver la LED de warning.
+// Pour activer/désactiver la LED de warning.
 //--------------------------------------------------------------------------
 void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 {
@@ -874,14 +874,14 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 // Conversion de VccVoltage_mV en DAC Word
 //--------------------------------------------------------------------------
 // VccVoltage_mV : en milliVolt, tension de sortie des Vcc
-// VccPosition   : position de la sortie du DAC (1 � 8)
+// VccPosition   : position de la sortie du DAC (1 à 8)
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
 {
    float Rs, Rd, RL, Is, DacVoltage_Volt, DacWordTemp;
    uint32_t DacWord;
 
    // Sur le EFA-00331-001, les canaux 2 et 6 sont des ampli-op en mode
-   // suiveur. Tous les autres canaux sont des LDO avec la m�me config.
+   // suiveur. Tous les autres canaux sont des LDO avec la même config.
    if ((VccPosition == 2) || (VccPosition == 6))
    {
       // Calcul de la tension du DAC en fonction de la tension voulue de l'ampli-op
@@ -909,7 +909,7 @@ uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccP
 // Conversion de DAC Word en VccVoltage_mV
 //--------------------------------------------------------------------------
 // VccVoltage_mV : en milliVolt, tension de sortie des Vcc
-// VccPosition   : position de la sortie du DAC (1 � 8)
+// VccPosition   : position de la sortie du DAC (1 à 8)
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
 {
    float Rs, Rd, RL, Is, DacVoltage_Volt, VccVoltage_mV;
@@ -920,7 +920,7 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
    DacVoltage_Volt = (float)DacWordTemp * ((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN)/exp2f((float)FLEG_DAC_RESOLUTION_BITS);
 
    // Sur le EFA-00331-001, les canaux 2 et 6 sont des ampli-op en mode
-   // suiveur. Tous les autres canaux sont des LDO avec la m�me config.
+   // suiveur. Tous les autres canaux sont des LDO avec la même config.
    if ((VccPosition == 2) || (VccPosition == 6))
    {
       // Calcul de la tension de l'ampli-op en fonction de la tension du DAC
@@ -950,7 +950,7 @@ void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
    // envoi config des Dacs
    while(ii < TOTAL_DAC_NUM)
    {
-      AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  // dans le vhd, division par 4 avant entr�e dans ram
+      AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  // dans le vhd, division par 4 avant entrée dans ram
       ii++;
    }
 }
