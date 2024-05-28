@@ -20,7 +20,7 @@ use work.proxy_define.all;
 use work.tel2000.all;
 
 entity calcium_prog_ctrler_core is
-   port(
+   port (
       ARESET           : in std_logic;
       CLK              : in std_logic;
       
@@ -33,10 +33,15 @@ entity calcium_prog_ctrler_core is
       PROG_DONE        : out std_logic;
       ROIC_INIT_DONE   : out std_logic;
       
-      -- sortie vers spi
-      SPI_DATA         : out std_logic_vector(15 downto 0);
-      SPI_EN           : out std_logic;
-      SPI_DONE         : in std_logic
+      -- interface TX
+      TX_DVAL     : out std_logic;
+      TX_DATA     : out std_logic_vector(15 downto 0);
+      TX_TLAST    : out std_logic;
+      TX_DONE     : in std_logic;
+      
+      -- interface RX
+      RX_DVAL     : in std_logic;
+      RX_DATA     : in std_logic_vector(15 downto 0)
    );
 end calcium_prog_ctrler_core;
 
@@ -79,8 +84,8 @@ architecture rtl of calcium_prog_ctrler_core is
    signal prog_rqst_i               : std_logic;
    signal prog_done_i               : std_logic;
    signal roic_init_done_i          : std_logic;
-   signal spi_en_i                  : std_logic;
-   signal spi_data_i                : std_logic_vector(SPI_DATA'length-1 downto 0);
+   signal tx_dval_i                 : std_logic;
+   signal tx_data_i                 : std_logic_vector(TX_DATA'length-1 downto 0);
    signal cfg_num_gray              : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
    signal cfg_num_i                 : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
    signal new_cfg_num               : unsigned(USER_CFG.CFG_NUM'length-1 downto 0);
@@ -96,8 +101,8 @@ begin
    PROG_RQST <= prog_rqst_i;
    PROG_DONE <= prog_done_i;
    ROIC_INIT_DONE <= roic_init_done_i;
-   SPI_DATA <= spi_data_i;
-   SPI_EN <= spi_en_i;
+   TX_DATA <= tx_data_i;
+   TX_DVAL <= tx_dval_i;
    
    --------------------------------------------------
    -- Reset
@@ -162,7 +167,7 @@ begin
             prog_fsm <= idle;
             prog_done_i <= '0';
             prog_rqst_i <= '0';
-            spi_en_i <= '0';
+            tx_dval_i <= '0';
             present_cfg_num <= not new_cfg_num;
             roic_init_done_i <= '0';
             
@@ -176,7 +181,7 @@ begin
                   prog_done_i <= '1';
                   prog_rqst_i <= '0';
                   reg_idx <= 1;
-                  if new_cfg_num_pending = '1' and SPI_DONE = '1' then
+                  if new_cfg_num_pending = '1' and TX_DONE = '1' then
                      present_cfg_num <= new_cfg_num;  -- mis à jour le plus tôt possible pour qu'un changement de cfg pendant une prog déclenche une 2e prog
                      prog_fsm <= forward_rqst_st;
                   end if;
@@ -192,16 +197,16 @@ begin
                   
                -- accès accordé au programmeur du détecteur
                when prog_st =>
-                  spi_data_i <= std_logic_vector(to_unsigned(reg_idx, spi_data_i'length/2) & to_unsigned(reg_idx, spi_data_i'length/2));
-                  spi_en_i <= '1';
-                  if SPI_DONE = '0' then
+                  tx_data_i <= std_logic_vector(to_unsigned(reg_idx, tx_data_i'length/2) & to_unsigned(reg_idx, tx_data_i'length/2));
+                  tx_dval_i <= '1';
+                  if TX_DONE = '0' then
                      prog_fsm <= wait_prog_end_st;
                   end if; 
                   
                -- attente de la fin de transaction pour le programmeur du détecteur
                when wait_prog_end_st =>
-                  spi_en_i <= '0';
-                  if SPI_DONE = '1' then
+                  tx_dval_i <= '0';
+                  if TX_DONE = '1' then
                      prog_fsm <= check_end_st;
                   end if;
                

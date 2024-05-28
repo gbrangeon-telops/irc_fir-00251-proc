@@ -32,7 +32,6 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ddc_brd_id_reader.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx_v2.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_switch_ctrl.vhd \
  d:\Telops\Common_HDL\SPI\ads1118_driver.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\monitoring_adc_ctrl.vhd \
@@ -62,7 +61,7 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_int_signal_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_spi_feeder.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_spi_driver.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler_core.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_hw_driver.bde \
