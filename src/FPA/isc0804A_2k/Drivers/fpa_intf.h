@@ -32,7 +32,7 @@
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
-#define FPA_WIDTH_MULT     64 // !!!patch temporaire!!!  //32
+#define FPA_WIDTH_MULT     32
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
 #define FPA_HEIGHT_MIN     8     // 

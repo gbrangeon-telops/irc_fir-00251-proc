@@ -1360,9 +1360,9 @@ void GC_UpdateImageLimits()
       if (gcRegsData.OffsetY > gcRegsData.OffsetYMax)
          GC_SetOffsetY(gcRegsData.OffsetYMax);
    }
-
+   //Update Inc in the case binning mode was changed
    gcRegsData.HeightInc = FPA_CONFIG_GET(height_inc);
-   gcRegsData.WidthInc = FPA_CONFIG_GET(width_inc);
+   gcRegsData.WidthInc = lcm(FPA_CONFIG_GET(width_mult), 2 * FPA_CONFIG_GET(offsetx_mult));
 
 }
 
