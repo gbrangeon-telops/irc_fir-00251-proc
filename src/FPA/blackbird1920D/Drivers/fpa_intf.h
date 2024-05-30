@@ -88,7 +88,7 @@
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (Blackbird1920DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
-#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask | Binning2x2IsImplementedMask | AECIsImplementedMask | \
+#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask /*| Binning2x2IsImplementedMask*/ | AECIsImplementedMask | \
                                  CalibrationFileStorageIsImplementedMask)
 
 #define FPA_COOLER_TEMP_THRES    -20815   //[cC]
