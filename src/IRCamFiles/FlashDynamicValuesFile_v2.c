@@ -5,7 +5,7 @@
  * This file defines the camera flash dynamic values file structure v2.
  *
  * Auto-generated flash dynamic values file library.
- * Generated from the flash dynamic values file structure definition XLS file version 2.3.0
+ * Generated from the flash dynamic values file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -60,6 +60,8 @@ FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t FlashDynamicValues_FlashDyn
    /* CalibrationCollectionFileOrderKey5 = */ 0,
    /* DetectorMode = */ 0,
    /* AutofocusROI = */ 50.0F,
+   /* DeviceStabilizationTime = */ 0,
+   /* DeviceStabilizationDeltaTemperature = */ 0.0F,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -138,7 +140,9 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader_v2(uint8_t *buffer
    memcpy(&hdr->CalibrationCollectionFileOrderKey5, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->DetectorMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->AutofocusROI, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 438; // Skip FREE space
+   memcpy(&hdr->DeviceStabilizationTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->DeviceStabilizationDeltaTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   numBytes += 430; // Skip FREE space
    memcpy(&hdr->FileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->FileHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
@@ -218,7 +222,9 @@ uint32_t FlashDynamicValues_WriteFlashDynamicValuesFileHeader_v2(FlashDynamicVal
    memcpy(&buffer[numBytes], &hdr->CalibrationCollectionFileOrderKey5, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->DetectorMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->AutofocusROI, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 438); numBytes += 438; // FREE space
+   memcpy(&buffer[numBytes], &hdr->DeviceStabilizationTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->DeviceStabilizationDeltaTemperature, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 430); numBytes += 430; // FREE space
 
    hdr->FileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
    memcpy(&buffer[numBytes], &hdr->FileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
@@ -265,6 +271,8 @@ void FlashDynamicValues_PrintFlashDynamicValuesFileHeader_v2(FlashDynamicValues_
    FPGA_PRINTF("CalibrationCollectionFileOrderKey5: %u\n", hdr->CalibrationCollectionFileOrderKey5);
    FPGA_PRINTF("DetectorMode: %u\n", hdr->DetectorMode);
    FPGA_PRINTF("AutofocusROI: " _PCF(3) " %%\n", _FFMT(hdr->AutofocusROI, 3));
+   FPGA_PRINTF("DeviceStabilizationTime: %u s\n", hdr->DeviceStabilizationTime);
+   FPGA_PRINTF("DeviceStabilizationDeltaTemperature: " _PCF(3) " C\n", _FFMT(hdr->DeviceStabilizationDeltaTemperature, 3));
    FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);
 }
 

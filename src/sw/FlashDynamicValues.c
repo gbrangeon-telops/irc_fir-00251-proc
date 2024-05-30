@@ -115,6 +115,8 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
    gcRegsData.DevicePowerOnCycles = p_flashDynamicValues->DevicePowerOnCycles;
    gcRegsData.DeviceCoolerRunningTime = p_flashDynamicValues->DeviceCoolerRunningTime;
    gcRegsData.DeviceCoolerPowerOnCycles = p_flashDynamicValues->DeviceCoolerPowerOnCycles;
+   gcRegsData.DeviceStabilizationTime = p_flashDynamicValues->DeviceStabilizationTime;
+   gcRegsData.DeviceStabilizationDeltaTemperature = p_flashDynamicValues->DeviceStabilizationDeltaTemperature;
 
    // Build flash dynamic values data
    p_flashDynamicValues->DeviceSerialNumber = gcRegsData.DeviceSerialNumber;
