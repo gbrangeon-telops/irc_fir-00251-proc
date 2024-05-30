@@ -528,6 +528,8 @@ void Acquisition_SM()
             }
 
             GETTIME(&tic_timeout);
+            GETTIME(&tic_cooldownStart);
+            GETTIME(&tic_cooldownStability);
             ACQ_INF("Waiting for sensor temperature to be available...");
             acquisitionState = ACQ_WAITING_FOR_SENSOR_TEMP;
          }
@@ -551,8 +553,6 @@ void Acquisition_SM()
 
             ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
 
-            GETTIME(&tic_cooldownStart);
-            GETTIME(&tic_cooldownStability);
             tic_cooldownSampling = 0;
             initial_temp = sensorTemp;
             min_temp = sensorTemp;
@@ -611,15 +611,25 @@ void Acquisition_SM()
                }
 
                // Check if sensor cooldown is done 
-                  if ((cooldownTempTarget - FPA_COOLER_TEMP_TOL < sensorTemp) &&
-                       (sensorTemp < cooldownTempTarget + FPA_COOLER_TEMP_TOL) &&
-                       (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
+               if ((cooldownTempTarget - FPA_COOLER_TEMP_TOL < sensorTemp) &&
+                   (sensorTemp < cooldownTempTarget + FPA_COOLER_TEMP_TOL) &&
+                   (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
                {
+                  uint32_t stabTime = elapsed_time_us(tic_cooldownStart) / 1000000;
+                  float stabDeltaTemp = (sensorTemp - initial_temp) / 100.0F;
 
                   builtInTests[BITID_Cooldown].result = BITR_Passed;
-                  ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
-                     ((uint32_t) elapsed_time_us( tic_cooldownStart )) / 1000000);
+                  ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp, stabTime);
                   TDCStatusClr(WaitingForCoolerMask);
+
+                  // Update Flash Dynamic Values
+                  gFlashDynamicValues.DeviceStabilizationTime = stabTime;
+                  gFlashDynamicValues.DeviceStabilizationDeltaTemperature = stabDeltaTemp;
+                  if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
+                  {
+                     ACQ_ERR("Failed to update flash dynamic values.");
+                  }
+
                   ACQ_INF("Waiting for sensor initialization...");
 
                      #ifdef SCD_PROXY
