@@ -138,8 +138,8 @@ package Proxy_define is
       
       int_fdbk_dly                     : unsigned(3 downto 0);             -- delai en CLK_100MHz avant generation du feedback d'integration
       
-      kpix_pgen_en                     : std_logic;                        --
-      kpix_median_value                : std_logic_vector(15 downto 0);    --
+      kpix_pgen_en                     : std_logic;                        -- active le mode des kpix uniformes avec une valeur programmée
+      kpix_median_value                : unsigned(15 downto 0);            -- valeur médiane pour le calcul des kpix
       
       use_ext_pixqnb                   : std_logic;                        -- indique s'il faut activer le bias externe vTstPixQNB. S'il est désactivé, le bias interne doit être configuré
       clk_frm_pulse_width              : unsigned(7 downto 0);             -- durée fixe du pulse CLK_FRM en CLK_100MHz lorsque le temps d'intégration est contrôlé à l'interne du ROIC (configuré par registres).
@@ -148,7 +148,9 @@ package Proxy_define is
       fpa_serdes_lval_num              : unsigned(10 downto 0);            -- nombre total de LVAL dans un FVAL pour la calibration des serdes d'entrée
       fpa_serdes_lval_len              : unsigned(10 downto 0);            -- nombre de pixel_clk dans un LVAL (width / 8) pour la calibration des serdes d'entrée
       
-      compr_ratio_fp32                 : std_logic_vector(31 downto 0);    -- 
+      compr_ratio_fp32                 : std_logic_vector(31 downto 0);    -- ratio de compression en fp32 utilisé comme exposant par la loi de puissance
+      
+      roic_tx_nb_data                  : unsigned(7 downto 0);             -- nombre de données à envoyer au ROIC
       
       cfg_num                          : unsigned(7 downto 0);             -- numéro incrémental de la config actuelle
       
@@ -271,6 +273,7 @@ package body Proxy_define is
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_len, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.compr_ratio_fp32, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.roic_tx_nb_data, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.cfg_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(1), a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(2), a(0)'length)),

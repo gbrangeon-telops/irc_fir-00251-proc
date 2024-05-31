@@ -115,6 +115,8 @@
 #define AR_KPIX_STATUS                             0x000
 // adresse de lecture des erreurs du module de compression
 #define AR_COMPR_ERR                               0x004
+// adresse de lecture du nombre de données reçues du ROIC
+#define AR_ROIC_RX_NB_DATA                         0x008
 
 typedef struct
 {
@@ -166,6 +168,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t fpa_serdes_lval_num;
    uint32_t fpa_serdes_lval_len;
    float    compr_ratio_fp32;
+   uint32_t roic_tx_nb_data;
    uint32_t cfg_num;
    
 };

@@ -20,18 +20,18 @@ use work.fpa_define.all;
 
 package calcium640D_intf_testbench_pkg is
    
-   constant USER_CFG_VECTOR_SIZE             : natural := 36;        -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE             : natural := 37;        -- number of variables to write in the USER_CFG
    constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;    -- ClkCore is 10 MHz
    constant C_FPA_PIXCLK_RATE_KHZ            : integer := 33_333;    -- Pixel clk is 400 MHz DDR / 24 bits per pixel
    constant C_FPA_EXPOSURE_TIME_MIN          : integer := 100;       -- 1us in clk_100M
    
-   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
+   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural; roic_data_to_send:natural) return unsigned;
    
 end calcium640D_intf_testbench_pkg;
 
 package body calcium640D_intf_testbench_pkg is
    
-   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned is
+   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural; roic_data_to_send:natural) return unsigned is
       
       -- USER_CFG variables
       variable comn_fpa_diag_mode : unsigned(31 downto 0);
@@ -69,6 +69,7 @@ package body calcium640D_intf_testbench_pkg is
       variable fpa_serdes_lval_num : unsigned(31 downto 0);
       variable fpa_serdes_lval_len : unsigned(31 downto 0);
       variable compr_ratio_fp32 : unsigned(31 downto 0);
+      variable roic_tx_nb_data : unsigned(31 downto 0);
       variable cfg_num : unsigned(31 downto 0);
       
       -- Return variable
@@ -134,6 +135,8 @@ package body calcium640D_intf_testbench_pkg is
       
       compr_ratio_fp32 := unsigned'(x"3F321643");   -- 16/23 in float
       
+      roic_tx_nb_data := to_unsigned(roic_data_to_send, 32);
+      
       cfg_num := to_unsigned(send_id, 32);
       
       
@@ -173,6 +176,7 @@ package body calcium640D_intf_testbench_pkg is
       & fpa_serdes_lval_num
       & fpa_serdes_lval_len
       & compr_ratio_fp32
+      & roic_tx_nb_data
       & cfg_num;
       
       return y;

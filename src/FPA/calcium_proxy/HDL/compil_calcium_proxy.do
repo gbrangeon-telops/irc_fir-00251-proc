@@ -62,6 +62,7 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_services.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_int_signal_gen.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_spi_driver.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_mem.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler_core.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_prog_ctrler.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\calcium_proxy\HDL\calcium_hw_driver.bde \

@@ -41,6 +41,7 @@ entity calcium_mblaze_intf is
       FPA_SOFTW_STAT        : out fpa_firmw_stat_type;
       
       COMPR_ERR             : in std_logic_vector(4 downto 0);
+      ROIC_RX_NB_DATA       : in std_logic_vector(7 downto 0);    -- feedback du nombre de données reçues disponibles dans la RAM
       
       KPIX_REG              : inout kpix_reg_type
    );
@@ -265,7 +266,7 @@ begin
                   when X"06C" =>    user_cfg_i.int_fdbk_dly    <= unsigned(data_i(user_cfg_i.int_fdbk_dly'length-1 downto 0));
                   
                   when X"070" =>    user_cfg_i.kpix_pgen_en       <= data_i(0);
-                  when X"074" =>    user_cfg_i.kpix_median_value  <= data_i(user_cfg_i.kpix_median_value'length-1 downto 0);
+                  when X"074" =>    user_cfg_i.kpix_median_value  <= unsigned(data_i(user_cfg_i.kpix_median_value'length-1 downto 0));
                   
                   when X"078" =>    user_cfg_i.use_ext_pixqnb        <= data_i(0);
                   when X"07C" =>    user_cfg_i.clk_frm_pulse_width   <= unsigned(data_i(user_cfg_i.clk_frm_pulse_width'length-1 downto 0));
@@ -275,7 +276,9 @@ begin
                   
                   when X"088" =>    user_cfg_i.compr_ratio_fp32   <= data_i(user_cfg_i.compr_ratio_fp32'length-1 downto 0);
                   
-                  when X"08C" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  when X"08C" =>    user_cfg_i.roic_tx_nb_data    <= unsigned(data_i(user_cfg_i.roic_tx_nb_data'length-1 downto 0));
+                  
+                  when X"090" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -418,6 +421,7 @@ begin
             case MB_MOSI.ARADDR(11 downto 0) is
                when X"000" => axi_rdata <= resize(kpix_status, axi_rdata'length);
                when X"004" => axi_rdata <= resize(compr_err_latch, axi_rdata'length);
+               when X"008" => axi_rdata <= resize(ROIC_RX_NB_DATA, axi_rdata'length);
                when others => axi_rdata <= (others => '1'); 
             end case; 
          end if;

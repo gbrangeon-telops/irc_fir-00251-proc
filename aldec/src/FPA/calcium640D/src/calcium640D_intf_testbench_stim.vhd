@@ -57,23 +57,26 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    constant CLK_PIX_PERIOD          : time := 30 ns;
    constant ACQ_TRIG_PERIOD         : time := 105 us;
    
+   constant ROIC_TX_BASE_ADD        : natural := to_integer(unsigned'(x"8000"));
+   constant ROIC_TX_DATA_NB         : natural := 4;
+   
    constant DIAG_MODE_CFG1          : std_logic := '0';
    constant XSIZE_CFG1              : natural := 640;
    constant YSIZE_CFG1              : natural := 4;
-   signal user_cfg_vector1          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG1, XSIZE_CFG1, YSIZE_CFG1, 1);
+   signal user_cfg_vector1          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG1, XSIZE_CFG1, YSIZE_CFG1, 1, ROIC_TX_DATA_NB);
    
    constant DIAG_MODE_CFG2          : std_logic := '1';
    constant XSIZE_CFG2              : natural := 640;
    constant YSIZE_CFG2              : natural := 512;
-   signal user_cfg_vector2          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG2, XSIZE_CFG2, YSIZE_CFG2, 2);
+   signal user_cfg_vector2          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG2, XSIZE_CFG2, YSIZE_CFG2, 2, ROIC_TX_DATA_NB);
    
    constant FPA_SOFTW_STAT_FPA_ROIC    : std_logic_vector(7 downto 0) := FPA_ROIC_CALCIUM;
    constant FPA_SOFTW_STAT_FPA_OUTPUT  : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL;
    constant FPA_SOFTW_STAT_FPA_INPUT   : std_logic_vector(7 downto 0) := LVCMOS18;
-   constant FPA_SOFTW_STAT_BASE_ADD    : natural := 2784;  -- x"AE0"
+   constant FPA_SOFTW_STAT_BASE_ADD    : natural := to_integer(unsigned'(x"AE0"));
    
-   constant VDAC_VALUE              : unsigned(31 downto 0) := to_unsigned(4005, 32);    -- x"FA5" all DACs to the same value
-   constant DAC_CFG_BASE_ADD        : natural := 3328;     -- x"D00"
+   constant VDAC_VALUE              : unsigned(31 downto 0) := x"0000_0FA5";           -- all DACs to the same value
+   constant DAC_CFG_BASE_ADD        : natural := to_integer(unsigned'(x"D00"));
    constant DAC_CFG_VECTOR_SIZE     : natural := 8;
    
    signal ACQ_TRIG : STD_LOGIC;
@@ -82,7 +85,7 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    signal CLK_200M : STD_LOGIC := '0';
    signal CLK_PIX  : STD_LOGIC := '0';
    signal MB_CLK : STD_LOGIC;
-   signal ROIC_MISO : STD_LOGIC;       -- À implémenter !!!
+   signal ROIC_MISO : STD_LOGIC;
    signal XTRA_TRIG : STD_LOGIC := '0';
    signal DOUT_MISO : t_axi4_stream_miso;
    signal FPA_EXP_INFO : exp_info_type;
@@ -115,6 +118,7 @@ begin
    DOUT_MISO.TREADY <= '1';
    HDER_MISO.WREADY  <= '1';
    HDER_MISO.AWREADY <= '1';
+   ROIC_MISO <= ROIC_MOSI;    -- readback what we send only for test
    
    -- Reset
    U0 : process
@@ -171,6 +175,13 @@ begin
       wait for 30 ns; 
       write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(FPA_SOFTW_STAT_BASE_ADD + 8, 32)), resize(FPA_SOFTW_STAT_FPA_INPUT, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns;
+      
+      -- Write data to program the ROIC
+      for ii in 0 to ROIC_TX_DATA_NB-1 loop 
+         wait until rising_edge(MB_CLK);
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(ROIC_TX_BASE_ADD + 4*ii, 32)), std_logic_vector(to_unsigned(ROIC_TX_BASE_ADD + 4*ii, 32)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;
       
       -- Write DAC
       for ii in 0 to DAC_CFG_VECTOR_SIZE-1 loop 

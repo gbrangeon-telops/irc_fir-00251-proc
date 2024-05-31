@@ -30,7 +30,7 @@ entity calcium_prog_spi_driver is
       TX_DVAL     : in std_logic;
       TX_DATA     : in std_logic_vector(15 downto 0);
       TX_TLAST    : in std_logic;
-      TX_DONE     : out std_logic;
+      TX_DONE     : out std_logic;  -- signale que le TX_DATA a été envoyé
       
       -- interface RX
       RX_DVAL     : out std_logic;
@@ -66,6 +66,7 @@ architecture rtl of calcium_prog_spi_driver is
    signal tx_done_i                 : std_logic;
    signal sclk_in_last              : std_logic;
    signal sclk_out_i                : std_logic;
+   signal sclk_out_last             : std_logic;
    signal mosi_i                    : std_logic;
    signal csn_i                     : std_logic;
    signal rx_dval_i                 : std_logic;
@@ -104,6 +105,7 @@ begin
             sclk_out_i <= '0';
             mosi_i <= '1';
             csn_i <= '1';
+            sclk_in_last <= '0';
          else 
             
             sclk_in_last <= SCLK_IN;
@@ -111,7 +113,7 @@ begin
             case spi_tx_fsm is
                
                when idle =>
-                  tx_done_i <= '1';
+                  tx_done_i <= '1';    -- monte à 1 après chaque TX_DATA
                   if TX_DVAL = '1' then
                      spi_tx_fsm <= latch_tx_data_st;
                   end if;
@@ -167,7 +169,10 @@ begin
          if sreset = '1' then
             spi_rx_fsm <= idle;
             rx_dval_i <= '0';
+            sclk_out_last <= '0';
          else 
+            
+            sclk_out_last <= sclk_out_i;
             
             case spi_rx_fsm is
                
@@ -177,7 +182,7 @@ begin
                   spi_rx_fsm <= receive_rx_data_st;
                
                when receive_rx_data_st =>
-                  if csn_i = '0' and sclk_in_last = '0' and SCLK_IN = '1' then    -- Synchro sur front montant
+                  if csn_i = '0' and sclk_out_last = '0' and sclk_out_i = '1' then    -- Synchro sur front montant
                      rx_data_i(rx_bit_cnt) <= MISO;
                      if rx_bit_cnt = 0 then
                         spi_rx_fsm <= output_rx_data_st;
