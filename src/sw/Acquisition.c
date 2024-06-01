@@ -529,7 +529,6 @@ void Acquisition_SM()
 
             GETTIME(&tic_timeout);
             GETTIME(&tic_cooldownStart);
-            GETTIME(&tic_cooldownStability);
             ACQ_INF("Waiting for sensor temperature to be available...");
             acquisitionState = ACQ_WAITING_FOR_SENSOR_TEMP;
          }
@@ -553,6 +552,7 @@ void Acquisition_SM()
 
             ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
 
+            GETTIME(&tic_cooldownStability);
             tic_cooldownSampling = 0;
             initial_temp = sensorTemp;
             min_temp = sensorTemp;
