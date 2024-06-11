@@ -30,20 +30,19 @@ extern t_Trig gTrig;
 
 static uint32_t AEC_TimeStamps_d1[SFW_FILTER_NB];
 uint64_t AECP_Int_Sum_Cnts;
-uint32_t AECP_Int_Data_Valid, AEC_NbPixelTotal;
+uint32_t AECP_Int_Data_Valid;
 float AECP_Int_SumExpTime;
 float AECPlusMaximumTotalFlux;
 float FluxRatio[2];
 uint8_t MinNDFPosition, MaxNDFPosition;
 
-static timerData_t AECPlusDataPrintf, AECPlusArmedDelay;
-float AECPlus_ExpTime = 0;
+static timerData_t AECPlusArmedDelay;
 bool AECArmed = false;
 
 bool AECPlusCheckForUnattenuation(gcRegistersData_t *pGCRegs, float PET);
 bool AECPlusCheckForAttenuation(gcRegistersData_t *pGCRegs, float PET);
-void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate);
-float computeTotalFlux(int N, int n, float totalCounts, float ET, float w);
+float AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate, float PET);
+float computeTotalFlux(gcRegistersData_t *pGCRegs, uint64_t totalCounts, float ET);
 /***************************************************************************//**
    Interrupt Initialisation of the AEC module.
 
@@ -102,10 +101,6 @@ IRC_Status_t AEC_Init(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
 
    AEC_UpdateImageFraction(pGCRegs,pAEC_CTRL);
    AEC_UpdateMode(pGCRegs, pAEC_CTRL );
-
-   AEC_NbPixelTotal = FPA_CONFIG_GET(width_max) *FPA_CONFIG_GET(height_max);
-
-   StartTimer(&AECPlusDataPrintf, 1000);
 
    return IRC_SUCCESS;
 
@@ -250,7 +245,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    float PET = 0.0f;
    float den;
 
-   bool done = false;
+   bool AECPlusdone = false;
 
    const float binWidth = exp2f((float)FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
    extern gcRegister_t* pGcRegsDefExposureTimeX[MAX_NUM_FILTER];
@@ -288,7 +283,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
    gAEC_Data_Ready = false;
 
-   // Start wait time for AEC
+   // Start wait time for AEC+
    if (GC_AECPlusIsActive && AECArmed && (AECPlusArmedDelay.enabled == false))
    {
       StartTimer(&AECPlusArmedDelay, ((uint32_t)gcRegsData.AECResponseTime) * 5);
@@ -310,10 +305,10 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    {
       // On reset l'histogramme lorsqu'on est à l'extérieur d'une plage valide ou si le PET précédent n'a pas encore été appliqué.
       AEC_ClearMem(pAEC_CTRL);
+      AEC_PRINTF("Histogram rejected: Last proposed ET was not applied\n");
    }
    else
    {
-
       // Read Data
       AEC_Int_lowerbinId         = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERBINID_OFFSET);
       AEC_Int_lowercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERCUMSUM_OFFSET);
@@ -325,42 +320,33 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       //Clear MEM
       AEC_ClearMem(pAEC_CTRL);
 
-      if (AEC_TimeStamps_d1[AEC_Int_FWPosition] == 0) // Condition where filter was changed but haven't reached setpoint in AEC+
+      if (AEC_TimeStamps_d1[AEC_Int_FWPosition] == 0) // First time in AEC there is no last timestamp
       {
          AEC_TimeStamps_d1[AEC_Int_FWPosition] = AEC_Int_timeStamp;
-         AEC_PRINTF("AEC_TimeStamps_d1[AEC_Int_FWPosition] == 0\n");
+         AEC_PRINTF("AEC_TimeStamps_d1[%u] == 0\n", AEC_Int_FWPosition);
          return;
       }
-      else if (((pGCRegs->ExposureAuto == EA_ContinuousNDFilter) && (pGCRegs->NDFilterPosition == NDFP_NDFilterInTransition)) || // AECPlus hold the AEC when "in transition"
-            ((AECPlus_ExpTime != 0) && (pGCRegs->NDFilterPosition == pGCRegs->NDFilterPositionSetpoint))) // Set AECPlus ExpTime when no frame was received during "in transition", i.e. at lower frame rates
+      else if ((pGCRegs->ExposureAuto == EA_ContinuousNDFilter) && (pGCRegs->NDFilterPosition == NDFP_NDFilterInTransition))  // AECPlus holds the AEC when "in transition"
       {
-
-         if (AECPlus_ExpTime != 0)
-         {
-            GC_SetExposureTime(AECPlus_ExpTime);
-            AECPlus_ExpTime = 0;
-         }
-
          AEC_TimeStamps_d1[AEC_Int_FWPosition] = AEC_Int_timeStamp;
-         AEC_PRINTF("AECPlus_ExpTime != 0\n");
+         AEC_PRINTF("NDF in transition\n");
          return;
       }
 
       if (GC_AECPlusIsActive)
       {
          AECP_Int_Data_Valid = AXI4L_read32(AEC_BASE_ADDR + AECP_DATAVALID_OFFSET);
-         if(AECP_Int_Data_Valid)
+         if (AECP_Int_Data_Valid)
          {
            // Read Data
-           AECP_Int_Sum_Cnts       = AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_MSB_OFFSET);
-           AECP_Int_Sum_Cnts       = (AECP_Int_Sum_Cnts << 32);
-           AECP_Int_Sum_Cnts       |= AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_LSB_OFFSET);
-           AECP_Int_SumExpTime     = ((float)AXI4L_read32(AEC_BASE_ADDR + AECP_EXPTIME_OFFSET) / 100);
+           AECP_Int_Sum_Cnts       = (uint64_t)AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_MSB_OFFSET) << 32;
+           AECP_Int_Sum_Cnts       |= (uint64_t)AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_LSB_OFFSET);
+           AECP_Int_SumExpTime     = (float)AXI4L_read32(AEC_BASE_ADDR + AECP_EXPTIME_OFFSET) / EXPOSURE_TIME_FACTOR; // in us
            AECP_Int_NbPixels       = AXI4L_read32(AEC_BASE_ADDR + AECP_NBPIXELS_OFFSET);
          }
       }
 
-      if(calibrationInfo.isValid == false)
+      if (calibrationInfo.isValid == false)
       {
          PDRmin = DEFAULT_PIXDYNRANGEMIN;
          PDRmax = DEFAULT_PIXDYNRANGEMAX;
@@ -373,7 +359,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       }
 
       // Check for errors
-      if(AEC_Int_errors)
+      if (AEC_Int_errors)
       {
          AEC_PRINTF("AEC CUMSUM ERROR\n");
       }
@@ -384,33 +370,40 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       CurrentWF = (p_factor + (float)kif_factor) * binWidth;
 
       // Correction factor
-      TargetWF = (float) ( PDRmin + (pGCRegs->AECTargetWellFilling/100) * (PDRmax-PDRmin));
+      TargetWF = (float)(PDRmin + (pGCRegs->AECTargetWellFilling/100.0f) * (PDRmax-PDRmin));
+      AEC_PRINTF("CurrentWF = " _PCF(3) ", TargetWF = " _PCF(3) "\n", _FFMT(CurrentWF, 3), _FFMT(TargetWF, 3));
 
-      den = MAX(1.0, CurrentWF - ((float)PDRmin));
-      CorrectionFactor =  (TargetWF - ((float) PDRmin)) / den;
+      den = MAX(1.0f, CurrentWF - (float)PDRmin);
+      CorrectionFactor =  (TargetWF - (float)PDRmin) / den;
 
       // Verify saturation
       if (CurrentWF >= (float)PDRmax)
+      {
          // Reduce the correction factor if the calculation is distorted by saturation
          CorrectionFactor = MIN(CorrectionFactor, flashSettings.AECSaturatedCorrectionFactor);
+         // If there is saturation and we are not already at ETmin, skip AEC+ processing
+         if (fabsf(pGCRegs->ExposureTimeMin - AEC_Int_expTime) >= AEC_EXPTIME_THRESHOLD)
+            AECPlusdone = true;
+      }
 
       // Check if Correction factor is valid
-      if(CorrectionFactor > CORRECTION_FACTOR_MAX)
+      if (CorrectionFactor > CORRECTION_FACTOR_MAX)
       {
          CorrectionFactor = CORRECTION_FACTOR_MAX;
       }
-      else if(CorrectionFactor < CORRECTION_FACTOR_MIN)
+      else if (CorrectionFactor < CORRECTION_FACTOR_MIN)
       {
          CorrectionFactor = CORRECTION_FACTOR_MIN;
       }
+      AEC_PRINTF("CorrectionFactor = " _PCF(3) "\n", _FFMT(CorrectionFactor, 3));
 
       // Target ET
       TargetExpTime = CorrectionFactor * AEC_Int_expTime ; //CorrectionFactor * exptime used in histogram
 
       // IIR Filter
-      if(AEC_Int_timeStamp <= AEC_TimeStamps_d1[AEC_Int_FWPosition]) // Check for wrap around
+      if (AEC_Int_timeStamp <= AEC_TimeStamps_d1[AEC_Int_FWPosition]) // Check for wrap around
       {
-         DeltaT = (float)(( 4294967296 - AEC_TimeStamps_d1[AEC_Int_FWPosition] ) + AEC_Int_timeStamp) / (float)AEC_BASE_CLOCK_FREQ_HZ; //(2^32 - Last Value) + NewValue
+         DeltaT = (float)(4294967296 - AEC_TimeStamps_d1[AEC_Int_FWPosition] + AEC_Int_timeStamp) / (float)AEC_BASE_CLOCK_FREQ_HZ; //(2^32 - Last Value) + NewValue
       }
       else
       {
@@ -419,32 +412,91 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
       AEC_TimeStamps_d1[AEC_Int_FWPosition] = AEC_Int_timeStamp;
 
-      alpha = powf(0.05f, (1.0f / (pGCRegs->AECResponseTime / (DeltaT*1000)) )); // AEC REsponse time in ms DaltaT is Sec
+      alpha = powf(0.05f, (1.0f / (pGCRegs->AECResponseTime / (DeltaT*1000.0f)) )); // AEC REsponse time in ms DeltaT is Sec
 
       if (alpha >= ALPHA_MAX)
       {
          alpha = ALPHA_MAX;
       }
 
-      PET = (1-alpha) * TargetExpTime + alpha * AEC_Int_expTime;
+      PET = (1.0f-alpha) * TargetExpTime + alpha * AEC_Int_expTime;
 
       //round to 0.1us
-      PET = ((float)((uint32_t)(PET/AEC_EXPOSURE_TIME_RESOLUTION))) * AEC_EXPOSURE_TIME_RESOLUTION;
+      PET = (float)((uint32_t)(PET/AEC_EXPOSURE_TIME_RESOLUTION)) * AEC_EXPOSURE_TIME_RESOLUTION;
 
       //Limite to ETmin and ETmax
-      if(PET < pGCRegs->ExposureTimeMin)
+      if (PET < pGCRegs->ExposureTimeMin)
       {
          PET = pGCRegs->ExposureTimeMin;
       }
-      else if(PET > pGCRegs->ExposureTimeMax)
+      else if (PET > pGCRegs->ExposureTimeMax)
       {
          PET = pGCRegs->ExposureTimeMax;
       }
 
 
+      //********************
+      // AEC+ Calculus
+      //********************
+      if (GC_AECPlusIsActive)
+      {
+         // Check for errors
+         if ((!AECP_Int_Data_Valid) || (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height)))
+         {
+            if (!AECP_Int_Data_Valid)
+               AEC_PRINTF("!AECP_Int_Data_Valid\n");
+
+            if (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height))
+               AEC_PRINTF("AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height\n");
+
+            AECPlusdone = true;
+         }
+
+         if (!AECPlusdone && AECArmed && !TimedOut(&AECPlusArmedDelay))
+         {
+            AEC_PRINTF("!TimedOut(&AECPlusArmedDelay\n");
+            AECPlusdone = true;
+         }
+
+         // Check if we have a NDF higher than the current filter
+         if (!AECPlusdone && pGCRegs->NDFilterPositionSetpoint < MaxNDFPosition)
+         {
+            // if we change the ND filter, no need to check for other option.
+            if (AECPlusCheckForAttenuation(pGCRegs, PET))
+            {
+               // Change ND filter and return new proposed ET
+               PET = AECPlusChangeFilter(pGCRegs, true, PET);
+               AECPlusdone = true;
+            }
+         }
+
+         //Check if we have a NDF lower than the current filter
+         if (!AECPlusdone && pGCRegs->NDFilterPositionSetpoint > MinNDFPosition)
+         {
+            if (AECPlusCheckForUnattenuation(pGCRegs, PET))
+            {
+               // Change ND filter and return new proposed ET
+               PET = AECPlusChangeFilter(pGCRegs, false, PET);
+               AECPlusdone = true;
+            }
+         }
+
+         if (!AECPlusdone && AECArmed) // quand on atteint ce point, le mode ARM est triggé et l'AEC+ peut commencer à suivre la scène
+         {
+            AEC_PRINTF("AECArmed = false\n");
+            // Apply new ExposureAuto mode
+            GC_SetExposureAuto(EA_ContinuousNDFilter);
+            AECArmed = false;
+         }
+      }
+
+
+      //-----------------------------
+      // Apply proposed exposure time
+      //-----------------------------
+      AEC_PRINTF("Proposed ET = " _PCF(3) "\n", _FFMT(PET, 3));
       if ((AEC_Int_FWPosition == FWPOSITION_NOT_IMPLEMENTED) || (pGCRegs->FWMode == FWM_Fixed))
       {
-         //Apply Exposure time
          GC_SetExposureTime(PET);
       }
       else
@@ -460,71 +512,6 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    updateStats(&aec_stats, elapsed_time_us(profiler));
    GETTIME(&profiler);
 #endif
-
-   //********************
-   // AEC+ Calculus
-   //********************
-
-   if (GC_AECPlusIsActive)
-   {
-	   // Check if we are in the mode AECPlusContinuous, if AEC+ data is valid or if filter command have already been sent
-	   if((!AECP_Int_Data_Valid) || (AECPlus_ExpTime != 0) || (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height)))
-	   {
-	      //Apply Exposure time
-	      //GC_SetExposureTime(PET); // deja appliqué
-
-	      if (TimedOut(&AECPlusDataPrintf))
-	      {
-	         if (!AECP_Int_Data_Valid)
-	            AEC_PRINTF("!AECP_Int_Data_Valid\n");
-
-	         if (AECPlus_ExpTime != 0)
-	            AEC_PRINTF("AECPlus_ExpTime != 0\n");
-
-	         if (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height))
-	            AEC_PRINTF("AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height\n");
-
-	         StartTimer(&AECPlusDataPrintf, 1000);
-	      }
-	      done = true;
-	   }
-
-	   if (!done && AECArmed && !TimedOut(&AECPlusArmedDelay))
-	   {
-	      AEC_PRINTF("!TimedOut(&AECPlusArmedDelay\n");
-	      done = true;
-	   }
-
-	   // Check if we have a NDF higher than the current filter
-	   if (!done && pGCRegs->NDFilterPositionSetpoint < MaxNDFPosition)
-	   {
-	      // if we changed the ND filter, no need to check for other option.
-	      if (AECPlusCheckForAttenuation(pGCRegs, PET))
-	      {
-	         AECPlusChangeFilter(pGCRegs, true);
-	         done = true;
-	      }
-	   }
-
-	   //Check if we have a NDF lower than the current filter
-	   if (!done && pGCRegs->NDFilterPositionSetpoint > MinNDFPosition)
-	   {
-	      if(AECPlusCheckForUnattenuation(pGCRegs, PET))
-	      {
-	         AECPlusChangeFilter(pGCRegs, false);
-	         done = true;
-	      }
-	   }
-
-	   if (!done && AECArmed) // quand on atteint ce point, le mode ARM est triggé et l'AEC+ peut commencer à suivre la scène
-	   {
-	      AEC_PRINTF("AECArmed = false\n");
-	      // Apply new ExposureAuto mode
-	      GC_SetExposureAuto(EA_ContinuousNDFilter);
-	      AECArmed = false;
-	   }
-
-   }
 
 #ifdef AEC_ENABLE_PROFILER
    updateStats(&aec_plus_stats, elapsed_time_us(profiler));
@@ -553,105 +540,75 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
 AEC_MSBPOS_t AEC_GetMsbPos()
 {
-   AEC_MSBPOS_t p;
-
    switch (FPA_DATA_RESOLUTION)
    {
-   case 13:
-      p = AEC_13B;
-      break;
+      case 13:
+         return AEC_13B;
 
-   case 14:
-      p = AEC_14B;
-      break;
+      case 14:
+         return AEC_14B;
 
-   case 15:
-      p = AEC_15B;
-      break;
+      case 15:
+         return AEC_15B;
 
-   case 16:
-      p = AEC_16B;
-      break;
-   default:
-      p = AEC_16B;
+      case 16:
+      default:
+         return AEC_16B;
    };
-
-   return p;
 }
 
 bool AECPlusCheckForAttenuation(gcRegistersData_t *pGCRegs, float PET)
 {
    float SumOfFlux;
-   float NbPixelsRead;
 
-   //Check if ExposureTime is at its minimum
-   if (PET == pGCRegs->ExposureTimeMin)
+   //Check if proposed ExposureTime is the minimum
+   if (PET <= pGCRegs->ExposureTimeMin)
    {
-      AEC_PRINTF("AEC ForAt - EXPTIME at min\n");
+      AEC_PRINTF("NDF++ Proposed ET (" _PCF(2) " us) <= ETmin (" _PCF(2) " us)\n", _FFMT(PET, 2), _FFMT(pGCRegs->ExposureTimeMin, 2));
       return true;
    }
 
-   NbPixelsRead = (float) (pGCRegs->Width * pGCRegs->Height);
-
    //Calculate the Flux received at the detector [counts/µs]
-   SumOfFlux = computeTotalFlux(AEC_NbPixelTotal, NbPixelsRead, AECP_Int_Sum_Cnts, AECP_Int_SumExpTime, pGCRegs->AECPlusExtrapolationWeight);
-
-   if (TimedOut(&AECPlusDataPrintf))
-   {
-      AEC_PRINTF("SumOfFlux: %d\n", (uint32_t)(SumOfFlux));
-      AEC_PRINTF("AECP_Int_SumExpTime: %d\n", (uint32_t)(AECP_Int_SumExpTime));
-      StartTimer(&AECPlusDataPrintf, 1000);
-   }
+   SumOfFlux = computeTotalFlux(pGCRegs, AECP_Int_Sum_Cnts, AECP_Int_SumExpTime);
 
    //Compare the SumOfFlux with MaximumTotalFlux
-   if(SumOfFlux >= AECPlusMaximumTotalFlux)
+   if (SumOfFlux >= AECPlusMaximumTotalFlux)
    {
       if (!AECArmed)
       {
-         AEC_PRINTF("AEC ForAt - AECP_Int_Sum_Cnts=%d, NbPixelsRead = %d, AEC_NbPixelTotal=%d, AECP_Int_SumExpTime(x100)=%d\n",AECP_Int_Sum_Cnts, (uint32_t)NbPixelsRead, AEC_NbPixelTotal,((uint32_t) (AECP_Int_SumExpTime*100)));
-         AEC_PRINTF("AEC ForAt- SumOfFlux=%d, MaximumTotalFlux=%d\n", (uint32_t) SumOfFlux, (uint32_t)AECPlusMaximumTotalFlux);
+         AEC_PRINTF("NDF++ AECP_Int_Sum_Cnts (%u << 32 + %u), AECP_Int_SumExpTime (" _PCF(2) " us)\n", (uint32_t)(AECP_Int_Sum_Cnts >> 32), (uint32_t)AECP_Int_Sum_Cnts, _FFMT(AECP_Int_SumExpTime, 2));
+         AEC_PRINTF("NDF++ SumOfFlux (%u) >= MaximumTotalFlux (%u)\n", (uint32_t)SumOfFlux, (uint32_t)AECPlusMaximumTotalFlux);
       }
       return true;
    }
-   else
-   {
-      return false;
-   }
 
+   return false;
 }
 
 bool AECPlusCheckForUnattenuation(gcRegistersData_t *pGCRegs, float PET)
 {
-   float ExposureTimeEstimated;
-   float SumOfFlux;
-   uint32_t NbPixelsRead;
+   float ExposureTimeEstimated, ExposureTimeMinPlusMargin;
+   float SumOfFluxEstimated, MaximumTotalFluxMinusMargin;
 
-   //We estimate the new ExposureTime
-   ExposureTimeEstimated = PET/FluxRatio[pGCRegs->NDFilterPositionSetpoint-1];
+   //We estimate the proposed ExposureTime for previous NDF
+   ExposureTimeEstimated = PET / FluxRatio[pGCRegs->NDFilterPositionSetpoint-1];
+   ExposureTimeMinPlusMargin = pGCRegs->ExposureTimeMin / flashSettings.AECPlusExpTimeMargin;
 
-   //Check if the Estimated Exposure Time if far from ExposureTimeMin with new filter
-   if (ExposureTimeEstimated > (pGCRegs->ExposureTimeMin/flashSettings.AECPlusExpTimeMargin))
+   //Check if the Estimated Exposure Time is far from ExposureTimeMin
+   if (ExposureTimeEstimated > ExposureTimeMinPlusMargin)
    {
-      NbPixelsRead = pGCRegs->Width * pGCRegs->Height;
+      //We estimate the Flux received at the detector [counts/µs] for previous NDF
+      SumOfFluxEstimated = computeTotalFlux(pGCRegs, AECP_Int_Sum_Cnts, AECP_Int_SumExpTime) * FluxRatio[pGCRegs->NDFilterPositionSetpoint-1];
+      MaximumTotalFluxMinusMargin = AECPlusMaximumTotalFlux * flashSettings.AECPlusFluxMargin;
 
-      //Calculate the Flux received at the detector [counts/µs]
-      SumOfFlux = computeTotalFlux(AEC_NbPixelTotal, NbPixelsRead, AECP_Int_Sum_Cnts, AECP_Int_SumExpTime, pGCRegs->AECPlusExtrapolationWeight);
-
-      if (TimedOut(&AECPlusDataPrintf))
-      {
-         AEC_PRINTF("SumOfFlux: %d\n", (uint32_t)(SumOfFlux));
-         AEC_PRINTF("AECP_Int_SumExpTime: %d\n", (uint32_t)(AECP_Int_SumExpTime));
-         StartTimer(&AECPlusDataPrintf, 1000);
-      }
-
-      //Compare the SumOfFlux with MaximumTotalFlux
-      if(SumOfFlux * FluxRatio[pGCRegs->NDFilterPositionSetpoint - 1] < AECPlusMaximumTotalFlux * flashSettings.AECPlusFluxMargin)
+      //Compare the estimated SumOfFlux with MaximumTotalFlux
+      if (SumOfFluxEstimated < MaximumTotalFluxMinusMargin)
       {
          if (!AECArmed)
          {
-            AEC_PRINTF("AEC ForUnat- AECP_Int_Sum_Cnts=%d, NbPixelsRead = %d, AEC_NbPixelTotal=%d, AECP_Int_SumExpTime=%d (x100)\n",AECP_Int_Sum_Cnts, (uint32_t)NbPixelsRead,AEC_NbPixelTotal,((uint32_t)(AECP_Int_SumExpTime*100)));
-            AEC_PRINTF("AEC ForUnat- SumOfFlux=%d, MaximumTotalFlux=%d\n",(uint32_t) SumOfFlux, (uint32_t)AECPlusMaximumTotalFlux);
-            AEC_PRINTF("AEC ForUnat - FluxRatio(x100)=%d, FPA_FLUX_MARGIN_AECP(x100)=%d\n",(uint32_t)(FluxRatio[pGCRegs->NDFilterPositionSetpoint-1]*100.0f),(uint32_t)(100.0f*flashSettings.AECPlusFluxMargin));
+            AEC_PRINTF("NDF-- ExposureTimeEstimated (" _PCF(2) " us) > ExposureTimeMinPlusMargin (" _PCF(2) " us)\n", _FFMT(ExposureTimeEstimated, 2), _FFMT(ExposureTimeMinPlusMargin, 2));
+            AEC_PRINTF("NDF-- AECP_Int_Sum_Cnts (%u << 32 + %u), AECP_Int_SumExpTime (" _PCF(2) " us)\n", (uint32_t)(AECP_Int_Sum_Cnts >> 32), (uint32_t)AECP_Int_Sum_Cnts, _FFMT(AECP_Int_SumExpTime, 2));
+            AEC_PRINTF("NDF-- SumOfFluxEstimated (%u) < MaximumTotalFluxMinusMargin (%u)\n", (uint32_t)SumOfFluxEstimated, (uint32_t)MaximumTotalFluxMinusMargin);
          }
          return true;
       }
@@ -660,26 +617,27 @@ bool AECPlusCheckForUnattenuation(gcRegistersData_t *pGCRegs, float PET)
    return false;
 }
 
-void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate)
+float AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate, float PET)
 {
+   float AECPlus_ExpTime;
+
    // if NDF Continuous Hold keep the filter in place
    if (AECArmed)
-      return;
+      return PET;
 
-   AECPlus_ExpTime = AECP_Int_SumExpTime;
-
-   if(Attenuate)
+   if (Attenuate)
    {
-      GC_SetNDFilterPositionSetpoint(pGCRegs->NDFilterPositionSetpoint + 1); //Go to the next NDF Filter
+      //Go to the next NDF Filter
+      GC_SetNDFilterPositionSetpoint(pGCRegs->NDFilterPositionSetpoint + 1);
 
-      AECPlus_ExpTime *= FluxRatio[pGCRegs->NDFilterPositionSetpoint - 1];
+      AECPlus_ExpTime = PET * FluxRatio[pGCRegs->NDFilterPositionSetpoint - 1];
    }
    else
    {
       //Go to the previous NDF Filter
-      GC_SetNDFilterPositionSetpoint(pGCRegs->NDFilterPositionSetpoint - 1); //Go to the next NDF Filter
+      GC_SetNDFilterPositionSetpoint(pGCRegs->NDFilterPositionSetpoint - 1);
 
-      AECPlus_ExpTime /= FluxRatio[pGCRegs->NDFilterPositionSetpoint];
+      AECPlus_ExpTime = PET / FluxRatio[pGCRegs->NDFilterPositionSetpoint];
    }
 
    //Check and apply new exposure time relative to flux ratio
@@ -692,12 +650,7 @@ void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate)
       AECPlus_ExpTime = pGCRegs->ExposureTimeMin;
    }
 
-#ifdef AEC_VERBOSE
-   t_PosixTime t0 = TRIG_GetRTC(&gTrig);
-#endif
-
-   AEC_PRINTF("AECPlus_ExpTime (x100) = %d\n", ((uint32_t)AECPlus_ExpTime * 100));
-   AEC_PRINTF("AEC+: change filter request @ %010d.%d s\n", t0.Seconds, t0.SubSeconds);
+   return AECPlus_ExpTime;
 }
 
 void AEC_UpdateAECPlusParameters(void)
@@ -736,26 +689,29 @@ void AEC_UpdateAECPlusParameters(void)
       FluxRatio[1] = calibrationInfo.collection.FluxRatio12;
    }
 
-   AEC_PRINTF("AEC+ available\n");
-   AEC_PRINTF("AEC+ FluxRatio01 = %d\n", ((uint32_t) FluxRatio[0]));
-   AEC_PRINTF("AEC+ FluxRatio12 = %d\n", ((uint32_t) FluxRatio[1]));
-   AEC_PRINTF("AEC+ Maximal Total Flux = %d\n", ((uint32_t) AECPlusMaximumTotalFlux));
-   AEC_PRINTF("AEC+ MinNDFPosition = %d\n", MinNDFPosition);
-   AEC_PRINTF("AEC+ MaxNDFPosition = %d\n", MaxNDFPosition);
+   AEC_PRINTF("AEC+ FluxRatio01 = " _PCF(3) "\n", _FFMT(FluxRatio[0], 3));
+   AEC_PRINTF("AEC+ FluxRatio12 = " _PCF(3) "\n", _FFMT(FluxRatio[1], 3));
+   AEC_PRINTF("AEC+ MaximumTotalFlux = %u\n", ((uint32_t)AECPlusMaximumTotalFlux));
+   AEC_PRINTF("AEC+ FluxMargin = " _PCF(3) "\n", _FFMT(flashSettings.AECPlusFluxMargin, 3));
+   AEC_PRINTF("AEC+ ExpTimeMargin = " _PCF(3) "\n", _FFMT(flashSettings.AECPlusExpTimeMargin, 3));
+   AEC_PRINTF("AEC+ MinNDFPosition = %u\n", MinNDFPosition);
+   AEC_PRINTF("AEC+ MaxNDFPosition = %u\n", MaxNDFPosition);
 
 }
 
-float computeTotalFlux(int N, int n, float totalCounts, float ET, float w)
+float computeTotalFlux(gcRegistersData_t *pGCRegs, uint64_t totalCounts, float ET)
 {
    float totalFlux;
    float alpha;
 
-   const float pixelRatio = (float)N/(float)n;
+   const uint32_t NbPixelTotal = FPA_CONFIG_GET(width_max) * FPA_CONFIG_GET(height_max);
+   const uint32_t NbPixelsRead = pGCRegs->Width * pGCRegs->Height;
+   const float pixelRatio = (float)NbPixelTotal / (float)NbPixelsRead;
 
    // Calculate Extrapolation factor
-   alpha = (1.0f - w) + pixelRatio*w;
+   alpha = (1.0f - pGCRegs->AECPlusExtrapolationWeight) + pixelRatio * pGCRegs->AECPlusExtrapolationWeight;
 
-   totalFlux = totalCounts/ET * alpha;
+   totalFlux = (float)totalCounts/ET * alpha;
 
    return totalFlux;
 }

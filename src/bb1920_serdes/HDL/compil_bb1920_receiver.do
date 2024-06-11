@@ -26,7 +26,7 @@ acom -incr -nowarn DAGGEN_0523 \
 
 --acom -incr -nowarn DAGGEN_0523 \
 acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd
-acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd		 
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd
 acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_mux_dsync.vhd
 acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd
 acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde

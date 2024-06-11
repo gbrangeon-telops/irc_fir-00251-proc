@@ -533,7 +533,7 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
       // Live update is supported only for a specific block.
       // For other selection modes, it will be updated on next acq arm (in CAL_SendConfigGC).
       AXI4L_write32((uint32_t)pA->calib_block_sel_mode, pA->ADD + AW_BLOCK_SEL_MODE);
-      CAL_INF("calib_block_sel_mode = %d", (uint32_t)pA->calib_block_sel_mode);
+      CAL_DBG("calib_block_sel_mode = %d", (uint32_t)pA->calib_block_sel_mode);
    }
    else
    {
