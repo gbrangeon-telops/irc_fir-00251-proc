@@ -324,7 +324,7 @@ struct s_FpaStatus    //
 };
 typedef struct s_FpaStatus t_FpaStatus;
 
-t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] ;
+extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
 																						  
 // Function prototypes
 
