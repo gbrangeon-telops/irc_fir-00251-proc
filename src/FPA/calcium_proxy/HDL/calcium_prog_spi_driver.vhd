@@ -54,7 +54,7 @@ architecture rtl of calcium_prog_spi_driver is
       );
    end component;  
    
-   type spi_tx_fsm_type is (idle, latch_tx_data_st, launch_tx_st, send_tx_st, check_end_tx_st);
+   type spi_tx_fsm_type is (idle, latch_tx_data_st, sclk_sync_st, send_tx_st, check_end_tx_st);
    type spi_rx_fsm_type is (idle, receive_rx_data_st, output_rx_data_st);
    
    signal spi_tx_fsm                : spi_tx_fsm_type;
@@ -66,6 +66,7 @@ architecture rtl of calcium_prog_spi_driver is
    signal tx_done_i                 : std_logic;
    signal sclk_in_last              : std_logic;
    signal sclk_out_i                : std_logic;
+   signal sclk_out_en               : std_logic;
    signal sclk_out_last             : std_logic;
    signal mosi_i                    : std_logic;
    signal csn_i                     : std_logic;
@@ -106,9 +107,11 @@ begin
             mosi_i <= '1';
             csn_i <= '1';
             sclk_in_last <= '0';
+            sclk_out_en <= '0';
          else 
             
             sclk_in_last <= SCLK_IN;
+            sclk_out_i <= SCLK_IN and sclk_out_en;  -- on finit toujours avec SCLK_OUT à 0
             
             case spi_tx_fsm is
                
@@ -121,21 +124,25 @@ begin
                when latch_tx_data_st =>
                   tx_data_latch <= TX_DATA;
                   tx_tlast_latch <= TX_TLAST;
-                  tx_done_i <= '0';          -- La donnée est latchée donc la génération de la prochaine données peut être enclenchée
-                  spi_tx_fsm <= launch_tx_st;
-                           
-               when launch_tx_st =>
+                  tx_done_i <= '0';          -- la donnée est latchée donc la génération de la prochaine données peut être enclenchée
                   tx_bit_cnt <= TX_DATA'length-1;
-                  if sclk_in_last = '1' and SCLK_IN = '0' then    -- On attend un premier front descendant pour donner un cycle entier sur SCLK_OUT
+                  if csn_i = '1' then
+                     spi_tx_fsm <= sclk_sync_st;   -- synchro avec SCLK avant d'envoyer la 1re donnée
+                  else
+                     spi_tx_fsm <= send_tx_st;     -- synchro n'est pas nécessaire pour les données subséquentes
+                  end if;
+                           
+               when sclk_sync_st =>
+                  if sclk_in_last = '1' and SCLK_IN = '0' then    -- on attend un premier front descendant pour donner un cycle entier sur SCLK_OUT
+                     sclk_out_en <= '1';     -- active SCLK_OUT
                      spi_tx_fsm <= send_tx_st;
                   end if;
                
                when send_tx_st =>
-                  sclk_out_i <= SCLK_IN;
-                  if sclk_in_last = '1' and SCLK_IN = '0' then    -- Synchro sur front descendant
+                  if sclk_in_last = '1' and SCLK_IN = '0' then    -- synchro sur front descendant
                      mosi_i <= tx_data_latch(tx_bit_cnt);
                      if tx_bit_cnt = TX_DATA'length-1 then
-                        csn_i <= '0';     -- Activation du chip select
+                        csn_i <= '0';     -- activation du chip select
                      elsif tx_bit_cnt = 0 then
                         spi_tx_fsm <= check_end_tx_st;
                      end if;
@@ -143,13 +150,15 @@ begin
                   end if;
                
                when check_end_tx_st =>
-                  sclk_out_i <= SCLK_IN;
-                  if sclk_in_last = '1' and SCLK_IN = '0' then    -- On attend un dernier front descendant
-                     if tx_tlast_latch = '1' then
-                        mosi_i <= '1';
-                        csn_i <= '1';     -- Désactivation du chip select
+                  if tx_tlast_latch = '1' then
+                     if sclk_in_last = '1' and SCLK_IN = '0' then    -- on attend un dernier front descendant
+                        mosi_i <= '1';       -- valeur par défaut
+                        csn_i <= '1';        -- désactivation du chip select
+                        sclk_out_en <= '0';  -- désactive sclk_out
+                        spi_tx_fsm <= idle;
                      end if;
-                     spi_tx_fsm <= idle;
+                  else
+                     spi_tx_fsm <= idle;  -- on se prépare tout de suite pour la prochaine donnée
                   end if;
                
                when others => 
@@ -182,7 +191,7 @@ begin
                   spi_rx_fsm <= receive_rx_data_st;
                
                when receive_rx_data_st =>
-                  if csn_i = '0' and sclk_out_last = '0' and sclk_out_i = '1' then    -- Synchro sur front montant
+                  if csn_i = '0' and sclk_out_last = '0' and sclk_out_i = '1' then    -- synchro sur front montant
                      rx_data_i(rx_bit_cnt) <= MISO;
                      if rx_bit_cnt = 0 then
                         spi_rx_fsm <= output_rx_data_st;

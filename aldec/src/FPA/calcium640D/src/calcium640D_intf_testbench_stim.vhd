@@ -57,8 +57,12 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    constant CLK_PIX_PERIOD          : time := 30 ns;
    constant ACQ_TRIG_PERIOD         : time := 105 us;
    
-   constant ROIC_TX_BASE_ADD        : natural := to_integer(unsigned'(x"8000"));
-   constant ROIC_TX_DATA_NB         : natural := 4;
+   -- BRAM is connected to a demux and starts at x8000 address.
+   -- BRAM has 512 addresses and is divided in 2: TX first and RX second.
+   constant ROIC_PROG_MEM_BASE_ADD  : natural := to_integer(unsigned'(x"8000"));
+   constant ROIC_RX_MEM_OFFSET      : natural := 256;
+   constant AR_ROIC_RX_NB_DATA      : natural := to_integer(unsigned'(x"008"));
+   constant ROIC_TX_DATA_NB         : natural := 6;
    
    constant DIAG_MODE_CFG1          : std_logic := '0';
    constant XSIZE_CFG1              : natural := 640;
@@ -111,6 +115,11 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    signal IMAGE_INFO : img_info_type;
    signal MB_MISO : t_axi4_lite_miso;
    
+   signal roic_rx_nb_data : std_logic_vector(31 downto 0);
+   type roic_rx_data_type is array (0 to ROIC_TX_DATA_NB-1) of std_logic_vector(31 downto 0);
+   signal roic_rx_data : roic_rx_data_type;
+   signal roic_rx_data_temp : std_logic_vector(31 downto 0);
+   
 begin
    
    -- Constant assignments
@@ -147,6 +156,7 @@ begin
    U4 : process
       variable start_pos : integer;
       variable end_pos   : integer;
+      variable roic_rx_nb_data_i : integer;
    begin
       
       MB_MOSI.awaddr <= (others => '0');
@@ -179,7 +189,7 @@ begin
       -- Write data to program the ROIC
       for ii in 0 to ROIC_TX_DATA_NB-1 loop 
          wait until rising_edge(MB_CLK);
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(ROIC_TX_BASE_ADD + 4*ii, 32)), std_logic_vector(to_unsigned(ROIC_TX_BASE_ADD + 4*ii, 32)), MB_MISO,  MB_MOSI);
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(ROIC_PROG_MEM_BASE_ADD + 4*ii, 32)), std_logic_vector(to_unsigned(4*ii, 32)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop;
       
@@ -211,6 +221,19 @@ begin
       wait until rising_edge(MB_CLK);
       FPA_EXP_INFO.exp_dval <= '0';
       
+      loop
+         wait for 200 us;
+         read_axi_lite (MB_CLK, std_logic_vector(to_unsigned(AR_ROIC_RX_NB_DATA, 32)), MB_MISO, MB_MOSI, roic_rx_nb_data);
+         roic_rx_nb_data_i := to_integer(unsigned(roic_rx_nb_data));
+         if roic_rx_nb_data_i > 0 then
+            for ii in 0 to roic_rx_nb_data_i-1 loop
+               read_axi_lite (MB_CLK, std_logic_vector(to_unsigned(ROIC_PROG_MEM_BASE_ADD + 4*(ROIC_RX_MEM_OFFSET+ii), 32)), MB_MISO, MB_MOSI, roic_rx_data_temp);
+               roic_rx_data(ii) <= roic_rx_data_temp;
+            end loop;
+            exit;
+         end if;
+      end loop;
+      
 --      -- Write 2nd config
 --      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
 --         wait until rising_edge(MB_CLK);      
@@ -219,7 +242,7 @@ begin
 --         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
 --         wait for 30 ns;
 --      end loop;
-
+      
       wait for 4 ms;
 
       -- Configure exposure time
