@@ -1001,6 +1001,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    FPA_PRINTF(" ptrA->dynrange_clipping_level               =  %d", (int32_t)( ptrA->dynrange_clipping_level                ) );
    FPA_PRINTF(" ptrA->dynrange_global_offset                =  %d", (int32_t)( ptrA->dynrange_global_offset                 ) );
    FPA_PRINTF(" ptrA->dynrange_op_sel                       =  %d", (int32_t)( ptrA->dynrange_op_sel                        ) );
+   FPA_PRINTF(" ptrA->clk_area_c_line_start_num             =  %d", (int32_t)( ptrA->clk_area_c_line_start_num              ) );
+   FPA_PRINTF(" ptrA->clk_area_c_line_end_num               =  %d", (int32_t)( ptrA->clk_area_c_line_end_num                ) );
+   FPA_PRINTF(" ptrA->clk_area_c_sol_posl_pclk              =  %d", (int32_t)( ptrA->clk_area_c_sol_posl_pclk               ) );
+   FPA_PRINTF(" ptrA->clk_area_c_eol_posl_pclk              =  %d", (int32_t)( ptrA->clk_area_c_eol_posl_pclk               ) );
+   FPA_PRINTF(" ptrA->clk_area_c_spare                      =  %d", (int32_t)( ptrA->clk_area_c_spare                       ) );
+   FPA_PRINTF(" ptrA->clk_area_c_clk_id                     =  %d", (int32_t)( ptrA->clk_area_c_clk_id                      ) );
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
