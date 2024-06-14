@@ -128,7 +128,7 @@
 
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
-#define CALCIUM_COMPRESSION_PARAM_DEFAULT          1.0F
+#define CALCIUM_COMPRESSION_PARAM_DEFAULT          (16.0F / 23.0F)
 
 #define TOTAL_DAC_NUM                              8
 
@@ -164,18 +164,143 @@ typedef struct calcium_param_s calcium_param_t;
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 
 // Private variables
 static uint32_t sw_init_done = 0;
 static uint32_t sw_init_success = 0;
 static ProximCfg_t ProximCfg;
-t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
+static t_FpaRegister RoicRegs[] = {
+      /* bGenCtrl */             {.addr = 1,   .data = 101},
+      /* bGenCtrl2 */            {.addr = 2,   .data = 27},
+      /* bRowStartLSB */         {.addr = 3,   .data = 1},
+      /* bRowStartMSB */         {.addr = 4,   .data = 0},
+      /* bRowStopLSB */          {.addr = 5,   .data = 0},
+      /* bRowStopMSB */          {.addr = 6,   .data = 2},
+      /* bFrmCtrl */             {.addr = 10,  .data = 48},
+      /* bClkRowCntLSB */        {.addr = 11,  .data = 2},
+      /* bClkRowCntMSB */        {.addr = 12,  .data = 1},
+      /* bPixRstHCnt */          {.addr = 13,  .data = CALCIUM_bPixRstHCnt},
+      /* bPixXferCnt */          {.addr = 14,  .data = CALCIUM_bPixXferCnt},
+      /* bPixOHCnt */            {.addr = 15,  .data = CALCIUM_bPixOHCnt},
+      /* bPixOH2Cnt */           {.addr = 16,  .data = CALCIUM_bPixOH2Cnt},
+      /* bPixRstBECnt */         {.addr = 17,  .data = CALCIUM_bPixRstBECnt},
+      /* bRODelayCnt */          {.addr = 18,  .data = CALCIUM_bRODelayCnt},
+      /* bPixBECtrl */           {.addr = 19,  .data = 7},
+      /* bPixClampDelayCnt */    {.addr = 20,  .data = 0},
+      /* bPixTstNOCCnt */        {.addr = 21,  .data = 8},
+      /* bIntCntLSB */           {.addr = 22,  .data = 9},
+      /* bIntCnt */              {.addr = 23,  .data = 0},
+      /* bIntCntMSB */           {.addr = 24,  .data = 0},
+      /* bFrmHoldOffLSB */       {.addr = 25,  .data = 0},
+      /* bFrmHoldOff */          {.addr = 26,  .data = 0},
+      /* bFrmHoldOffMSB */       {.addr = 27,  .data = 0},
+      /* bClkRowDelayCnt */      {.addr = 28,  .data = 0},
+      /* bClkCtrlDSMDiv */       {.addr = 29,  .data = 1},
+      /* bDSMCyclesLSB */        {.addr = 30,  .data = 0},
+      /* bDSMCyclesMSB */        {.addr = 31,  .data = 0},
+      /* bDSMDeltaCnt */         {.addr = 32,  .data = 1},
+      /* bDSMOHCnt */            {.addr = 33,  .data = 0},
+      /* bDSMQRstCnt */          {.addr = 34,  .data = 3},
+      /* bDSMDelayCntLSB */      {.addr = 35,  .data = 0},
+      /* bDSMDelayCntMSB */      {.addr = 36,  .data = 0},
+      /* bDSMInitDelayCntLSB */  {.addr = 37,  .data = 0},
+      /* bDSMInitDelayCntMSB */  {.addr = 38,  .data = 0},
+      /* bDSMSeedRowsSel */      {.addr = 39,  .data = 6},
+      /* bColGrpStart */         {.addr = 40,  .data = 1},
+      /* bColGrpStop */          {.addr = 41,  .data = 80},
+      /* bTstDig */              {.addr = 56,  .data = 0},
+      /* bTstAddrDig1 */         {.addr = 57,  .data = 0},
+      /* bTstAddrDig2 */         {.addr = 58,  .data = 0},
+      /* bADCtrl */              {.addr = 64,  .data = 67},
+      /* bADOSamp */             {.addr = 75,  .data = 0},
+      /* bADDigOSLSB */          {.addr = 76,  .data = 0},
+      /* bADDigOS */             {.addr = 77,  .data = 0},
+      /* bADDigOSMSB */          {.addr = 78,  .data = 0},
+      /* bADRstCnt */            {.addr = 79,  .data = CALCIUM_bADRstCnt},
+      /* bADCalCtrl */           {.addr = 80,  .data = 22},
+      /* bADCalOSampCtrl */      {.addr = 81,  .data = 5},
+      /* bADCalConstLSB */       {.addr = 82,  .data = 0},
+      /* bADCalConstMSB */       {.addr = 83,  .data = 2},
+      /* bADCal2Const */         {.addr = 84,  .data = 16},
+      /* bADCalClkLSB */         {.addr = 85,  .data = 0},
+      /* bADCalClkMSB */         {.addr = 86,  .data = 8},
+      /* bADCal2ClkLSB */        {.addr = 87,  .data = 0},
+      /* bADCal2ClkMSB */        {.addr = 88,  .data = 4},
+      /* bADCalDigOSLSB */       {.addr = 89,  .data = 0},
+      /* bADCalDigOS */          {.addr = 90,  .data = 64},
+      /* bADCalDigOSMSB */       {.addr = 91,  .data = 0},
+      /* bADCalCnt1 */           {.addr = 92,  .data = 0},
+      /* bADCalCnt2 */           {.addr = 93,  .data = 40},
+      /* bDVPOffsetLSB */        {.addr = 100, .data = 0},
+      /* bDVPOffset */           {.addr = 101, .data = 0},
+      /* bDVPOffsetMSB */        {.addr = 102, .data = 0},
+      /* bResidueHandler */      {.addr = 103, .data = 0},
+      /* bResDataMaxLSB */       {.addr = 104, .data = 0},
+      /* bResDataMax */          {.addr = 105, .data = 64},
+      /* bResDataMaxMSB */       {.addr = 106, .data = 0},
+      /* bDataHandler */         {.addr = 107, .data = 3},
+      /* bOutCtrl */             {.addr = 111, .data = 165},
+      /* bTxCtrl */              {.addr = 112, .data = 26},
+      /* bLVDSCtrl */            {.addr = 115, .data = 34},
+      /* bSkewXCLK */            {.addr = 117, .data = 32},
+      /* bSkewX<1> */            {.addr = 118, .data = 32},
+      /* bSkewX<2> */            {.addr = 119, .data = 32},
+      /* bSkewX<3> */            {.addr = 120, .data = 32},
+      /* bSkewX<4> */            {.addr = 121, .data = 32},
+      /* bSkewX<5> */            {.addr = 122, .data = 32},
+      /* bSkewX<6> */            {.addr = 123, .data = 32},
+      /* bSkewX<7> */            {.addr = 124, .data = 32},
+      /* bSkewX<8> */            {.addr = 125, .data = 32},
+      /* bClkCoreCnt */          {.addr = 126, .data = 20},
+      /* bClkColCnt */           {.addr = 127, .data = 4},
+      /* b3PixBiasMstr1 */       {.addr = 128, .data = 7},
+      /* b3PixPDIBias */         {.addr = 129, .data = 85},
+      /* b3PixCPDIBias */        {.addr = 130, .data = 105},
+      /* b3PixCompRef */         {.addr = 131, .data = 100},
+      /* b3PixCompRefBias1 */    {.addr = 132, .data = 78},
+      /* b3PixCompRefBias2 */    {.addr = 133, .data = 8},
+      /* b3PixQNB */             {.addr = 134, .data = 94},
+      /* b3PixQNBBias1 */        {.addr = 135, .data = 39},
+      /* b3PixQNBBias2 */        {.addr = 136, .data = 8},
+      /* b3PixAnaCtrl */         {.addr = 137, .data = 253},
+      /* b3RstLimRamp */         {.addr = 138, .data = 1},
+      /* b3PixRstLim */          {.addr = 139, .data = 16},
+      /* b3PixAnaEn */           {.addr = 140, .data = 125},
+      /* b3TstAna */             {.addr = 141, .data = 0},
+      /* b3TR2I */               {.addr = 142, .data = 0},
+      /* b3PixBiasMstr2 */       {.addr = 150, .data = 7},
+      /* b3PixClamp */           {.addr = 151, .data = 50},
+      /* b3PixClampCtrl */       {.addr = 152, .data = 2},
+      /* b3BISTRmpCtrl_3p3 */    {.addr = 160, .data = 0},
+      /* b3BISTSlope */          {.addr = 161, .data = 16},
+      /* b3BISTOffset */         {.addr = 162, .data = 7},
+      /* b3BISTRmpBias */        {.addr = 163, .data = 0},
+      /* b3ColBias */            {.addr = 165, .data = 50},
+      /* b3ColCtrl */            {.addr = 166, .data = 8},
+      /* b3ColDRBias */          {.addr = 167, .data = 3},
+      /* b3ADCtrl */             {.addr = 193, .data = 88},
+      /* b3ADBiasMstr */         {.addr = 194, .data = 7},
+      /* b3ADBiasBuf */          {.addr = 195, .data = 15},
+      /* b3ADBiasComp */         {.addr = 196, .data = 9},
+      /* b3ADRamp */             {.addr = 197, .data = 119},
+      /* b3ADRampTrim */         {.addr = 198, .data = 32},
+      /* b3ADBiasRampBuf */      {.addr = 199, .data = 3},
+      /* b3ADRefLow */           {.addr = 200, .data = 16},
+      /* b3ADRmpI1Ctrl */        {.addr = 201, .data = 8},
+      /* b3ADBiasRmpI1DR */      {.addr = 202, .data = 3},
+      /* b3LVDSBiasMstr */       {.addr = 208, .data = 119},
+      /* b3LVDSBias */           {.addr = 209, .data = 50},
+      /* b3LVDSBiasRec */        {.addr = 210, .data = 110},
+      /* b3TstAddrAna */         {.addr = 240, .data = 0}
+};
 
 
 // Prototypes fonctions internes
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 void FPA_SoftwType(const t_FpaIntf *ptrA);
+uint8_t FPA_SendRoicRegs(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
@@ -193,6 +318,10 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 
    static float lastDesiredFreq = 0.0f;
    extern float gFpaDesiredFreq_MHz;
+
+   if (sw_init_done == 0)
+      gFpaDesiredFreq_MHz = CALCIUM_CLK_DDR_HZ / 1e6F;
+
    if(lastDesiredFreq != gFpaDesiredFreq_MHz) {
       float clkFreq[7] = {gFpaDesiredFreq_MHz};
       if(axil_clk_wiz_setFreq((void *)(ptrA->ADD + ARW_CLK_WIZ_BASE_ADD), VHD_CLK_100M_RATE_HZ / 1e6f, clkFreq, clkFreq) == 0) {
@@ -208,8 +337,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    
    FPA_Reset(ptrA);
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides
-   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
+   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roic de fpa le pilote en C est conçu pour.
+   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd. Il attendra l'allumage du proxy pour le programmer
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
    
@@ -435,8 +564,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Nombre de données envoyées pour la programmation du ROIC
    // Si 0, il n'y aura pas de programmation du ROIC, mais la nouvelle fpa cfg sera appliquée.
-   // TODO: valeur à déterminer
-   ptrA->roic_tx_nb_data = 0;
+   ptrA->roic_tx_nb_data = FPA_SendRoicRegs(ptrA);
 
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Déclenche la programmation du ROIC
    ptrA->cfg_num = ++cfg_num;
@@ -855,7 +983,7 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
 //////////////////////////////////////////////////////////////////////////////
 
 //--------------------------------------------------------------------------
-// Informations sur les drivers C utilisés.
+// Informations sur les drivers C utilisés
 //--------------------------------------------------------------------------
 void FPA_SoftwType(const t_FpaIntf *ptrA)
 {
@@ -865,7 +993,7 @@ void FPA_SoftwType(const t_FpaIntf *ptrA)
 }
 
 //--------------------------------------------------------------------------
-// Pour activer/désactiver la LED de warning.
+// Pour activer/désactiver la LED de warning
 //--------------------------------------------------------------------------
 void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 {
@@ -878,6 +1006,32 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
       AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);
       FPA_ClearErr(ptrA);
    }
+}
+
+//--------------------------------------------------------------------------
+// Pour envoyer les données de programmation au ROIC
+// Retourne le nombre de données envoyées
+//--------------------------------------------------------------------------
+uint8_t FPA_SendRoicRegs(const t_FpaIntf *ptrA)
+{
+   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + ARW_PROG_MEM_BASE_ADD);
+   const uint8_t nbRegs = NUM_OF(RoicRegs);  // on envoie toujours tous les registres
+   uint8_t ii;
+
+   // Envoi du header
+   uint16_t header = (uint16_t)(HDR_START_PATTERN | HDR_LOAD_BIT(1) | HDR_FRM_SYNC | HDR_PAGE_ID | HDR_NBR_DATA(nbRegs));
+   *p_addr++ = (uint32_t)header;
+
+   //FPA_INF("FPA_SendRoicRegs hdr = 0x%08X", (uint32_t)header);
+
+   // Envoi des registres
+   for (ii = 0; ii < nbRegs; ii++)
+   {
+      *p_addr++ = (uint32_t)RoicRegs[ii].word;
+      //FPA_INF(" 0x%08X", (uint32_t)RoicRegs[ii].word);
+   }
+
+   return nbRegs + 1;   // nombre de registres + le header
 }
 
 //--------------------------------------------------------------------------
