@@ -1578,16 +1578,32 @@ int uffs_main(flashIntfCtrl_t* flashIntfCtrl,int iStep)
 		dev.dev_num = 1;
 		ret = nand_readid(&dev);
 		if (ret) {
-			print("ERROR NAND ID failed\n\r");
+			print("ERROR NAND ID\n\r");
 			break;
+		}
+		//reset others dies has mentionned in the datasheet
+		if(gpflash_intf_struct->nand_model == MT29F16G08AJADAWP) {
+	      dev.dev_num = 2;
+	      ret = nand_readid(&dev);
+	      dev.dev_num = 1;
 		}
 		// Set features of Array Operation Mode
 		nand_set_features(&dev, 0x90, features_data);
 		ret = nand_get_features(&dev, 0x90, features_data);
 		if (ret) {
-			print("ERROR Set features HW ECC failed\n\r");
+			print("ERROR features HW ECC0\n\r");
 			break;
 		}
+      //Set others dies
+      if(gpflash_intf_struct->nand_model == MT29F16G08AJADAWP) {
+         dev.dev_num = 2;
+         nand_set_features(&dev, 0x90, features_data);
+         ret = nand_get_features(&dev, 0x90, features_data);
+         if (ret) {
+            print("ERROR features HW ECC1\n\r");
+            break;
+         }
+      }
 #ifdef LOW_FORMAT
 		nand_low_format();					// only for Nand driver development
 #endif

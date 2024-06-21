@@ -113,7 +113,8 @@ uint8_t gCollectionIdx = 0;
 void FM_ClearFileDB();
 int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
 static IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file);
-
+uint64_t FM_GetMinimalReservedSpace(const uffs_Device *dev);
+uint64_t FM_GetRequieredSpace(const char *name);
 /**
  * Initializes the file manager.
  *
@@ -163,9 +164,9 @@ void File_Manager_SM()
    static networkCommand_t fmResponse;
    static uint32_t byteCount;
    static uint32_t fileIndex;
-   static uint32_t fileSize;
+   static uint32_t fileSize = 0;
    static uint16_t fileCRC16;
-   static uint64_t spaceTotal, spaceUsed, spaceFree;
+   static uint64_t memorySpace, spaceFree;
    static uint32_t length;
    extern char gFI_FileSignature[][5];
    extern flashIntfCtrl_t gflashIntfCtrl;
@@ -261,8 +262,10 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_CREATE_REQ:
-                     // Create file, maximum size 512
-                     file = FM_CreateFile(fmRequest.f1f2.payload.fileName.name,FM_TEMP_FILE_DATA_BUFFER_SIZE);
+                     // Create file, minimum size for mount_points (can be 0 or 1)
+                     memorySpace =  FM_GetRequieredSpace(fmRequest.f1f2.payload.fileName.name);
+
+                     file = FM_CreateFile(fmRequest.f1f2.payload.fileName.name,memorySpace);
                      if (file != NULL)
                      {
                         // Add file to list
@@ -373,19 +376,8 @@ void File_Manager_SM()
                                        //get device info from any mount point
                                        dev = uffs_GetDeviceFromMountPoint(gflashIntfCtrl.mount_points[0]);
                                     }
-                                    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-                                    uint32_t numDataToProcess = FPA_CONFIG_GET(width_max) * FPA_CONFIG_GET(height_max);
-                                    long tsfsLen, tsdvLen, tsicLen;
-
-                                    /* Reserve space for flash settings, flash dynamic values and
-                                     * actualization files, rounded up to UFFS's block granularity.
-                                     */
-                                    tsfsLen = ceil((double) FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE / blkSize) * blkSize;
-                                    tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
-                                    tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
-                                                             CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
-                                                             numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
-                                    if (spaceFree >= tsfsLen + tsdvLen + tsicLen * MAX(gFM_icuBlocks.count,1))
+                                    memorySpace = FM_GetMinimalReservedSpace(dev);
+                                    if (spaceFree >= memorySpace)
                                     {
                                        gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                        F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
@@ -518,10 +510,10 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_USED_SPACE_REQ:
-                     spaceUsed = flash_all_space_used();
+                     memorySpace = flash_all_space_used();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_USED_SPACE_RSP;
-                     fmResponse.f1f2.payload.fileSpace.space = spaceUsed;
+                     fmResponse.f1f2.payload.fileSpace.space = memorySpace;
                      break;
 
                   case F1F2_CMD_FILE_FREE_SPACE_REQ:
@@ -532,10 +524,10 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_TOTAL_SPACE_REQ:
-                     spaceTotal = flash_all_space_total();
+                     memorySpace = flash_all_space_total();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_TOTAL_SPACE_RSP;
-                     fmResponse.f1f2.payload.fileSpace.space = spaceTotal;
+                     fmResponse.f1f2.payload.fileSpace.space = memorySpace;
                      break;
 
                   case F1F2_CMD_PING:
@@ -621,9 +613,9 @@ IRC_Status_t FM_InitFileDB()
 
    FM_ClearFileDB();
 
+   fileCount = 0;
    for(int idx = 0 ; idx < gflashIntfCtrl.nr_partition ; idx++)
    {
-      fileCount = 0;
       FM_PRINTF("Open mount %d: %s\n", idx,gflashIntfCtrl.mount_points[idx]);
 
       dir = uffs_opendir(gflashIntfCtrl.mount_points[idx]);
@@ -840,7 +832,7 @@ static IRC_Status_t FM_InitFileData(file_struct_t* file_data,const char *filenam
 
    //try found mount available
    for (int i = 0; i <gflashIntfCtrl.nr_partition ; i++) {
-       if( (flash_space_free(gflashIntfCtrl.mount_points[i])) >= size) {
+       if( (flash_space_free(gflashIntfCtrl.mount_points[i])) > size) {
           strncpy(file_data->mount,gflashIntfCtrl.mount_points[i],FM_MOUNT_POINT_STRING_SIZE);
           file_data->size = size;
           break;
@@ -1910,6 +1902,79 @@ IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file)
 
    return IRC_SUCCESS;
 }
+
+
+   //Compute the right value using the extension of the file
+
+uint64_t FM_GetRequieredSpace(const char *name)
+{
+   extern flashIntfCtrl_t gflashIntfCtrl;
+   //define from Calibration Files Structure.xlsx
+   const uint32_t  MaxOfLUTRQ = 3,LUTRQSizeMax = 4096,MaxNumberOfLUTNL = 64,LUTSizeMax = 256,MAXTKSizeMax = 256;
+   const uint64_t LUTNLMaxLength = CALIBBLOCK_LUTNLDATA_SIZE*LUTSizeMax*MaxNumberOfLUTNL, LUTRQLUTMaxLength = LUTRQSizeMax*CALIBBLOCK_LUTRQDATA_SIZE_V2*MaxOfLUTRQ, MAXTKMaxLength = MAXTKSizeMax*CALIBBLOCK_MAXTKDATA_SIZE_V2 , PixelDataMaxLength =  gcRegsData.SensorWidth * gcRegsData.SensorHeight*CALIBBLOCK_PIXELDATA_SIZE;
+   uint64_t size = 0;
+
+   if(name == NULL)
+   {
+      FM_ERR ("name is null\n");
+      size =  0;
+   }
+
+   char * ext;
+   ext=strstr (name,".tsco");
+   if (ext != NULL) {
+      size += (CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE + 4 );
+      FM_DBG("TSCO minimum size %lu B\n",size);
+   }
+   else {
+      ext=strstr (name,".tsbl");
+      if(ext != NULL) {
+
+         //block file header in bytes
+         size += CALIBBLOCK_BLOCKFILEHEADER_SIZE + CALIBBLOCK_PIXELDATAHEADER_SIZE + CALIBBLOCK_MAXTKDATAHEADER_SIZE + CALIBBLOCK_LUTNLDATAHEADER_SIZE + CALIBBLOCK_LUTRQDATAHEADER_SIZE*MaxOfLUTRQ  ;
+         //block file data
+         size += PixelDataMaxLength + LUTNLMaxLength + LUTRQLUTMaxLength + MAXTKMaxLength ;
+         //Calcium has KPixData
+         if(strcmp(FPA_DEVICE_MODEL_NAME, "CALCIUM640D" ) == 0) {
+            size += CALIBBLOCK_KPIXDATAHEADER_SIZE + CALIBBLOCK_KPIXDATA_SIZE*gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+         }
+      }
+      FM_DBG("TSBL minimum size %lu B\n",size);
+
+   }
+
+   // Assure to let minimal
+   uffs_Device *dev = uffs_GetDeviceFromMountPoint(gflashIntfCtrl.mount_points[0]);
+   size += FM_GetMinimalReservedSpace(dev) ;//bytes
+   FM_DBG("Minimal size for %s: %lu B\n",ext,size);
+
+   return size;
+}
+
+uint64_t FM_GetMinimalReservedSpace(const uffs_Device *dev)
+{
+   if(dev == NULL)
+   {
+      FM_ERR("dev is null");
+      return 0;
+   }
+   long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
+   uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+   long tsfsLen, tsdvLen, tsicLen;
+
+   /* Reserve space for flash settings, flash dynamic values and
+    * actualization files, rounded up to UFFS's block granularity.
+    */
+   tsfsLen = ceil((double) FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE / blkSize) * blkSize;
+   tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
+   tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
+                            CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
+                            numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
+   return (uint64_t)(tsfsLen + tsdvLen + tsicLen * MAX(gFM_icuBlocks.count,1));
+
+
+}
+
 
 /**
  * Clear file manager file database.

@@ -899,20 +899,13 @@ void GC_UpdateCalibrationRegisters()
          case CCT_TelopsNDF:
          case CCT_TelopsFOV:
             GC_SetFWMode(FWM_Fixed);
-            //revert potential modifications during raw mode
-            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
-            GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
-            GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
+
             break;
 
          case CCT_MultipointFW:
             GC_SetExposureMode(EM_Timed);
             GC_SetExposureAuto(EA_Off);
             GC_SetEHDRINumberOfExposures(1);
-            //revert potential modifications during raw mode
-            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
-            GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
-            GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
             // Configure ExposureTime for FW module
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
             {
@@ -927,10 +920,6 @@ void GC_UpdateCalibrationRegisters()
             GC_SetExposureMode(EM_Timed);
             GC_SetExposureAuto(EA_Off);
             GC_SetFWMode(FWM_Fixed);
-            //revert potential modifications during raw mode
-            GC_SetBinningMode(calibrationInfo.collection.BinningMode);
-            GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
-            GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
             // Configure and activate EHDRI
             GC_SetEHDRIMode(EHDRIM_Advanced);
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
@@ -939,6 +928,13 @@ void GC_UpdateCalibrationRegisters()
             GC_SetEHDRINumberOfExposures(calibrationInfo.collection.NumberOfBlocks);
             break;
       }
+   }
+   if (gcRegsData.CalibrationMode != CM_Raw)
+   {
+      //revert potential modifications during raw mode only
+      GC_SetBinningMode(calibrationInfo.collection.BinningMode);
+      GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
+      GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
    }
 }
 

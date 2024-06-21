@@ -592,16 +592,16 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("LensID: %u\n", hdr->LensID);
    FPGA_PRINTF("LowCut: " _PCF(3) " um\n", _FFMT(hdr->LowCut, 3));
    FPGA_PRINTF("HighCut: " _PCF(3) " um\n", _FFMT(hdr->HighCut, 3));
-   FPGA_PRINTF("LowReferenceTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->LowReferenceTemperature, 3));
-   FPGA_PRINTF("HighReferenceTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->HighReferenceTemperature, 3));
-   FPGA_PRINTF("LowExtrapolationTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->LowExtrapolationTemperature, 3));
-   FPGA_PRINTF("HighExtrapolationTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->HighExtrapolationTemperature, 3));
+   FPGA_PRINTF("LowReferenceTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->LowReferenceTemperature, 3));
+   FPGA_PRINTF("HighReferenceTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->HighReferenceTemperature, 3));
+   FPGA_PRINTF("LowExtrapolationTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->LowExtrapolationTemperature, 3));
+   FPGA_PRINTF("HighExtrapolationTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->HighExtrapolationTemperature, 3));
    FPGA_PRINTF("FluxOffset: " _PCF(3) " DL/us\n", _FFMT(hdr->FluxOffset, 3));
    FPGA_PRINTF("FluxSaturation: " _PCF(3) " DL/us\n", _FFMT(hdr->FluxSaturation, 3));
    FPGA_PRINTF("LowExtrapolationFactor: " _PCF(3) "\n", _FFMT(hdr->LowExtrapolationFactor, 3));
    FPGA_PRINTF("HighExtrapolationFactor: " _PCF(3) "\n", _FFMT(hdr->HighExtrapolationFactor, 3));
-   FPGA_PRINTF("LowValidTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->LowValidTemperature, 3));
-   FPGA_PRINTF("HighValidTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->HighValidTemperature, 3));
+   FPGA_PRINTF("LowValidTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->LowValidTemperature, 3));
+   FPGA_PRINTF("HighValidTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->HighValidTemperature, 3));
    FPGA_PRINTF("BinningMode: %u enum\n", hdr->BinningMode);
    FPGA_PRINTF("FOVPosition: %u enum\n", hdr->FOVPosition);
    FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
@@ -612,7 +612,7 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("CalibrationReferenceSourceID: %u\n", hdr->CalibrationReferenceSourceID);
    FPGA_PRINTF("CalibrationReferenceSourceEmissivity: " _PCF(3) "\n", _FFMT(hdr->CalibrationReferenceSourceEmissivity, 3));
    FPGA_PRINTF("CalibrationReferenceSourceDistance: " _PCF(3) " m\n", _FFMT(hdr->CalibrationReferenceSourceDistance, 3));
-   FPGA_PRINTF("CalibrationChamberTemperature: " _PCF(3) " 캜\n", _FFMT(hdr->CalibrationChamberTemperature, 3));
+   FPGA_PRINTF("CalibrationChamberTemperature: " _PCF(3) " 째C\n", _FFMT(hdr->CalibrationChamberTemperature, 3));
    FPGA_PRINTF("CalibrationChamberRelativeHumidity: " _PCF(3) " %%\n", _FFMT(hdr->CalibrationChamberRelativeHumidity, 3));
    FPGA_PRINTF("CalibrationChamberCO2MixingRatio: " _PCF(3) " ppm\n", _FFMT(hdr->CalibrationChamberCO2MixingRatio, 3));
    FPGA_PRINTF("SSEParameter1: " _PCF(3) "\n", _FFMT(hdr->SSEParameter1, 3));
@@ -1017,6 +1017,69 @@ void CalibBlock_PrintMaxTKDataHeader_v2(CalibBlock_MaxTKDataHeader_v2_t *hdr)
    FPGA_PRINTF("MaxTKDataLength: %u bytes\n", hdr->MaxTKDataLength);
    FPGA_PRINTF("MaxTKDataCRC16: %u\n", hdr->MaxTKDataCRC16);
    FPGA_PRINTF("DataHeaderCRC16: %u\n", hdr->DataHeaderCRC16);
+}
+
+/**
+ * MaxTKData data parser.
+ *
+ * @param buffer is the byte buffer to parse.
+ * @param buflen is the byte buffer length.
+ * @param data is the pointer to the data structure to fill.
+ *
+ * @return the number of byte read from the buffer.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_ParseMaxTKData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_MaxTKData_v2_t *data)
+{
+   uint32_t numBytes = 0;
+   uint32_t rawData;
+
+   if (buflen < CALIBBLOCK_MAXTKDATA_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
+
+   memcpy(&rawData, buffer, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+
+   data->MaxTK_Data = ((rawData & CALIBBLOCK_MAXTKDATA_MAXTK_DATA_MASK_V2) >> CALIBBLOCK_MAXTKDATA_MAXTK_DATA_SHIFT_V2);
+   if ((data->MaxTK_Data & CALIBBLOCK_MAXTKDATA_MAXTK_DATA_SIGNPOS_V2) == CALIBBLOCK_MAXTKDATA_MAXTK_DATA_SIGNPOS_V2)
+   {
+      // Sign extension
+      data->MaxTK_Data |= 0x00000000;
+   }
+
+   return numBytes;
+}
+
+/**
+ * MaxTKData data writer.
+ *
+ * @param data is the pointer to the data structure to write.
+ * @param buffer is the byte buffer to write.
+ * @param buflen is the byte buffer length.
+ *
+ * @return the number of byte written to the buffer.
+ * @return 0 if an error occurred.
+ */
+uint32_t CalibBlock_WriteMaxTKData_v2(CalibBlock_MaxTKData_v2_t *data, uint8_t *buffer, uint32_t buflen)
+{
+   uint32_t numBytes = 0;
+   uint32_t tmpData;
+   uint32_t rawData = 0;
+
+   if (buflen < CALIBBLOCK_MAXTKDATA_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
+
+   tmpData = data->MaxTK_Data;
+   rawData |= ((tmpData << CALIBBLOCK_MAXTKDATA_MAXTK_DATA_SHIFT_V2) & CALIBBLOCK_MAXTKDATA_MAXTK_DATA_MASK_V2);
+
+   memcpy(buffer, &rawData, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+
+   return numBytes;
 }
 
 /**

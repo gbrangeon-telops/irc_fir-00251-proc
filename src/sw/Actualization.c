@@ -2954,6 +2954,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       actFileHeader.AcquisitionFrameRate = (uint32_t)(currentDeltaBeta->dbEntry->info.AcquisitionFrameRate * 1000.0F);
       actFileHeader.FWMode = currentDeltaBeta->dbEntry->info.FWMode;
       actFileHeader.FocusPositionRaw = currentDeltaBeta->dbEntry->info.FocusPositionRaw;
+      actFileHeader.BinningMode = currentDeltaBeta->dbEntry->info.BinningMode;
 
       // write file header
       numBytes = CalibImageCorrection_WriteImageCorrectionFileHeader(&actFileHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);

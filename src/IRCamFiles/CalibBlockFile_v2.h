@@ -47,6 +47,10 @@
 #define CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT_V2   63
 
 #define CALIBBLOCK_MAXTKDATAHEADER_SIZE_V2   256
+#define CALIBBLOCK_MAXTKDATA_SIZE_V2   4
+#define CALIBBLOCK_MAXTKDATA_MAXTK_DATA_MASK_V2    (uint32_t)(0xFFFFFFFF)
+#define CALIBBLOCK_MAXTKDATA_MAXTK_DATA_SHIFT_V2   0
+#define CALIBBLOCK_MAXTKDATA_MAXTK_DATA_SIGNPOS_V2 (1 << 31)
 
 #define CALIBBLOCK_LUTNLDATAHEADER_SIZE_V2   256
 #define CALIBBLOCK_LUTNLDATA_SIZE_V2   4
@@ -258,6 +262,18 @@ struct CalibBlock_MaxTKDataHeader_v2Struct {
 typedef struct CalibBlock_MaxTKDataHeader_v2Struct CalibBlock_MaxTKDataHeader_v2_t;
 
 /**
+ * MaxTKData data structure.
+ */
+struct CalibBlock_MaxTKData_v2Struct {
+   int32_t MaxTK_Data;   /**< MaxTK constant used for recombining coarse and residue values */
+};
+
+/**
+ * MaxTKData data type.
+ */
+typedef struct CalibBlock_MaxTKData_v2Struct CalibBlock_MaxTKData_v2_t;
+
+/**
  * LUTNLDataHeader data structure.
  */
 struct CalibBlock_LUTNLDataHeader_v2Struct {
@@ -377,6 +393,8 @@ uint32_t CalibBlock_WritePixelData_v2(CalibBlock_PixelData_v2_t *data, uint8_t *
 uint32_t CalibBlock_ParseMaxTKDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_MaxTKDataHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteMaxTKDataHeader_v2(CalibBlock_MaxTKDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
 void CalibBlock_PrintMaxTKDataHeader_v2(CalibBlock_MaxTKDataHeader_v2_t *hdr);
+uint32_t CalibBlock_ParseMaxTKData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_MaxTKData_v2_t *data);
+uint32_t CalibBlock_WriteMaxTKData_v2(CalibBlock_MaxTKData_v2_t *data, uint8_t *buffer, uint32_t buflen);
 uint32_t CalibBlock_ParseLUTNLDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_LUTNLDataHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteLUTNLDataHeader_v2(CalibBlock_LUTNLDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
 void CalibBlock_PrintLUTNLDataHeader_v2(CalibBlock_LUTNLDataHeader_v2_t *hdr);
