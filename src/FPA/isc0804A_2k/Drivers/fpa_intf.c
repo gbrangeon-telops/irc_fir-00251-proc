@@ -198,10 +198,10 @@
 #define  VHD_DEFINE_FPA_MCLK2_ID                   2    // 
 #define  VHD_DEFINE_FPA_MCLK3_ID                   3    // 
 
-#define DEFINE_FPA_NOMINAL_MCLK_RATE_HZ      FPA_NOMINAL_MCLK_RATE_HZ
-#define DEFINE_DEFINE_FPA_MCLK1_RATE_HZ      (8.0/12.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
-#define DEFINE_DEFINE_FPA_MCLK2_RATE_HZ      (FAST_CLK_FACTOR*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
-#define DEFINE_DEFINE_FPA_MCLK3_RATE_HZ      (8.0/10.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
+#define DEFINE_FPA_NOMINAL_MCLK_RATE_HZ            FPA_NOMINAL_MCLK_RATE_HZ
+#define DEFINE_FPA_MCLK1_RATE_HZ                   (8.0/12.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
+#define DEFINE_FPA_MCLK2_RATE_HZ                   (FAST_CLK_FACTOR*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
+#define DEFINE_FPA_MCLK3_RATE_HZ                   (8.0/10.0*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
 
 #define LINE_PAUSE                1.0F
 #define OVH_LINES_NUM             2.0F
@@ -507,7 +507,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    *  */
 
    // Raw area (fast mclk domain)
-   ptrA->raw_area_line_start_num          = 2;
+   ptrA->raw_area_line_start_num          = 3;
    ptrA->raw_area_line_end_num            = (uint32_t)hh.roic_ysize + ptrA->raw_area_line_start_num - 1;
    ptrA->raw_area_line_period_pclk        = ((uint32_t)hh.roic_xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
    ptrA->raw_area_sof_posf_pclk           = ptrA->raw_area_line_period_pclk * (ptrA->raw_area_line_start_num - 1) + 1;                 
@@ -518,7 +518,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->raw_area_lsync_start_posl_pclk   = 39;
    ptrA->raw_area_lsync_end_posl_pclk     = 40;
    ptrA->raw_area_lsync_num               = (uint32_t)hh.roic_ysize + 2;   
-   ptrA->raw_area_clk_id                  = (uint32_t)VHD_DEFINE_FPA_MCLK2_ID;
+   ptrA->raw_area_clk_id                  = VHD_DEFINE_FPA_MCLK2_ID;
    
    // user area (nominal mclk domain)
    ptrA->user_area_line_start_num         = ptrA->raw_area_line_start_num;
@@ -532,24 +532,24 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->clk_area_a_line_end_num          = ptrA->user_area_line_end_num;
    ptrA->clk_area_a_sol_posl_pclk         = MIN(ptrA->user_area_eol_posl_pclk + 1 , ptrA->raw_area_line_period_pclk - 1);
    ptrA->clk_area_a_eol_posl_pclk         = MIN(ptrA->clk_area_a_sol_posl_pclk + 1, ptrA->raw_area_line_period_pclk);
-   ptrA->clk_area_a_clk_id                = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+   ptrA->clk_area_a_clk_id                = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    ptrA->clk_area_a_spare                 = 0;
    
    // Overriding of LSYNC and blank frequency with nominal MCLK.
    // A further protection cycle before LSYNC is needed to prevent an offset shift in subwindows.
-   ptrA->clk_area_b_line_start_num        = ptrA->raw_area_line_start_num - 1;
-   ptrA->clk_area_b_line_end_num          = ptrA->raw_area_line_end_num + 1;
+   ptrA->clk_area_b_line_start_num        = ptrA->raw_area_line_start_num - 2;
+   ptrA->clk_area_b_line_end_num          = ptrA->raw_area_line_end_num;
    ptrA->clk_area_b_sol_posl_pclk         = ptrA->raw_area_lsync_start_posl_pclk - 2;
    ptrA->clk_area_b_eol_posl_pclk         = ptrA->raw_area_lsync_end_posl_pclk + 2;
-   ptrA->clk_area_b_clk_id                = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+   ptrA->clk_area_b_clk_id                = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    ptrA->clk_area_b_spare                 = 0;
 
    // Stretching of the user area by three mclk cycles to cancel offset with subwindows (non-AOI->AOI transition)
-   ptrA->clk_area_c_line_start_num        = ptrA->clk_area_b_line_start_num;
-   ptrA->clk_area_c_line_end_num          = ptrA->clk_area_b_line_end_num;
+   ptrA->clk_area_c_line_start_num        = ptrA->user_area_line_start_num;
+   ptrA->clk_area_c_line_end_num          = ptrA->user_area_line_end_num;
    ptrA->clk_area_c_sol_posl_pclk         = MAX(1,(int32_t)ptrA->user_area_sol_posl_pclk - 6);
    ptrA->clk_area_c_eol_posl_pclk         = MAX(2,(int32_t)ptrA->user_area_sol_posl_pclk - 1);
-   ptrA->clk_area_c_clk_id                = (uint32_t)VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+   ptrA->clk_area_c_clk_id                = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    ptrA->clk_area_c_spare                 = 0;
 
    // nombre d'échantillons par canal  de carte ADC
