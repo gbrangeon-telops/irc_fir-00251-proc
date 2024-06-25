@@ -539,6 +539,10 @@ IRC_Status_t Proc_GC_Init()
       }
    }
 
+   // Change ExposureAuto register value if it is not implemented
+   if (!TDCFlags2Tst(AECIsImplementedMask))
+      gcRegsData.ExposureAuto = EA_Off;
+
    // Initialize registers from flash dynamic values
    gcRegsData.PowerOnAtStartup = gFlashDynamicValues.PowerOnAtStartup;
    gcRegsData.AcquisitionStartAtStartup = gFlashDynamicValues.AcquisitionStartAtStartup;
