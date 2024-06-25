@@ -929,9 +929,9 @@ void GC_UpdateCalibrationRegisters()
             break;
       }
    }
-   if (gcRegsData.CalibrationMode != CM_Raw)
+   if (gcRegsData.CalibrationMode != CM_Raw0)
    {
-      //revert potential modifications during raw mode only
+      //revert potential modifications during raw0 mode only
       GC_SetBinningMode(calibrationInfo.collection.BinningMode);
       GC_SetIntegrationMode(calibrationInfo.collection.IntegrationMode);
       GC_SetSensorWellDepth(calibrationInfo.collection.SensorWellDepth);
