@@ -372,10 +372,6 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
 // pour désactiver l'envoi de commande de temps d'intégration
 void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 
-// pour écrire un registre unique du roic (non testé)
-void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal);
-
-void FPA_ReadRoicReg(t_FpaIntf *ptrA, uint8_t regAdd);
 
 /**
  * FPA Initialization state.

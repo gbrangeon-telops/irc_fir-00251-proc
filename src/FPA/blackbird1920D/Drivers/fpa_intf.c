@@ -385,7 +385,6 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
     static bool proxy_init_status = false;
     static uint64_t tic_delay;
     extern bool gFpaInit;
-    extern uint8_t gRoicReg19;
 
     switch (fpaInitState)
     {
@@ -921,7 +920,6 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t reg19Val;
    uint8_t reg19Val_default  = 0xb1;
    extern bool gExtIntCtrl;
-   extern uint8_t gRoicReg19;
    min_int_time = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(FPA_MIN_EXPOSURE/1E6F);
    max_int_time = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(FPA_MAX_EXPOSURE/1E6F);
 
@@ -1026,7 +1024,6 @@ void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state)
 void FPA_EnableSerialOpCMD(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
-   extern uint8_t gRoicReg19;
 
    /* Protection : On désactive l'envoi de toute commande opérationnelle,
     * tant que la valeur des bits reservés du registre 19 du ROIC n'a pas été récupérée,
@@ -1311,10 +1308,8 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
   */
  void FPA_ReadRoicReg19(t_FpaIntf *ptrA)
  {
-    extern uint8_t gRoicReg19;
-
     FPA_EnableSerialOpCMD(ptrA, false); // On ne doit pas activer l'envoi de commande sérielle tant que le registre 19 n'a pas été lu.
-    ptrA->roic_reg_cmd_id = 0x8501;
+    ptrA->roic_reg_cmd_id = ROIC_READ_CMD_ID;
     FPA_SendConfigGC(ptrA, &gcRegsData);
 
     FPA_SendRoicRead_SerialCmd(ptrA, 19);       // envoi la commande serielle
@@ -1322,28 +1317,6 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 
     FPA_GetPrivateStatus(&gPrivateStat, ptrA);
     gRoicReg19 = (uint8_t)gPrivateStat.roic_read_reg;
- }
-
- void FPA_ReadRoicReg(t_FpaIntf *ptrA, uint8_t regAdd)
-  {
-     FPA_EnableSerialOpCMD(ptrA, false);
-     ptrA->roic_reg_cmd_id = ROIC_READ_CMD_ID;
-     FPA_SendConfigGC(ptrA, &gcRegsData);
-
-     FPA_SendRoicRead_SerialCmd(ptrA, regAdd);   // envoi la commande serielle
-     FPA_SendRoicReg_StructCmd(ptrA);            // envoi un interrupt au contrôleur du hw driver
-  }
-
- void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal)
- {
-       FPA_EnableSerialOpCMD(ptrA, false);
-       ptrA->roic_reg_cmd_id = ROIC_WRITE_CMD_ID;
-       FPA_SendConfigGC(ptrA, &gcRegsData);
-
-
-       FPA_SendRoicWrite_SerialCmd(ptrA, regAdd, regVal); // envoi la commande serielle
-       FPA_SendRoicReg_StructCmd(ptrA); // envoi un interrupt au contrôleur du hw driver
-    //FPA_EnableSerialOpCMD(ptrA, true);
  }
 
 
