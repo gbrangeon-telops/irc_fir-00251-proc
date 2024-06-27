@@ -65,7 +65,8 @@ end isc0804A_2k_readout_kernel;
 
 architecture rtl of isc0804A_2k_readout_kernel is
    
-   constant C_FLAG_PIPE_LEN  : integer := 16;
+	constant C_FLAG_PIPE_LEN  : integer := 16;
+	constant C_LSYNC_PIPE_LEN : integer := 8;
    
    component sync_reset
       port(
@@ -112,6 +113,7 @@ architecture rtl of isc0804A_2k_readout_kernel is
    signal raw_fval_i          : std_logic := '0';
    signal raw_fval_last       : std_logic := '0';
    signal fpa_lsync_i         : std_logic;
+   signal last_lsync_pipe     : std_logic_vector(C_LSYNC_PIPE_LEN-1 downto 0) := (others => '0');
    signal readout_info_valid  : std_logic;
    signal elcorr_ref_start_pipe : std_logic_vector(15 downto 0);
    signal elcorr_ref_end_pipe   : std_logic_vector(15 downto 0);
@@ -396,9 +398,13 @@ begin
 --            
 --            fpa_lsync_i <= (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i and not imminent_well_rst_i) or last_lsync_i; 
             
-            fpa_lsync_i <= (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i); 
-
-            
+			-- Correctif pour le problème d'offset lors du dernier LSYNC de la trame actuelle
+			last_lsync_pipe(C_LSYNC_PIPE_LEN-1 downto 0) <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2 downto 0) & (AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i);
+			if AREA_FIFO_DATA.RAW.LINE_CNT /= FPA_INTF_CFG.raw_area.line_end_num then
+				fpa_lsync_i <= AREA_FIFO_DATA.RAW.LSYNC and area_fifo_rd_i;
+			else		
+				fpa_lsync_i <= last_lsync_pipe(C_LSYNC_PIPE_LEN-1);
+			end if;
             
             -- 
             read_end_last <= readout_info_i.aoi.read_end;
