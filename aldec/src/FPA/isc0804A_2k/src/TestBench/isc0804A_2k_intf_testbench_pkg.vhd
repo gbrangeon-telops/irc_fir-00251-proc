@@ -19,12 +19,12 @@ use work.fpa_define.all;
 
 package isc0804A_2k_intf_testbench_pkg is           
    
-   constant QWORDS_NUM                 : natural := 113;
+   constant QWORDS_NUM                 : natural := 119;
    constant PIXNUM_PER_TAP_PER_MCLK    : natural := 2;
    constant FOVH_LINE                  : natural := 1;
    constant PAUSE_SIZE                 : integer := 1;
    constant TAP_NUM                    : integer := 16;
-   constant USER_FIRST_LINE_NUM        : integer := 2;
+   constant USER_FIRST_LINE_NUM        : integer := 3;
    constant STRETCH_LINE_LENGTH_MCLK   : integer := 1;
    constant C_ELCORR_ENABLED           : std_logic := '0';
    constant C_elcorr_ref0_image_map_enabled : std_logic := '0';
@@ -158,9 +158,15 @@ package body isc0804A_2k_intf_testbench_pkg is
       variable  dynrange_clipping_level                : unsigned(31 downto 0);
       variable  dynrange_global_offset                 : unsigned(31 downto 0);
       variable  dynrange_op_sel                        : unsigned(31 downto 0);
-      variable  roic_xsize : natural                   := 640;
+	  variable  clk_area_c_line_start_num              : unsigned(31 downto 0);
+      variable  clk_area_c_line_end_num                : unsigned(31 downto 0);
+      variable  clk_area_c_sol_posl_pclk               : unsigned(31 downto 0);
+      variable  clk_area_c_eol_posl_pclk               : unsigned(31 downto 0); 
+      variable  clk_area_c_spare                       : unsigned(31 downto 0); 
+      variable  clk_area_c_clk_id                      : unsigned(31 downto 0); 
+	  variable  roic_xsize : natural                   := 640;
       variable  roic_ysize : natural                   := user_ysize;                             -- pas utilisé dans la config
-      variable  user_sol_posl_pclk : natural           := ((roic_xsize - user_xsize)/2)/TAP_NUM + 3;
+      variable  user_sol_posl_pclk : natural           := ((roic_xsize - user_xsize)/2)/TAP_NUM + 1;
       variable y                                       : unsigned(QWORDS_NUM*32-1 downto 0);
       
    begin 
@@ -200,8 +206,8 @@ package body isc0804A_2k_intf_testbench_pkg is
       raw_area_eof_posf_pclk               := to_unsigned(to_integer(raw_area_line_end_num) * to_integer(raw_area_line_period_pclk) - PAUSE_SIZE * PIXNUM_PER_TAP_PER_MCLK,32);
       raw_area_sol_posl_pclk               := to_unsigned(1, 32);
       raw_area_eol_posl_pclk               := to_unsigned(roic_xsize / (TAP_NUM * PIXNUM_PER_TAP_PER_MCLK) * PIXNUM_PER_TAP_PER_MCLK,32);
-      raw_area_lsync_start_posl_pclk       := to_unsigned(1, 32);
-      raw_area_lsync_end_posl_pclk         := to_unsigned(2, 32);
+      raw_area_lsync_start_posl_pclk       := to_unsigned(39, 32);
+      raw_area_lsync_end_posl_pclk         := to_unsigned(40, 32);
       raw_area_clk_id                      := to_unsigned(DEFINE_FPA_MCLK2_ID, 32);      
       
       user_area_line_start_num             := to_unsigned(USER_FIRST_LINE_NUM, 32);
@@ -209,7 +215,6 @@ package body isc0804A_2k_intf_testbench_pkg is
       --if USER_FIRST_LINE_NUM > 0 then
       --   user_area_line_start_num_m1       := to_unsigned(USER_FIRST_LINE_NUM - 1, 32);
       --end if;
-	  
       user_area_line_end_num               := to_unsigned(user_ysize + to_integer(user_area_line_start_num) - 1, 32);
       user_area_sol_posl_pclk              := to_unsigned(user_sol_posl_pclk, 32);
       user_area_eol_posl_pclk              := to_unsigned(user_sol_posl_pclk + user_xsize/(TAP_NUM*PIXNUM_PER_TAP_PER_MCLK)*PIXNUM_PER_TAP_PER_MCLK - 1,32);
@@ -217,19 +222,34 @@ package body isc0804A_2k_intf_testbench_pkg is
       
       clk_area_a_line_start_num            := user_area_line_start_num; 
       clk_area_a_line_end_num              := user_area_line_end_num; 
-      clk_area_a_sol_posl_pclk             := minimum(user_area_eol_posl_pclk + 1 , raw_area_line_period_pclk - 1); --user_area_sol_posl_pclk;
-      clk_area_a_eol_posl_pclk             := to_unsigned(to_integer(clk_area_a_sol_posl_pclk) + 1,32);
-      clk_area_a_spare                     := (others => '0');
+	  clk_area_a_sol_posl_pclk             := minimum(user_area_eol_posl_pclk + 1 , raw_area_line_period_pclk - 1); --user_area_sol_posl_pclk;
+      clk_area_a_eol_posl_pclk             := minimum(clk_area_a_sol_posl_pclk + 1, raw_area_line_period_pclk); --to_unsigned(to_integer(clk_area_a_sol_posl_pclk) + 1,32);
+	  clk_area_a_spare                     := (others => '0');
       clk_area_a_clk_id                    := to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32); 
       
       clk_area_b_line_start_num            := to_unsigned(to_integer(raw_area_line_start_num) - 1,32); --user_area_line_start_num;                    
       clk_area_b_line_end_num              := to_unsigned(to_integer(raw_area_line_end_num) + 1,32);  --user_area_line_end_num;                       
-      clk_area_b_sol_posl_pclk             := raw_area_lsync_start_posl_pclk; --user_area_sol_posl_pclk;                     
-      clk_area_b_eol_posl_pclk             := raw_area_lsync_end_posl_pclk; --user_area_eol_posl_pclk;                     
-      clk_area_b_spare                     := (others => '0');                             
-      clk_area_b_clk_id                    := to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32); 
-      
-      pix_samp_num_per_ch                  := to_unsigned(1, 32);
+	  clk_area_b_sol_posl_pclk             := raw_area_lsync_start_posl_pclk - 2;--raw_area_lsync_start_posl_pclk; --user_area_sol_posl_pclk;                     
+      clk_area_b_eol_posl_pclk             := raw_area_lsync_end_posl_pclk + 2; --user_area_eol_posl_pclk;                     
+	  clk_area_b_spare                     := (others => '0');                             
+      clk_area_b_clk_id                    := to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32);
+	  
+	  clk_area_c_line_start_num			   := clk_area_b_line_start_num;
+	  clk_area_c_line_end_num              := clk_area_b_line_end_num;
+	  if (to_integer(user_area_sol_posl_pclk) - 6) <= 1 then
+			clk_area_c_sol_posl_pclk := to_unsigned(1,32);	  	
+	  else
+		  	clk_area_c_sol_posl_pclk := user_area_sol_posl_pclk - 6;
+	  end if;
+	  if (to_integer(user_area_sol_posl_pclk) - 1) <= 2 then
+			clk_area_c_eol_posl_pclk := to_unsigned(2,32);	  	
+	  else
+		  	clk_area_c_eol_posl_pclk := user_area_sol_posl_pclk - 1;
+	  end if;
+	  clk_area_c_spare                     := (others => '0');
+	  clk_area_c_clk_id                    := to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32);	   
+
+	  pix_samp_num_per_ch                  := to_unsigned(1, 32);
       
       hgood_samp_sum_num                   := to_unsigned(1, 32);                                      
       hgood_samp_mean_numerator            := to_unsigned(2**21, 32);                           
@@ -466,8 +486,13 @@ package body isc0804A_2k_intf_testbench_pkg is
       & dynrange_scaling_numerator
       & dynrange_clipping_level
       & dynrange_global_offset
-      & dynrange_op_sel;      
-      
+      & dynrange_op_sel
+      & clk_area_c_line_start_num               
+      & clk_area_c_line_end_num                 
+      & clk_area_c_sol_posl_pclk                
+      & clk_area_c_eol_posl_pclk                
+      & clk_area_c_spare                        
+      & clk_area_c_clk_id;
       return y;
    end to_intf_cfg;
    

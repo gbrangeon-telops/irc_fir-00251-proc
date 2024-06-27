@@ -295,7 +295,7 @@ begin
          -- cfg usager
          user_xsize1 <= 640;
          user_ysize1 <= 512;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
+		 user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
          
          user_xsize2 <= 640;
          user_ysize2 <= 512;
