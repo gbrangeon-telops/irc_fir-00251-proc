@@ -64,13 +64,20 @@
 // adresse d'écriture du registre du reset des erreurs
 #define AW_RESET_ERR                               0xAEC
 
- // adresse d'écriture du registre du reset du module FPA
+// adresse d'écriture du registre du reset du module FPA
 #define AW_CTRLED_RESET                            0xAF0
+
+// adresse d'écriture du registre du reset des données reçues du ROIC
+#define AW_RESET_ROIC_RX_DATA                      0xB04
 
 // division de l'address space AXIL par un demux
 #define ARW_CLK_WIZ_BASE_ADD                       0x4000   // adresse de base de l'IP Clock Wizard
 #define ARW_PROG_MEM_BASE_ADD                      0x8000   // adresse de base de la mémoire de programmation du ROIC
 #define ARW_UNUSED_BASE_ADD                        0xC000   // pour l'instant cet adress space n'est pas utilisé
+
+// division des adresses de la mémoire de programmation en 2 sections pour le TX et le RX
+#define PROG_MEM_TX_OFFSET                         0
+#define PROG_MEM_RX_OFFSET                         256
 
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
 #define TELOPS_DIAG_CNST                           0xD1     // mode diag constant (patron de test generé par la carte d'acquisition : tous les pixels à la même valeur)
@@ -129,6 +136,8 @@
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
 #define CALCIUM_COMPRESSION_PARAM_DEFAULT          (16.0F / 23.0F)
+
+#define WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US        ((NUM_OF(RoicRegs) + 1 + 2) * 16)    // (nbRegs + header + RX overhead) x 16b @ 1MHz
 
 #define TOTAL_DAC_NUM                              8
 
@@ -289,7 +298,7 @@ static t_FpaRegister RoicRegs[] = {
       /* b3ADRefLow */           {.addr = 200, .data = 16},
       /* b3ADRmpI1Ctrl */        {.addr = 201, .data = 8},
       /* b3ADBiasRmpI1DR */      {.addr = 202, .data = 3},
-      /* b3LVDSBiasMstr */       {.addr = 208, .data = 119},
+      /* b3LVDSBiasMstr */       {.addr = 208, .data = 167},
       /* b3LVDSBias */           {.addr = 209, .data = 50},
       /* b3LVDSBiasRec */        {.addr = 210, .data = 110},
       /* b3TstAddrAna */         {.addr = 240, .data = 0}
@@ -300,7 +309,9 @@ static t_FpaRegister RoicRegs[] = {
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 void FPA_SoftwType(const t_FpaIntf *ptrA);
-uint8_t FPA_SendRoicRegs(const t_FpaIntf *ptrA);
+void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs);
+void FPA_SendRoicRegs(const t_FpaIntf *ptrA);
+void FPA_ReadRoicRegs(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
@@ -328,7 +339,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
          extern float gFpaActualFreq_MHz;
          gFpaActualFreq_MHz = clkFreq[0];
          axil_clk_wiz_doReconfig((void *)(ptrA->ADD + ARW_CLK_WIZ_BASE_ADD), FALSE);
-         FPA_PRINTF("FPA Clock Wizard have been configured with the desired frequency");
+         FPA_PRINTF("FPA Clock Wizard has been configured with the desired frequency");
       } else {
          FPA_ERR("FPA Clock Wizard cannot be configured with the desired frequency");
       }
@@ -416,7 +427,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern CompressionAlgorithm_t gCompressionAlgorithm;
    extern float gCompressionParameter;
    extern bool gCompressionParameterForced;
+   extern bool gFpaReadReg;
    static uint8_t cfg_num;
+
+   // on bâtit les données de programmation du ROIC
+   FPA_BuildRoicRegs(pGCRegs);
 
    // on bâtit les parametres specifiques
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);
@@ -564,7 +579,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Nombre de données envoyées pour la programmation du ROIC
    // Si 0, il n'y aura pas de programmation du ROIC, mais la nouvelle fpa cfg sera appliquée.
-   ptrA->roic_tx_nb_data = FPA_SendRoicRegs(ptrA);
+   ptrA->roic_tx_nb_data = NUM_OF(RoicRegs) + 1;  // on envoie toujours tous les registres + le header
 
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Déclenche la programmation du ROIC
    ptrA->cfg_num = ++cfg_num;
@@ -668,9 +683,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
+
+   // envoi des données de programmation du ROIC
+   FPA_SendRoicRegs(ptrA);
     
    // envoi du reste de la config 
    WriteStruct(ptrA);
+
+   if (gFpaReadReg)
+   {
+      // lecture du feedback
+      FPA_ReadRoicRegs(ptrA);
+      // Reset de la demande du debug terminal
+      gFpaReadReg = false;
+   }
 }
 
 //--------------------------------------------------------------------------
@@ -1009,29 +1035,97 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 }
 
 //--------------------------------------------------------------------------
-// Pour envoyer les données de programmation au ROIC
-// Retourne le nombre de données envoyées
+// Pour bâtir les données de programmation du ROIC
 //--------------------------------------------------------------------------
-uint8_t FPA_SendRoicRegs(const t_FpaIntf *ptrA)
+void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs)
 {
-   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + ARW_PROG_MEM_BASE_ADD);
-   const uint8_t nbRegs = NUM_OF(RoicRegs);  // on envoie toujours tous les registres
+   extern bool gFpaWriteReg;
+   extern uint8_t gFpaWriteRegAddr;
+   extern uint8_t gFpaWriteRegValue;
+
    uint8_t ii;
 
-   // Envoi du header
-   uint16_t header = (uint16_t)(HDR_START_PATTERN | HDR_LOAD_BIT(1) | HDR_FRM_SYNC | HDR_PAGE_ID | HDR_NBR_DATA(nbRegs));
-   *p_addr++ = (uint32_t)header;
+   // Traitement des demandes du debug terminal
+   if (gFpaWriteReg)
+   {
+      // On trouve l'adresse du registre pour le modifier
+      for (ii = 0; ii < NUM_OF(RoicRegs); ii++)
+      {
+         if (RoicRegs[ii].addr == gFpaWriteRegAddr)
+         {
+            RoicRegs[ii].data = gFpaWriteRegValue;
+            break;
+         }
+      }
 
-   //FPA_INF("FPA_SendRoicRegs hdr = 0x%08X", (uint32_t)header);
+      // Reset de la demande du debug terminal
+      gFpaWriteReg = false;
+   }
+}
+
+//--------------------------------------------------------------------------
+// Pour envoyer les données de programmation au ROIC
+//--------------------------------------------------------------------------
+void FPA_SendRoicRegs(const t_FpaIntf *ptrA)
+{
+   extern bool gFpaReadReg;
+
+   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + ARW_PROG_MEM_BASE_ADD) + PROG_MEM_TX_OFFSET;  // l'offset est divisé par 4 dans le vhd
+   uint8_t nbRegs = ptrA->roic_tx_nb_data;   // header inclus
+   uint8_t ii;
+   uint8_t writeFlag = 1;  // par défaut on écrit la config contenue dans RoicRegs
+   t_FpaRegister dataMask = {.word = 0xFFFF};   // par défaut l'adresse et le data ne sont pas masqués
+
+   // Reset des données reçues
+   AXI4L_write32(1, ptrA->ADD + AW_RESET_ROIC_RX_DATA);
+   AXI4L_write32(0, ptrA->ADD + AW_RESET_ROIC_RX_DATA);
+
+   // Traitement des demandes du debug terminal
+   if (gFpaReadReg)
+   {
+      writeFlag = 0;
+      dataMask.data = 0;   // le data est forcé à 0
+   }
+
+   FPA_PRINTF("%u registers sent to ROIC", nbRegs);
+   nbRegs--;   // on enlève le header
+
+   // Envoi du header
+   uint16_t header = (uint16_t)(HDR_START_PATTERN | HDR_LOAD_BIT(writeFlag) | HDR_FRM_SYNC | HDR_PAGE_ID | HDR_NBR_DATA(nbRegs));
+   *p_addr++ = (uint32_t)header;
+   FPA_PRINTF(" 0x%04X", header);
 
    // Envoi des registres
    for (ii = 0; ii < nbRegs; ii++)
    {
-      *p_addr++ = (uint32_t)RoicRegs[ii].word;
-      //FPA_INF(" 0x%08X", (uint32_t)RoicRegs[ii].word);
+      *p_addr++ = (uint32_t)(RoicRegs[ii].word & dataMask.word);
+      FPA_PRINTF(" 0x%04X", (RoicRegs[ii].word & dataMask.word));
    }
+}
 
-   return nbRegs + 1;   // nombre de registres + le header
+//--------------------------------------------------------------------------
+// Pour lire les données reçues du ROIC
+//--------------------------------------------------------------------------
+void FPA_ReadRoicRegs(const t_FpaIntf *ptrA)
+{
+   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + ARW_PROG_MEM_BASE_ADD) + PROG_MEM_RX_OFFSET;  // l'offset est divisé par 4 dans le vhd
+   uint8_t nbRegs;
+   uint8_t ii;
+   uint64_t tic_timeout;
+
+   // On attend que les données soient reçues
+   GETTIME(&tic_timeout);
+   do
+      nbRegs = (uint8_t)AXI4L_read32(ptrA->ADD + AR_ROIC_RX_NB_DATA);
+   while ((nbRegs == 0) && (elapsed_time_us(tic_timeout) < WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US));
+
+   FPA_INF("%u registers read from ROIC", nbRegs);
+
+   // Lecture des registres
+   for (ii = 0; ii < nbRegs; ii++)
+   {
+      FPA_INF(" 0x%04X", *p_addr++);
+   }
 }
 
 //--------------------------------------------------------------------------

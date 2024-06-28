@@ -59,6 +59,7 @@ static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFPACFG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseCCMREG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf);
@@ -104,6 +105,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"FPACFG", DebugTerminalParseFPACFG},
    {"XRO", DebugTerminalParseXRO},
    {"CCM", DebugTerminalParseCCM},
+   {"CCMREG", DebugTerminalParseCCMREG},
    {"HDER", DebugTerminalParseHDER},
    {"CAL", DebugTerminalParseCAL},
    {"TRIG", DebugTerminalParseTRIG},
@@ -611,7 +613,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
 
 #ifdef AR_COMPR_ERR
-   // bus d'erreurs spÃ©cifiques au calciumD
+   // bus d'erreurs spécifiques au calciumD
    DT_PRINTF("compr_err_latch = 0x%08X", AXI4L_read32(gFpaIntf.ADD + AR_COMPR_ERR));
 #endif
 
@@ -681,7 +683,7 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
       // Read argument value
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
-            ((uValue < 0) && (uValue > USHRT_MAX)))
+            (uValue < 0) || (uValue > USHRT_MAX))
       {
          DT_ERR("Invalid argument");
          return IRC_FAILURE;
@@ -846,7 +848,7 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
          case 9:  // WARNLED
          case 10: // KPIX
             if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
-                  ((uValue < 0) && (uValue > USHRT_MAX)))
+                  (uValue < 0) || (uValue > USHRT_MAX))
             {
                DT_ERR("Invalid uint16 argument");
                return IRC_FAILURE;
@@ -953,6 +955,96 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA Compression Parameter Forced = %u", gCompressionParameterForced);
 
    DT_PRINTF("FPA actual frequency = "_PCF(6)" MHz", _FFMT(gFpaActualFreq_MHz, 6));
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Debug terminal get CCM register command parser.
+ * This parser is used to parse and validate get CCM register command arguments and to
+ * execute the command.
+ *
+ * @return IRC_SUCCESS when CCM register command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseCCMREG(circByteBuffer_t *cbuf)
+{
+   extern t_FpaIntf gFpaIntf;
+   extern bool gFpaReadReg;
+   extern bool gFpaWriteReg;
+   extern uint8_t gFpaWriteRegAddr;
+   extern uint8_t gFpaWriteRegValue;
+
+   uint8_t cmdStr[3], argStr[7];
+   uint32_t arglen;
+   uint32_t cmd;
+   uint32_t uAddr, uValue;
+
+   // Read command value
+   arglen = GetNextArg(cbuf, cmdStr, sizeof(cmdStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid command");
+      return IRC_FAILURE;
+   }
+   cmdStr[arglen++] = '\0'; // Add string terminator
+
+   // Identify command and read optional arguments
+   if (strcasecmp((char *)cmdStr, "RD") == 0)
+   {
+      cmd = 1;
+      // No argument to read
+   }
+   else if (strcasecmp((char *)cmdStr, "WR") == 0)
+   {
+      cmd = 2;
+
+      // Read argument address
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if ((ParseNumArg((char *)argStr, arglen, &uAddr) != IRC_SUCCESS) ||
+            (uAddr < 0) || (uAddr > UCHAR_MAX))
+      {
+         DT_ERR("Invalid uint8 argument");
+         return IRC_FAILURE;
+      }
+
+      // Read argument value
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
+            (uValue < 0) || (uValue > UCHAR_MAX))
+      {
+         DT_ERR("Invalid uint8 argument");
+         return IRC_FAILURE;
+      }
+   }
+   else
+   {
+      DT_ERR("Unsupported command");
+      return IRC_FAILURE;
+   }
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   // Process command
+   switch (cmd)
+   {
+      case 1:  // RD
+         gFpaReadReg = true;
+         break;
+
+      case 2:  // WR
+         gFpaWriteReg = true;
+         gFpaWriteRegAddr = (uint8_t)uAddr;
+         gFpaWriteRegValue = (uint8_t)uValue;
+         break;
+   }
+
+   FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
 
    return IRC_SUCCESS;
 }
@@ -2449,7 +2541,7 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
       // Read ADC command b argument
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if ((ParseSignedNumDec((char *)argStr, arglen, &adc_b) != IRC_SUCCESS) ||
-            ((adc_b < SHRT_MIN) && (adc_b > SHRT_MAX)))
+            (adc_b < SHRT_MIN) || (adc_b > SHRT_MAX))
       {
          DT_ERR("Invalid ADC command b argument.");
          return IRC_FAILURE;
@@ -2974,6 +3066,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
    DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX|COMPR|FREQ value]");
+   DT_PRINTF("  calciumD register:  CCMREG RD|WR [address value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
@@ -3008,8 +3101,8 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
    DT_PRINTF("  Print Buffer Table: PBT");
-   DT_PRINTF("  FB status & errors :  FB");
-   DT_PRINTF("  Get Hardware ID    :  HWID");
+   DT_PRINTF("  FB status & errors: FB");
+   DT_PRINTF("  Get Hardware ID:    HWID");
    DT_PRINTF("  Print help:         HLP");
 
    /*
