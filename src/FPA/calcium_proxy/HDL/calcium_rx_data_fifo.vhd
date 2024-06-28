@@ -19,6 +19,7 @@ use work.proxy_define.all;
 
 entity calcium_rx_data_fifo is
    port (
+      ARESET         : in std_logic;
       CLK            : in std_logic;
       
       -- RX_CLK domain
@@ -138,7 +139,7 @@ begin
       SLOWEST_CLK => RX_CLK,
       ORST        => cond_reset
    );
-   cond_reset_in <= not RX_RDY;
+   cond_reset_in <= ARESET or not RX_RDY;
    
    U1B : sync_reset
    port map (
@@ -149,7 +150,7 @@ begin
    
    U1C : sync_reset
    port map (
-      ARESET => cond_reset,
+      ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset_clk
    );
