@@ -21,38 +21,39 @@ use work.tel2000.all;
 
 entity calcium_prog_ctrler_core is
    port (
-      ARESET            : in std_logic;
-      CLK               : in std_logic;
+      ARESET               : in std_logic;
+      CLK                  : in std_logic;
       
       -- config
-      USER_CFG          : in fpa_intf_cfg_type;
-      ROIC_RX_NB_DATA   : out std_logic_vector(7 downto 0);    -- feedback du nombre de données reçues disponibles dans la RAM
+      USER_CFG             : in fpa_intf_cfg_type;
+      ROIC_RX_NB_DATA      : out std_logic_vector(7 downto 0);    -- feedback du nombre de données reçues disponibles dans la RAM
+      RESET_ROIC_RX_DATA   : in std_logic;
       
       -- interface avec le contrôleur principal
-      PROG_EN           : in std_logic;
-      PROG_RQST         : out std_logic;
-      PROG_DONE         : out std_logic;
-      ROIC_INIT_DONE    : out std_logic;
+      PROG_EN              : in std_logic;
+      PROG_RQST            : out std_logic;
+      PROG_DONE            : out std_logic;
+      ROIC_INIT_DONE       : out std_logic;
       
       -- interface RAM
-      RAM_BUSY          : in std_logic;
-      RAM_RD_EN         : out std_logic;
-      RAM_RD_ADD        : out std_logic_vector(8 downto 0);
-      RAM_RD_DATA       : in std_logic_vector(15 downto 0);
-      RAM_RD_DVAL       : in std_logic;
-      RAM_WR_EN         : out std_logic;
-      RAM_WR_ADD        : out std_logic_vector(8 downto 0);
-      RAM_WR_DATA       : out std_logic_vector(15 downto 0);
+      RAM_BUSY             : in std_logic;
+      RAM_RD_EN            : out std_logic;
+      RAM_RD_ADD           : out std_logic_vector(8 downto 0);
+      RAM_RD_DATA          : in std_logic_vector(15 downto 0);
+      RAM_RD_DVAL          : in std_logic;
+      RAM_WR_EN            : out std_logic;
+      RAM_WR_ADD           : out std_logic_vector(8 downto 0);
+      RAM_WR_DATA          : out std_logic_vector(15 downto 0);
       
       -- interface PROG TX
-      TX_DVAL           : out std_logic;
-      TX_DATA           : out std_logic_vector(15 downto 0);
-      TX_TLAST          : out std_logic;
-      TX_DONE           : in std_logic;
+      TX_DVAL              : out std_logic;
+      TX_DATA              : out std_logic_vector(15 downto 0);
+      TX_TLAST             : out std_logic;
+      TX_DONE              : in std_logic;
       
       -- interface PROG RX
-      RX_DVAL           : in std_logic;
-      RX_DATA           : in std_logic_vector(15 downto 0)
+      RX_DVAL              : in std_logic;
+      RX_DATA              : in std_logic_vector(15 downto 0)
    );
 end calcium_prog_ctrler_core;
 
@@ -64,6 +65,18 @@ architecture rtl of calcium_prog_ctrler_core is
          CLK : in std_logic;
          SRESET : out std_logic := '1'
          );
+   end component;
+   
+   component double_sync
+      generic (
+         INIT_VALUE : bit := '0'
+      );
+      port (
+         D     : in STD_LOGIC;
+         Q     : out STD_LOGIC := '0';
+         RESET : in STD_LOGIC;
+         CLK   : in STD_LOGIC
+      );
    end component;
 
    component double_sync_vector is
@@ -117,6 +130,7 @@ architecture rtl of calcium_prog_ctrler_core is
    signal ram_wr_add_i              : unsigned(RAM_WR_ADD'length-1 downto 0);
    signal ram_wr_data_i             : std_logic_vector(RAM_WR_DATA'length-1 downto 0);
    signal roic_rx_nb_data_i         : unsigned(ROIC_RX_NB_DATA'length-1 downto 0);
+   signal reset_roic_rx_data_sync   : std_logic;
    signal tx_data_cnt               : unsigned(USER_CFG.ROIC_TX_NB_DATA'length-1 downto 0);
    signal rx_data_cnt               : unsigned(USER_CFG.ROIC_TX_NB_DATA'length-1 downto 0);
    signal total_rx_data_cnt         : unsigned(USER_CFG.ROIC_TX_NB_DATA'length-1 downto 0);
@@ -149,9 +163,9 @@ begin
    );
    
    --------------------------------------------------
-   -- Gray encoding of CFG_NUM 
+   -- Gray encoding and double sync of CFG_NUM 
    --------------------------------------------------
-   U2 : gh_binary2gray
+   U2A : gh_binary2gray
    generic map (
       SIZE => USER_CFG.CFG_NUM'length
    )
@@ -160,14 +174,25 @@ begin
       G => cfg_num_gray
    );
    
-   --------------------------------------------------
-   -- Double sync of Gray encoded CFG_NUM
-   --------------------------------------------------
-   U3 : double_sync_vector
+   U2B : double_sync_vector
    port map (
       D => cfg_num_gray,
       CLK => CLK,
       Q => cfg_num_i
+   );
+   
+   --------------------------------------------------
+   -- Double sync 
+   --------------------------------------------------   
+   U3 : double_sync
+   generic map (
+      INIT_VALUE => '0'
+   )
+   port map (
+      RESET => sreset,
+      D => RESET_ROIC_RX_DATA,
+      CLK => CLK,
+      Q => reset_roic_rx_data_sync
    );
    
    --------------------------------------------------
@@ -351,6 +376,11 @@ begin
             roic_rx_nb_data_i <= (others => '0');
          else 
             
+            -- on efface la réponse reçue pour s'assurer qu'il n'y a pas de mismatch dans les requêtes
+            if reset_roic_rx_data_sync = '1' then
+               roic_rx_nb_data_i <= (others => '0');
+            end if;
+            
             case feedback_fsm is
                
                -- on attend le début du message
@@ -360,7 +390,6 @@ begin
                   rx_data_cnt <= (others => '0');     -- on reset le compteur pour les données d'extra reçues
                   if rx_start = '1' then
                      total_rx_data_cnt <= tx_data_cnt;         -- TX et RX ont le même nombre de données
-                     roic_rx_nb_data_i <= (others => '0');     -- le dernier message n'est plus disponible
                      feedback_fsm <= skip_data_st;
                   end if;
                

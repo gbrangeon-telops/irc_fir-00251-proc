@@ -42,6 +42,7 @@ entity calcium_mblaze_intf is
       
       COMPR_ERR             : in std_logic_vector(4 downto 0);
       ROIC_RX_NB_DATA       : in std_logic_vector(7 downto 0);    -- feedback du nombre de données reçues disponibles dans la RAM
+      RESET_ROIC_RX_DATA    : out std_logic;
       
       KPIX_REG              : inout kpix_reg_type
    );
@@ -106,6 +107,7 @@ architecture rtl of calcium_mblaze_intf is
    signal kpix_dval                    : std_logic;
    signal kpix_status                  : std_logic_vector(31 downto 0);
    signal compr_err_latch              : std_logic_vector(COMPR_ERR'range);
+   signal reset_roic_rx_data_i         : std_logic;
    
 begin
    
@@ -114,6 +116,7 @@ begin
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
    COOLER_STAT.COOLER_ON <= '1';
+   RESET_ROIC_RX_DATA <= reset_roic_rx_data_i;
    
    -- KPIX register mapping
    KPIX_REG.WRITE      <= kpix_value;
@@ -213,6 +216,7 @@ begin
             mb_ctrled_reset_i <= '0';
             fpa_softw_stat_i.dval <= '0';
             kpix_dval <= '0';
+            reset_roic_rx_data_i <= '0';
             
          else                   
             
@@ -292,7 +296,9 @@ begin
                   when X"AF0" =>    mb_ctrled_reset_i                          <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on eteint la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                   
                   -- pour écrire les valeurs de kpix dans la BRAM
-                  when X"B00" =>    kpix_value     <= data_i(kpix_value'length-1 downto 0); kpix_dval <= '1';   -- le dval monte pour 1 clk
+                  when X"B00" =>    kpix_value        <= data_i(kpix_value'length-1 downto 0); kpix_dval <= '1';   -- le dval monte pour 1 clk
+                  -- pour un reset des données reçues du ROIC
+                  when X"B04" =>    reset_roic_rx_data_i       <= data_i(0);
                      
                      ----------------------------------------------------------------------------------------------------------------------------------------                  
                      -- EN0 15 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
