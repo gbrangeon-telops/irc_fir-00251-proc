@@ -28,6 +28,7 @@ entity hder_insert_mb_intf is
       FPA_HDER_CLK  : in std_logic;
       EHDRI_HDER_CLK: in std_logic;
       CAL_HDER_CLK  : in std_logic;
+	  ADC_RDOUT_HDER_CLK : in std_logic;
       
       CONFIG        : out hder_insert_cfg_type;
       
@@ -95,10 +96,8 @@ architecture rtl of hder_insert_mb_intf is
    signal fw_hder_err_sync     : std_logic;
    signal trig_hder_err_sync   : std_logic;
    signal fpa_hder_err_sync    : std_logic;
-   
    signal sequencer_done       : std_logic;
    signal hdr_rx_mosi         : t_axi4_lite_mosi;
-   
    signal axi_awaddr	          : std_logic_vector(31 downto 0);
    signal axi_awready	       : std_logic;
    signal axi_wready	          : std_logic;
@@ -122,9 +121,10 @@ architecture rtl of hder_insert_mb_intf is
    signal config_valid         : std_logic;
    signal cal_hder_ovfl        : std_logic;
    signal cal_hder_ovfl_sync   : std_logic;
-   signal flagging_hder_ovfl        : std_logic;
-   signal flagging_hder_ovfl_sync   : std_logic;
-   
+   signal flagging_hder_ovfl       : std_logic;
+   signal flagging_hder_ovfl_sync  : std_logic;
+   signal adc_rdout_hder_ovfl      : std_logic;
+   signal adc_rdout_hder_ovfl_sync : std_logic;
    signal ram_wr_add_i       : unsigned(ALEN_M1 downto 0);
    signal ram_wr_data_i      : std_logic_vector(31 downto 0);
    signal ram_bwe_i           : std_logic_vector(3 downto 0);
@@ -156,7 +156,8 @@ begin
    
    --ERR <= error_found;
    
-   -- mapping statuts 
+   -- mapping statuts
+   adc_rdout_hder_ovfl  <=  STATUS(12);
    flagging_hder_ovfl   <=  STATUS(11);
    cal_hder_ovfl     	<=  STATUS(10);
    ehdri_hder_ovfl   	<=  STATUS(9); 
@@ -395,11 +396,13 @@ begin
    Ue8 : err_sync port map(D => ehdri_hder_ovfl,Q => ehdri_hder_ovfl_sync,ARESET => ARESET, D_CLK => FW_HDER_CLK,   Q_CLK => MB_CLK);
    Ue9 : err_sync port map(D => cal_hder_ovfl,  Q => cal_hder_ovfl_sync,  ARESET => ARESET, D_CLK => CAL_HDER_CLK,  Q_CLK => MB_CLK);
    Ue10 : err_sync port map(D => flagging_hder_ovfl,  Q => flagging_hder_ovfl_sync,  ARESET => ARESET, D_CLK => CAL_HDER_CLK,  Q_CLK => MB_CLK);
+   Ue11 : err_sync port map(D => adc_rdout_hder_ovfl,  Q => adc_rdout_hder_ovfl_sync,  ARESET => ARESET, D_CLK => ADC_RDOUT_HDER_CLK,  Q_CLK => MB_CLK);
    
    -- definition des erreurs (connecter les signaux des erreurs ici)
-   error(15 downto 12) <= (others => '0');
-   error(11)  <= flagging_hder_ovfl_sync;
-   error(10)  <= cal_hder_ovfl_sync;
+   error(15 downto 13) <= (others => '0');
+   error(12) <= adc_rdout_hder_ovfl_sync;
+   error(11) <= flagging_hder_ovfl_sync;
+   error(10) <= cal_hder_ovfl_sync;
    error(9)  <= ehdri_hder_ovfl_sync;
    error(8)  <= din_ovfl_sync;
    error(7)  <= fw_hder_ovfl_sync;
@@ -428,9 +431,10 @@ begin
             error_found <= '0';
          else            
             
-            ERR <= din_ovfl_sync or fw_hder_ovfl_sync or trig_hder_ovfl_sync or fpa_hder_ovfl_sync or fpa_hder_err_sync or trig_hder_err_sync or fw_hder_err_sync;
-            
-            -- latch des erreurs
+            ERR <= din_ovfl_sync or fw_hder_ovfl_sync or trig_hder_ovfl_sync or fpa_hder_ovfl_sync or fpa_hder_err_sync or trig_hder_err_sync or fw_hder_err_sync or
+				   ehdri_hder_ovfl_sync or cal_hder_ovfl_sync or flagging_hder_ovfl_sync or adc_rdout_hder_ovfl_sync;
+
+			-- latch des erreurs
             for i in 0 to error'length-1 loop
                if error(i) = '1'  then  
                   error_latch(i)  <=  '1';
@@ -447,7 +451,7 @@ begin
                end if;
             end if;
             
-            status_to_mb(10 downto 1) <= error_latch(10 downto 1); -- le bit '0' n'est pas une erreur mais un done
+            status_to_mb(12 downto 1) <= error_latch(12 downto 1); -- le bit '0' n'est pas une erreur mais un done
             status_to_mb(0) <= sequencer_done;			
             
          end if;
