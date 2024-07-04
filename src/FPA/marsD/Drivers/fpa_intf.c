@@ -514,9 +514,9 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 void FPA_PrintConfig(const t_FpaIntf *ptrA)
 {
    FPA_INF("This functionality is not supported for this FPA");
-//   uint32_t idx = 0;
+//   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD);
 //
-//   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
+//   FPA_INF("int_time = %u", *p_addr++);
 
 }
 
