@@ -96,8 +96,9 @@
 #define FLEG_DAC_RESOLUTION_BITS                   14       // le DAC est à 14 bits
 #define FLEG_DAC_REF_VOLTAGE_V                     2.5      // on utilise la reference interne de 2.5V du DAC
 #define FLEG_DAC_REF_GAIN                          2.0      // gain de référence du DAC
+#define TOTAL_DAC_NUM                              8
 
-
+// specific parameters
 #define CALCIUM_VA1P8_DEFAULT_mV                   1800
 #define CALCIUM_VA1P8_MIN_mV                       1500
 #define CALCIUM_VA1P8_MAX_mV                       2100
@@ -131,15 +132,185 @@
 #define CALCIUM_VPIXQNB_MAX_mV                     2100
 
 #define CALCIUM_DEFAULT_REGF                       2     // AOI commence à la ligne 2
+#define CALCIUM_DEFAULT_REGG                       1     // contrôle interne (registre bIntCnt) du temps d'intégration
 #define CALCIUM_DEFAULT_REGH                       1     // le LDO de VPIXQNB est activé
 
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
 #define CALCIUM_COMPRESSION_PARAM_DEFAULT          (16.0F / 23.0F)
 
-#define WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US        ((NUM_OF(RoicRegs) + 1 + 2) * 16)    // (nbRegs + header + RX overhead) x 16b @ 1MHz
 
-#define TOTAL_DAC_NUM                              8
+// Programmation des registres du ROIC
+/* Définitions du header */
+#define HDR_START_PATTERN           (2 << 13)                  // [15:13] sync word
+#define HDR_LOAD_BIT(write)         (((write) & 0x01) << 12)   // [12] 1 = write, 0 = read
+#define HDR_FRM_SYNC                (0 << 11)                  // [11] not used (SPI Frame Mode)
+#define HDR_PAGE_ID                 (0 << 8)                   // [10:8] not used for this ROIC
+#define HDR_NBR_DATA(x)             ((x) & 0xFF)               // [7:0] number of words (addr, data) sent (header word excluded)
+/* Indices des registres dans RoicRegs */
+#define bGenCtrl_idx                0
+#define bGenCtrl2_idx               1
+#define bRowStartLSB_idx            2
+#define bRowStartMSB_idx            3
+#define bRowStopLSB_idx             4
+#define bRowStopMSB_idx             5
+#define bFrmCtrl_idx                6
+#define bClkRowCntLSB_idx           7
+#define bClkRowCntMSB_idx           8
+#define bPixRstHCnt_idx             9
+#define bPixXferCnt_idx             10
+#define bPixOHCnt_idx               11
+#define bPixOH2Cnt_idx              12
+#define bPixRstBECnt_idx            13
+#define bRODelayCnt_idx             14
+#define bPixBECtrl_idx              15
+#define bPixClampDelayCnt_idx       16
+#define bPixTstNOCCnt_idx           17
+#define bIntCntLSB_idx              18
+#define bIntCnt_idx                 19
+#define bIntCntMSB_idx              20
+#define bFrmHoldOffLSB_idx          21
+#define bFrmHoldOff_idx             22
+#define bFrmHoldOffMSB_idx          23
+#define bClkRowDelayCnt_idx         24
+#define bClkCtrlDSMDiv_idx          25
+#define bDSMCyclesLSB_idx           26
+#define bDSMCyclesMSB_idx           27
+#define bDSMDeltaCnt_idx            28
+#define bDSMOHCnt_idx               29
+#define bDSMQRstCnt_idx             30
+#define bDSMDelayCntLSB_idx         31
+#define bDSMDelayCntMSB_idx         32
+#define bDSMInitDelayCntLSB_idx     33
+#define bDSMInitDelayCntMSB_idx     34
+#define bDSMSeedRowsSel_idx         35
+#define bColGrpStart_idx            36
+#define bColGrpStop_idx             37
+#define bTstDig_idx                 38
+#define bTstAddrDig1_idx            39
+#define bTstAddrDig2_idx            40
+#define bADCtrl_idx                 41
+#define bADOSamp_idx                42
+#define bADDigOSLSB_idx             43
+#define bADDigOS_idx                44
+#define bADDigOSMSB_idx             45
+#define bADRstCnt_idx               46
+#define bADCalCtrl_idx              47
+#define bADCalOSampCtrl_idx         48
+#define bADCalConstLSB_idx          49
+#define bADCalConstMSB_idx          50
+#define bADCal2Const_idx            51
+#define bADCalClkLSB_idx            52
+#define bADCalClkMSB_idx            53
+#define bADCal2ClkLSB_idx           54
+#define bADCal2ClkMSB_idx           55
+#define bADCalDigOSLSB_idx          56
+#define bADCalDigOS_idx             57
+#define bADCalDigOSMSB_idx          58
+#define bADCalCnt1_idx              59
+#define bADCalCnt2_idx              60
+#define bDVPOffsetLSB_idx           61
+#define bDVPOffset_idx              62
+#define bDVPOffsetMSB_idx           63
+#define bResidueHandler_idx         64
+#define bResDataMaxLSB_idx          65
+#define bResDataMax_idx             66
+#define bResDataMaxMSB_idx          67
+#define bDataHandler_idx            68
+#define bOutCtrl_idx                69
+#define bTxCtrl_idx                 70
+#define bLVDSCtrl_idx               71
+#define bSkewXCLK_idx               72
+#define bSkewX1_idx                 73
+#define bSkewX2_idx                 74
+#define bSkewX3_idx                 75
+#define bSkewX4_idx                 76
+#define bSkewX5_idx                 77
+#define bSkewX6_idx                 78
+#define bSkewX7_idx                 79
+#define bSkewX8_idx                 80
+#define bClkCoreCnt_idx             81
+#define bClkColCnt_idx              82
+#define b3PixBiasMstr1_idx          83
+#define b3PixPDIBias_idx            84
+#define b3PixCPDIBias_idx           85
+#define b3PixCompRef_idx            86
+#define b3PixCompRefBias1_idx       87
+#define b3PixCompRefBias2_idx       88
+#define b3PixQNB_idx                89
+#define b3PixQNBBias1_idx           90
+#define b3PixQNBBias2_idx           91
+#define b3PixAnaCtrl_idx            92
+#define b3RstLimRamp_idx            93
+#define b3PixRstLim_idx             94
+#define b3PixAnaEn_idx              95
+#define b3TstAna_idx                96
+#define b3TR2I_idx                  97
+#define b3PixBiasMstr2_idx          98
+#define b3PixClamp_idx              99
+#define b3PixClampCtrl_idx          100
+#define b3BISTRmpCtrl_3p3_idx       101
+#define b3BISTSlope_idx             102
+#define b3BISTOffset_idx            103
+#define b3BISTRmpBias_idx           104
+#define b3ColBias_idx               105
+#define b3ColCtrl_idx               106
+#define b3ColDRBias_idx             107
+#define b3ADCtrl_idx                108
+#define b3ADBiasMstr_idx            109
+#define b3ADBiasBuf_idx             110
+#define b3ADBiasComp_idx            111
+#define b3ADRamp_idx                112
+#define b3ADRampTrim_idx            113
+#define b3ADBiasRampBuf_idx         114
+#define b3ADRefLow_idx              115
+#define b3ADRmpI1Ctrl_idx           116
+#define b3ADBiasRmpI1DR_idx         117
+#define b3LVDSBiasMstr_idx          118
+#define b3LVDSBias_idx              119
+#define b3LVDSBiasRec_idx           120
+#define b3TstAddrAna_idx            121
+/* Macros GET et SET pour certains champs des registres */
+#define REG_FIELD_GET(idx, mask, shift)            ((RoicRegs[idx].data & (mask)) >> (shift))
+#define REG_FIELD_SET(idx, mask, shift, val)       BitMaskClr(RoicRegs[idx].data, (mask)); BitMaskSet(RoicRegs[idx].data, ((val) << (shift)) & (mask))
+#define bGenCtrl_bLoGn_mask                        0x01
+#define bGenCtrl_bLoGn_shift                       0
+#define bGenCtrl_bLoGn_GET()                       REG_FIELD_GET(bGenCtrl_idx, bGenCtrl_bLoGn_mask, bGenCtrl_bLoGn_shift)
+#define bGenCtrl_bLoGn_SET(val)                    REG_FIELD_SET(bGenCtrl_idx, bGenCtrl_bLoGn_mask, bGenCtrl_bLoGn_shift, val)
+#define bGenCtrl2_bTestRowsEn_mask                 0x08
+#define bGenCtrl2_bTestRowsEn_shift                3
+#define bGenCtrl2_bTestRowsEn_GET()                REG_FIELD_GET(bGenCtrl2_idx, bGenCtrl2_bTestRowsEn_mask, bGenCtrl2_bTestRowsEn_shift)
+#define bGenCtrl2_bTestRowsEn_SET(val)             REG_FIELD_SET(bGenCtrl2_idx, bGenCtrl2_bTestRowsEn_mask, bGenCtrl2_bTestRowsEn_shift, val)
+#define bFrmCtrl_bITREn_mask                       0x10
+#define bFrmCtrl_bITREn_shift                      4
+#define bFrmCtrl_bITREn_GET()                      REG_FIELD_GET(bFrmCtrl_idx, bFrmCtrl_bITREn_mask, bFrmCtrl_bITREn_shift)
+#define bFrmCtrl_bITREn_SET(val)                   REG_FIELD_SET(bFrmCtrl_idx, bFrmCtrl_bITREn_mask, bFrmCtrl_bITREn_shift, val)
+#define bFrmCtrl_bClkFrmIntCntEn_mask              0x20
+#define bFrmCtrl_bClkFrmIntCntEn_shift             5
+#define bFrmCtrl_bClkFrmIntCntEn_GET()             REG_FIELD_GET(bFrmCtrl_idx, bFrmCtrl_bClkFrmIntCntEn_mask, bFrmCtrl_bClkFrmIntCntEn_shift)
+#define bFrmCtrl_bClkFrmIntCntEn_SET(val)          REG_FIELD_SET(bFrmCtrl_idx, bFrmCtrl_bClkFrmIntCntEn_mask, bFrmCtrl_bClkFrmIntCntEn_shift, val)
+#define bOutCtrl_bTestModeSel_mask                 0x20
+#define bOutCtrl_bTestModeSel_shift                5
+#define bOutCtrl_bTestModeSel_GET()                REG_FIELD_GET(bOutCtrl_idx, bOutCtrl_bTestModeSel_mask, bOutCtrl_bTestModeSel_shift)
+#define bOutCtrl_bTestModeSel_SET(val)             REG_FIELD_SET(bOutCtrl_idx, bOutCtrl_bTestModeSel_mask, bOutCtrl_bTestModeSel_shift, val)
+#define b3PixAnaCtrl_b3PixQNBOvr_mask              0x04
+#define b3PixAnaCtrl_b3PixQNBOvr_shift             2
+#define b3PixAnaCtrl_b3PixQNBOvr_GET()             REG_FIELD_GET(b3PixAnaCtrl_idx, b3PixAnaCtrl_b3PixQNBOvr_mask, b3PixAnaCtrl_b3PixQNBOvr_shift)
+#define b3PixAnaCtrl_b3PixQNBOvr_SET(val)          REG_FIELD_SET(b3PixAnaCtrl_idx, b3PixAnaCtrl_b3PixQNBOvr_mask, b3PixAnaCtrl_b3PixQNBOvr_shift, val)
+#define b3PixAnaCtrl_b3PixQNBExtEn_mask            0x20
+#define b3PixAnaCtrl_b3PixQNBExtEn_shift           5
+#define b3PixAnaCtrl_b3PixQNBExtEn_GET()           REG_FIELD_GET(b3PixAnaCtrl_idx, b3PixAnaCtrl_b3PixQNBExtEn_mask, b3PixAnaCtrl_b3PixQNBExtEn_shift)
+#define b3PixAnaCtrl_b3PixQNBExtEn_SET(val)        REG_FIELD_SET(b3PixAnaCtrl_idx, b3PixAnaCtrl_b3PixQNBExtEn_mask, b3PixAnaCtrl_b3PixQNBExtEn_shift, val)
+#define b3PixAnaEn_b3PixQNBEn_mask                 0x02
+#define b3PixAnaEn_b3PixQNBEn_shift                1
+#define b3PixAnaEn_b3PixQNBEn_GET()                REG_FIELD_GET(b3PixAnaEn_idx, b3PixAnaEn_b3PixQNBEn_mask, b3PixAnaEn_b3PixQNBEn_shift)
+#define b3PixAnaEn_b3PixQNBEn_SET(val)             REG_FIELD_SET(b3PixAnaEn_idx, b3PixAnaEn_b3PixQNBEn_mask, b3PixAnaEn_b3PixQNBEn_shift, val)
+/* Timeout de la réponse */
+// Le temps de transmission/réception du message n'est pas déterminant puisque le contrôleur
+// doit attendre entre 2 images pour communiquer. Des mesures montrent que 10 ms est
+// généralement suffisant pour obtenir une réponse.
+//#define WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US        ((NUM_OF(RoicRegs) + 1 + 2) * 16)    // (nbRegs + header + RX overhead) x 16b @ 1MHz
+#define WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US        10000    // 10ms
 
 struct s_ProximCfgConfig
 {
@@ -169,6 +340,17 @@ struct calcium_param_s
    float int_end_to_trig_start_dly;
 };
 typedef struct calcium_param_s calcium_param_t;
+
+// Structure d'un registre de ROIC
+typedef union
+{
+   uint16_t word;       // pour accéder à la concaténation de addr et data
+   struct {
+      // data est le LSB alors il doit être en 1er dans le µBlaze (little-endian)
+      uint8_t data;     // valeur du registre
+      uint8_t addr;     // adresse du registre
+   };
+} t_RoicRegister;
  
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
@@ -179,7 +361,7 @@ t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD
 static uint32_t sw_init_done = 0;
 static uint32_t sw_init_success = 0;
 static ProximCfg_t ProximCfg;
-static t_FpaRegister RoicRegs[] = {
+static t_RoicRegister RoicRegs[] = {
       /* bGenCtrl */             {.addr = 1,   .data = 101},
       /* bGenCtrl2 */            {.addr = 2,   .data = 27},
       /* bRowStartLSB */         {.addr = 3,   .data = 1},
@@ -189,12 +371,12 @@ static t_FpaRegister RoicRegs[] = {
       /* bFrmCtrl */             {.addr = 10,  .data = 48},
       /* bClkRowCntLSB */        {.addr = 11,  .data = 2},
       /* bClkRowCntMSB */        {.addr = 12,  .data = 1},
-      /* bPixRstHCnt */          {.addr = 13,  .data = CALCIUM_bPixRstHCnt},
-      /* bPixXferCnt */          {.addr = 14,  .data = CALCIUM_bPixXferCnt},
-      /* bPixOHCnt */            {.addr = 15,  .data = CALCIUM_bPixOHCnt},
-      /* bPixOH2Cnt */           {.addr = 16,  .data = CALCIUM_bPixOH2Cnt},
-      /* bPixRstBECnt */         {.addr = 17,  .data = CALCIUM_bPixRstBECnt},
-      /* bRODelayCnt */          {.addr = 18,  .data = CALCIUM_bRODelayCnt},
+      /* bPixRstHCnt */          {.addr = 13,  .data = 0},
+      /* bPixXferCnt */          {.addr = 14,  .data = 0},
+      /* bPixOHCnt */            {.addr = 15,  .data = 0},
+      /* bPixOH2Cnt */           {.addr = 16,  .data = 0},
+      /* bPixRstBECnt */         {.addr = 17,  .data = 0},
+      /* bRODelayCnt */          {.addr = 18,  .data = 0},
       /* bPixBECtrl */           {.addr = 19,  .data = 7},
       /* bPixClampDelayCnt */    {.addr = 20,  .data = 0},
       /* bPixTstNOCCnt */        {.addr = 21,  .data = 8},
@@ -226,7 +408,7 @@ static t_FpaRegister RoicRegs[] = {
       /* bADDigOSLSB */          {.addr = 76,  .data = 0},
       /* bADDigOS */             {.addr = 77,  .data = 0},
       /* bADDigOSMSB */          {.addr = 78,  .data = 0},
-      /* bADRstCnt */            {.addr = 79,  .data = CALCIUM_bADRstCnt},
+      /* bADRstCnt */            {.addr = 79,  .data = (uint8_t)ceilf(337.5e-9f * CALCIUM_CLK_COL_HZ - 1.0f)}, // delay is bADRstCnt + 1},
       /* bADCalCtrl */           {.addr = 80,  .data = 22},
       /* bADCalOSampCtrl */      {.addr = 81,  .data = 5},
       /* bADCalConstLSB */       {.addr = 82,  .data = 0},
@@ -249,7 +431,7 @@ static t_FpaRegister RoicRegs[] = {
       /* bResDataMax */          {.addr = 105, .data = 64},
       /* bResDataMaxMSB */       {.addr = 106, .data = 0},
       /* bDataHandler */         {.addr = 107, .data = 3},
-      /* bOutCtrl */             {.addr = 111, .data = 165},
+      /* bOutCtrl */             {.addr = 111, .data = 133},
       /* bTxCtrl */              {.addr = 112, .data = 26},
       /* bLVDSCtrl */            {.addr = 115, .data = 34},
       /* bSkewXCLK */            {.addr = 117, .data = 32},
@@ -272,7 +454,7 @@ static t_FpaRegister RoicRegs[] = {
       /* b3PixQNB */             {.addr = 134, .data = 94},
       /* b3PixQNBBias1 */        {.addr = 135, .data = 39},
       /* b3PixQNBBias2 */        {.addr = 136, .data = 8},
-      /* b3PixAnaCtrl */         {.addr = 137, .data = 253},
+      /* b3PixAnaCtrl */         {.addr = 137, .data = 61},
       /* b3RstLimRamp */         {.addr = 138, .data = 1},
       /* b3PixRstLim */          {.addr = 139, .data = 16},
       /* b3PixAnaEn */           {.addr = 140, .data = 125},
@@ -292,7 +474,7 @@ static t_FpaRegister RoicRegs[] = {
       /* b3ADBiasMstr */         {.addr = 194, .data = 7},
       /* b3ADBiasBuf */          {.addr = 195, .data = 15},
       /* b3ADBiasComp */         {.addr = 196, .data = 9},
-      /* b3ADRamp */             {.addr = 197, .data = 119},
+      /* b3ADRamp */             {.addr = 197, .data = (uint8_t)roundf(3.662e-6f * CALCIUM_CLK_COL_HZ * 0.65f)},
       /* b3ADRampTrim */         {.addr = 198, .data = 32},
       /* b3ADBiasRampBuf */      {.addr = 199, .data = 3},
       /* b3ADRefLow */           {.addr = 200, .data = 16},
@@ -309,7 +491,7 @@ static t_FpaRegister RoicRegs[] = {
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 void FPA_SoftwType(const t_FpaIntf *ptrA);
-void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs);
+void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH);
 void FPA_SendRoicRegs(const t_FpaIntf *ptrA);
 void FPA_ReadRoicRegs(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
@@ -405,7 +587,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                       // reservé active_line_start_num pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                       // reservé pour le contrôle interne/externe du temps d'intégration
-   extern int32_t gFpaDebugRegH;                       // reservé pour l'activation du LDO de VPIXQNB
+   extern int32_t gFpaDebugRegH;                       // reservé pour l'activation/désactivation du LDO de VPIXQNB
    extern uint16_t gFpaVa1p8_mV;
    static uint16_t presentFpaVa1p8_mV = CALCIUM_VA1P8_DEFAULT_mV;
    extern uint16_t gFpaVPixRst_mV;
@@ -431,10 +613,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static uint8_t cfg_num;
 
    // on bâtit les données de programmation du ROIC
-   FPA_BuildRoicRegs(pGCRegs);
+   FPA_BuildRoicRegs(pGCRegs, &hh);
 
-   // on bâtit les parametres specifiques
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs);
+   // on bâtit les parametres specifiques (est maintenant appelée dans FPA_BuildRoicRegs)
+   //FPA_SpecificParams(&hh, 0.0F, pGCRegs);
 
    // diag mode, diag type et data source
    ptrA->fpa_diag_mode = 0;                 // par defaut
@@ -489,12 +671,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->height   = pGCRegs->Height;
    
    // Registre F : ajustement des lignes conservées
+   int32_t maxDebugRegF = hh.numFrRows - ptrA->height + 1;
    if (sw_init_done == 0)
       gFpaDebugRegF = CALCIUM_DEFAULT_REGF;
    if (gFpaDebugRegF < 1)
       gFpaDebugRegF = 1;
-   else if (gFpaDebugRegF > 3 + 2*CALCIUM_bTestRowsEn)
-      gFpaDebugRegF = 3 + 2*CALCIUM_bTestRowsEn;
+   else if (gFpaDebugRegF > maxDebugRegF)
+      gFpaDebugRegF = maxDebugRegF;
    ptrA->active_line_start_num = (uint32_t)gFpaDebugRegF;
    ptrA->active_line_end_num = ptrA->active_line_start_num + ptrA->height - 1;
    ptrA->active_line_width_div4 = ptrA->width/4;    // 4 pix de large
@@ -536,16 +719,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDebugKPix = (uint16_t)ptrA->kpix_median_value;
    
    // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
-   if (sw_init_done == 0)
-      gFpaDebugRegH = CALCIUM_DEFAULT_REGH;
-   if (gFpaDebugRegH < 0)
-      gFpaDebugRegH = 0;
-   else if (gFpaDebugRegH > 1)
-      gFpaDebugRegH = 1;
    ptrA->use_ext_pixqnb = (uint32_t)gFpaDebugRegH;
    
    // largeur du pulse de CLK_FRM en clk_100M pour un contrôle interne du temps d'intégration (registre bIntCnt)
-   if (gFpaDebugRegG == 0)
+   if (gFpaDebugRegG == 1)
       ptrA->clk_frm_pulse_width = (uint32_t)(0.5e-6F * VHD_CLK_100M_RATE_HZ); // pulse < ETMin
    else
       // 0 -> CLK_FRM est la réplique de FPA_INT pour un contrôle externe du temps d'intégration
@@ -704,11 +881,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
-   // Compile-time assertions
-   _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_CORE_HZ == 0, "Unsupported ClkDDR/ClkCore ratio");
-   _Static_assert((uint32_t)CALCIUM_CLK_CORE_HZ % (uint32_t)CALCIUM_CLK_CTRL_DSM_HZ == 0, "Unsupported ClkCore/ClkCtrlDSM ratio");
-   _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_COL_HZ == 0, "Unsupported ClkDDR/ClkCol ratio");
-   
    // Make sure exposure time is rounded to a factor of ClkCore
    float exposureTime = roundf(exposureTime_usec/1e6F * CALCIUM_CLK_CORE_HZ) / CALCIUM_CLK_CORE_HZ;
    
@@ -728,13 +900,13 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
    // - In ITR mode, the readout delay is the overhead time. The back-end reset is done between the
    //       readout end and the integration start so we have to add it to the readout delay.
    // - In IWR mode, the readout delay is the sum of all delays. The overhead time is also multiplied by 2.
-   ptrH->itrReadoutDelay = ((CALCIUM_bPixOHCnt + 1.0F) + (CALCIUM_bPixRstBECnt + 1.0F)) / CALCIUM_CLK_CORE_HZ;
+   ptrH->itrReadoutDelay = ((RoicRegs[bPixOHCnt_idx].data + 1.0F) + (RoicRegs[bPixRstBECnt_idx].data + 1.0F)) / CALCIUM_CLK_CORE_HZ;
    ptrH->iwrReadoutDelay =
-      ((CALCIUM_bPixRstHCnt + 1.0F) + (CALCIUM_bPixXferCnt + 1.0F) + 2.0F*(CALCIUM_bPixOHCnt + 1.0F) +
-      (CALCIUM_bPixOH2Cnt + 1.0F) + (CALCIUM_bPixRstBECnt + 1.0F) + (CALCIUM_bRODelayCnt + 1.0F)) / CALCIUM_CLK_CORE_HZ;
+      ((RoicRegs[bPixRstHCnt_idx].data + 1.0F) + (RoicRegs[bPixXferCnt_idx].data + 1.0F) + 2.0F*(RoicRegs[bPixOHCnt_idx].data + 1.0F) +
+      (RoicRegs[bPixOH2Cnt_idx].data + 1.0F) + (RoicRegs[bPixRstBECnt_idx].data + 1.0F) + (RoicRegs[bRODelayCnt_idx].data + 1.0F)) / CALCIUM_CLK_CORE_HZ;
    
    // Residue ADC conversion time is 130 ClkCol cycles and ADC reset time.
-   float ADCConvTime = (130.0F + CALCIUM_bADRstCnt) / CALCIUM_CLK_COL_HZ;
+   float ADCConvTime = (130.0F + RoicRegs[bADRstCnt_idx].data) / CALCIUM_CLK_COL_HZ;
    
    // Serializer transmission time.
    // 1st line is the transmission of a row and is done on both edges of ClkDDR.
@@ -747,7 +919,7 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->readoutRowTime = (floorf(MAX(ADCConvTime, serializerTxTime) * CALCIUM_CLK_COL_HZ) + 1.0F) / CALCIUM_CLK_COL_HZ;
    
    // Frame has image rows, 2 overhead rows and 2 test rows if enabled.
-   ptrH->numFrRows = pGCRegs->Height + 2 + 2*CALCIUM_bTestRowsEn;
+   ptrH->numFrRows = pGCRegs->Height + 2 + 2*bGenCtrl2_bTestRowsEn_GET();
    
    // Total readout time.
    // 2 overhead rows are generated but not transmitted.
@@ -885,58 +1057,59 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 {
+   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + AR_STATUS_BASE_ADD);
    uint32_t temp_32b;
 
-   Stat->adc_oper_freq_max_khz                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x00);
-   Stat->adc_analog_channel_num                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x04);
-   Stat->adc_resolution                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x08);
-   Stat->adc_brd_spare                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0C);
-   Stat->ddc_fpa_roic                           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x10);
-   Stat->ddc_brd_spare                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x14);
-   Stat->flex_fpa_roic                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x18);
-   Stat->flex_fpa_input                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x1C);
-   Stat->flex_ch_diversity_num                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x20);
-   Stat->cooler_volt_min_mV                     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x24);
-   Stat->cooler_volt_max_mV                     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x28);
-   Stat->fpa_temp_raw                           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x2C);
-   Stat->global_done                            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x30);
-   Stat->fpa_powered                            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x34);
-   Stat->cooler_powered                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x38);
-   Stat->errors_latchs                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x3C);
-   Stat->intf_seq_stat                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x40);
-   Stat->data_path_stat                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x44);
-   Stat->trig_ctler_stat                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x48);
-   Stat->fpa_driver_stat                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x4C);
-   Stat->adc_ddc_detect_process_done            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x50);
-   Stat->adc_ddc_present                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x54);
-   Stat->flex_flegx_detect_process_done         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
-   Stat->flex_flegx_present                     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
-   Stat->id_cmd_in_error                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
-   Stat->fpa_serdes_done                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
-   Stat->fpa_serdes_success                     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
-   temp_32b                                     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x6C);
+   Stat->adc_oper_freq_max_khz                  = *p_addr++;
+   Stat->adc_analog_channel_num                 = *p_addr++;
+   Stat->adc_resolution                         = *p_addr++;
+   Stat->adc_brd_spare                          = *p_addr++;
+   Stat->ddc_fpa_roic                           = *p_addr++;
+   Stat->ddc_brd_spare                          = *p_addr++;
+   Stat->flex_fpa_roic                          = *p_addr++;
+   Stat->flex_fpa_input                         = *p_addr++;
+   Stat->flex_ch_diversity_num                  = *p_addr++;
+   Stat->cooler_volt_min_mV                     = *p_addr++;
+   Stat->cooler_volt_max_mV                     = *p_addr++;
+   Stat->fpa_temp_raw                           = *p_addr++;
+   Stat->global_done                            = *p_addr++;
+   Stat->fpa_powered                            = *p_addr++;
+   Stat->cooler_powered                         = *p_addr++;
+   Stat->errors_latchs                          = *p_addr++;
+   Stat->intf_seq_stat                          = *p_addr++;
+   Stat->data_path_stat                         = *p_addr++;
+   Stat->trig_ctler_stat                        = *p_addr++;
+   Stat->fpa_driver_stat                        = *p_addr++;
+   Stat->adc_ddc_detect_process_done            = *p_addr++;
+   Stat->adc_ddc_present                        = *p_addr++;
+   Stat->flex_flegx_detect_process_done         = *p_addr++;
+   Stat->flex_flegx_present                     = *p_addr++;
+   Stat->id_cmd_in_error                        = *p_addr++;
+   Stat->fpa_serdes_done                        = *p_addr++;
+   Stat->fpa_serdes_success                     = *p_addr++;
+   temp_32b                                     = *p_addr++;
    memcpy(Stat->fpa_serdes_delay, (uint8_t *)&temp_32b, sizeof(Stat->fpa_serdes_delay));
-   Stat->fpa_serdes_edges[0]                    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x70);
-   Stat->fpa_serdes_edges[1]                    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x74);
-   Stat->fpa_serdes_edges[2]                    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x78);
-   Stat->fpa_serdes_edges[3]                    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
-   Stat->hw_init_done                           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
-   Stat->hw_init_success                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
-   Stat->flegx_present                          =((Stat->flex_flegx_present & Stat->adc_brd_spare) & 0x01);
-   Stat->prog_init_done                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
-   Stat->cooler_on_curr_min_mA                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
-   Stat->cooler_off_curr_max_mA                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
-   Stat->acq_trig_cnt                           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x94);
-   Stat->acq_int_cnt                            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x98);
-   Stat->fpa_readout_cnt                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x9C);
-   Stat->acq_readout_cnt                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA0);
-   Stat->out_pix_cnt_min                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);
-   Stat->out_pix_cnt_max                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
-   Stat->trig_to_int_delay_min                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xAC);
-   Stat->trig_to_int_delay_max                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB0);
-   Stat->int_to_int_delay_min                   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB4);
-   Stat->int_to_int_delay_max                   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);
-   Stat->fast_hder_cnt                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
+   Stat->fpa_serdes_edges[0]                    = *p_addr++;
+   Stat->fpa_serdes_edges[1]                    = *p_addr++;
+   Stat->fpa_serdes_edges[2]                    = *p_addr++;
+   Stat->fpa_serdes_edges[3]                    = *p_addr++;
+   Stat->hw_init_done                           = *p_addr++;
+   Stat->hw_init_success                        = *p_addr++;
+   Stat->flegx_present                          = (Stat->flex_flegx_present & Stat->adc_brd_spare) & 0x01;
+   Stat->prog_init_done                         = *p_addr++;
+   Stat->cooler_on_curr_min_mA                  = *p_addr++;
+   Stat->cooler_off_curr_max_mA                 = *p_addr++;
+   Stat->acq_trig_cnt                           = *p_addr++;
+   Stat->acq_int_cnt                            = *p_addr++;
+   Stat->fpa_readout_cnt                        = *p_addr++;
+   Stat->acq_readout_cnt                        = *p_addr++;
+   Stat->out_pix_cnt_min                        = *p_addr++;
+   Stat->out_pix_cnt_max                        = *p_addr++;
+   Stat->trig_to_int_delay_min                  = *p_addr++;
+   Stat->trig_to_int_delay_max                  = *p_addr++;
+   Stat->int_to_int_delay_min                   = *p_addr++;
+   Stat->int_to_int_delay_max                   = *p_addr++;
+   Stat->fast_hder_cnt                          = *p_addr++;
 
    // generation de fpa_init_done et fpa_init_success
    Stat->fpa_init_success                       = (Stat->hw_init_success & sw_init_success);
@@ -948,59 +1121,59 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_PrintConfig(const t_FpaIntf *ptrA)
 {
-   uint32_t idx = 0;
+   uint32_t *p_addr = (uint32_t *)(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD);
    uint32_t temp_u32;
    float *p_temp_fp32 = (float *)(&temp_u32);
 
-   FPA_INF("int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("int_indx = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("int_signal_high_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_diag_mode = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_diag_type = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_pwr_on = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_acq_trig_mode = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_acq_trig_ctrl_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_xtra_trig_mode = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_xtra_trig_ctrl_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_trig_ctrl_timeout_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_stretch_acq_trig = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_intf_data_source = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_xtra_trig_int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.fpa_prog_trig_int_time = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.intclk_to_clk100_conv_numerator = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("comn.clk100_to_intclk_conv_numerator = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("offsetx = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("offsety = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("width = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("height = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("active_line_start_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("active_line_end_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("active_line_width_div4 = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("diag.x_to_readout_start_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("diag.fval_re_to_dval_re_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("diag.lval_pause_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("diag.x_to_next_fsync_re_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("diag.xsize_div_per_pixel_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("fpa_int_time_offset = %d", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("int_fdbk_dly = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("kpix_pgen_en = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("kpix_median_value = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("use_ext_pixqnb = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("clk_frm_pulse_width = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("fpa_serdes_lval_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("fpa_serdes_lval_len = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   temp_u32 = AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx); idx += 4;
+   FPA_INF("int_time = %u", *p_addr++);
+   FPA_INF("int_indx = %u", *p_addr++);
+   FPA_INF("int_signal_high_time = %u", *p_addr++);
+   FPA_INF("comn.fpa_diag_mode = %u", *p_addr++);
+   FPA_INF("comn.fpa_diag_type = %u", *p_addr++);
+   FPA_INF("comn.fpa_pwr_on = %u", *p_addr++);
+   FPA_INF("comn.fpa_acq_trig_mode = %u", *p_addr++);
+   FPA_INF("comn.fpa_acq_trig_ctrl_dly = %u", *p_addr++);
+   FPA_INF("comn.fpa_xtra_trig_mode = %u", *p_addr++);
+   FPA_INF("comn.fpa_xtra_trig_ctrl_dly = %u", *p_addr++);
+   FPA_INF("comn.fpa_trig_ctrl_timeout_dly = %u", *p_addr++);
+   FPA_INF("comn.fpa_stretch_acq_trig = %u", *p_addr++);
+   FPA_INF("comn.fpa_intf_data_source = %u", *p_addr++);
+   FPA_INF("comn.fpa_xtra_trig_int_time = %u", *p_addr++);
+   FPA_INF("comn.fpa_prog_trig_int_time = %u", *p_addr++);
+   FPA_INF("comn.intclk_to_clk100_conv_numerator = %u", *p_addr++);
+   FPA_INF("comn.clk100_to_intclk_conv_numerator = %u", *p_addr++);
+   FPA_INF("offsetx = %u", *p_addr++);
+   FPA_INF("offsety = %u", *p_addr++);
+   FPA_INF("width = %u", *p_addr++);
+   FPA_INF("height = %u", *p_addr++);
+   FPA_INF("active_line_start_num = %u", *p_addr++);
+   FPA_INF("active_line_end_num = %u", *p_addr++);
+   FPA_INF("active_line_width_div4 = %u", *p_addr++);
+   FPA_INF("diag.x_to_readout_start_dly = %u", *p_addr++);
+   FPA_INF("diag.fval_re_to_dval_re_dly = %u", *p_addr++);
+   FPA_INF("diag.lval_pause_dly = %u", *p_addr++);
+   FPA_INF("diag.x_to_next_fsync_re_dly = %u", *p_addr++);
+   FPA_INF("diag.xsize_div_per_pixel_num = %u", *p_addr++);
+   FPA_INF("fpa_int_time_offset = %d", *p_addr++);
+   FPA_INF("int_fdbk_dly = %u", *p_addr++);
+   FPA_INF("kpix_pgen_en = %u", *p_addr++);
+   FPA_INF("kpix_median_value = %u", *p_addr++);
+   FPA_INF("use_ext_pixqnb = %u", *p_addr++);
+   FPA_INF("clk_frm_pulse_width = %u", *p_addr++);
+   FPA_INF("fpa_serdes_lval_num = %u", *p_addr++);
+   FPA_INF("fpa_serdes_lval_len = %u", *p_addr++);
+   temp_u32 = *p_addr++;
    FPA_INF("compr_ratio_fp32 = " _PCF(6), _FFMT(*p_temp_fp32, 6));
-   FPA_INF("roic_tx_nb_data = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("cfg_num = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(1) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(2) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(3) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(4) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(5) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(6) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(7) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
-   FPA_INF("vdac_value(8) = %u", AXI4L_read32(ptrA->ADD + AR_FPA_INTF_CFG_BASE_ADD + idx)); idx += 4;
+   FPA_INF("roic_tx_nb_data = %u", *p_addr++);
+   FPA_INF("cfg_num = %u", *p_addr++);
+   FPA_INF("vdac_value(1) = %u", *p_addr++);
+   FPA_INF("vdac_value(2) = %u", *p_addr++);
+   FPA_INF("vdac_value(3) = %u", *p_addr++);
+   FPA_INF("vdac_value(4) = %u", *p_addr++);
+   FPA_INF("vdac_value(5) = %u", *p_addr++);
+   FPA_INF("vdac_value(6) = %u", *p_addr++);
+   FPA_INF("vdac_value(7) = %u", *p_addr++);
+   FPA_INF("vdac_value(8) = %u", *p_addr++);
 }
 
 
@@ -1036,14 +1209,22 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 
 //--------------------------------------------------------------------------
 // Pour bâtir les données de programmation du ROIC
+// ptrH retourne les paramètres de FPA_SpecificParams
 //--------------------------------------------------------------------------
-void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs)
+void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
 {
    extern bool gFpaWriteReg;
    extern uint8_t gFpaWriteRegAddr;
    extern uint8_t gFpaWriteRegValue;
+   extern int32_t gFpaDebugRegG;       // réservé pour le contrôle interne/externe du temps d'intégration
+   extern int32_t gFpaDebugRegH;       // réservé pour l'activation/désactivation du LDO de VPIXQNB
 
    uint8_t ii;
+
+   // Compile-time assertions
+   _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_CORE_HZ == 0, "Unsupported ClkDDR/ClkCore ratio");
+   _Static_assert((uint32_t)CALCIUM_CLK_CORE_HZ % (uint32_t)CALCIUM_CLK_CTRL_DSM_HZ == 0, "Unsupported ClkCore/ClkCtrlDSM ratio");
+   _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_COL_HZ == 0, "Unsupported ClkDDR/ClkCol ratio");
 
    // Traitement des demandes du debug terminal
    if (gFpaWriteReg)
@@ -1061,6 +1242,105 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs)
       // Reset de la demande du debug terminal
       gFpaWriteReg = false;
    }
+
+   // on bâtit les paramètres spécifiques en tenant compte des valeurs possiblement changées par le debug terminal
+   FPA_SpecificParams(ptrH, 0.0F, pGCRegs);
+
+   /**
+    * On calcule tous les registres qui ont une valeur imposée.
+    * Le debug terminal ne peut pas les modifier.
+    */
+
+   // Clocks
+   RoicRegs[bClkCoreCnt_idx].data = (uint8_t)(CALCIUM_CLK_DDR_HZ / CALCIUM_CLK_CORE_HZ);
+   RoicRegs[bClkCtrlDSMDiv_idx].data = (uint8_t)(CALCIUM_CLK_CORE_HZ / CALCIUM_CLK_CTRL_DSM_HZ);
+   RoicRegs[bClkColCnt_idx].data = (uint8_t)(CALCIUM_CLK_DDR_HZ / CALCIUM_CLK_COL_HZ);
+
+   // vPixQNB
+   if (sw_init_done == 0)
+      gFpaDebugRegH = CALCIUM_DEFAULT_REGH;
+   if (gFpaDebugRegH < 0)
+      gFpaDebugRegH = 0;
+   else if (gFpaDebugRegH > 1)
+      gFpaDebugRegH = 1;
+   b3PixAnaCtrl_b3PixQNBOvr_SET(gFpaDebugRegH);
+   b3PixAnaCtrl_b3PixQNBExtEn_SET(gFpaDebugRegH);
+   b3PixAnaEn_b3PixQNBEn_SET(!gFpaDebugRegH);
+
+   // Modes
+   bGenCtrl_bLoGn_SET(pGCRegs->SensorWellDepth == SWD_LowGain);
+   bFrmCtrl_bITREn_SET(pGCRegs->IntegrationMode == IM_IntegrateThenRead);
+   bOutCtrl_bTestModeSel_SET(pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage);
+
+   // Integration source
+   if (sw_init_done == 0)
+      gFpaDebugRegG = CALCIUM_DEFAULT_REGG;
+   if (gFpaDebugRegG < 0)
+      gFpaDebugRegG = 0;
+   else if (gFpaDebugRegG > 1)
+      gFpaDebugRegG = 1;
+   bFrmCtrl_bClkFrmIntCntEn_SET(gFpaDebugRegG);
+
+   // Columns
+   uint32_t bColGrpStart = pGCRegs->OffsetX/8 + 1; // first ColGrp is 1
+   uint32_t bColGrpStop = (pGCRegs->OffsetX + pGCRegs->Width)/8; // last ColGrp is 80
+   RoicRegs[bColGrpStart_idx].data = (uint8_t)bColGrpStart;
+   RoicRegs[bColGrpStop_idx].data = (uint8_t)bColGrpStop;
+
+   // Rows
+   uint32_t bRowStart = pGCRegs->OffsetY + 1; // first row is 1
+   uint32_t bRowStop = pGCRegs->OffsetY + pGCRegs->Height; // last row is 512
+   RoicRegs[bRowStartLSB_idx].data = (uint8_t)bRowStart;
+   RoicRegs[bRowStartMSB_idx].data = (uint8_t)(bRowStart >> 8);
+   RoicRegs[bRowStopLSB_idx].data = (uint8_t)bRowStop;
+   RoicRegs[bRowStopMSB_idx].data = (uint8_t)(bRowStop >> 8);
+
+   // Row clock
+   uint32_t bClkRowCnt = (uint32_t)roundf(ptrH->readoutRowTime * CALCIUM_CLK_COL_HZ - 1.0f); // delay is bClkRowCnt + 1
+   RoicRegs[bClkRowCntLSB_idx].data = (uint8_t)bClkRowCnt;
+   RoicRegs[bClkRowCntMSB_idx].data = (uint8_t)(bClkRowCnt >> 8);
+
+   // Exposure time
+   uint32_t bIntCnt = (uint32_t)roundf(pGCRegs->ExposureTime/1e6f * CALCIUM_CLK_CORE_HZ - 1.0f); // delay is bIntCnt + 1
+   RoicRegs[bIntCntLSB_idx].data = (uint8_t)bIntCnt;
+   RoicRegs[bIntCnt_idx].data    = (uint8_t)(bIntCnt >> 8);
+   RoicRegs[bIntCntMSB_idx].data = (uint8_t)(bIntCnt >> 16);
+   float exposureTime = (float)(bIntCnt + 1) / CALCIUM_CLK_CORE_HZ;
+
+   // DSM
+   float tDSMDelta = (float)(RoicRegs[bDSMDeltaCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
+   float tDSMOH = (float)(RoicRegs[bDSMOHCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
+   float tDSMQRst = (float)(RoicRegs[bDSMQRstCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
+   // on commence avec le délai minimum et la valeur finale sera calculée plus tard
+   uint32_t bDSMDelayCnt = 0;
+   float tDSMDelay = (float)(bDSMDelayCnt + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
+   // on commence avec le nombre de cycles maximum et la valeur finale sera calculée plus tard
+   uint32_t bDSMCycles = 255;
+   float tDSMPeriod = tDSMDelta + tDSMOH + tDSMQRst + tDSMDelay;
+   float tDSMTotal = tDSMDelay + (float)(bDSMCycles + 1) * tDSMPeriod;
+   // on calcule bDSMDelayCnt and bDSMCycles en fonction du temps d'intégration.
+   if (exposureTime > tDSMTotal)
+   {
+      // le temps d'intégration est plus long que le temps total
+      // - on conserve le maximum de cycles
+      // - on augmente le délai pour que le temps total soit aussi long que le temps d'intégration
+      tDSMDelay = (exposureTime - (float)(bDSMCycles + 1) * (tDSMDelta + tDSMOH + tDSMQRst)) / (float)(bDSMCycles + 2);
+      bDSMDelayCnt = MAX((uint32_t)(tDSMDelay * CALCIUM_CLK_CTRL_DSM_HZ - 1.0f), 0); // delay is bDSMDelayCnt + 1
+   }
+   else
+   {
+      // le temps d'intégration est plus court que le temps total de DSM
+      // - on conserve le délai minimum
+      // - on diminue le nombre de cycles jusqu'à ce que le temps total soit aussi long que le temps d'intégration
+      bDSMCycles = MAX((uint32_t)((exposureTime - tDSMDelay) / tDSMPeriod - 1.0f), 0);
+   }
+   RoicRegs[bDSMCyclesLSB_idx].data = (uint8_t)bDSMCycles;
+   RoicRegs[bDSMCyclesMSB_idx].data = (uint8_t)(bDSMCycles >> 8);
+   RoicRegs[bDSMDelayCntLSB_idx].data = (uint8_t)bDSMDelayCnt;
+   RoicRegs[bDSMDelayCntMSB_idx].data = (uint8_t)(bDSMDelayCnt >> 8);
+   // on utilise bDSMInitDelayCnt = bDSMDelayCnt
+   RoicRegs[bDSMInitDelayCntLSB_idx].data = (uint8_t)bDSMDelayCnt;
+   RoicRegs[bDSMInitDelayCntMSB_idx].data = (uint8_t)(bDSMDelayCnt >> 8);
 }
 
 //--------------------------------------------------------------------------
@@ -1074,7 +1354,7 @@ void FPA_SendRoicRegs(const t_FpaIntf *ptrA)
    uint8_t nbRegs = ptrA->roic_tx_nb_data;   // header inclus
    uint8_t ii;
    uint8_t writeFlag = 1;  // par défaut on écrit la config contenue dans RoicRegs
-   t_FpaRegister dataMask = {.word = 0xFFFF};   // par défaut l'adresse et le data ne sont pas masqués
+   t_RoicRegister dataMask = {.word = 0xFFFF};   // par défaut l'adresse et le data ne sont pas masqués
 
    // Reset des données reçues
    AXI4L_write32(1, ptrA->ADD + AW_RESET_ROIC_RX_DATA);

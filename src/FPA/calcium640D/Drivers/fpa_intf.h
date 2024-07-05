@@ -32,7 +32,7 @@
 #define FPA_ERR(fmt, ...)        FPGA_PRINTF("FPA: Error: " fmt "\n", ##__VA_ARGS__)
 #define FPA_INF(fmt, ...)        FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
-#define FPA_DEVICE_MODEL_NAME    "CALCIUM640D"
+#define FPA_DEVICE_MODEL_NAME    "CALCIUM640D " XSTR(CALCIUM_CLK_DDR_HZ) " MHz"
 
 #define FPA_WIDTH_MIN      64    // camera min is 64 even if FPA can do 16
 #define FPA_WIDTH_MAX      640
@@ -73,24 +73,17 @@
 #define FPA_EHDRI_EXP_3    6893.0F
 
 // horloges du module FPA et du ROIC
-// les relations entre les horloges sont vérifiées dans la fonction FPA_SpecificParams
+// les relations entre les horloges sont vérifiées dans la fonction FPA_BuildRoicRegs
 #define VHD_CLK_100M_RATE_HZ        100e6F
 #define CALCIUM_CLK_DDR_HZ          200e6F
 #define CALCIUM_CLK_CORE_HZ         10e6F
 #define CALCIUM_CLK_CTRL_DSM_HZ     CALCIUM_CLK_CORE_HZ
 #define CALCIUM_CLK_COL_HZ          50e6F
 
-// paramètres du ROIC
+// paramètres du ROIC (ne pas modifier)
 #define CALCIUM_TX_OUTPUTS          8     // nombre d'outputs en parallèle
 #define CALCIUM_BITS_PER_PIX        24    // nombre de bits transmis pour 1 pixel
-#define CALCIUM_bTestRowsEn         1     // désactive (0) ou active (1) les 2 test rows
-#define CALCIUM_bADRstCnt           16    // reset time for the ADC, in ClkCol cycles
-#define CALCIUM_bPixRstHCnt         0     // reset time of hold capacitor, in units of ClkCore
-#define CALCIUM_bPixXferCnt         0     // transfer time of hold capacitor, in units of ClkCore
-#define CALCIUM_bPixOHCnt           0     // overhead time between reset and transfer of hold capacitor, in units of ClkCore
-#define CALCIUM_bPixOH2Cnt          0     // overhead time between transfer of hold capacitor and pixel back-end reset, in units of ClkCore
-#define CALCIUM_bPixRstBECnt        0     // reset time for pixel back-end counters, in units of ClkCore
-#define CALCIUM_bRODelayCnt         0     // readout delay time after reset of pixel back-end counters, in units of ClkCore
+
 
 #define FPA_EXPOSURE_TIME_RESOLUTION   (1e6F/CALCIUM_CLK_CORE_HZ)     // [us]
 
@@ -255,22 +248,6 @@ struct s_FpaStatus    //
    uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
-
-// Programmation des registres du ROIC
-#define HDR_START_PATTERN     (2 << 13)                     // [15:13] sync word
-#define HDR_LOAD_BIT(write)   (((write) & 0x01) << 12)      // [12] 1 = write, 0 = read
-#define HDR_FRM_SYNC          (0 << 11)                     // [11] not used (SPI Frame Mode)
-#define HDR_PAGE_ID           (0 << 8)                      // [10:8] not used for this ROIC
-#define HDR_NBR_DATA(x)       ((x) & 0xFF)                  // [7:0] number of words (addr, data) sent (header word excluded)
-typedef union
-{
-   uint16_t word;       // pour accéder à la concaténation de addr et data
-   struct {
-      // data est le LSB alors il doit être en 1er dans le µBlaze (little-endian)
-      uint8_t data;     // valeur du registre
-      uint8_t addr;     // adresse du registre
-   };
-} t_FpaRegister;
 
 extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
 						
