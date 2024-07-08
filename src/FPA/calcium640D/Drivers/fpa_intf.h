@@ -32,7 +32,7 @@
 #define FPA_ERR(fmt, ...)        FPGA_PRINTF("FPA: Error: " fmt "\n", ##__VA_ARGS__)
 #define FPA_INF(fmt, ...)        FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
-#define FPA_DEVICE_MODEL_NAME    "CALCIUM640D " XSTR(CALCIUM_CLK_DDR_HZ) " MHz"
+#define FPA_DEVICE_MODEL_NAME    "CALCIUM640D " XSTR(CALCIUM_CLK_DDR_HZ) " Hz"
 
 #define FPA_WIDTH_MIN      64    // camera min is 64 even if FPA can do 16
 #define FPA_WIDTH_MAX      640

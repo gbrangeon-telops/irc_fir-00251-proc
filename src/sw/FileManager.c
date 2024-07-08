@@ -15,6 +15,7 @@
 
 #include "FileManager.h"
 #include "FileInfo.h"
+#include "GenICam.h"
 #include "GC_Registers.h"
 #include "CRC.h"
 #include "uffs\uffs.h"
@@ -1935,7 +1936,7 @@ uint64_t FM_GetRequieredSpace(const char *name)
          //block file data
          size += PixelDataMaxLength + LUTNLMaxLength + LUTRQLUTMaxLength + MAXTKMaxLength ;
          //Calcium has KPixData
-         if(strcmp(FPA_DEVICE_MODEL_NAME, "CALCIUM640D" ) == 0) {
+         if(TDCFlagsTst(Calcium640DIsImplemented)) {
             size += CALIBBLOCK_KPIXDATAHEADER_SIZE + CALIBBLOCK_KPIXDATA_SIZE*gcRegsData.SensorWidth * gcRegsData.SensorHeight;
          }
       }
