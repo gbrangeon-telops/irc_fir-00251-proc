@@ -376,12 +376,12 @@ static t_RoicRegister RoicRegs[] = {
       /* bFrmCtrl */             {.addr = 10,  .data = 48},
       /* bClkRowCntLSB */        {.addr = 11,  .data = 2},
       /* bClkRowCntMSB */        {.addr = 12,  .data = 1},
-      /* bPixRstHCnt */          {.addr = 13,  .data = 0},
-      /* bPixXferCnt */          {.addr = 14,  .data = 0},
+      /* bPixRstHCnt */          {.addr = 13,  .data = (uint8_t)ceilf(62.5e-9f * CALCIUM_CLK_CORE_HZ - 1.0f)}, // delay is bPixRstHCnt + 1
+      /* bPixXferCnt */          {.addr = 14,  .data = (uint8_t)ceilf(62.5e-9f * CALCIUM_CLK_CORE_HZ - 1.0f)}, // delay is bPixXferCnt + 1
       /* bPixOHCnt */            {.addr = 15,  .data = 0},
       /* bPixOH2Cnt */           {.addr = 16,  .data = 0},
-      /* bPixRstBECnt */         {.addr = 17,  .data = 0},
-      /* bRODelayCnt */          {.addr = 18,  .data = 0},
+      /* bPixRstBECnt */         {.addr = 17,  .data = (uint8_t)ceilf(62.5e-9f * CALCIUM_CLK_CORE_HZ - 1.0f)}, // delay is bPixRstBECnt + 1
+      /* bRODelayCnt */          {.addr = 18,  .data = (uint8_t)ceilf(62.5e-9f * CALCIUM_CLK_CORE_HZ - 1.0f)}, // delay is bRODelayCnt + 1
       /* bPixBECtrl */           {.addr = 19,  .data = 7},
       /* bPixClampDelayCnt */    {.addr = 20,  .data = 0},
       /* bPixTstNOCCnt */        {.addr = 21,  .data = 8},
@@ -413,7 +413,7 @@ static t_RoicRegister RoicRegs[] = {
       /* bADDigOSLSB */          {.addr = 76,  .data = 0},
       /* bADDigOS */             {.addr = 77,  .data = 0},
       /* bADDigOSMSB */          {.addr = 78,  .data = 0},
-      /* bADRstCnt */            {.addr = 79,  .data = (uint8_t)ceilf(337.5e-9f * CALCIUM_CLK_COL_HZ - 1.0f)}, // delay is bADRstCnt + 1},
+      /* bADRstCnt */            {.addr = 79,  .data = (uint8_t)ceilf(337.5e-9f * CALCIUM_CLK_COL_HZ - 1.0f)}, // delay is bADRstCnt + 1
       /* bADCalCtrl */           {.addr = 80,  .data = 22},
       /* bADCalOSampCtrl */      {.addr = 81,  .data = 5},
       /* bADCalConstLSB */       {.addr = 82,  .data = 0},
