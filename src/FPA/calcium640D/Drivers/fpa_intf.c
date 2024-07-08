@@ -134,6 +134,7 @@
 #define CALCIUM_DEFAULT_REGF                       2     // AOI commence à la ligne 2
 #define CALCIUM_DEFAULT_REGG                       1     // contrôle interne (registre bIntCnt) du temps d'intégration
 #define CALCIUM_DEFAULT_REGH                       1     // le LDO de VPIXQNB est activé
+#define CALCIUM_DEFAULT_REGI                       1     // les DSM sont activés
 
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
@@ -277,6 +278,10 @@
 #define bGenCtrl_bLoGn_shift                       0
 #define bGenCtrl_bLoGn_GET()                       REG_FIELD_GET(bGenCtrl_idx, bGenCtrl_bLoGn_mask, bGenCtrl_bLoGn_shift)
 #define bGenCtrl_bLoGn_SET(val)                    REG_FIELD_SET(bGenCtrl_idx, bGenCtrl_bLoGn_mask, bGenCtrl_bLoGn_shift, val)
+#define bGenCtrl2_bDSMEn_mask                      0x01
+#define bGenCtrl2_bDSMEn_shift                     0
+#define bGenCtrl2_bDSMEn_GET()                     REG_FIELD_GET(bGenCtrl2_idx, bGenCtrl2_bDSMEn_mask, bGenCtrl2_bDSMEn_shift)
+#define bGenCtrl2_bDSMEn_SET(val)                  REG_FIELD_SET(bGenCtrl2_idx, bGenCtrl2_bDSMEn_mask, bGenCtrl2_bDSMEn_shift, val)
 #define bGenCtrl2_bTestRowsEn_mask                 0x08
 #define bGenCtrl2_bTestRowsEn_shift                3
 #define bGenCtrl2_bTestRowsEn_GET()                REG_FIELD_GET(bGenCtrl2_idx, bGenCtrl2_bTestRowsEn_mask, bGenCtrl2_bTestRowsEn_shift)
@@ -588,6 +593,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                       // reservé active_line_start_num pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                       // reservé pour le contrôle interne/externe du temps d'intégration
    extern int32_t gFpaDebugRegH;                       // reservé pour l'activation/désactivation du LDO de VPIXQNB
+   //extern int32_t gFpaDebugRegI;                       // reservé pour l'activation/désactivation des DSM
    extern uint16_t gFpaVa1p8_mV;
    static uint16_t presentFpaVa1p8_mV = CALCIUM_VA1P8_DEFAULT_mV;
    extern uint16_t gFpaVPixRst_mV;
@@ -1218,6 +1224,7 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    extern uint8_t gFpaWriteRegValue;
    extern int32_t gFpaDebugRegG;       // réservé pour le contrôle interne/externe du temps d'intégration
    extern int32_t gFpaDebugRegH;       // réservé pour l'activation/désactivation du LDO de VPIXQNB
+   extern int32_t gFpaDebugRegI;       // réservé pour l'activation/désactivation des DSM
 
    uint8_t ii;
 
@@ -1255,6 +1262,15 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    RoicRegs[bClkCoreCnt_idx].data = (uint8_t)(CALCIUM_CLK_DDR_HZ / CALCIUM_CLK_CORE_HZ);
    RoicRegs[bClkCtrlDSMDiv_idx].data = (uint8_t)(CALCIUM_CLK_CORE_HZ / CALCIUM_CLK_CTRL_DSM_HZ);
    RoicRegs[bClkColCnt_idx].data = (uint8_t)(CALCIUM_CLK_DDR_HZ / CALCIUM_CLK_COL_HZ);
+
+   // DSM enable
+   if (sw_init_done == 0)
+      gFpaDebugRegI = CALCIUM_DEFAULT_REGI;
+   if (gFpaDebugRegI < 0)
+      gFpaDebugRegI = 0;
+   else if (gFpaDebugRegI > 1)
+      gFpaDebugRegI = 1;
+   bGenCtrl2_bDSMEn_SET(gFpaDebugRegI);
 
    // vPixQNB
    if (sw_init_done == 0)
@@ -1307,7 +1323,7 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    RoicRegs[bIntCntMSB_idx].data = (uint8_t)(bIntCnt >> 16);
    float exposureTime = (float)(bIntCnt + 1) / CALCIUM_CLK_CORE_HZ;
 
-   // DSM
+   // DSM timing
    float tDSMDelta = (float)(RoicRegs[bDSMDeltaCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
    float tDSMOH = (float)(RoicRegs[bDSMOHCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
    float tDSMQRst = (float)(RoicRegs[bDSMQRstCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
