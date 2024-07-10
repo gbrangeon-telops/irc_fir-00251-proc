@@ -27,7 +27,7 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
          MB_MOSI : in t_axi4_lite_mosi;
          XTRA_TRIG : in STD_LOGIC;
          ADC_SYNC_FLAG : out STD_LOGIC;
-         DOUT_MOSI : out t_axi4_stream_mosi64;
+         DOUT_MOSI : out t_axi4_stream_mosi128;
          ERR_FOUND : out STD_LOGIC;
          FPA_DIGIO1 : out STD_LOGIC;
          FPA_DIGIO10 : out STD_LOGIC;
@@ -108,7 +108,7 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
    signal XTRA_TRIG : STD_LOGIC;
    -- Observed signals - signals mapped to the output ports of tested entity
    signal ADC_SYNC_FLAG : STD_LOGIC;
-   signal DOUT_MOSI : t_axi4_stream_mosi64;
+   signal DOUT_MOSI : t_axi4_stream_mosi128;
    signal ERR_FOUND : STD_LOGIC;
    signal FPA_DIGIO1 : STD_LOGIC;
    signal FPA_DIGIO10 : STD_LOGIC;
