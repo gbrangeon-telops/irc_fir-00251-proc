@@ -1230,6 +1230,7 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
 
    // Compile-time assertions
    _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_CORE_HZ == 0, "Unsupported ClkDDR/ClkCore ratio");
+   _Static_assert(CALCIUM_CLK_CORE_HZ == CALCIUM_CLK_CTRL_DSM_HZ, "ClkCore and ClkCtrlDSM must have the same value");
    _Static_assert((uint32_t)CALCIUM_CLK_CORE_HZ % (uint32_t)CALCIUM_CLK_CTRL_DSM_HZ == 0, "Unsupported ClkCore/ClkCtrlDSM ratio");
    _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_COL_HZ == 0, "Unsupported ClkDDR/ClkCol ratio");
 
