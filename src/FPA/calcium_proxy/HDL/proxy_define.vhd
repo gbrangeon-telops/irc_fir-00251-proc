@@ -93,6 +93,7 @@ package Proxy_define is
       xsize_div_per_pixel_num                : unsigned(9 downto 0);
    end record;
    
+   -- kpix
    type kpix_reg_type is
    record     
       write      : std_logic_vector(31 downto 0);     
@@ -108,6 +109,15 @@ package Proxy_define is
    
    -- compression
    type compr_err_ary_type is array (natural range <>) of std_logic_vector(4 downto 0);
+   
+   -- roic exposure time config
+   type roic_exp_time_cfg_type is
+   record
+      bIntCnt             : unsigned(19 downto 0);    -- valeur du registre bIntCnt. Le temps d'intégration est bIntCnt + 1.
+      bDSMCycles          : unsigned(15 downto 0);    -- valeur du registre bDSMCycles. Le nombre de cycles DSM est bDSMCycles + 1.
+      bDSMDelayCnt        : unsigned(15 downto 0);    -- valeur du registre bDSMDelayCnt. Le délai entre les cycles DSM est bDSMDelayCnt + 1.
+      bDSMInitDelayCnt    : unsigned(15 downto 0);    -- valeur du registre bDSMInitDelayCnt. Le délai avant le 1er cycle DSM est bDSMInitDelayCnt + 1.
+   end record;
    
    ------------------------------------------------
    -- Configuration du Bloc FPA_interface

@@ -22,29 +22,33 @@ use work.fleg_brd_define.all;
 
 entity calcium_mblaze_intf is
    port (
-      ARESET                : in std_logic;
-      MB_CLK                : in std_logic;
+      ARESET                     : in std_logic;
+      MB_CLK                     : in std_logic;
       
-      FPA_EXP_INFO          : in exp_info_type;
+      FPA_EXP_INFO               : in exp_info_type;
       
-      MB_MOSI               : in t_axi4_lite_mosi;
-      MB_MISO               : out t_axi4_lite_miso;
+      MB_MOSI                    : in t_axi4_lite_mosi;
+      MB_MISO                    : out t_axi4_lite_miso;
       
-      RESET_ERR             : out std_logic;
-      STATUS_MOSI           : out t_axi4_lite_mosi;
-      STATUS_MISO           : in t_axi4_lite_miso;
-      MB_RESET              : out std_logic;
+      RESET_ERR                  : out std_logic;
+      STATUS_MOSI                : out t_axi4_lite_mosi;
+      STATUS_MISO                : in t_axi4_lite_miso;
+      MB_RESET                   : out std_logic;
       
-      USER_CFG              : out fpa_intf_cfg_type;
-      COOLER_STAT           : out fpa_cooler_stat_type;
+      USER_CFG                   : out fpa_intf_cfg_type;
+      ROIC_EXP_TIME_CFG          : out roic_exp_time_cfg_type;          -- paramètres reliés au temps d'intégration à programmer dans le ROIC
+      ROIC_EXP_TIME_CFG_EN       : out std_logic;
+      ROIC_EXP_TIME_CFG_DONE     : in std_logic;
       
-      FPA_SOFTW_STAT        : out fpa_firmw_stat_type;
+      COOLER_STAT                : out fpa_cooler_stat_type;
       
-      COMPR_ERR             : in std_logic_vector(4 downto 0);
-      ROIC_RX_NB_DATA       : in std_logic_vector(7 downto 0);    -- feedback du nombre de données reçues disponibles dans la RAM
-      RESET_ROIC_RX_DATA    : out std_logic;
+      FPA_SOFTW_STAT             : out fpa_firmw_stat_type;
       
-      KPIX_REG              : inout kpix_reg_type
+      COMPR_ERR                  : in std_logic_vector(4 downto 0);
+      ROIC_RX_NB_DATA            : in std_logic_vector(7 downto 0);     -- feedback du nombre de données reçues disponibles dans la RAM
+      RESET_ROIC_RX_DATA         : out std_logic;
+      
+      KPIX_REG                   : inout kpix_reg_type
    );
 end calcium_mblaze_intf;
 
@@ -64,10 +68,22 @@ architecture rtl of calcium_mblaze_intf is
       );
    end component;
    
-   type exp_indx_pipe_type is array (0 to 4) of std_logic_vector(USER_CFG.int_indx'length-1 downto 0);
-   type exp_time_pipe_type is array (0 to 4) of unsigned(USER_CFG.int_time'length-1 downto 0);
-   type conv_exp_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
+   component double_sync
+      generic (
+         INIT_VALUE : bit := '0'
+      );
+      port (
+         D     : in STD_LOGIC;
+         Q     : out STD_LOGIC := '0';
+         RESET : in STD_LOGIC;
+         CLK   : in STD_LOGIC
+      );
+   end component;
    
+   type exp_cfg_fsm_type is (idle, wait_conv_st, wait_prog_rdy_st, wait_prog_ack_st, wait_prog_end_st);
+   type conv_exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
+   
+   signal exp_cfg_fsm                  : exp_cfg_fsm_type;
    signal sreset                       : std_logic;
    signal axi_awaddr	                  : std_logic_vector(31 downto 0);
    signal axi_awready	               : std_logic;
@@ -85,15 +101,16 @@ architecture rtl of calcium_mblaze_intf is
    signal data_i                       : std_logic_vector(31 downto 0);
    signal user_cfg_in_progress         : std_logic;
    signal user_cfg_i                   : fpa_intf_cfg_type;
-   signal int_dval_i                   : std_logic := '0';
+   signal int_dval_i                   : std_logic;
    signal int_time_i                   : unsigned(USER_CFG.int_time'length-1 downto 0);
    signal int_indx_i                   : std_logic_vector(USER_CFG.int_indx'length-1 downto 0);
    signal int_signal_high_time_i       : unsigned(USER_CFG.int_signal_high_time'length-1 downto 0);
-   signal exp_indx_pipe                : exp_indx_pipe_type;
-   signal exp_time_pipe                : exp_time_pipe_type;
    signal conv_exp_time_pipe           : conv_exp_time_pipe_type;
-   signal conv_int_time_i              : unsigned(19 downto 0);
-   signal exp_dval_pipe                : std_logic_vector(7 downto 0) := (others => '0');
+   signal exp_dval_i                   : std_logic;
+   signal exp_dval_pipe                : std_logic_vector(conv_exp_time_pipe'length downto 0) := (others => '0');  -- 1 pipe de plus que la conversion
+   signal roic_exp_time_cfg_i          : roic_exp_time_cfg_type;
+   signal roic_exp_time_cfg_en_i       : std_logic;
+   signal roic_exp_time_cfg_done_sync  : std_logic;
    signal fpa_softw_stat_i             : fpa_firmw_stat_type;
    signal ctrled_reset_i               : std_logic;
    signal reset_err_i                  : std_logic;
@@ -116,6 +133,8 @@ begin
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
    COOLER_STAT.COOLER_ON <= '1';
+   ROIC_EXP_TIME_CFG <= roic_exp_time_cfg_i;
+   ROIC_EXP_TIME_CFG_EN <= roic_exp_time_cfg_en_i;
    RESET_ROIC_RX_DATA <= reset_roic_rx_data_i;
    
    -- KPIX register mapping
@@ -154,12 +173,26 @@ begin
       ARESET => ARESET,
       CLK    => MB_CLK,
       SRESET => sreset
-   ); 
+   );
+   
+   --------------------------------------------------
+   -- Double sync 
+   --------------------------------------------------   
+   U2 : double_sync
+   generic map (
+      INIT_VALUE => '0'
+   )
+   port map (
+      RESET => sreset,
+      D => ROIC_EXP_TIME_CFG_DONE,
+      CLK => MB_CLK,
+      Q => roic_exp_time_cfg_done_sync
+   );
    
    --------------------------------------------------
    -- sortie de la config
    --------------------------------------------------
-   U2 : process(MB_CLK)
+   U3 : process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
          
@@ -179,7 +212,7 @@ begin
    --------------------------------------------------
    -- gestion des erreurs
    --------------------------------------------------
-   U3 : process(MB_CLK) 
+   U4 : process(MB_CLK) 
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
@@ -205,7 +238,7 @@ begin
    --------------------------------------------------
    -- reception Config
    --------------------------------------------------
-   U4 : process(MB_CLK)
+   U5 : process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
@@ -322,59 +355,88 @@ begin
    end process;
    
    --------------------------------------------------
-   -- calcul du temps d'integration
+   -- gestion du temps d'integration
    --------------------------------------------------
-   U5 : process(MB_CLK)
+   U6 : process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
-         
-         -- conv_int_time_i, int_time_i, int_signal_high_time_i et int_indx_i sont parfaitement synchronisés
-         
-         abs_fpa_int_time_offset_i <= unsigned(abs(user_cfg_i.fpa_int_time_offset));
-         
-         -- pipe pour le calcul de conversion du temps d'integration en int clk pour le fpa
-         conv_exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, conv_exp_time_pipe(0)'length);
-         if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then   -- tenir compte de l'offset pour la commande envoyée au fpa
-            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) + abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset positif
+         if sreset = '1' then
+            exp_cfg_fsm <= idle;
+            roic_exp_time_cfg_en_i <= '0';
+            int_dval_i <= '0';
+            exp_dval_i <= '0';
+            
          else
-            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) - abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset négatif
+         
+            abs_fpa_int_time_offset_i <= unsigned(abs(user_cfg_i.fpa_int_time_offset));
+            
+            -- pipe pour le calcul de conversion du temps d'integration en int clk pour le fpa
+            if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then   -- tenir compte de l'offset pour la commande envoyée au fpa
+               conv_exp_time_pipe(0) <= resize(int_time_i + abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset positif
+            else
+               conv_exp_time_pipe(0) <= resize(int_time_i - abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset négatif
+            end if;
+            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);          
+            conv_exp_time_pipe(2) <= resize(conv_exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), conv_exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
+            conv_exp_time_pipe(3) <= conv_exp_time_pipe(2) + unsigned(resize(conv_exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), conv_exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
+            
+            -- signal high time est en CLK_100MHz et tient compte du ET offset
+            int_signal_high_time_i <= resize(conv_exp_time_pipe(0), int_signal_high_time_i'length);
+            -- bIntCnt est le temps d'intégration converti en int clk pour le fpa. Le temps d'intégration est bIntCnt + 1.
+            roic_exp_time_cfg_i.bIntCnt <= resize(conv_exp_time_pipe(3) - 1, roic_exp_time_cfg_i.bIntCnt'length);
+            roic_exp_time_cfg_i.bDSMCycles <= to_unsigned(1, roic_exp_time_cfg_i.bDSMCycles'length);
+            roic_exp_time_cfg_i.bDSMDelayCnt <= to_unsigned(2, roic_exp_time_cfg_i.bDSMDelayCnt'length);
+            roic_exp_time_cfg_i.bDSMInitDelayCnt <= to_unsigned(3, roic_exp_time_cfg_i.bDSMInitDelayCnt'length);
+            
+            -- pipe pour rendre la donnée valide après la conversion
+            exp_dval_pipe <= exp_dval_pipe(exp_dval_pipe'high-1 downto 0) & exp_dval_i;
+            
+            case exp_cfg_fsm is
+               
+               -- on attend qu'un nouveau temps d'intégration arrive
+               when idle =>
+                  int_dval_i <= '0';
+                  if FPA_EXP_INFO.EXP_DVAL = '1' then   -- le signal FPA_EXP_INFO.EXP_DVAL est un pulse
+                     exp_dval_i <= '1';
+                     -- on copie les valeurs venant de la FPA_EXP_INFO
+                     int_time_i <= FPA_EXP_INFO.EXP_TIME;
+                     int_indx_i <= FPA_EXP_INFO.EXP_INDX;
+                     exp_cfg_fsm <= wait_conv_st;
+                  end if;
+               
+               -- on attend la fin de la conversion
+               when wait_conv_st =>
+                  exp_dval_i <= '0';
+                  if exp_dval_pipe(exp_dval_pipe'high) = '1' then
+                     exp_cfg_fsm <= wait_prog_rdy_st; 
+                  end if;
+               
+               -- on attend que le programmeur soit prêt
+               when wait_prog_rdy_st =>
+                  if roic_exp_time_cfg_done_sync = '1' then
+                     roic_exp_time_cfg_en_i <= '1';        -- reste à 1 tant que la requête n'a pas été approuvée
+                     exp_cfg_fsm <= wait_prog_ack_st; 
+                  end if;
+               
+               -- on attend la confirmation du programmeur
+               when wait_prog_ack_st =>
+                  if roic_exp_time_cfg_done_sync = '0' then
+                     roic_exp_time_cfg_en_i <= '0';
+                     exp_cfg_fsm <= wait_prog_end_st; 
+                  end if;
+               
+               -- on attend la confirmation du programmeur
+               when wait_prog_end_st =>
+                  if roic_exp_time_cfg_done_sync = '1' then
+                     int_dval_i <= '1';        -- reste à 1 pour 1 clk
+                     exp_cfg_fsm <= idle; 
+                  end if;
+               
+               when others => 
+               
+            end case;
+            
          end if;
-         conv_exp_time_pipe(2) <= resize(conv_exp_time_pipe(1) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);          
-         conv_exp_time_pipe(3) <= resize(conv_exp_time_pipe(2)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), conv_exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
-         conv_exp_time_pipe(4) <= conv_exp_time_pipe(3) + unsigned(resize(conv_exp_time_pipe(2)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), conv_exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
-         conv_int_time_i <= resize(conv_exp_time_pipe(4), conv_int_time_i'length);
-         
-         -- pipe de synchro pour le temps d'integration (non converti)
-         exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length);
-         exp_time_pipe(1) <= exp_time_pipe(0);
-         exp_time_pipe(2) <= exp_time_pipe(1);
-         exp_time_pipe(3) <= exp_time_pipe(2);
-         exp_time_pipe(4) <= exp_time_pipe(3);
-         int_time_i       <= exp_time_pipe(4);
-         
-         if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then   -- tenir compte de l'offset pour la commande envoyée au fpa
-            int_signal_high_time_i <= resize(exp_time_pipe(4) + abs_fpa_int_time_offset_i, int_signal_high_time_i'length); -- offset positif
-         else
-            int_signal_high_time_i <= resize(exp_time_pipe(4) - abs_fpa_int_time_offset_i, int_signal_high_time_i'length); -- offset négatif
-         end if;
-         
-         -- pipe de synchro pour l'index
-         exp_indx_pipe(0) <= resize(FPA_EXP_INFO.EXP_INDX, exp_indx_pipe(0)'length);
-         exp_indx_pipe(1) <= exp_indx_pipe(0);
-         exp_indx_pipe(2) <= exp_indx_pipe(1);
-         exp_indx_pipe(3) <= exp_indx_pipe(2);
-         exp_indx_pipe(4) <= exp_indx_pipe(3);
-         int_indx_i       <= exp_indx_pipe(4);
-         
-         -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
-         exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
-         exp_dval_pipe(1) <= exp_dval_pipe(0);
-         exp_dval_pipe(2) <= exp_dval_pipe(1);
-         exp_dval_pipe(3) <= exp_dval_pipe(2);
-         exp_dval_pipe(4) <= exp_dval_pipe(3);
-         exp_dval_pipe(5) <= exp_dval_pipe(4);
-         int_dval_i       <= exp_dval_pipe(5);
-         
       end if;
    end process;
    
@@ -383,7 +445,7 @@ begin
    -- CFG MB AXI RD : contrôle du flow
    ---------------------------------------------------------------------------- 
    -- (pour l'instant transaction se fait à au max 1 CLK sur 2   
-   U6: process (MB_CLK)
+   U7: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
@@ -417,7 +479,7 @@ begin
    ---------------------------------------------------------------------------- 
    -- CFG MB AXI RD : données vers µBlaze                                       
    ---------------------------------------------------------------------------- 
-   U7: process(MB_CLK)
+   U8: process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then         
          
@@ -439,7 +501,7 @@ begin
    -- CFG MB AXI WR : contrôle du flow 
    ---------------------------------------------------------------------------- 
    -- (pour l'instant transaction se fait à au max 1 CLK sur 2 
-   U8: process (MB_CLK)
+   U9: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
@@ -469,7 +531,7 @@ begin
    -----------------------------------------------------
    -- CFG MB AXI WR  : WR feedback envoyé au MB
    -----------------------------------------------------
-   U9: process (MB_CLK)
+   U10: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
