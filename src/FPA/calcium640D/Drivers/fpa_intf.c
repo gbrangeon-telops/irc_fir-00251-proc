@@ -908,6 +908,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+   extern float gFpaActualFreq_MHz;
+
    // Make sure exposure time is rounded to a factor of ClkCore
    float exposureTime = roundf(exposureTime_usec/1e6F * CALCIUM_CLK_CORE_HZ) / CALCIUM_CLK_CORE_HZ;
    
@@ -938,7 +940,7 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
    // Serializer transmission time.
    // 1st line is the transmission of a row and is done on both edges of ClkDDR.
    // 2nd line is an overhead time on ClkCol.
-   float serializerTxTime = 8.0F * (pGCRegs->Width/8.0F + 4.0F) * CALCIUM_BITS_PER_PIX / (2.0F * CALCIUM_CLK_DDR_HZ * CALCIUM_TX_OUTPUTS)
+   float serializerTxTime = 8.0F * (pGCRegs->Width/8.0F + 4.0F) * CALCIUM_BITS_PER_PIX / (2.0F * gFpaActualFreq_MHz * 1e6f * CALCIUM_TX_OUTPUTS)
       + 6.0F / CALCIUM_CLK_COL_HZ;
    
    // Readout row time must be longer than the ADC conversion time and the serializer transmission time.
@@ -1245,6 +1247,7 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    extern bool gFpaWriteReg;
    extern uint8_t gFpaWriteRegAddr;
    extern uint8_t gFpaWriteRegValue;
+   extern float gFpaActualFreq_MHz;
    extern int32_t gFpaDebugRegG;       // réservé pour le contrôle interne/externe du temps d'intégration
    extern int32_t gFpaDebugRegH;       // réservé pour l'activation/désactivation du LDO de VPIXQNB
    extern int32_t gFpaDebugRegI;       // réservé pour l'activation/désactivation des DSM
@@ -1283,9 +1286,9 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
     */
 
    // Clocks
-   RoicRegs[bClkCoreCnt_idx].data = (uint8_t)(CALCIUM_CLK_DDR_HZ / CALCIUM_CLK_CORE_HZ);
+   RoicRegs[bClkCoreCnt_idx].data = (uint8_t)(gFpaActualFreq_MHz * 1e6f / CALCIUM_CLK_CORE_HZ);
    RoicRegs[bClkCtrlDSMDiv_idx].data = (uint8_t)(CALCIUM_CLK_CORE_HZ / CALCIUM_CLK_CTRL_DSM_HZ);
-   RoicRegs[bClkColCnt_idx].data = (uint8_t)(CALCIUM_CLK_DDR_HZ / CALCIUM_CLK_COL_HZ);
+   RoicRegs[bClkColCnt_idx].data = (uint8_t)(gFpaActualFreq_MHz * 1e6f / CALCIUM_CLK_COL_HZ);
 
    // DSM enable
    if (sw_init_done == 0)
