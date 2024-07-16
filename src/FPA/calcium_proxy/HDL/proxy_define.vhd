@@ -159,6 +159,8 @@ package Proxy_define is
       fpa_serdes_lval_len              : unsigned(10 downto 0);            -- nombre de pixel_clk dans un LVAL (width / 8) pour la calibration des serdes d'entrée
       
       compr_ratio_fp32                 : std_logic_vector(31 downto 0);    -- ratio de compression en fp32 utilisé comme exposant par la loi de puissance
+      compr_en                         : std_logic;                        -- active la compression par la loi de puissance
+      compr_bypass_shift               : unsigned(3 downto 0);             -- bit shift à appliquer aux données quand la compression est désactivée
       
       roic_tx_nb_data                  : unsigned(7 downto 0);             -- nombre de données à envoyer au ROIC
       
@@ -283,6 +285,8 @@ package body Proxy_define is
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.fpa_serdes_lval_len, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.compr_ratio_fp32, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.compr_en, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.compr_bypass_shift, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.roic_tx_nb_data, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.cfg_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(1), a(0)'length)),

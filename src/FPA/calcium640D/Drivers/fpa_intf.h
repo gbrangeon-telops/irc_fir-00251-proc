@@ -161,6 +161,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t fpa_serdes_lval_num;
    uint32_t fpa_serdes_lval_len;
    float    compr_ratio_fp32;
+   uint32_t compr_en;
+   uint32_t compr_bypass_shift;
    uint32_t roic_tx_nb_data;
    uint32_t cfg_num;
    

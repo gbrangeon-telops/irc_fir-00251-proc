@@ -782,6 +782,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    extern float gFpaDesiredFreq_MHz;
    extern float gCompressionParameter;
    extern bool gCompressionParameterForced;
+   extern uint8_t gCompressionBypassShift;
+   extern bool gCompressionBypassShiftForced;
    extern t_calib gCal;
    extern t_HderInserter gHderInserter;
 
@@ -827,6 +829,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
          cmd = 11;
       else if (strcasecmp((char *)cmdStr, "FREQ") == 0)
          cmd = 12;
+      else if (strcasecmp((char *)cmdStr, "SHIFT") == 0)
+         cmd = 13;
       else
       {
          DT_ERR("Unsupported command");
@@ -847,6 +851,7 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
          case 8:  // VPIXQNB
          case 9:  // WARNLED
          case 10: // KPIX
+         case 13: // SHIFT
             if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
                   (uValue < 0) || (uValue > USHRT_MAX))
             {
@@ -920,6 +925,11 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
             break;
          
          case 11:  // COMPR
+            if (gCompressionBypassShiftForced)
+            {
+               gCompressionBypassShiftForced = false;
+               DT_INF("The compression parameter overwrites the compression bypass");
+            }
             gCompressionParameter = fValue;
             gCompressionParameterForced = true;
             break;
@@ -930,6 +940,21 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
                DT_PRINTF("New frequency will be applied on next FPA power on");
             } else {
                DT_ERR("New frequency must be greater than 0.0");
+            }
+            break;
+
+         case 13:  // SHIFT
+            if (gcRegsData.CalibrationMode != CM_Raw0)   //TODO: empêcher modif CalibrationMode quand bypass activé?
+               DT_ERR("CalibrationMode must be Raw0 to bypass the compression");
+            else
+            {
+               if (gCompressionParameterForced)
+               {
+                  gCompressionParameterForced = false;
+                  DT_INF("The compression bypass overwrites the compression parameter");
+               }
+               gCompressionBypassShift = (uint8_t)uValue;
+               gCompressionBypassShiftForced = true;
             }
             break;
       }
@@ -953,6 +978,8 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
 
    DT_PRINTF("FPA Compression Parameter = " _PCF(6), _FFMT(gCompressionParameter, 6));
    DT_PRINTF("FPA Compression Parameter Forced = %u", gCompressionParameterForced);
+   DT_PRINTF("FPA Compression Bypass Shift = %u", gCompressionBypassShift);
+   DT_PRINTF("FPA Compression Bypass Shift Forced = %u", gCompressionBypassShiftForced);
 
    DT_PRINTF("FPA actual frequency = "_PCF(6)" MHz", _FFMT(gFpaActualFreq_MHz, 6));
 
@@ -3065,7 +3092,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|REGI|REGJ|REGK|REGL|REGM|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  FPA config:         FPACFG");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
-   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX|COMPR|FREQ value]");
+   DT_PRINTF("  calciumD status:    CCM [VA1P8|VPIXRST|VDHS1P8|VD1P8|VA3P3|VDETGUARD|VDETCOM|VPIXQNB|WARNLED|KPIX|COMPR|FREQ|SHIFT value]");
    DT_PRINTF("  calciumD register:  CCMREG RD|WR [address value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");

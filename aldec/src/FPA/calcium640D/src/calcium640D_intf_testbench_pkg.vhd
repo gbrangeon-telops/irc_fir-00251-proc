@@ -20,7 +20,7 @@ use work.fpa_define.all;
 
 package calcium640D_intf_testbench_pkg is
    
-   constant USER_CFG_VECTOR_SIZE             : natural := 37;        -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE             : natural := 39;        -- number of variables to write in the USER_CFG
    constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;    -- ClkCore is 10 MHz
    constant C_FPA_PIXCLK_RATE_KHZ            : integer := 33_333;    -- Pixel clk is 400 MHz DDR / 24 bits per pixel
    constant C_FPA_EXPOSURE_TIME_MIN          : integer := 100;       -- 1us in clk_100M
@@ -69,6 +69,8 @@ package body calcium640D_intf_testbench_pkg is
       variable fpa_serdes_lval_num : unsigned(31 downto 0);
       variable fpa_serdes_lval_len : unsigned(31 downto 0);
       variable compr_ratio_fp32 : unsigned(31 downto 0);
+      variable compr_en : unsigned(31 downto 0);
+      variable compr_bypass_shift : unsigned(31 downto 0);
       variable roic_tx_nb_data : unsigned(31 downto 0);
       variable cfg_num : unsigned(31 downto 0);
       
@@ -133,7 +135,9 @@ package body calcium640D_intf_testbench_pkg is
       fpa_serdes_lval_num     := to_unsigned(user_ysize, 32);
       fpa_serdes_lval_len     := to_unsigned(user_xsize/8, 32);
       
-      compr_ratio_fp32 := unsigned'(x"3F321643");   -- 16/23 in float
+      compr_ratio_fp32     := unsigned'(x"3F321643");   -- 16/23 in float
+      compr_en             := (others => '1');
+      compr_bypass_shift   := to_unsigned(0, 32);
       
       roic_tx_nb_data := to_unsigned(roic_data_to_send, 32);
       
@@ -176,6 +180,8 @@ package body calcium640D_intf_testbench_pkg is
       & fpa_serdes_lval_num
       & fpa_serdes_lval_len
       & compr_ratio_fp32
+      & compr_en
+      & compr_bypass_shift
       & roic_tx_nb_data
       & cfg_num;
       

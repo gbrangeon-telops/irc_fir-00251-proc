@@ -69,9 +69,9 @@ architecture TB_ARCHITECTURE of calcium640D_intf_testbench_stim is
    constant YSIZE_CFG1              : natural := 4;
    signal user_cfg_vector1          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG1, XSIZE_CFG1, YSIZE_CFG1, 1, ROIC_TX_DATA_NB);
    
-   constant DIAG_MODE_CFG2          : std_logic := '1';
+   constant DIAG_MODE_CFG2          : std_logic := '0';
    constant XSIZE_CFG2              : natural := 640;
-   constant YSIZE_CFG2              : natural := 512;
+   constant YSIZE_CFG2              : natural := 8;
    signal user_cfg_vector2          : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0) := to_intf_cfg(DIAG_MODE_CFG2, XSIZE_CFG2, YSIZE_CFG2, 2, ROIC_TX_DATA_NB);
    
    constant FPA_SOFTW_STAT_FPA_ROIC    : std_logic_vector(7 downto 0) := FPA_ROIC_CALCIUM;

@@ -133,12 +133,15 @@
 
 #define CALCIUM_DEFAULT_REGF                       2     // AOI commence à la ligne 2
 #define CALCIUM_DEFAULT_REGG                       1     // contrôle interne (registre bIntCnt) du temps d'intégration
-#define CALCIUM_DEFAULT_REGH                       1     // le LDO de VPIXQNB est activé
+#define CALCIUM_DEFAULT_REGH                       0 //TODO pour l'instant on utilise le registre interne     1     // le LDO de VPIXQNB est activé
 #define CALCIUM_DEFAULT_REGI                       1     // les DSM sont activés
 
 #define CALCIUM_DEBUG_KPIX_MAX                     32768 // valeur min est 0
 
 #define CALCIUM_COMPRESSION_PARAM_DEFAULT          (16.0F / 23.0F)
+
+#define CALCIUM_COMPRESSION_BYPASS_SHIFT_DEFAULT   0
+#define CALCIUM_COMPRESSION_BYPASS_SHIFT_MAX       15  // valeur min est 0
 
 
 // Programmation des registres du ROIC
@@ -512,7 +515,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    // sw_init_done = 0;                                                     // ENO: 11-sept 2019: ligne en commentaire pour que plusieurs appels de FPA_init ne créent des bugs de flashsettings.
    sw_init_success = 0;
 
-   //TODO: ajouter la vérification de la révision du ROIC
+   //TODO ajouter la vérification de la révision du ROIC
 
    static float lastDesiredFreq = 0.0f;
    extern float gFpaDesiredFreq_MHz;
@@ -615,6 +618,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern CompressionAlgorithm_t gCompressionAlgorithm;
    extern float gCompressionParameter;
    extern bool gCompressionParameterForced;
+   extern uint8_t gCompressionBypassShift;
+   extern bool gCompressionBypassShiftForced;
    extern bool gFpaReadReg;
    static uint8_t cfg_num;
 
@@ -722,7 +727,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->kpix_pgen_en = 0;
       ptrA->kpix_median_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
    }
-   gFpaDebugKPix = (uint16_t)ptrA->kpix_median_value;
    
    // activation du LDO de VPIXQNB (s'il est désactivé c'est la valeur du registre b3PixQNB qui est utilisée par le ROIC)
    ptrA->use_ext_pixqnb = (uint32_t)gFpaDebugRegH;
@@ -738,25 +742,42 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_serdes_lval_num = hh.numFrRows;
    ptrA->fpa_serdes_lval_len = ptrA->width/8;    // 8 pix de large
    
-   // compression loi de puissance
-   gCompressionAlgorithm = CA_PowerLaw;
+   // compression par loi de puissance ou bypass de la compression par un bit shift
    if (sw_init_done == 0 || gCompressionParameter == 0.0F)
    {
       gCompressionParameter = CALCIUM_COMPRESSION_PARAM_DEFAULT;
       gCompressionParameterForced = false;
    }
+   if (sw_init_done == 0 || gCompressionBypassShift > CALCIUM_COMPRESSION_BYPASS_SHIFT_MAX)
+   {
+      gCompressionBypassShift = CALCIUM_COMPRESSION_BYPASS_SHIFT_DEFAULT;
+      gCompressionBypassShiftForced = false;
+   }
    if (ptrA->fpa_diag_mode ||
-         gCompressionParameterForced ||
+         gCompressionBypassShiftForced)
+   {
+      gCompressionAlgorithm = CA_NoCompression; //TODO ajouter une valeur a l'enum?
+      ptrA->compr_ratio_fp32 = gCompressionParameter;    // pas utilisé
+      ptrA->compr_en = 0;
+      ptrA->compr_bypass_shift = gCompressionBypassShift;
+   }
+   else if (gCompressionParameterForced ||
          !calibrationInfo.isValid ||
          calibrationInfo.blocks[0].CompressionAlgorithm != CA_PowerLaw)
    {
       // On force le compression parameter par défaut ou transmis par l'usager
+      gCompressionAlgorithm = CA_PowerLaw;
       ptrA->compr_ratio_fp32 = gCompressionParameter;
+      ptrA->compr_en = 1;
+      ptrA->compr_bypass_shift = gCompressionBypassShift;   // pas utilisé
    }
    else
    {
       // On utilise le compression parameter disponible dans le bloc (la compression est la même pour tous les blocs)
+      gCompressionAlgorithm = CA_PowerLaw;
       ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
+      ptrA->compr_en = 1;
+      ptrA->compr_bypass_shift = gCompressionBypassShift;   // pas utilisé
    }
    gCompressionParameter = ptrA->compr_ratio_fp32;
    
@@ -836,7 +857,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaVa3p3_mV = presentFpaVa3p3_mV;
 
    // VDETGUARD
-   // TODO ajouter protection VDETGUARD < VDETCOM
+   //TODO ajouter protection VDETGUARD < VDETCOM
    if (gFpaVDetGuard_mV != presentFpaVDetGuard_mV)
    {
       if (gFpaVDetGuard_mV >= CALCIUM_VDETGUARD_MIN_mV && gFpaVDetGuard_mV <= CALCIUM_VDETGUARD_MAX_mV)
@@ -846,7 +867,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaVDetGuard_mV = presentFpaVDetGuard_mV;
 
    // VDETCOM
-   // TODO ajouter protection VDETCOM > VA3P3 - b3PixPDIBias pour éviter polarisation positive des photodiodes
+   //TODO ajouter protection VDETCOM > VA3P3 - b3PixPDIBias pour éviter polarisation positive des photodiodes
    if (gFpaVDetCom_mV != presentFpaVDetCom_mV)
    {
       if (gFpaVDetCom_mV >= CALCIUM_VDETCOM_MIN_mV && gFpaVDetCom_mV <= CALCIUM_VDETCOM_MAX_mV)
@@ -1170,6 +1191,8 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
    FPA_INF("fpa_serdes_lval_len = %u", *p_addr++);
    temp_u32 = *p_addr++;
    FPA_INF("compr_ratio_fp32 = " _PCF(6), _FFMT(*p_temp_fp32, 6));
+   FPA_INF("compr_en = %u", *p_addr++);
+   FPA_INF("compr_bypass_shift = %u", *p_addr++);
    FPA_INF("roic_tx_nb_data = %u", *p_addr++);
    FPA_INF("cfg_num = %u", *p_addr++);
    FPA_INF("vdac_value(1) = %u", *p_addr++);

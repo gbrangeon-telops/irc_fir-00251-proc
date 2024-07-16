@@ -311,11 +311,13 @@ begin
                   when X"080" =>    user_cfg_i.fpa_serdes_lval_num   <= unsigned(data_i(user_cfg_i.fpa_serdes_lval_num'length-1 downto 0));
                   when X"084" =>    user_cfg_i.fpa_serdes_lval_len   <= unsigned(data_i(user_cfg_i.fpa_serdes_lval_len'length-1 downto 0));
                   
-                  when X"088" =>    user_cfg_i.compr_ratio_fp32   <= data_i(user_cfg_i.compr_ratio_fp32'length-1 downto 0);
+                  when X"088" =>    user_cfg_i.compr_ratio_fp32      <= data_i(user_cfg_i.compr_ratio_fp32'length-1 downto 0);
+                  when X"08C" =>    user_cfg_i.compr_en              <= data_i(0);
+                  when X"090" =>    user_cfg_i.compr_bypass_shift    <= unsigned(data_i(user_cfg_i.compr_bypass_shift'length-1 downto 0));
                   
-                  when X"08C" =>    user_cfg_i.roic_tx_nb_data    <= unsigned(data_i(user_cfg_i.roic_tx_nb_data'length-1 downto 0));
+                  when X"094" =>    user_cfg_i.roic_tx_nb_data    <= unsigned(data_i(user_cfg_i.roic_tx_nb_data'length-1 downto 0));
                   
-                  when X"090" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  when X"098" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
