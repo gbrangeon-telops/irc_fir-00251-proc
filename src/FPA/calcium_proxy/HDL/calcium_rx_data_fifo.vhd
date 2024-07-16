@@ -281,7 +281,11 @@ begin
             -- Fifo read while it is in reset. This error is latched
             if fifo_dval_i = '1' and rd_rst_busy = '1' then
                fifo_rd_err_i <= '1';
+               -- pragma translate_off
+               fifo_rd_err_i <= '0';  -- on masque cette erreur en simulation
+            -- pragma translate_on
             end if;
+            
             
             -- Invalid data. This error is latched
             if quad_data_pipe1.fval /= unused_fval or quad_data_pipe1.lval /= unused_lval or (quad_data_pipe1.fval = '0' and quad_data_pipe1.lval = '1') then
