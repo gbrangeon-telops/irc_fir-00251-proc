@@ -476,7 +476,6 @@ begin
             readout_info_i.naoi.stop         <= elcorr_ref_end_i;    -- end global de zone naoi
             readout_info_i.naoi.dval         <= elcorr_ref_fval_i;
             readout_info_i.naoi.samp_pulse   <= quad_clk_fe_pipe(0) and elcorr_ref_fval_i;
-            
             readout_info_i.samp_pulse        <= quad_clk_fe_pipe(0);
             
             -- ADC_FLAGS
@@ -486,7 +485,7 @@ begin
             adc_time_stamp.naoi_stop         <= elcorr_ref_end_i and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
             adc_time_stamp.aoi_sof           <= WDOW_FIFO_DATA.USER.SOF and window_fifo_rd_i;
             adc_time_stamp.aoi_sol           <= WDOW_FIFO_DATA.USER.SOL and window_fifo_rd_i;
-            adc_time_stamp.samp_pulse        <= readout_info_i.samp_pulse;
+            adc_time_stamp.samp_pulse        <= quad_clk_fe_pipe(0);
             
          end if; 
       end if;
