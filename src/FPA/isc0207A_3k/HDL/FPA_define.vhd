@@ -366,7 +366,7 @@ package FPA_define is
       vdac_value                          : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)
       
       -- adc clk_phase                    
-      adc_clk_source_phase                : signed(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs 
+      adc_clk_source_phase                : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs 
       adc_clk_pipe_sel                    : unsigned(7 downto 0);
       spare1                              : std_logic_vector(7 downto 0);
       

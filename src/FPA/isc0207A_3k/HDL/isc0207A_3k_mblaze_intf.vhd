@@ -309,7 +309,7 @@ begin
                   when X"0B0" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
                      
                   -- quads                                                                                
-                  when X"0B4" =>    user_cfg_i.adc_clk_source_phase            <= signed(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
+                  when X"0B4" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
                   when X"0B8" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
                   when X"0BC" =>    user_cfg_i.spare1                          <= (data_i(user_cfg_i.spare1'length-1 downto 0));
                      
