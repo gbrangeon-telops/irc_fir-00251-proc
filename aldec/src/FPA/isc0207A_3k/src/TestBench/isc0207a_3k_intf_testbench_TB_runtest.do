@@ -54,6 +54,7 @@ acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream32_afifo_d512\t_axi4_stream32_
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w43_d512\fwft_sfifo_w43_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d16\fwft_afifo_w72_d16_sim_netlist.vhdl
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
@@ -107,6 +108,7 @@ acom d:\Telops\Common_HDL\SPI\spi_rx.vhd
 acom d:\Telops\Common_HDL\SPI\spi_tx.vhd
 --acom d:\Telops\FIR-00251-Proc\src\QuadADC\HDL\quad_adc_ctrl.vhd
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd
 acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_min_max_ctrl.vhd
 acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_high_duration.vhd
 acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde  

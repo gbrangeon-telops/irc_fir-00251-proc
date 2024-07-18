@@ -209,7 +209,7 @@ package body isc0207a_3k_intf_testbench_pkg is
       good_samp_first_pos_per_ch    := pix_samp_num_per_ch;
       good_samp_last_pos_per_ch     := pix_samp_num_per_ch; 
       
-      adc_clk_source_phase           := to_unsigned(132000, 32);
+      adc_clk_source_phase           := to_unsigned(30, 32);
       adc_clk_pipe_sel               := to_unsigned(1, 32);
       spare1                         := to_unsigned(1, 32);
       
