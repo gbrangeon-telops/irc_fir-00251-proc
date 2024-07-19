@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 53092
+ FREEID 53109
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -72,11 +72,12 @@ HEADER
     #GENERIC0="RESET200ms:boolean:=true"
     #GENERIC1="CLK_PERIOD_NS:real:=12.5"
     #GENERIC2="DATA_WIDTH:integer:=14"
+    #GENERIC3="G_INVERT_VIDEO_DATA:std_logic:='0'"
     #HDL_ENTRIES=
 "library IEEE;\n"+
 "use ieee.std_logic_1164.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1660319603"
+    #MODIFIED="1721395062"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="cfdeac5c-c060-40b1-b11b-eb5bd8c03524"
    }
   }
@@ -15165,9 +15166,10 @@ PAGE ""
    {
     #COMPONENT="afpa_data_deserializer_16chn_v2"
     #CUSTOM_NAME=""
-    #GENERIC0="DATA_WIDTH : integer := 14"
-    #GENERIC1="RESET200ms : boolean := true"
-    #GENERIC2="CLK_PERIOD_NS : real := ADC_SERDES_CLK_1X_PERIOD_NS"
+    #GENERIC0="RESET200ms : boolean := true"
+    #GENERIC1="G_INVERT_VIDEO_DATA : std_logic := DEFINE_FPA_VIDEO_DATA_INVERTED"
+    #GENERIC2="DATA_WIDTH : integer := 14"
+    #GENERIC3="CLK_PERIOD_NS : real := ADC_SERDES_CLK_1X_PERIOD_NS"
     #IMPL="sch"
     #LIBRARY="#default"
     #NO_CONF="1"
@@ -15197,7 +15199,7 @@ PAGE ""
   TEXT  51046, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (1740,4120,2528,4219)
+   RECT (1740,4120,2672,4252)
    PARENT 51043
   }
   NET WIRE  51049, 0, 0
@@ -16785,7 +16787,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  53075, 0, 0
+  TEXT  53092, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16796,7 +16798,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  53076, 0, 0
+  TEXT  53093, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -16807,7 +16809,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  53077, 0, 0
+  TEXT  53094, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -16817,7 +16819,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  53078, 0, 0
+  TEXT  53095, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16829,7 +16831,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  53079, 0, 0
+  TEXT  53096, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -16842,7 +16844,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  53080, 0, 0
+  TEXT  53097, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -16852,7 +16854,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  53081, 0, 0
+  TEXT  53098, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16864,7 +16866,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  53082, 0, 0
+  TEXT  53099, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -16874,7 +16876,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  53083, 0, 0
+  TEXT  53100, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -16885,7 +16887,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  53084, 0, 0
+  GROUP  53101, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6220,8601,6601)
@@ -16897,7 +16899,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  53085, 0, 0
+  GROUP  53102, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6420,8601,6421)
@@ -16909,7 +16911,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  53086, 0, 0
+  GROUP  53103, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6360,8601,6361)
@@ -16921,7 +16923,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  53087, 0, 0
+  GROUP  53104, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6480,8601,6481)
@@ -16933,7 +16935,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  53088, 0, 0
+  GROUP  53105, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6540,8601,6541)
@@ -16945,7 +16947,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  53089, 0, 0
+  GROUP  53106, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6220,7901,6361)
@@ -16956,7 +16958,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  53090, 0, 0
+  GROUP  53107, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6360,7901,6601)
@@ -16967,7 +16969,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  53091, 0, 0
+  BMPPICT  53108, 0, 0
   {
    PAGEALIGN 10
    RECT (7740,6280,7879,6325)
