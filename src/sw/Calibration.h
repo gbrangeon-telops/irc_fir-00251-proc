@@ -132,7 +132,8 @@ typedef struct LUTRQInfoStruct LUTRQInfo_t;
  */
 typedef enum {
    CA_NoCompression = 0,
-   CA_PowerLaw = 1
+   CA_PowerLaw = 1,
+   CA_BitShift = 2  // TODO ce mode n'est pas officiel
 } CompressionAlgorithm_t;
 
 /**

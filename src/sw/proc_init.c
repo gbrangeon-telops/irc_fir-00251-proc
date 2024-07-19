@@ -124,6 +124,7 @@ uint16_t gFpaVDetCom_mV = 0;
 uint16_t gFpaVPixQNB_mV = 0;
 uint16_t gFpaDebugKPix = 0;
 bool gFpaDebugKPixForced = false;
+bool gFpaDebugKPixApplied = false;
 float gFpaActualFreq_MHz = 400.0f;
 float gFpaDesiredFreq_MHz = 0.0f;
 CompressionAlgorithm_t gCompressionAlgorithm = CA_NoCompression;

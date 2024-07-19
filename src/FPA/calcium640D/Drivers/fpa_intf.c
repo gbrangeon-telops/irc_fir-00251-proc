@@ -615,6 +615,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static uint16_t presentFpaVPixQNB_mV = CALCIUM_VPIXQNB_DEFAULT_mV;
    extern uint16_t gFpaDebugKPix;
    extern bool gFpaDebugKPixForced;
+   extern bool gFpaDebugKPixApplied;
    extern CompressionAlgorithm_t gCompressionAlgorithm;
    extern float gCompressionParameter;
    extern bool gCompressionParameterForced;
@@ -713,17 +714,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDebugKPixForced = false;
    }
    if (ptrA->fpa_diag_mode ||
-         gFpaDebugKPixForced ||
-         !calibrationInfo.isValid ||
-         !calibrationInfo.blocks[0].KPixDataPresence)
+       gFpaDebugKPixForced ||
+       !calibrationInfo.isValid ||
+       !calibrationInfo.blocks[0].KPixDataPresence)
    {
       // On force le KPix par défaut ou transmis par l'usager
+      gFpaDebugKPixApplied = true;
       ptrA->kpix_pgen_en = 1;
       ptrA->kpix_median_value = gFpaDebugKPix;
    }
    else
    {
       // On utilise la médiane disponible dans le bloc (les KPix sont les mêmes pour tous les blocs)
+      gFpaDebugKPixApplied = false;
       ptrA->kpix_pgen_en = 0;
       ptrA->kpix_median_value = calibrationInfo.blocks[0].KPixData.KPix_Median;
    }
@@ -756,30 +759,34 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (ptrA->fpa_diag_mode ||
          gCompressionBypassShiftForced)
    {
-      gCompressionAlgorithm = CA_NoCompression; //TODO ajouter une valeur a l'enum?
-      ptrA->compr_ratio_fp32 = gCompressionParameter;    // pas utilisé
-      ptrA->compr_en = 0;
-      ptrA->compr_bypass_shift = gCompressionBypassShift;
+      // On force le bypass de la compression par un bit shift avec le paramètre par défaut ou transmis par l'usager
+      gCompressionAlgorithm = CA_BitShift;
    }
    else if (gCompressionParameterForced ||
-         !calibrationInfo.isValid ||
-         calibrationInfo.blocks[0].CompressionAlgorithm != CA_PowerLaw)
+            !calibrationInfo.isValid ||
+            (calibrationInfo.blocks[0].CompressionAlgorithm != CA_BitShift &&
+             calibrationInfo.blocks[0].CompressionAlgorithm != CA_PowerLaw))  // un algo de compression doit absolument être défini
    {
-      // On force le compression parameter par défaut ou transmis par l'usager
+      // On force la compression par loi de puissance avec le paramètre par défaut ou transmis par l'usager
       gCompressionAlgorithm = CA_PowerLaw;
-      ptrA->compr_ratio_fp32 = gCompressionParameter;
-      ptrA->compr_en = 1;
-      ptrA->compr_bypass_shift = gCompressionBypassShift;   // pas utilisé
+   }
+   else if (calibrationInfo.blocks[0].CompressionAlgorithm == CA_BitShift)
+   {
+      // On utilise l'algo et le paramètre de compression disponibles dans le bloc (la compression est la même pour tous les blocs)
+      gCompressionAlgorithm = CA_BitShift;
+      gCompressionBypassShift = (uint8_t)calibrationInfo.blocks[0].CompressionParameter;
    }
    else
    {
-      // On utilise le compression parameter disponible dans le bloc (la compression est la même pour tous les blocs)
+      // On utilise l'algo et le paramètre de compression disponibles dans le bloc (la compression est la même pour tous les blocs)
       gCompressionAlgorithm = CA_PowerLaw;
-      ptrA->compr_ratio_fp32 = calibrationInfo.blocks[0].CompressionParameter;
-      ptrA->compr_en = 1;
-      ptrA->compr_bypass_shift = gCompressionBypassShift;   // pas utilisé
+      gCompressionParameter = calibrationInfo.blocks[0].CompressionParameter;
    }
-   gCompressionParameter = ptrA->compr_ratio_fp32;
+   ptrA->compr_ratio_fp32 = gCompressionParameter;
+   ptrA->compr_en = (gCompressionAlgorithm == CA_PowerLaw) ? 1 : 0;
+   ptrA->compr_bypass_shift = (uint32_t)gCompressionBypassShift;
+   if (gCompressionAlgorithm == CA_BitShift && pGCRegs->CalibrationMode != CM_Raw0)
+      FPA_ERR("Bit Shift compression should only be used in Raw0");
    
    // Nombre de données envoyées pour la programmation du ROIC
    // Si 0, il n'y aura pas de programmation du ROIC, mais la nouvelle fpa cfg sera appliquée.
@@ -920,7 +927,7 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->diag_x_to_next_fsync_re_dly = 0;
    ptrH->diag_xsize_div_per_pixel_num = pGCRegs->Width/4;   // 4 pix wide
 
-   // Integration signal transmitted by ClkFrm has to be latched to ClkCore
+   // Integration signal transmitted by CLK_FRM has to be latched to ClkCore
    // domain. Therefore, the delay (and uncertainty) of the integration start
    // is one clock cycle of ClkCore.
    ptrH->integrationDelay = 1.0F / CALCIUM_CLK_CORE_HZ;
@@ -1288,7 +1295,7 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    // Clocks
    RoicRegs[bClkCoreCnt_idx].data = (uint8_t)(gFpaActualFreq_MHz * 1e6f / CALCIUM_CLK_CORE_HZ);
    RoicRegs[bClkCtrlDSMDiv_idx].data = (uint8_t)(CALCIUM_CLK_CORE_HZ / CALCIUM_CLK_CTRL_DSM_HZ);
-   RoicRegs[bClkColCnt_idx].data = (uint8_t)(gFpaActualFreq_MHz * 1e6f / CALCIUM_CLK_COL_HZ);
+   RoicRegs[bClkColCnt_idx].data = (uint8_t)ceilf(gFpaActualFreq_MHz * 1e6f / CALCIUM_CLK_COL_HZ); // ClkCol < max
 
    // DSM enable
    if (sw_init_done == 0)

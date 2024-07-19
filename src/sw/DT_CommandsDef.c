@@ -776,10 +776,13 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    extern uint16_t gFpaVDetGuard_mV;
    extern uint16_t gFpaVDetCom_mV;
    extern uint16_t gFpaVPixQNB_mV;
+   extern int32_t gFpaDebugRegH;                       // reservé pour l'activation/désactivation du LDO de VPIXQNB
    extern uint16_t gFpaDebugKPix;
    extern bool gFpaDebugKPixForced;
+   extern bool gFpaDebugKPixApplied;
    extern float gFpaActualFreq_MHz;
    extern float gFpaDesiredFreq_MHz;
+   extern CompressionAlgorithm_t gCompressionAlgorithm;
    extern float gCompressionParameter;
    extern bool gCompressionParameterForced;
    extern uint8_t gCompressionBypassShift;
@@ -928,7 +931,7 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
             if (gCompressionBypassShiftForced)
             {
                gCompressionBypassShiftForced = false;
-               DT_INF("The compression parameter overwrites the compression bypass");
+               DT_INF("The compression parameter overwrites the compression bypass shift");
             }
             gCompressionParameter = fValue;
             gCompressionParameterForced = true;
@@ -944,18 +947,13 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
             break;
 
          case 13:  // SHIFT
-            if (gcRegsData.CalibrationMode != CM_Raw0)   //TODO: empêcher modif CalibrationMode quand bypass activé?
-               DT_ERR("CalibrationMode must be Raw0 to bypass the compression");
-            else
+            if (gCompressionParameterForced)
             {
-               if (gCompressionParameterForced)
-               {
-                  gCompressionParameterForced = false;
-                  DT_INF("The compression bypass overwrites the compression parameter");
-               }
-               gCompressionBypassShift = (uint8_t)uValue;
-               gCompressionBypassShiftForced = true;
+               gCompressionParameterForced = false;
+               DT_INF("The compression bypass shift overwrites the compression parameter");
             }
+            gCompressionBypassShift = (uint8_t)uValue;
+            gCompressionBypassShiftForced = true;
             break;
       }
 
@@ -971,15 +969,27 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA VA3P3 voltage = %u mV", gFpaVa3p3_mV);
    DT_PRINTF("FPA VDETGUARD voltage = %u mV", gFpaVDetGuard_mV);
    DT_PRINTF("FPA VDETCOM voltage = %u mV", gFpaVDetCom_mV);
-   DT_PRINTF("FPA VPIXQNB voltage = %u mV", gFpaVPixQNB_mV);
+   DT_PRINTF("FPA VPIXQNB voltage = %u mV is %s", gFpaVPixQNB_mV, gFpaDebugRegH ? "enabled" : "disabled");
 
-   DT_PRINTF("FPA Debug KPix = %u", gFpaDebugKPix);
-   DT_PRINTF("FPA Debug KPix Forced = %u", gFpaDebugKPixForced);
+   DT_PRINTF("FPA debug KPix = %u is %s", gFpaDebugKPix, gFpaDebugKPixApplied ? "enabled" : "disabled");
 
-   DT_PRINTF("FPA Compression Parameter = " _PCF(6), _FFMT(gCompressionParameter, 6));
-   DT_PRINTF("FPA Compression Parameter Forced = %u", gCompressionParameterForced);
-   DT_PRINTF("FPA Compression Bypass Shift = %u", gCompressionBypassShift);
-   DT_PRINTF("FPA Compression Bypass Shift Forced = %u", gCompressionBypassShiftForced);
+   switch (gCompressionAlgorithm)
+   {
+      case CA_NoCompression:
+      default:
+         DT_PRINTF("FPA compression is disabled");
+         break;
+
+      case CA_PowerLaw:
+         DT_PRINTF("FPA Power Law compression is enabled");
+         DT_PRINTF("FPA Power Law parameter = " _PCF(6), _FFMT(gCompressionParameter, 6));
+         break;
+
+      case CA_BitShift:
+         DT_PRINTF("FPA Bit Shift compression is enabled");
+         DT_PRINTF("FPA Bit Shift parameter = %u", gCompressionBypassShift);
+         break;
+   };
 
    DT_PRINTF("FPA actual frequency = "_PCF(6)" MHz", _FFMT(gFpaActualFreq_MHz, 6));
 

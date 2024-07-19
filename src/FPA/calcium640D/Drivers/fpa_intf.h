@@ -77,7 +77,7 @@
 #define VHD_CLK_100M_RATE_HZ        100e6F
 #define CALCIUM_CLK_DDR_HZ          200e6F
 #define CALCIUM_CLK_CORE_HZ         10e6F
-#define CALCIUM_CLK_CTRL_DSM_HZ     CALCIUM_CLK_CORE_HZ  // ne pas modifier. Le VHD considère seulement CLK_CORE
+#define CALCIUM_CLK_CTRL_DSM_HZ     CALCIUM_CLK_CORE_HZ  // ne pas modifier. Le VHD considère seulement ClkCore
 #define CALCIUM_CLK_COL_HZ          50e6F
 
 // paramètres du ROIC (ne pas modifier)

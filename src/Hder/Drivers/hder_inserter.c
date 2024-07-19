@@ -259,16 +259,35 @@ void HDER_UpdateCompressionConfig(const t_HderInserter *a, const gcRegistersData
    extern CompressionAlgorithm_t gCompressionAlgorithm;
    extern float gCompressionParameter;
    uint32_t *p_gCompressionParameter = (uint32_t *)(&gCompressionParameter);  // to write float over AXIL
+   extern uint8_t gCompressionBypassShift;
 
-   if (pGCRegs->CalibrationMode == CM_RT || pGCRegs->CalibrationMode == CM_IBR || pGCRegs->CalibrationMode == CM_IBI)
-      // Deactivate compression for radiometric quantity data
-      AXI4L_write8((uint8_t)(CA_NoCompression), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
-   else
-      // Write the compression algorithm as determined in FPA_SendConfigGC
-      AXI4L_write8((uint8_t)(gCompressionAlgorithm), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+   // Write the compression algorithm and parameter as determined in FPA_SendConfigGC
+   switch (gCompressionAlgorithm)
+   {
+      case CA_NoCompression:
+      default:
+         AXI4L_write8((uint8_t)(CA_NoCompression), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+         AXI4L_write32(0, a->ADD + A_BASE_HEADER + CompressionParameterHdrAddr);
+         break;
 
-   // We always write the compression parameter as determined in FPA_SendConfigGC
-   AXI4L_write32(*p_gCompressionParameter, a->ADD + A_BASE_HEADER + CompressionParameterHdrAddr);
+      case CA_PowerLaw:
+         // Compression is deactivated for radiometric quantity data
+         if (pGCRegs->CalibrationMode == CM_RT || pGCRegs->CalibrationMode == CM_IBR || pGCRegs->CalibrationMode == CM_IBI)
+            AXI4L_write8((uint8_t)(CA_NoCompression), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+         else
+            AXI4L_write8((uint8_t)(CA_PowerLaw), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+
+         // Power Law algo uses the compression parameter. Write it even if it is not used
+         AXI4L_write32(*p_gCompressionParameter, a->ADD + A_BASE_HEADER + CompressionParameterHdrAddr);
+         break;
+
+      case CA_BitShift:
+         AXI4L_write8((uint8_t)(CA_BitShift), a->ADD + A_BASE_HEADER + CompressionAlgorithmHdrAddr);
+
+         // Bit Shift algo uses the shift parameter
+         AXI4L_write32((uint32_t)gCompressionBypassShift, a->ADD + A_BASE_HEADER + CompressionParameterHdrAddr);
+         break;
+   };
 }
 
 //-------------------------------------------------------------------------
