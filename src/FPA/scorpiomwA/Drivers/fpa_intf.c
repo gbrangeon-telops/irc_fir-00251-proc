@@ -74,7 +74,6 @@
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                          0x18      // 0x18 -> FPA_ROIC_SCORPIO_MW . Provient du fichier fpa_common_pkg.vhd.
-#define FPA_ROIC_UNKNOWN                  0xFF      // 0xFF -> ROIC inconnu. Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                   0x01      // 0x01 -> output analogique .provient du fichier fpa_common_pkg.vhd. La valeur 0x01 est celle de OUTPUT_ANALOG
 #define FPA_INPUT_TYPE                    0x04      // 0x04 -> input LVCMOS33 .provient du fichier fpa_common_pkg.vhd
 
@@ -810,22 +809,6 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
    AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);          
    AXI4L_write32(FPA_OUTPUT_TYPE, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);
    AXI4L_write32(FPA_INPUT_TYPE, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
-}
-
-//--------------------------------------------------------------------------
-// Pour activer/désactiver la LED de warning.
-//--------------------------------------------------------------------------
-void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
-{
-   if (enable)
-   {
-      AXI4L_write32(FPA_ROIC_UNKNOWN, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);
-   }
-   else
-   {
-      AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);
-      FPA_ClearErr(ptrA);
-   }
 }
 
 //--------------------------------------------------------------------------

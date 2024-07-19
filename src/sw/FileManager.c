@@ -1935,10 +1935,10 @@ uint64_t FM_GetRequieredSpace(const char *name)
          size += CALIBBLOCK_BLOCKFILEHEADER_SIZE + CALIBBLOCK_PIXELDATAHEADER_SIZE + CALIBBLOCK_MAXTKDATAHEADER_SIZE + CALIBBLOCK_LUTNLDATAHEADER_SIZE + CALIBBLOCK_LUTRQDATAHEADER_SIZE*MaxOfLUTRQ  ;
          //block file data
          size += PixelDataMaxLength + LUTNLMaxLength + LUTRQLUTMaxLength + MAXTKMaxLength ;
+#ifdef CALCIUM_PROXY
          //Calcium has KPixData
-         if(TDCFlagsTst(Calcium640DIsImplemented)) {
-            size += CALIBBLOCK_KPIXDATAHEADER_SIZE + CALIBBLOCK_KPIXDATA_SIZE*gcRegsData.SensorWidth * gcRegsData.SensorHeight;
-         }
+         size += CALIBBLOCK_KPIXDATAHEADER_SIZE + CALIBBLOCK_KPIXDATA_SIZE*gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+#endif
       }
       FM_DBG("TSBL minimum size %lu B\n",size);
 

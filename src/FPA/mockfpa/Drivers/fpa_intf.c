@@ -50,7 +50,6 @@
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                          0x19      // 0x19 -> 0804 . Provient du fichier fpa_common_pkg.vhd.
-#define FPA_ROIC_UNKNOWN                  0xFF      // 0xFF -> ROIC inconnu. Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                   0x01      // 0x01 -> output analogique .provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
 #define FPA_INPUT_TYPE                    0x04      // 0x04 -> input LVCMOS33 .provient du fichier fpa_common_pkg.vhd. La valeur 0x03 est celle de LVTTL50
 
@@ -361,14 +360,6 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
 //
 //   FPA_INF("int_time = %u", *p_addr++);
 
-}
-
-//--------------------------------------------------------------------------
-// Pour activer/désactiver la LED de warning.
-//--------------------------------------------------------------------------
-void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
-{
-   FPA_INF("This functionality is not supported for this FPA");
 }
 
 

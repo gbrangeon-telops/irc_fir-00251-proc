@@ -267,7 +267,4 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA);
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
 
-// pour activer/désactiver la LED de warning.
-void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable);
-
 #endif // __FPA_INTF_H__

@@ -1244,7 +1244,7 @@ void Calibration_SM()
                CM_INF("KPIX data header loaded.");
                cmCurrentState = CMS_LOAD_KPIX_DATA;
 
-#ifdef AR_KPIX_STATUS
+#ifdef CALCIUM_PROXY
                t_KPixStatus *kpixStatus = (t_KPixStatus *)(XPAR_FPA_CTRL_BASEADDR + AR_KPIX_STATUS);
 
                if (calibrationInfo.blocks[blockIndex].KPixData.KPix_EffectiveBitWidth != (kpixStatus->size ? 13 : 12)) {
@@ -1278,7 +1278,7 @@ void Calibration_SM()
             // Compute CRC-16 value
             crc16 = CRC16(crc16, tmpFileDataBuffer, length);
 
-#ifdef AW_KPIX_VALUE
+#ifdef CALCIUM_PROXY
             for(uint32_t i = 0; i < (length / 4); i += 1) {
                *(uint32_t *)(XPAR_FPA_CTRL_BASEADDR + AW_KPIX_VALUE) = ((uint32_t *)tmpFileDataBuffer)[i];
             }

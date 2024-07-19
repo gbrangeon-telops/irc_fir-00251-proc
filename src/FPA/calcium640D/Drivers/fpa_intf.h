@@ -23,6 +23,10 @@
 #include "GC_Registers.h"
 #include "FPABinningConfig.h"
 
+#ifndef CALCIUM_PROXY
+   #define CALCIUM_PROXY
+#endif
+
 #ifdef FPA_VERBOSE
    #define FPA_PRINTF(fmt, ...)    FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 #else

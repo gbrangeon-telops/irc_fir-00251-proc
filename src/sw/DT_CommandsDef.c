@@ -612,7 +612,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.int_to_int_delay_min  = %d", status.int_to_int_delay_min);
    DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
 
-#ifdef AR_COMPR_ERR
+#ifdef CALCIUM_PROXY
    // bus d'erreurs spécifiques au calciumD
    DT_PRINTF("compr_err_latch = 0x%08X", AXI4L_read32(gFpaIntf.ADD + AR_COMPR_ERR));
 #endif
@@ -767,6 +767,7 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
 {
+#ifdef CALCIUM_PROXY
    extern t_FpaIntf gFpaIntf;
    extern uint16_t gFpaVa1p8_mV;
    extern uint16_t gFpaVPixRst_mV;
@@ -994,6 +995,11 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA actual frequency = "_PCF(6)" MHz", _FFMT(gFpaActualFreq_MHz, 6));
 
    return IRC_SUCCESS;
+
+#else
+   DT_ERR("Unsupported command for this FPA");
+   return IRC_FAILURE;
+#endif
 }
 
 /**
@@ -1006,6 +1012,7 @@ IRC_Status_t DebugTerminalParseCCM(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseCCMREG(circByteBuffer_t *cbuf)
 {
+#ifdef CALCIUM_PROXY
    extern t_FpaIntf gFpaIntf;
    extern bool gFpaReadReg;
    extern bool gFpaWriteReg;
@@ -1084,6 +1091,11 @@ IRC_Status_t DebugTerminalParseCCMREG(circByteBuffer_t *cbuf)
    FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
 
    return IRC_SUCCESS;
+
+#else
+   DT_ERR("Unsupported command for this FPA");
+   return IRC_FAILURE;
+#endif
 }
 
 /**
