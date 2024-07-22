@@ -313,12 +313,6 @@
 #define b3PixAnaEn_b3PixQNBEn_shift                1
 #define b3PixAnaEn_b3PixQNBEn_GET()                REG_FIELD_GET(b3PixAnaEn_idx, b3PixAnaEn_b3PixQNBEn_mask, b3PixAnaEn_b3PixQNBEn_shift)
 #define b3PixAnaEn_b3PixQNBEn_SET(val)             REG_FIELD_SET(b3PixAnaEn_idx, b3PixAnaEn_b3PixQNBEn_mask, b3PixAnaEn_b3PixQNBEn_shift, val)
-/* Timeout de la réponse */
-// Le temps de transmission/réception du message n'est pas déterminant puisque le contrôleur
-// doit attendre entre 2 images pour communiquer. Des mesures montrent que 10 ms est
-// généralement suffisant pour obtenir une réponse.
-//#define WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US        ((NUM_OF(RoicRegs) + 1 + 2) * 16)    // (nbRegs + header + RX overhead) x 16b @ 1MHz
-#define WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US        10000    // 10ms
 
 struct s_ProximCfgConfig
 {
@@ -501,7 +495,6 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH);
 void FPA_SendRoicRegs(const t_FpaIntf *ptrA);
-void FPA_ReadRoicRegs(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
@@ -621,7 +614,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern bool gCompressionParameterForced;
    extern uint8_t gCompressionBypassShift;
    extern bool gCompressionBypassShiftForced;
-   extern bool gFpaReadReg;
    static uint8_t cfg_num;
 
    // on bâtit les données de programmation du ROIC
@@ -900,14 +892,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     
    // envoi du reste de la config 
    WriteStruct(ptrA);
-
-   if (gFpaReadReg)
-   {
-      // lecture du feedback
-      FPA_ReadRoicRegs(ptrA);
-      // Reset de la demande du debug terminal
-      gFpaReadReg = false;
-   }
 }
 
 //--------------------------------------------------------------------------
@@ -1435,27 +1419,28 @@ void FPA_SendRoicRegs(const t_FpaIntf *ptrA)
 
 //--------------------------------------------------------------------------
 // Pour lire les données reçues du ROIC
+// Retourne le nombre de données reçues
 //--------------------------------------------------------------------------
-void FPA_ReadRoicRegs(const t_FpaIntf *ptrA)
+uint8_t FPA_ReadRoicRegs(const t_FpaIntf *ptrA)
 {
    uint32_t *p_addr = (uint32_t *)(ptrA->ADD + ARW_PROG_MEM_BASE_ADD) + PROG_MEM_RX_OFFSET;  // l'offset est divisé par 4 dans le vhd
    uint8_t nbRegs;
    uint8_t ii;
-   uint64_t tic_timeout;
 
-   // On attend que les données soient reçues
-   GETTIME(&tic_timeout);
-   do
-      nbRegs = (uint8_t)AXI4L_read32(ptrA->ADD + AR_ROIC_RX_NB_DATA);
-   while ((nbRegs == 0) && (elapsed_time_us(tic_timeout) < WAITING_FOR_ROIC_RX_DATA_TIMEOUT_US));
-
-   FPA_INF("%u registers read from ROIC", nbRegs);
-
-   // Lecture des registres
-   for (ii = 0; ii < nbRegs; ii++)
+   // On vérifie que des données sont reçues
+   nbRegs = (uint8_t)AXI4L_read32(ptrA->ADD + AR_ROIC_RX_NB_DATA);
+   if (nbRegs)
    {
-      FPA_INF(" 0x%04X", *p_addr++);
+      FPA_INF("%u registers read from ROIC", nbRegs);
+
+      // Lecture des registres
+      for (ii = 0; ii < nbRegs; ii++)
+      {
+         FPA_INF(" 0x%04X", *p_addr++);
+      }
    }
+
+   return nbRegs;
 }
 
 //--------------------------------------------------------------------------

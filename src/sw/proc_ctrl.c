@@ -277,6 +277,12 @@ void disable_caches()
       SightLine_ProtocolHandler_SM(&theSlCtrl);
       Autofocus_SM(&theAutoCtrl, &theSlCtrl, &theRpCtrl);
       apply_resolution();
+#ifdef CALCIUM_PROXY
+      extern t_FpaIntf gFpaIntf;
+      extern bool gFpaReadReg;
+      if (gFpaReadReg && (FPA_ReadRoicRegs(&gFpaIntf) > 0))
+         gFpaReadReg = false;
+#endif
    }
 }
 

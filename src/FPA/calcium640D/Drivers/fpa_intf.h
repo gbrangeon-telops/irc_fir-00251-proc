@@ -284,10 +284,13 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 // pour afficher le feedback de FPA_INTF_CFG
 void FPA_PrintConfig(const t_FpaIntf *ptrA);
 
-// pour mttre les io en 'Z' avant d'éteindre la carte DDC
+// pour mettre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
 
 // pour activer/désactiver la LED de warning.
 void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable);
+
+// pour lire les données reçues du ROIC
+uint8_t FPA_ReadRoicRegs(const t_FpaIntf *ptrA);
 
 #endif // __FPA_INTF_H__
