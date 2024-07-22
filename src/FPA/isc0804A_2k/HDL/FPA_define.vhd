@@ -55,6 +55,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait pas que la correctioon de l'offset mais aussi du gain
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';
    constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN   : std_logic := '1';      -- on ne permet pas la troncature de la plage dynamique du détecteur (fait sur le M2K-UD uniquement pour reduire le ghost oscillant)
+   constant DEFINE_GENERATE_OFFSET_CORR_CHAIN     : std_logic := '1';      -- on applique une correction d'offset
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delai de stabilisation (analog setup)
    
    ------------------------------------------------------------
@@ -377,6 +378,11 @@ package FPA_define is
       dynrange_clipping_level             : unsigned(13 downto 0);
       dynrange_global_offset              : signed(17 downto 0); 
       dynrange_op_sel                     : std_logic_vector(1 downto 0);
+
+	  -- Offset correction
+	  offcorr_line_start                  : std_logic_vector(13 downto 0);
+	  offcorr_line_end                    : std_logic_vector(13 downto 0);
+	  offcorr_coeff0                      : std_logic_vector(13 downto 0);
    end record; 
    
    ----------------------------------------------								

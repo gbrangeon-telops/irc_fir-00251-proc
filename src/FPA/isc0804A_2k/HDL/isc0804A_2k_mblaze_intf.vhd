@@ -394,7 +394,12 @@ begin
                   when X"1D0" =>    user_cfg_i.clk_area_c.eol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_c.eol_posl_pclk'length-1 downto 0));
                   when X"1D4" =>    user_cfg_i.clk_area_c.spare                        <= unsigned(data_i(user_cfg_i.clk_area_c.spare'length-1 downto 0)); 
                   when X"1D8" =>    user_cfg_i.clk_area_c.clk_id                       <= unsigned(data_i(user_cfg_i.clk_area_c.clk_id'length-1 downto 0));
-                  user_cfg_in_progress <= '0';
+                  
+				      -- off_corr
+				      when X"1DC" =>    user_cfg_i.offcorr_line_start                      <= std_logic_vector(data_i(user_cfg_i.offcorr_line_start'length-1 downto 0));
+				      when X"1E0" =>    user_cfg_i.offcorr_line_end                        <= std_logic_vector(data_i(user_cfg_i.offcorr_line_end'length-1 downto 0));
+				      when X"1E4" =>    user_cfg_i.offcorr_coeff0                          <= std_logic_vector(data_i(user_cfg_i.offcorr_coeff0'length-1 downto 0));
+				      user_cfg_in_progress <= '0';
                                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                          <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

@@ -236,6 +236,10 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  clk_area_c_spare                      ;
    uint32_t  clk_area_c_clk_id                     ;
 
+   uint32_t  offcorr_line_start                    ;
+   uint32_t  offcorr_line_end                      ;
+   uint32_t  offcorr_coeff0                        ;
+
 };                                  
 typedef struct s_FpaIntfConfig t_FpaIntf;
 

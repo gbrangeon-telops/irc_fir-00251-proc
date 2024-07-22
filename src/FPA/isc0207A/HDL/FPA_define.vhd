@@ -51,7 +51,7 @@ package FPA_define is
    -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- n'a aucune importance pour les 16 taps
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
-   
+            
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 5_000.0;   --
    constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real      := 2.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 
    constant DEFINE_FPA_INTCLK_RATE_KHZ            : real      := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
@@ -65,7 +65,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- pour le M2K, on ne fait aucune correction de gain et d'offset
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait aucune correction de gain, mais juste l'offset au besoin
    constant DEFINE_GENERATE_DYNRANGE_CTRL_CHAIN   : std_logic := '0';      -- on ne permet la troncature de la plage dynamique du détecteur (fait uniquement sur le M2K-UD pour reduire le ghost oscillant)
-   
+   constant DEFINE_GENERATE_OFFSET_CORR_CHAIN     : std_logic := '0';      -- on ne fait aucune correction d'offset
    
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le isc0207A, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;           -- not used
@@ -439,6 +439,10 @@ package FPA_define is
       dynrange_global_offset              : signed(17 downto 0); 
       dynrange_op_sel                     : std_logic_vector(1 downto 0);
       
+  	   -- Offset correction
+	   offcorr_line_start                  : std_logic_vector(13 downto 0);
+	   offcorr_line_end                    : std_logic_vector(13 downto 0);
+	   offcorr_coeff0                      : std_logic_vector(13 downto 0);
    end record;     
    
    ----------------------------------------------								

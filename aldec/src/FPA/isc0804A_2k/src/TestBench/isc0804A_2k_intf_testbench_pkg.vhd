@@ -19,7 +19,7 @@ use work.fpa_define.all;
 
 package isc0804A_2k_intf_testbench_pkg is           
    
-   constant QWORDS_NUM                 : natural := 119;
+   constant QWORDS_NUM                 : natural := 122;
    constant PIXNUM_PER_TAP_PER_MCLK    : natural := 2;
    constant FOVH_LINE                  : natural := 1;
    constant PAUSE_SIZE                 : integer := 1;
@@ -30,6 +30,9 @@ package isc0804A_2k_intf_testbench_pkg is
    constant C_elcorr_ref0_image_map_enabled : std_logic := '0';
    constant C_elcorr_ref1_image_map_enabled : std_logic := '0';
    constant C_ROIC_DBG_REG             : integer := 322131831;
+   constant C_OFFCORR_LINE_START       : integer := 1;
+   constant C_OFFCORR_LINE_END         : integer := 2;
+   constant C_OFFCORR_COEFF0           : integer := 12;
    
    -- Electrical correction : embedded switches control
    constant ELCORR_SW_TO_PATH1             : unsigned(1 downto 0) :=   "01";
@@ -163,7 +166,10 @@ package body isc0804A_2k_intf_testbench_pkg is
       variable  clk_area_c_sol_posl_pclk               : unsigned(31 downto 0);
       variable  clk_area_c_eol_posl_pclk               : unsigned(31 downto 0); 
       variable  clk_area_c_spare                       : unsigned(31 downto 0); 
-      variable  clk_area_c_clk_id                      : unsigned(31 downto 0); 
+      variable  clk_area_c_clk_id                      : unsigned(31 downto 0);   
+	  variable  offcorr_line_start                     : unsigned(31 downto 0);
+	  variable  offcorr_line_end                       : unsigned(31 downto 0);
+	  variable  offcorr_coeff0                         : unsigned(31 downto 0);
 	  variable  roic_xsize : natural                   := 640;
       variable  roic_ysize : natural                   := user_ysize;                             -- pas utilisé dans la config
       variable  user_sol_posl_pclk : natural           := ((roic_xsize - user_xsize)/2)/TAP_NUM + 1;
@@ -371,7 +377,12 @@ package body isc0804A_2k_intf_testbench_pkg is
       dynrange_scaling_numerator := to_unsigned(2097152, 32);
       dynrange_clipping_level    := to_unsigned(8191, 32);
       dynrange_global_offset     := to_unsigned(0, 32);
-      dynrange_op_sel            := to_unsigned(3, 32);      
+      dynrange_op_sel            := to_unsigned(3, 32);
+	  
+	  -- residual offset correction
+	  offcorr_line_start         := to_unsigned(C_OFFCORR_LINE_START, 32);
+	  offcorr_line_end           := to_unsigned(C_OFFCORR_LINE_END, 32);
+	  offcorr_coeff0             := to_unsigned(C_OFFCORR_COEFF0, 32);
       
       -- cfg usager
       y := comn_fpa_diag_mode                                        
@@ -492,7 +503,10 @@ package body isc0804A_2k_intf_testbench_pkg is
       & clk_area_c_sol_posl_pclk                
       & clk_area_c_eol_posl_pclk                
       & clk_area_c_spare                        
-      & clk_area_c_clk_id;
+      & clk_area_c_clk_id
+	  & offcorr_line_start
+	  & offcorr_line_end
+	  & offcorr_coeff0;
       return y;
    end to_intf_cfg;
    

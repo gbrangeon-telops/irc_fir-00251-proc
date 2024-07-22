@@ -121,14 +121,14 @@ asim -ses isc0804A_2k_intf_testbench_TB
 --wave UUT/U1/U5/U1/* 
 
 -- readout controller
-wave UUT/U1/U5/U5/U4/* 
-wave UUT/U1/U5/U5/U2/* 
-wave UUT/U1/U5/U5/U10/* 
-wave UUT/U1/U5/U5/U7/* 
-wave UUT/U1/U5/U5/U1/*
-wave UUT/U1/U5/U5/U8/* 
-wave UUT/U1/U5/U5/U6/* 
-wave UUT/U1/U5/U5/U5/* 
+--wave UUT/U1/U5/U5/U4/* 
+--wave UUT/U1/U5/U5/U2/* 
+--wave UUT/U1/U5/U5/U10/* 
+--wave UUT/U1/U5/U5/U7/* 
+--wave UUT/U1/U5/U5/U1/*
+--wave UUT/U1/U5/U5/U8/* 
+--wave UUT/U1/U5/U5/U6/* 
+--wave UUT/U1/U5/U5/U5/* 
 --wave UUT/U1/U5/U5/* 
 
 -- clocks_gen
@@ -175,8 +175,12 @@ wave UUT/U1/U26/*
 
 --wave UUT/U1/U9/U10/*
 
+-- Data Controller
 #wave UUT/U1/U9/CH1/*
 #wave UUT/U1/U9/CH2/*   
+wave UUT/U1/U9/U22/*
+wave UUT/U1/U9/U22/g1/U1/*
+wave UUT/U1/U9/U22/g1/U2/*
 
 #wave UUT/U1/U9/CH3/*
 #wave UUT/U16/*  
@@ -216,5 +220,5 @@ wave UUT/U1/U26/*
 
 wave UUT/U1/*
 --run 100 ms
-run 50 ms
+run 15 ms
 --9.1 ms

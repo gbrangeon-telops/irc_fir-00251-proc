@@ -210,6 +210,10 @@
 #define DYNAMIC_RANGE_CLIPPING_LEVEL               8191   //8000  // niveau d'ecretage des donnnées du modèle M2K-UD
 #define DYNAMIC_RANGE_GLOBAL_OFFSET                0      //1675   // offset de base
 
+#define OFFCORR_LINE_START                         1  // starting line
+#define OFFCORR_LINE_END                           1  // ending line
+#define OFFCORR_COEFF0                             12 // zeroth-order coefficient
+
 
 struct s_ProximCfgConfig 
 {   
@@ -887,6 +891,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->dynrange_global_offset      = 0; /* on ne corrige pas l'offset */
    ptrA->dynrange_op_sel             = (uint32_t)ELCORR_SW_TO_NORMAL_OP;
 
+   /* Residual Offset correcion */
+   ptrA->offcorr_line_start          = OFFCORR_LINE_START;
+   ptrA->offcorr_line_end            = OFFCORR_LINE_END;
+   ptrA->offcorr_coeff0              = OFFCORR_COEFF0;
+
    // Affichage de debug
    FPA_PRINTF(" ptrA->fpa_diag_mode                         =  %d", (int32_t)( ptrA->fpa_diag_mode                          ) );
    FPA_PRINTF(" ptrA->fpa_diag_type                         =  %d", (int32_t)( ptrA->fpa_diag_type                          ) );
@@ -1006,6 +1015,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    FPA_PRINTF(" ptrA->clk_area_c_eol_posl_pclk              =  %d", (int32_t)( ptrA->clk_area_c_eol_posl_pclk               ) );
    FPA_PRINTF(" ptrA->clk_area_c_spare                      =  %d", (int32_t)( ptrA->clk_area_c_spare                       ) );
    FPA_PRINTF(" ptrA->clk_area_c_clk_id                     =  %d", (int32_t)( ptrA->clk_area_c_clk_id                      ) );
+   FPA_PRINTF(" ptrA->offcorr_line_start                    =  %d", (int32_t)( ptrA->offcorr_line_start                     ) );
+   FPA_PRINTF(" ptrA->offcorr_line_end                      =  %d", (int32_t)( ptrA->offcorr_line_end                       ) );
+   FPA_PRINTF(" ptrA->offcorr_coeff0                        =  %d", (int32_t)( ptrA->offcorr_coeff0                         ) );
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
