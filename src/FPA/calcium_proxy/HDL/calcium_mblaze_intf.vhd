@@ -106,8 +106,8 @@ architecture rtl of calcium_mblaze_intf is
    signal int_indx_i                   : std_logic_vector(USER_CFG.int_indx'length-1 downto 0);
    signal int_signal_high_time_i       : unsigned(USER_CFG.int_signal_high_time'length-1 downto 0);
    signal conv_exp_time_pipe           : conv_exp_time_pipe_type;
-   signal exp_dval_i                   : std_logic;
-   signal exp_dval_pipe                : std_logic_vector(conv_exp_time_pipe'length downto 0) := (others => '0');  -- 1 pipe de plus que la conversion
+   signal conv_exp_dval_i              : std_logic;
+   signal conv_exp_dval_pipe           : std_logic_vector(conv_exp_time_pipe'length downto 0) := (others => '0');  -- 1 pipe de plus que la conversion
    signal roic_exp_time_cfg_i          : roic_exp_time_cfg_type;
    signal roic_exp_time_cfg_en_i       : std_logic;
    signal roic_exp_time_cfg_done_sync  : std_logic;
@@ -250,6 +250,10 @@ begin
             fpa_softw_stat_i.dval <= '0';
             kpix_dval <= '0';
             reset_roic_rx_data_i <= '0';
+            -- pour éviter les undefined avant le 1er int_dval_i
+            user_cfg_i.int_time <= (others => '0');
+            user_cfg_i.int_indx <= (others => '0');
+            user_cfg_i.int_signal_high_time <= (others => '0');
             
          else                   
             
@@ -366,7 +370,7 @@ begin
             exp_cfg_fsm <= idle;
             roic_exp_time_cfg_en_i <= '0';
             int_dval_i <= '0';
-            exp_dval_i <= '0';
+            conv_exp_dval_i <= '0';
             
          else
          
@@ -391,7 +395,7 @@ begin
             roic_exp_time_cfg_i.bDSMInitDelayCnt <= to_unsigned(3, roic_exp_time_cfg_i.bDSMInitDelayCnt'length);
             
             -- pipe pour rendre la donnée valide après la conversion
-            exp_dval_pipe <= exp_dval_pipe(exp_dval_pipe'high-1 downto 0) & exp_dval_i;
+            conv_exp_dval_pipe <= conv_exp_dval_pipe(conv_exp_dval_pipe'high-1 downto 0) & conv_exp_dval_i;
             
             case exp_cfg_fsm is
                
@@ -399,7 +403,7 @@ begin
                when idle =>
                   int_dval_i <= '0';
                   if FPA_EXP_INFO.EXP_DVAL = '1' then   -- le signal FPA_EXP_INFO.EXP_DVAL est un pulse
-                     exp_dval_i <= '1';
+                     conv_exp_dval_i <= '1';
                      -- on copie les valeurs venant de la FPA_EXP_INFO
                      int_time_i <= FPA_EXP_INFO.EXP_TIME;
                      int_indx_i <= FPA_EXP_INFO.EXP_INDX;
@@ -408,14 +412,18 @@ begin
                
                -- on attend la fin de la conversion
                when wait_conv_st =>
-                  exp_dval_i <= '0';
-                  if exp_dval_pipe(exp_dval_pipe'high) = '1' then
+                  conv_exp_dval_i <= '0';
+                  if conv_exp_dval_pipe(conv_exp_dval_pipe'high) = '1' then
                      exp_cfg_fsm <= wait_prog_rdy_st; 
                   end if;
                
                -- on attend que le programmeur soit prêt
                when wait_prog_rdy_st =>
-                  if roic_exp_time_cfg_done_sync = '1' then
+                  if user_cfg_i.comn.fpa_diag_mode = '1' then
+                     -- en diag mode on ne programme pas, on valide directement les infos d'intégration
+                     int_dval_i <= '1';        -- reste à 1 pour 1 clk
+                     exp_cfg_fsm <= idle;
+                  elsif roic_exp_time_cfg_done_sync = '1' then
                      roic_exp_time_cfg_en_i <= '1';        -- reste à 1 tant que la requête n'a pas été approuvée
                      exp_cfg_fsm <= wait_prog_ack_st; 
                   end if;
