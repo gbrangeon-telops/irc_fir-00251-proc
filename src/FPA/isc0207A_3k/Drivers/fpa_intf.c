@@ -334,6 +334,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                         // non utilisé
    // extern int32_t gFpaDebugRegH;                      // non utilisé
+   extern uint16_t gFpaADCQuad1CoarsePhase;              // ajustemnt grossier phase adc_clk provenant des FS
+   extern uint16_t gFpaADCQuad1FinePhase;                // ajustement fin phase adc_clk provenant des FS
+   extern uint8_t  gFpaActivePixelDelay;                 // ajustement de délai de début de ligne
    uint32_t elcorr_config_mode;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
@@ -436,7 +439,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF =  DEFAULT_REGF_VAL;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
+      gFpaDebugRegF = gFpaActivePixelDelay;
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // accélerateurs 
@@ -509,20 +512,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                    
    
    // adc clk source phase   
-   if (sw_init_done == 0){
-      gFpaDebugRegC = DEFAULT_REGC_VAL;      //  ajustement fait avec IRC1843 qui utilise un FLEGX
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // 
-         gFpaDebugRegC = DEFAULT_REGC_VAL;   //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
-   }       
-   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
+   if (sw_init_done == 0)
+      gFpaDebugRegC = gFpaADCQuad1CoarsePhase;      //  ajustement fait avec IRC1843 qui utilise un FLEGX
+   else
+      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;
    
    // adc clk source phase (suite)
-   if (sw_init_done == 0){         
-      gFpaDebugRegD = DEFAULT_REGD_VAL;     //  ajustement refait sur M3k decentré qui utilise un FLEGX
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas particulier des systèmes avec Flex 264
-         gFpaDebugRegD = DEFAULT_REGD_VAL;  //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
-   }
-   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;    
+   if (sw_init_done == 0)
+      gFpaDebugRegD = gFpaADCQuad1FinePhase;     //  ajustement refait sur M3k decentré qui utilise un FLEGX
+   else
+      ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;
    // autres    
    ptrA->boost_mode              = 0;                    
    ptrA->adc_clk_pipe_sync_pos   = 2;   // obtenu par simulation
@@ -1160,8 +1159,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
   
   // generation de sw_init_done et sw_init_success
    if ((gStat.hw_init_done == 1) && (sw_init_done == 0)){
+      sw_init_done = 1;                       // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser de nouveau
       FPA_SendConfigGC(ptrA, &gcRegsData);    // cet envoi permet de reinitialiser le vhd avec les params requis puisque le type de hw présent est conniu maintenant (Stat->hw_init_done == 1).
-      sw_init_done = 1;                       // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser de nouveau 
       sw_init_success = 1;
    }
 }
