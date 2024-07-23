@@ -894,7 +894,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    /* Residual Offset correcion */
    ptrA->offcorr_line_start          = OFFCORR_LINE_START;
    ptrA->offcorr_line_end            = OFFCORR_LINE_END;
-   ptrA->offcorr_coeff0              = OFFCORR_COEFF0;
+   if (pGCRegs->Width != FPA_WIDTH_MAX || pGCRegs->Height != FPA_HEIGHT_MAX)
+      ptrA->offcorr_coeff0           = OFFCORR_COEFF0;
+   else
+      ptrA->offcorr_coeff0           = 0;
 
    // Affichage de debug
    FPA_PRINTF(" ptrA->fpa_diag_mode                         =  %d", (int32_t)( ptrA->fpa_diag_mode                          ) );
