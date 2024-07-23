@@ -182,6 +182,11 @@
 #define ISC0207_WINDOW_MANDATORY_COLUMN_POS1       128
 #define ISC0207_WINDOW_MANDATORY_COLUMN_POS2       191
 
+// Phase adjument
+#define DEFAULT_REGC_VAL                           0
+#define DEFAULT_REGD_VAL                           243
+#define DEFAULT_REGF_VAL                           13
+
 struct s_ProximCfgConfig 
 {   
    uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
@@ -431,7 +436,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF =  6;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
+      gFpaDebugRegF =  DEFAULT_REGF_VAL;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // accélerateurs 
@@ -505,17 +510,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc clk source phase   
    if (sw_init_done == 0){
-      gFpaDebugRegC = 2;                   //  ajustement fait avec IRC1843 qui utilise un FLEGX
+      gFpaDebugRegC = DEFAULT_REGC_VAL;      //  ajustement fait avec IRC1843 qui utilise un FLEGX
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // 
-         gFpaDebugRegC = 2;                //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
+         gFpaDebugRegC = DEFAULT_REGC_VAL;   //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
    }       
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
    
    // adc clk source phase (suite)
    if (sw_init_done == 0){         
-      gFpaDebugRegD = 48000;                //  ajustement refait sur M3k decentré qui utilise un FLEGX
+      gFpaDebugRegD = DEFAULT_REGD_VAL;     //  ajustement refait sur M3k decentré qui utilise un FLEGX
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas particulier des systèmes avec Flex 264
-         gFpaDebugRegD = 144000;            //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
+         gFpaDebugRegD = DEFAULT_REGD_VAL;  //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
    }
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;    
    // autres    
