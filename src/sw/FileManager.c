@@ -215,7 +215,7 @@ void File_Manager_SM()
             FM_SetFileListKeys(&gFM_collections, keys, FM_MAX_NUM_FILE_ORDER_KEY);
 
             fmCurresntState = FMS_WAITING_FOR_REQUEST;
-            FM_INF("SM:Fill Collection Done.Go to waiting for request state");
+            FM_DBG("SM:Fill Collection Done.Go to waiting for request state");
 
          }
          break;
@@ -683,13 +683,13 @@ IRC_Status_t FM_InitFileDB()
        {
           if ((gFM_collections.item[i]->posixTime == gFlashDynamicValues.CalibrationCollectionPOSIXTimeAtStartup) || (i == 0))
           {
-             FM_INF("Try to fill collection at posix %d",gFM_collections.item[i]->posixTime );
+             FM_DBG("Try to fill collection at posix %d",gFM_collections.item[i]->posixTime );
              if (FM_FillCollectionInfo(gFM_collections.item[i]) != IRC_SUCCESS)
              {
                 // Remove file from collection list
                 FM_RemoveFileFromList(gFM_collections.item[i], &gFM_collections);
 
-                FM_INF("Error to fill collection item %d",i);
+                FM_ERR("Unable to fill collection item %d",i);
                 status = IRC_FAILURE;
              }
              else {
