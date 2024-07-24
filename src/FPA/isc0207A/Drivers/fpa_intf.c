@@ -147,7 +147,13 @@
 
 // Electrical correction : valeurs cibles (desirées) apres correction
 #define ELCORR_TARGET_ADCCNT_AT_STARVATION       500
-#define ELCORR_TARGET_ADCCNT_AT_SATURATION       16000 
+#define ELCORR_TARGET_ADCCNT_AT_SATURATION       16000
+
+// Phase adjustment
+#define DEFAULT_REGC_VAL                           2
+#define DEFAULT_REGD_VAL                           840
+#define DEFAULT_REGF_VAL                           21
+
 
 
 struct s_ProximCfgConfig 
@@ -283,6 +289,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
+   extern uint16_t gFpaADCQuad1CoarsePhase;              // ajustemnt grossier phase adc_clk provenant des FS
+   extern uint16_t gFpaADCQuad1FinePhase;                // ajustement fin phase adc_clk provenant des FS
+   extern uint8_t  gFpaActivePixelDelay;                 // ajustement de délai de début de ligne
    static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    uint32_t elcorr_reg;
@@ -376,7 +385,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // ajustement de delais de la chaine
    if (init_done == 0)
-     gFpaDebugRegF  = 21;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
+     gFpaDebugRegF  = gFpaActivePixelDelay;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
    ptrA->real_mode_active_pixel_dly  = (uint32_t)gFpaDebugRegF;
       
    // accélerateurs 
@@ -457,11 +466,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
    if (init_done == 0)
-      gFpaDebugRegC = 2;
+      gFpaDebugRegC = gFpaADCQuad1CoarsePhase;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
 
    if (init_done == 0)
-      gFpaDebugRegD = 840;
+      gFpaDebugRegD = gFpaADCQuad1FinePhase;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;         // ODI: 12 avril 2023: valeur ajustée avec serdes v2
    
    // autres    
