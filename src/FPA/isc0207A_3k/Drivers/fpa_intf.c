@@ -182,7 +182,7 @@
 #define ISC0207_WINDOW_MANDATORY_COLUMN_POS1       128
 #define ISC0207_WINDOW_MANDATORY_COLUMN_POS2       191
 
-// Phase adjument
+// Phase adjustment
 #define DEFAULT_REGC_VAL                           0
 #define DEFAULT_REGD_VAL                           243
 #define DEFAULT_REGF_VAL                           13
