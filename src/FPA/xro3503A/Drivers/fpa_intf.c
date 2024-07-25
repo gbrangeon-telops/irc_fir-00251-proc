@@ -97,6 +97,7 @@
 #define GOOD_SAMP_MEAN_DIV_BIT_POS                 21       // ne pas changer meme si le detecteur change.
 
 #define XRO3503_CTIA_BIAS_MAX                      0xF      // value must be in 0x0 to 0xF
+#define XRO3503_CTIA_BIAS_DEFAULT                  0xA      // value must be in 0x0 to 0xF
 
 #define XRO3503_DETECT_SUB_DEFAULT_mV              3500     // Default DetectSub = 3500 mV
 #define XRO3503_DETECT_SUB_MIN_mV                  2800     // 2800 mV <= DetectSub <= 3500 mV
@@ -337,7 +338,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // CTIA Bias Current
    if (gFpaCtiaBiasEnum > XRO3503_CTIA_BIAS_MAX)  // corrige une valeur invalide
-      gFpaCtiaBiasEnum = XRO3503_CTIA_BIAS_MAX;   // valeur max est le défaut pour l'instant
+      gFpaCtiaBiasEnum = XRO3503_CTIA_BIAS_DEFAULT;   // valeur max est le défaut pour l'instant
    ptrA->ctia_bias_current = gFpaCtiaBiasEnum;
 
    // Registre F : ajustement des delais de la chaine
