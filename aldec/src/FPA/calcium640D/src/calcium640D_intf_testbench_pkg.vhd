@@ -20,7 +20,7 @@ use work.fpa_define.all;
 
 package calcium640D_intf_testbench_pkg is
    
-   constant USER_CFG_VECTOR_SIZE             : natural := 39;        -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE             : natural := 46;        -- number of variables to write in the USER_CFG
    constant C_FPA_INTCLK_RATE_KHZ            : integer := 10_000;    -- ClkCore is 10 MHz
    constant C_FPA_PIXCLK_RATE_KHZ            : integer := 33_333;    -- Pixel clk is 400 MHz DDR / 24 bits per pixel
    constant C_FPA_EXPOSURE_TIME_MIN          : integer := 100;       -- 1us in clk_100M
@@ -72,6 +72,13 @@ package body calcium640D_intf_testbench_pkg is
       variable compr_en : unsigned(31 downto 0);
       variable compr_bypass_shift : unsigned(31 downto 0);
       variable roic_tx_nb_data : unsigned(31 downto 0);
+      variable dsm_period_constants : unsigned(31 downto 0);
+      variable dsm_period_min : unsigned(31 downto 0);
+      variable dsm_period_min_div_numerator : unsigned(31 downto 0);
+      variable dsm_nb_period_max : unsigned(31 downto 0);
+      variable dsm_nb_period_max_div_numerator : unsigned(31 downto 0);
+      variable dsm_nb_period_min : unsigned(31 downto 0);
+      variable dsm_total_time_threshold : unsigned(31 downto 0);
       variable cfg_num : unsigned(31 downto 0);
       
       -- Return variable
@@ -141,6 +148,14 @@ package body calcium640D_intf_testbench_pkg is
       
       roic_tx_nb_data := to_unsigned(roic_data_to_send, 32);
       
+      dsm_period_constants             := to_unsigned(10, 32);
+      dsm_period_min                   := resize(dsm_period_constants + 1, 32);
+      dsm_period_min_div_numerator     := to_unsigned(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS / to_integer(dsm_period_min), 32);
+      dsm_nb_period_max                := to_unsigned(256, 32);
+      dsm_nb_period_max_div_numerator  := to_unsigned(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS / to_integer(dsm_nb_period_max), 32);
+      dsm_nb_period_min                := to_unsigned(2, 32);
+      dsm_total_time_threshold         := resize(dsm_nb_period_max * dsm_period_min, 32);
+      
       cfg_num := to_unsigned(send_id, 32);
       
       
@@ -183,6 +198,13 @@ package body calcium640D_intf_testbench_pkg is
       & compr_en
       & compr_bypass_shift
       & roic_tx_nb_data
+      & dsm_period_constants
+      & dsm_period_min
+      & dsm_period_min_div_numerator
+      & dsm_nb_period_max
+      & dsm_nb_period_max_div_numerator
+      & dsm_nb_period_min
+      & dsm_total_time_threshold
       & cfg_num;
       
       return y;

@@ -2207,6 +2207,13 @@ void GC_ExposureTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime, &DSM);
+      gcRegsData.ExposureTime = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (!GC_FWSynchronouslyRotatingModeIsActive && !GC_EHDRIIsActive)
       {
          // Update ExposureTime and FrameRate limits
@@ -2235,6 +2242,13 @@ void GC_ExposureTime1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime1, &DSM);
+      gcRegsData.ExposureTime1 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[0] = gcRegsData.ExposureTime1;
@@ -2261,6 +2275,13 @@ void GC_ExposureTime2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime2, &DSM);
+      gcRegsData.ExposureTime2 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[1] = gcRegsData.ExposureTime2;
@@ -2289,6 +2310,13 @@ void GC_ExposureTime3Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime3, &DSM);
+      gcRegsData.ExposureTime3 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[2] = gcRegsData.ExposureTime3;
@@ -2316,6 +2344,13 @@ void GC_ExposureTime4Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime4, &DSM);
+      gcRegsData.ExposureTime4 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[3] = gcRegsData.ExposureTime4;
@@ -2342,6 +2377,13 @@ void GC_ExposureTime5Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime5, &DSM);
+      gcRegsData.ExposureTime5 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[4] = gcRegsData.ExposureTime5;
@@ -2363,6 +2405,13 @@ void GC_ExposureTime6Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime6, &DSM);
+      gcRegsData.ExposureTime6 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[5] = gcRegsData.ExposureTime6;
@@ -2385,6 +2434,13 @@ void GC_ExposureTime7Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime7, &DSM);
+      gcRegsData.ExposureTime7 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[6] = gcRegsData.ExposureTime7;
@@ -2406,6 +2462,13 @@ void GC_ExposureTime8Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(gcRegsData.ExposureTime8, &DSM);
+      gcRegsData.ExposureTime8 = DSM.userRoundedExposureTime_usec;
+#endif
+
       if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[7] = gcRegsData.ExposureTime8;

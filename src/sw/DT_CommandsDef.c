@@ -1015,9 +1015,6 @@ IRC_Status_t DebugTerminalParseCCMREG(circByteBuffer_t *cbuf)
 #ifdef CALCIUM_PROXY
    extern t_FpaIntf gFpaIntf;
    extern bool gFpaReadReg;
-   extern bool gFpaWriteReg;
-   extern uint8_t gFpaWriteRegAddr;
-   extern uint8_t gFpaWriteRegValue;
 
    uint8_t cmdStr[3], argStr[7];
    uint32_t arglen;
@@ -1082,9 +1079,11 @@ IRC_Status_t DebugTerminalParseCCMREG(circByteBuffer_t *cbuf)
          break;
 
       case 2:  // WR
-         gFpaWriteReg = true;
-         gFpaWriteRegAddr = (uint8_t)uAddr;
-         gFpaWriteRegValue = (uint8_t)uValue;
+         if (!FPA_ModifyRoicRegs((uint8_t)uAddr, (uint8_t)uValue))
+         {
+            DT_ERR("Register address (%u) not found", (uint8_t)uAddr);
+            return IRC_FAILURE;
+         }
          break;
    }
 

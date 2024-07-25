@@ -1727,7 +1727,7 @@ void GC_UpdateExposureTimeMin()
    //thus prevent sending a command to the FPA that is less than FPA_MIN_EXPOSURE.
    CorrectedExposureTimeMin = FPA_MIN_EXPOSURE - exposureTimeOffset; // ("exposureTimeSendToFPA" = "UserDefineExposureTime" + exposureTimeOffset)
 
-   //CorrectedExposureTimeMin cannot be lesser than FPA_MIN_EXPOSURE, then CorrectedExposureTimeMin need to be discarded when exposureTimeOffset is positive.
+   //CorrectedExposureTimeMin cannot be less than FPA_MIN_EXPOSURE, then CorrectedExposureTimeMin need to be discarded when exposureTimeOffset is positive.
    CorrectedExposureTimeMin = MAX(CorrectedExposureTimeMin, FPA_MIN_EXPOSURE);
 
    // Always use default value when camera is unlocked
@@ -1755,6 +1755,13 @@ void GC_UpdateExposureTimeMin()
          UserExposureTimeMin = MAX(UserExposureTimeMin, FPA_AECP_MIN_EXPOSURE);
       }
    }
+
+#ifdef CALCIUM_PROXY
+      // Exposure Time has to be rounded to a value supported by the FPA
+      t_calcium_DSM_timings DSM;
+      FPA_CalculateDSMTimings(UserExposureTimeMin, &DSM);
+      UserExposureTimeMin = DSM.userRoundedExposureTime_usec;
+#endif
 
    // Update ExposureTimeMin value when needed
    if (gcRegsData.ExposureTimeMin != UserExposureTimeMin)

@@ -81,7 +81,7 @@ architecture rtl of calcium_mblaze_intf is
    end component;
    
    type exp_cfg_fsm_type is (idle, wait_conv_st, wait_prog_rdy_st, wait_prog_ack_st, wait_prog_end_st);
-   type conv_exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0);
+   type conv_exp_time_pipe_type is array (0 to 8) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto 0); -- la longueur du pipe en fonction du nombre de clk nécessaires et non de l'utilisation de l'array
    
    signal exp_cfg_fsm                  : exp_cfg_fsm_type;
    signal sreset                       : std_logic;
@@ -107,7 +107,7 @@ architecture rtl of calcium_mblaze_intf is
    signal int_signal_high_time_i       : unsigned(USER_CFG.int_signal_high_time'length-1 downto 0);
    signal conv_exp_time_pipe           : conv_exp_time_pipe_type;
    signal conv_exp_dval_i              : std_logic;
-   signal conv_exp_dval_pipe           : std_logic_vector(conv_exp_time_pipe'length downto 0) := (others => '0');  -- 1 pipe de plus que la conversion
+   signal conv_exp_dval_pipe           : std_logic_vector(conv_exp_time_pipe'length-1 downto 0) := (others => '0');  -- pipe dval synchro avec pipe de conversion
    signal roic_exp_time_cfg_i          : roic_exp_time_cfg_type;
    signal roic_exp_time_cfg_en_i       : std_logic;
    signal roic_exp_time_cfg_done_sync  : std_logic;
@@ -125,6 +125,9 @@ architecture rtl of calcium_mblaze_intf is
    signal kpix_status                  : std_logic_vector(31 downto 0);
    signal compr_err_latch              : std_logic_vector(COMPR_ERR'range);
    signal reset_roic_rx_data_i         : std_logic;
+   signal dsm_period                   : unsigned(USER_CFG.dsm_period_min'length-1 downto 0);
+   signal dsm_period_delay             : unsigned(dsm_period'length-1 downto 0);
+   signal dsm_nb_period                : unsigned(USER_CFG.dsm_nb_period_max'length-1 downto 0);
    
 begin
    
@@ -321,7 +324,15 @@ begin
                   
                   when X"094" =>    user_cfg_i.roic_tx_nb_data    <= unsigned(data_i(user_cfg_i.roic_tx_nb_data'length-1 downto 0));
                   
-                  when X"098" =>    user_cfg_i.cfg_num      <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  when X"098" =>    user_cfg_i.dsm_period_constants                 <= unsigned(data_i(user_cfg_i.dsm_period_constants'length-1 downto 0));
+                  when X"09C" =>    user_cfg_i.dsm_period_min                       <= unsigned(data_i(user_cfg_i.dsm_period_min'length-1 downto 0));
+                  when X"0A0" =>    user_cfg_i.dsm_period_min_div_numerator         <= unsigned(data_i(user_cfg_i.dsm_period_min_div_numerator'length-1 downto 0));
+                  when X"0A4" =>    user_cfg_i.dsm_nb_period_max                    <= unsigned(data_i(user_cfg_i.dsm_nb_period_max'length-1 downto 0));
+                  when X"0A8" =>    user_cfg_i.dsm_nb_period_max_div_numerator      <= unsigned(data_i(user_cfg_i.dsm_nb_period_max_div_numerator'length-1 downto 0));
+                  when X"0AC" =>    user_cfg_i.dsm_nb_period_min                    <= unsigned(data_i(user_cfg_i.dsm_nb_period_min'length-1 downto 0));
+                  when X"0B0" =>    user_cfg_i.dsm_total_time_threshold             <= unsigned(data_i(user_cfg_i.dsm_total_time_threshold'length-1 downto 0));
+                  
+                  when X"0B4" =>    user_cfg_i.cfg_num         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -376,23 +387,59 @@ begin
          
             abs_fpa_int_time_offset_i <= unsigned(abs(user_cfg_i.fpa_int_time_offset));
             
-            -- pipe pour le calcul de conversion du temps d'integration en int clk pour le fpa
-            if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then   -- tenir compte de l'offset pour la commande envoyée au fpa
+            ---------------------------------------------------------------------------------
+            -- pipe pour les calculs de conversion du temps d'integration et des timings DSM
+            ---------------------------------------------------------------------------------
+            -- pipe(0): temps d'intégration en CLK_100MHz qui tient compte de l'offset
+            if user_cfg_i.fpa_int_time_offset(user_cfg_i.fpa_int_time_offset'high) = '0' then
                conv_exp_time_pipe(0) <= resize(int_time_i + abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset positif
             else
                conv_exp_time_pipe(0) <= resize(int_time_i - abs_fpa_int_time_offset_i, conv_exp_time_pipe(0)'length); -- offset négatif
             end if;
-            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);          
+            -- pipe(1): étape de multiplication de la conversion en int clk
+            conv_exp_time_pipe(1) <= resize(conv_exp_time_pipe(0) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);
+            -- pipe(2): étape de division de la conversion en int clk
             conv_exp_time_pipe(2) <= resize(conv_exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), conv_exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
+            -- pipe(3): temps d'intégration converti en intclk
             conv_exp_time_pipe(3) <= conv_exp_time_pipe(2) + unsigned(resize(conv_exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), conv_exp_time_pipe(0)'length));  -- pour l'operation d'arrondi
+            -- On compare le temps d'intégration avec le threshold de temps total DSM
+            if conv_exp_time_pipe(3) > user_cfg_i.dsm_total_time_threshold then
+               -- Le temps d'intégration est plus long que le temps total de DSM
+               --    on conserve le nombre de périodes maximum
+               dsm_nb_period <= resize(user_cfg_i.dsm_nb_period_max, dsm_nb_period'length);
+               --    on augmente la période DSM pour que le temps total soit aussi long que le temps d'intégration
+               -- pipe(4): étape de multiplication de la division par le nombre de périodes maximum
+               conv_exp_time_pipe(4) <= resize(conv_exp_time_pipe(3) * resize(user_cfg_i.dsm_nb_period_max_div_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);
+               -- pipe(5): durée de la période DSM (la valeur est tronquée plutôt qu'arrondie)
+               conv_exp_time_pipe(5) <= resize(conv_exp_time_pipe(4)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), conv_exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
+               -- pipe(6): on s'assure que la durée de la période DSM est plus grande que la période minimum
+               dsm_period <= MAX(resize(conv_exp_time_pipe(5), dsm_period'length), resize(user_cfg_i.dsm_period_min, dsm_period'length));
+            else
+               -- Le temps d'intégration est plus court que le temps total de DSM
+               --    on conserve la période DSM minimum
+               dsm_period <= resize(user_cfg_i.dsm_period_min, dsm_period'length);
+               --    on diminue le nombre de périodes jusqu'à ce que le temps total soit aussi long que le temps d'intégration
+               -- pipe(4): étape de multiplication de la division par la période DSM minimum
+               conv_exp_time_pipe(4) <= resize(conv_exp_time_pipe(3) * resize(user_cfg_i.dsm_period_min_div_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), conv_exp_time_pipe(0)'length);
+               -- pipe(5): nombre de périodes DSM (la valeur est tronquée plutôt qu'arrondie)
+               conv_exp_time_pipe(5) <= resize(conv_exp_time_pipe(4)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_27 downto C_EXP_TIME_CONV_DENOMINATOR_BIT_POS), conv_exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
+               -- pipe(6): on s'assure que le nombre de périodes DSM est plus grand que le nombre de périodes minimum
+               dsm_nb_period <= MAX(resize(conv_exp_time_pipe(5), dsm_nb_period'length), resize(user_cfg_i.dsm_nb_period_min, dsm_nb_period'length));
+            end if;
+            -- pipe(7): durée du délai de la période DSM
+            dsm_period_delay <= resize(dsm_period - user_cfg_i.dsm_period_constants, dsm_period'length);
+            -- pipe(8): copie des valeurs calculées dans la config
+            --    bIntCnt est le temps d'intégration converti en int clk pour le fpa. Le temps d'intégration est bIntCnt + 1
+            roic_exp_time_cfg_i.bIntCnt <= resize(conv_exp_time_pipe(3) - 1, roic_exp_time_cfg_i.bIntCnt'length);
+            --    bDSMCycles est le nombre de DSM demandés au ROIC. Le nombre de cycles est bDSMCycles + 1 et il y a 1 période DSM pour DSMInitDelay
+            roic_exp_time_cfg_i.bDSMCycles <= resize(dsm_nb_period - 2, roic_exp_time_cfg_i.bDSMCycles'length);
+            --    bDSMDelayCnt est le délai entre les cycles DSM. Le délai est bDSMDelayCnt + 1
+            roic_exp_time_cfg_i.bDSMDelayCnt <= resize(dsm_period_delay - 1, roic_exp_time_cfg_i.bDSMDelayCnt'length);
+            --    bDSMInitDelayCnt est le délai avant le 1er cycle DSM. On utilise DSMInitDelay = DSMPeriod. Le délai est bDSMInitDelayCnt + 1
+            roic_exp_time_cfg_i.bDSMInitDelayCnt <= resize(dsm_period - 1, roic_exp_time_cfg_i.bDSMInitDelayCnt'length);
             
             -- signal high time est en CLK_100MHz et tient compte du ET offset
             int_signal_high_time_i <= resize(conv_exp_time_pipe(0), int_signal_high_time_i'length);
-            -- bIntCnt est le temps d'intégration converti en int clk pour le fpa. Le temps d'intégration est bIntCnt + 1.
-            roic_exp_time_cfg_i.bIntCnt <= resize(conv_exp_time_pipe(3) - 1, roic_exp_time_cfg_i.bIntCnt'length);
-            roic_exp_time_cfg_i.bDSMCycles <= to_unsigned(1, roic_exp_time_cfg_i.bDSMCycles'length);
-            roic_exp_time_cfg_i.bDSMDelayCnt <= to_unsigned(2, roic_exp_time_cfg_i.bDSMDelayCnt'length);
-            roic_exp_time_cfg_i.bDSMInitDelayCnt <= to_unsigned(3, roic_exp_time_cfg_i.bDSMInitDelayCnt'length);
             
             -- pipe pour rendre la donnée valide après la conversion
             conv_exp_dval_pipe <= conv_exp_dval_pipe(conv_exp_dval_pipe'high-1 downto 0) & conv_exp_dval_i;
@@ -413,6 +460,7 @@ begin
                -- on attend la fin de la conversion
                when wait_conv_st =>
                   conv_exp_dval_i <= '0';
+                  -- pipe dval synchro avec pipe de conversion. à ce moment-ci les données sont déjà prêtes donc cet état nous donne 1 clk de plus
                   if conv_exp_dval_pipe(conv_exp_dval_pipe'high) = '1' then
                      exp_cfg_fsm <= wait_prog_rdy_st; 
                   end if;

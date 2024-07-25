@@ -450,10 +450,10 @@ static t_RoicRegister RoicRegs[] = {
       /* b3PixBiasMstr1 */       {.addr = 128, .data = 7},
       /* b3PixPDIBias */         {.addr = 129, .data = 85},
       /* b3PixCPDIBias */        {.addr = 130, .data = 105},
-      /* b3PixCompRef */         {.addr = 131, .data = 100},
+      /* b3PixCompRef */         {.addr = 131, .data = 88},
       /* b3PixCompRefBias1 */    {.addr = 132, .data = 78},
       /* b3PixCompRefBias2 */    {.addr = 133, .data = 8},
-      /* b3PixQNB */             {.addr = 134, .data = 94},
+      /* b3PixQNB */             {.addr = 134, .data = 180},
       /* b3PixQNBBias1 */        {.addr = 135, .data = 39},
       /* b3PixQNBBias2 */        {.addr = 136, .data = 8},
       /* b3PixAnaCtrl */         {.addr = 137, .data = 61},
@@ -493,7 +493,7 @@ static t_RoicRegister RoicRegs[] = {
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 void FPA_SoftwType(const t_FpaIntf *ptrA);
-void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH);
+void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH, t_calcium_DSM_timings *pDSM);
 void FPA_SendRoicRegs(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
@@ -580,6 +580,7 @@ void FPA_PowerDown(const t_FpaIntf *ptrA)
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    calcium_param_t hh;
+   t_calcium_DSM_timings DSM;
    extern int32_t gFpaExposureTimeOffset;
    //extern int32_t gFpaDebugRegA;                       // reservé ELCORR pour correction électronique (gain et/ou offset)
    //extern int32_t gFpaDebugRegB;                       // reservé
@@ -616,11 +617,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern bool gCompressionBypassShiftForced;
    static uint8_t cfg_num;
 
-   // on bâtit les données de programmation du ROIC
-   FPA_BuildRoicRegs(pGCRegs, &hh);
+   // on bâtit les parametres specifiques
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs);
 
-   // on bâtit les parametres specifiques (est maintenant appelée dans FPA_BuildRoicRegs)
-   //FPA_SpecificParams(&hh, 0.0F, pGCRegs);
+   // on calcule les timings DSM
+   FPA_CalculateDSMTimings(pGCRegs->ExposureTime, &DSM);
+
+   // on bâtit les données de programmation du ROIC
+   FPA_BuildRoicRegs(pGCRegs, &hh, &DSM);
 
    // diag mode, diag type et data source
    ptrA->fpa_diag_mode = 0;                 // par defaut
@@ -784,6 +788,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // Si 0, il n'y aura pas de programmation du ROIC, mais la nouvelle fpa cfg sera appliquée.
    ptrA->roic_tx_nb_data = NUM_OF(RoicRegs) + 1;  // on envoie toujours tous les registres + le header
 
+   // paramètres de calcul des DSM
+   ptrA->dsm_period_constants = DSM.DSMConstants_clk;
+   ptrA->dsm_period_min = DSM.minDSMPeriod_clk;
+   ptrA->dsm_period_min_div_numerator = (uint32_t)roundf(exp2f((float)EXP_TIME_CONV_DENOMINATOR_BIT_POS) / (float)DSM.minDSMPeriod_clk);
+   ptrA->dsm_nb_period_max = DSM.maxNbDSMPeriod;
+   ptrA->dsm_nb_period_max_div_numerator = (uint32_t)roundf(exp2f((float)EXP_TIME_CONV_DENOMINATOR_BIT_POS) / (float)DSM.maxNbDSMPeriod);
+   ptrA->dsm_nb_period_min = DSM.minNbDSMPeriod;
+   ptrA->dsm_total_time_threshold = DSM.thresholdDSMTotal_clk;
+
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Déclenche la programmation du ROIC
    ptrA->cfg_num = ++cfg_num;
    
@@ -901,8 +914,8 @@ void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gc
 {
    extern float gFpaActualFreq_MHz;
 
-   // Make sure exposure time is rounded to a factor of ClkCore
-   float exposureTime = roundf(exposureTime_usec/1e6F * CALCIUM_CLK_CORE_HZ) / CALCIUM_CLK_CORE_HZ;
+   // Convert exposure time in seconds
+   float exposureTime = exposureTime_usec / 1e6F;
    
    // Diag config with shortest possible delays
    ptrH->diag_x_to_readout_start_dly = 0;
@@ -989,7 +1002,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    float MaxFrameRate;
    calcium_param_t hh;
 
-   FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
+   FPA_SpecificParams(&hh, pGCRegs->ExposureTime, pGCRegs);
 
    // ENO: 10 sept 2016: Apply margin
    MaxFrameRate = hh.frameRateMax * (1.0F - gFpaPeriodMinMargin);
@@ -1006,6 +1019,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    calcium_param_t hh;
+   t_calcium_DSM_timings DSM;
    float presentPeriod_sec;
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
@@ -1014,14 +1028,16 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
 
    // ENO: 10 sept 2016: tout reste inchangé
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nul
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
 
    // Calculate exposure time depending on mode ITR/IWR
    max_exposure_usec = (presentPeriod_sec - hh.integrationDelay - hh.int_end_to_trig_start_dly)*1e6F;
 
-   // Round exposure time
-   max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
+   // Round exposure time to a value supported by the FPA
+   FPA_CalculateDSMTimings(max_exposure_usec, &DSM);
+   max_exposure_usec = DSM.userRoundedExposureTime_usec;
+   //max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
 
    // Limit exposure time
    max_exposure_usec = MIN(MAX(max_exposure_usec, pGCRegs->ExposureTimeMin), FPA_MAX_EXPOSURE);
@@ -1187,6 +1203,13 @@ void FPA_PrintConfig(const t_FpaIntf *ptrA)
    FPA_INF("compr_en = %u", *p_addr++);
    FPA_INF("compr_bypass_shift = %u", *p_addr++);
    FPA_INF("roic_tx_nb_data = %u", *p_addr++);
+   FPA_INF("dsm_period_constants = %u", *p_addr++);
+   FPA_INF("dsm_period_min = %u", *p_addr++);
+   FPA_INF("dsm_period_min_div_numerator = %u", *p_addr++);
+   FPA_INF("dsm_nb_period_max = %u", *p_addr++);
+   FPA_INF("dsm_nb_period_max_div_numerator = %u", *p_addr++);
+   FPA_INF("dsm_nb_period_min = %u", *p_addr++);
+   FPA_INF("dsm_total_time_threshold = %u", *p_addr++);
    FPA_INF("cfg_num = %u", *p_addr++);
    FPA_INF("vdac_value(1) = %u", *p_addr++);
    FPA_INF("vdac_value(2) = %u", *p_addr++);
@@ -1230,20 +1253,35 @@ void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable)
 }
 
 //--------------------------------------------------------------------------
-// Pour bâtir les données de programmation du ROIC
-// ptrH retourne les paramètres de FPA_SpecificParams
+// Pour modifier la valeur d'un registre de programmation du ROIC
 //--------------------------------------------------------------------------
-void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
+bool FPA_ModifyRoicRegs(uint8_t regAddr, uint8_t regValue)
 {
-   extern bool gFpaWriteReg;
-   extern uint8_t gFpaWriteRegAddr;
-   extern uint8_t gFpaWriteRegValue;
+   uint8_t ii;
+
+   // On trouve l'adresse du registre pour le modifier
+   for (ii = 0; ii < NUM_OF(RoicRegs); ii++)
+   {
+      if (RoicRegs[ii].addr == regAddr)
+      {
+         RoicRegs[ii].data = regValue;
+         return true;
+      }
+   }
+
+   // l'adresse n'est pas présente
+   return false;
+}
+
+//--------------------------------------------------------------------------
+// Pour bâtir les données de programmation du ROIC
+//--------------------------------------------------------------------------
+void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH, t_calcium_DSM_timings *pDSM)
+{
    extern float gFpaActualFreq_MHz;
    extern int32_t gFpaDebugRegG;       // réservé pour le contrôle interne/externe du temps d'intégration
    extern int32_t gFpaDebugRegH;       // réservé pour l'activation/désactivation du LDO de VPIXQNB
    extern int32_t gFpaDebugRegI;       // réservé pour l'activation/désactivation des DSM
-
-   uint8_t ii;
 
    // Compile-time assertions
    _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_CORE_HZ == 0, "Unsupported ClkDDR/ClkCore ratio");
@@ -1251,30 +1289,10 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    _Static_assert((uint32_t)CALCIUM_CLK_CORE_HZ % (uint32_t)CALCIUM_CLK_CTRL_DSM_HZ == 0, "Unsupported ClkCore/ClkCtrlDSM ratio");
    _Static_assert((uint32_t)CALCIUM_CLK_DDR_HZ % (uint32_t)CALCIUM_CLK_COL_HZ == 0, "Unsupported ClkDDR/ClkCol ratio");
 
-   // Traitement des demandes du debug terminal
-   if (gFpaWriteReg)
-   {
-      // On trouve l'adresse du registre pour le modifier
-      for (ii = 0; ii < NUM_OF(RoicRegs); ii++)
-      {
-         if (RoicRegs[ii].addr == gFpaWriteRegAddr)
-         {
-            RoicRegs[ii].data = gFpaWriteRegValue;
-            break;
-         }
-      }
-
-      // Reset de la demande du debug terminal
-      gFpaWriteReg = false;
-   }
-
-   // on bâtit les paramètres spécifiques en tenant compte des valeurs possiblement changées par le debug terminal
-   FPA_SpecificParams(ptrH, 0.0F, pGCRegs);
-
-   /**
-    * On calcule tous les registres qui ont une valeur imposée.
-    * Le debug terminal ne peut pas les modifier.
-    */
+   //--------------------------------------------------------------------------
+   // On calcule tous les registres qui ont une valeur imposée.
+   // Le debug terminal ne peut pas les modifier.
+   //--------------------------------------------------------------------------
 
    // Clocks
    RoicRegs[bClkCoreCnt_idx].data = (uint8_t)(gFpaActualFreq_MHz * 1e6f / CALCIUM_CLK_CORE_HZ);
@@ -1335,46 +1353,77 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH)
    RoicRegs[bClkRowCntMSB_idx].data = (uint8_t)(bClkRowCnt >> 8);
 
    // Exposure time
-   uint32_t bIntCnt = (uint32_t)roundf(pGCRegs->ExposureTime/1e6f * CALCIUM_CLK_CORE_HZ - 1.0f); // delay is bIntCnt + 1
+   uint32_t bIntCnt = pDSM->CorrectedExposureTime_clk - 1;     // delay is bIntCnt + 1
    RoicRegs[bIntCntLSB_idx].data = (uint8_t)bIntCnt;
    RoicRegs[bIntCnt_idx].data    = (uint8_t)(bIntCnt >> 8);
    RoicRegs[bIntCntMSB_idx].data = (uint8_t)(bIntCnt >> 16);
-   float exposureTime = (float)(bIntCnt + 1) / CALCIUM_CLK_CORE_HZ;
 
-   // DSM timing
-   float tDSMDelta = (float)(RoicRegs[bDSMDeltaCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
-   float tDSMOH = (float)(RoicRegs[bDSMOHCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
-   float tDSMQRst = (float)(RoicRegs[bDSMQRstCnt_idx].data + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
-   // on commence avec le délai minimum et la valeur finale sera calculée plus tard
-   uint32_t bDSMDelayCnt = 0;
-   float tDSMDelay = (float)(bDSMDelayCnt + 1) / CALCIUM_CLK_CTRL_DSM_HZ;
-   // on commence avec le nombre de cycles maximum et la valeur finale sera calculée plus tard
-   uint32_t bDSMCycles = 255;
-   float tDSMPeriod = tDSMDelta + tDSMOH + tDSMQRst + tDSMDelay;
-   float tDSMTotal = tDSMDelay + (float)(bDSMCycles + 1) * tDSMPeriod;
-   // on calcule bDSMDelayCnt and bDSMCycles en fonction du temps d'intégration.
-   if (exposureTime > tDSMTotal)
+   // DSM timings
+   uint32_t bDSMCycles = pDSM->NbDSMPeriod - 2;      // number of cycles is bDSMCycles + 1 and there is 1 DSMPeriod for DSMInitDelay
+   RoicRegs[bDSMCyclesLSB_idx].data = (uint8_t)bDSMCycles;
+   RoicRegs[bDSMCyclesMSB_idx].data = (uint8_t)(bDSMCycles >> 8);
+   uint32_t bDSMDelayCnt = pDSM->DSMPeriod_clk - pDSM->DSMConstants_clk - 1;       // delay is bDSMDelayCnt + 1
+   RoicRegs[bDSMDelayCntLSB_idx].data = (uint8_t)bDSMDelayCnt;
+   RoicRegs[bDSMDelayCntMSB_idx].data = (uint8_t)(bDSMDelayCnt >> 8);
+   uint32_t bDSMInitDelayCnt = pDSM->DSMPeriod_clk - 1;     // delay is bDSMInitDelayCnt + 1
+   RoicRegs[bDSMInitDelayCntLSB_idx].data = (uint8_t)bDSMInitDelayCnt;
+   RoicRegs[bDSMInitDelayCntMSB_idx].data = (uint8_t)(bDSMInitDelayCnt >> 8);
+}
+
+//--------------------------------------------------------------------------
+// Pour calculer les timings DSM en fonction du temps d'intégration
+//--------------------------------------------------------------------------
+void FPA_CalculateDSMTimings(float userExposureTime_usec, t_calcium_DSM_timings *pDSM)
+{
+   extern int32_t gFpaExposureTimeOffset;
+
+   //--------------------------------------------------------------------------
+   // IMPORTANT: on considère que ClkCore et ClkCtrlDSM ont la même fréquence
+   //--------------------------------------------------------------------------
+
+   // on corrige le temps d'intégration en tenant compte de l'offset
+   float CorrectedExposureTime = (userExposureTime_usec + (float)gFpaExposureTimeOffset/EXPOSURE_TIME_FACTOR) / 1e6f;   // in sec
+   pDSM->CorrectedExposureTime_clk = (uint32_t)(CorrectedExposureTime * CALCIUM_CLK_CORE_HZ);   // on tronque ici pour faire un +1 plus loin
+
+   // on additionne toutes les valeurs de la période DSM que l'on n'ajuste pas
+   pDSM->DSMConstants_clk = (RoicRegs[bDSMDeltaCnt_idx].data + 1) +     // delay is bDSMDeltaCnt + 1
+         (RoicRegs[bDSMOHCnt_idx].data + 1) +                           // delay is bDSMOHCnt + 1
+         (RoicRegs[bDSMQRstCnt_idx].data + 1);                          // delay is bDSMQRstCnt + 1
+
+   // on calcule la période DSM minimum en se servant du délai minimum (bDSMDelayCnt + 1 où bDSMDelayCnt = 0)
+   pDSM->minDSMPeriod_clk = 1 + pDSM->DSMConstants_clk;
+
+   // on calcule le temps total du mécanisme DSM pour faire le maximum de cycles (255).
+   // on simplifie l'équation DSMTotal = DSMInitDelay + DSMCycles * DSMPeriod
+   // en utilisant DSMInitDelay = DSMPeriod. Il y a donc 256 périodes DSM.
+   pDSM->maxNbDSMPeriod = 256;
+   pDSM->minNbDSMPeriod = 2;     // le nombre de périodes est bDSMCycles + 1 et il y a 1 autre période pour DSMInitDelay
+   pDSM->thresholdDSMTotal_clk = pDSM->maxNbDSMPeriod * pDSM->minDSMPeriod_clk;
+
+   // on calcule la période et le nombre de périodes DSM en fonction du temps d'intégration
+   if (pDSM->CorrectedExposureTime_clk > pDSM->thresholdDSMTotal_clk)
    {
-      // le temps d'intégration est plus long que le temps total
-      // - on conserve le maximum de cycles
-      // - on augmente le délai pour que le temps total soit aussi long que le temps d'intégration
-      tDSMDelay = (exposureTime - (float)(bDSMCycles + 1) * (tDSMDelta + tDSMOH + tDSMQRst)) / (float)(bDSMCycles + 2);
-      bDSMDelayCnt = MAX((uint32_t)(tDSMDelay * CALCIUM_CLK_CTRL_DSM_HZ - 1.0f), 0); // delay is bDSMDelayCnt + 1
+      // le temps d'intégration est plus long que le temps total de DSM
+      // - on conserve le nombre de périodes maximum
+      pDSM->NbDSMPeriod = pDSM->maxNbDSMPeriod;
+      // - on augmente la période DSM pour que le temps total soit aussi long que le temps d'intégration
+      pDSM->DSMPeriod_clk = MAX(pDSM->CorrectedExposureTime_clk / pDSM->maxNbDSMPeriod, pDSM->minDSMPeriod_clk);  // la période est tronquée pour être plus petite
    }
    else
    {
       // le temps d'intégration est plus court que le temps total de DSM
-      // - on conserve le délai minimum
-      // - on diminue le nombre de cycles jusqu'à ce que le temps total soit aussi long que le temps d'intégration
-      bDSMCycles = MAX((uint32_t)((exposureTime - tDSMDelay) / tDSMPeriod - 1.0f), 0);
+      // - on conserve la période DSM minimum
+      pDSM->DSMPeriod_clk = pDSM->minDSMPeriod_clk;
+      // - on diminue le nombre de périodes jusqu'à ce que le temps total soit aussi long que le temps d'intégration
+      pDSM->NbDSMPeriod = MAX(pDSM->CorrectedExposureTime_clk / pDSM->minDSMPeriod_clk, pDSM->minNbDSMPeriod);    // le nombre de périodes est tronqué pour être plus petit
    }
-   RoicRegs[bDSMCyclesLSB_idx].data = (uint8_t)bDSMCycles;
-   RoicRegs[bDSMCyclesMSB_idx].data = (uint8_t)(bDSMCycles >> 8);
-   RoicRegs[bDSMDelayCntLSB_idx].data = (uint8_t)bDSMDelayCnt;
-   RoicRegs[bDSMDelayCntMSB_idx].data = (uint8_t)(bDSMDelayCnt >> 8);
-   // on utilise bDSMInitDelayCnt = bDSMDelayCnt
-   RoicRegs[bDSMInitDelayCntLSB_idx].data = (uint8_t)bDSMDelayCnt;
-   RoicRegs[bDSMInitDelayCntMSB_idx].data = (uint8_t)(bDSMDelayCnt >> 8);
+
+   // on met à jour le temps d'intégration qui est maintenant arrondi à une valeur multiple de la période DSM
+   // - qui tient compte de l'offset
+   pDSM->CorrectedExposureTime_clk = pDSM->NbDSMPeriod * pDSM->DSMPeriod_clk + 1;   // +1 pour être strictement > DSMTotal
+   CorrectedExposureTime = (float)pDSM->CorrectedExposureTime_clk / CALCIUM_CLK_CORE_HZ;   // in sec
+   // - qui ne tient pas compte de l'offset (pour l'usager)
+   pDSM->userRoundedExposureTime_usec = CorrectedExposureTime * 1e6f - (float)gFpaExposureTimeOffset/EXPOSURE_TIME_FACTOR;
 }
 
 //--------------------------------------------------------------------------

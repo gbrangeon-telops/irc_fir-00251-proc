@@ -164,6 +164,14 @@ package Proxy_define is
       
       roic_tx_nb_data                  : unsigned(7 downto 0);             -- nombre de données à envoyer au ROIC
       
+      dsm_period_constants             : unsigned(8 downto 0);             -- somme des parties constantes de la période DSM en ClkDSM
+      dsm_period_min                   : unsigned(8 downto 0);             -- durée min de la période DSM en ClkDSM
+      dsm_period_min_div_numerator     : unsigned(31 downto 0);            -- valeur multiplicative pour obtenir la division par la période DSM min
+      dsm_nb_period_max                : unsigned(8 downto 0);             -- nombre max de périodes DSM
+      dsm_nb_period_max_div_numerator  : unsigned(31 downto 0);            -- valeur multiplicative pour obtenir la division par le nombre max de périodes DSM
+      dsm_nb_period_min                : unsigned(3 downto 0);             -- nombre min de périodes DSM
+      dsm_total_time_threshold         : unsigned(15 downto 0);            -- threshold de temps total du mécanisme DSM pour utiliser le nombre max de périodes DSM
+      
       cfg_num                          : unsigned(7 downto 0);             -- numéro incrémental de la config actuelle
       
       vdac_value                       : fleg_vdac_value_type;             -- config du DAC. définition dans fleg_brd_define
@@ -288,6 +296,13 @@ package body Proxy_define is
          std_logic_vector(resize(FPA_INTF_CFG.compr_en, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.compr_bypass_shift, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.roic_tx_nb_data, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_period_constants, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_period_min, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_period_min_div_numerator, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_nb_period_max, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_nb_period_max_div_numerator, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_nb_period_min, a(0)'length)),
+         std_logic_vector(resize(FPA_INTF_CFG.dsm_total_time_threshold, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.cfg_num, a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(1), a(0)'length)),
          std_logic_vector(resize(FPA_INTF_CFG.vdac_value(2), a(0)'length)),

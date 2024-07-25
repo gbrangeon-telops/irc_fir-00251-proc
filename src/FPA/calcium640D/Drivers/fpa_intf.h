@@ -168,6 +168,13 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t compr_en;
    uint32_t compr_bypass_shift;
    uint32_t roic_tx_nb_data;
+   uint32_t dsm_period_constants;
+   uint32_t dsm_period_min;
+   uint32_t dsm_period_min_div_numerator;
+   uint32_t dsm_nb_period_max;
+   uint32_t dsm_nb_period_max_div_numerator;
+   uint32_t dsm_nb_period_min;
+   uint32_t dsm_total_time_threshold;
    uint32_t cfg_num;
    
 };
@@ -255,6 +262,24 @@ struct s_FpaStatus    //
 };
 typedef struct s_FpaStatus t_FpaStatus;
 
+// Structure pour les timings DSM
+typedef struct
+{
+   // paramètres de calculs
+   uint32_t DSMConstants_clk;
+   uint32_t minDSMPeriod_clk;
+   uint32_t maxNbDSMPeriod;
+   uint32_t minNbDSMPeriod;
+   uint32_t thresholdDSMTotal_clk;
+
+   // résultats
+   uint32_t NbDSMPeriod;
+   uint32_t DSMPeriod_clk;
+   uint32_t CorrectedExposureTime_clk;
+   float    userRoundedExposureTime_usec;
+} t_calcium_DSM_timings;
+
+
 extern t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE];
 						
 
@@ -285,10 +310,16 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 void FPA_PrintConfig(const t_FpaIntf *ptrA);
 
 // pour mettre les io en 'Z' avant d'éteindre la carte DDC
-void  FPA_PowerDown(const t_FpaIntf *ptrA);
+void FPA_PowerDown(const t_FpaIntf *ptrA);
 
 // pour activer/désactiver la LED de warning.
 void FPA_SetWarningLed(const t_FpaIntf *ptrA, const bool enable);
+
+// pour modifier la valeur d'un registre de programmation du ROIC
+bool FPA_ModifyRoicRegs(uint8_t regAddr, uint8_t regValue);
+
+// pour calculer les timings DSM en fonction du temps d'intégration
+void FPA_CalculateDSMTimings(float userExposureTime_usec, t_calcium_DSM_timings *pDSM);
 
 // pour lire les données reçues du ROIC
 uint8_t FPA_ReadRoicRegs(const t_FpaIntf *ptrA);
