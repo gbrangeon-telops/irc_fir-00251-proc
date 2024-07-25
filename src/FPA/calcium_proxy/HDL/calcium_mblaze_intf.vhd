@@ -125,7 +125,7 @@ architecture rtl of calcium_mblaze_intf is
    signal kpix_status                  : std_logic_vector(31 downto 0);
    signal compr_err_latch              : std_logic_vector(COMPR_ERR'range);
    signal reset_roic_rx_data_i         : std_logic;
-   signal dsm_period                   : unsigned(USER_CFG.dsm_period_min'length-1 downto 0);
+   signal dsm_period                   : unsigned(ROIC_EXP_TIME_CFG.bDSMDelayCnt'length-1 downto 0);
    signal dsm_period_delay             : unsigned(dsm_period'length-1 downto 0);
    signal dsm_nb_period                : unsigned(USER_CFG.dsm_nb_period_max'length-1 downto 0);
    
