@@ -184,7 +184,7 @@
 
 // Phase adjustment
 #define DEFAULT_REGC_VAL                           0
-#define DEFAULT_REGD_VAL                           243
+#define DEFAULT_REGD_VAL                           216
 #define DEFAULT_REGF_VAL                           13
 
 struct s_ProximCfgConfig 
