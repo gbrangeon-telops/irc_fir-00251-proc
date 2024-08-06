@@ -1751,8 +1751,10 @@ void GC_UpdateExposureTimeMin()
       }
       else
       {
+#ifdef FPA_AECP_MIN_EXPOSURE
          // Use the most restrictive value (max)
          UserExposureTimeMin = MAX(UserExposureTimeMin, FPA_AECP_MIN_EXPOSURE);
+#endif
       }
    }
 

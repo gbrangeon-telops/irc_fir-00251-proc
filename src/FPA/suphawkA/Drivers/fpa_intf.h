@@ -79,12 +79,7 @@
 #define FPA_EXPOSURE_TIME_RESOLUTION   (1E6F/FPA_MCLK_RATE_HZ)
 
 #define FPA_MIN_EXPOSURE               0.2F    // [us] 2 coups d'horloge en µsec. ENO 27 juillet 2019: Penser à l'envoyer dans un registre car doit tenir compte de gFpaExposureTimeOffset.
-#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
-
-#define FPA_CAL_MIN_EXPOSURE           FPA_MIN_EXPOSURE //
-#define FPA_CAL_MAX_EXPOSURE           FPA_MAX_EXPOSURE
-
-#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend
 
 #define FPA_DATA_RESOLUTION            14
 #define FPA_PIXEL_PITCH                8E-6F

@@ -71,9 +71,6 @@
 #define FPA_EHDRI_EXP_2    100.0F
 #define FPA_EHDRI_EXP_3    200.0F  // Saturation à 28
 
-#define FPA_CAL_MIN_EXPOSURE  1.0F
-#define FPA_CAL_MAX_EXPOSURE  1000000.0F
-
 #define FPA_MIN_EXPOSURE               1.0F     // [us]
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend
 

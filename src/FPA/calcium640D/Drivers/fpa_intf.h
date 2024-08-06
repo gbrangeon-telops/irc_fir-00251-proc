@@ -94,11 +94,6 @@
 #define FPA_MIN_EXPOSURE               1.0F  // [us]
 #define FPA_MAX_EXPOSURE               (1048575.0F * FPA_EXPOSURE_TIME_RESOLUTION)   // [us]  registre bIntcnt est sur 20b
 
-#define FPA_CAL_MIN_EXPOSURE           FPA_MIN_EXPOSURE
-#define FPA_CAL_MAX_EXPOSURE           FPA_MAX_EXPOSURE
-
-#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
-
 #define FPA_DATA_RESOLUTION            16       // for AEC
 #define FPA_PIXEL_PITCH                20E-6F
 

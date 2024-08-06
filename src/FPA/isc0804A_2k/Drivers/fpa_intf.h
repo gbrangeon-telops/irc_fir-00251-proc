@@ -70,13 +70,8 @@
 #define FPA_EHDRI_EXP_2    100.0F
 #define FPA_EHDRI_EXP_3    200.0F  // Saturation à 28
 
-#define FPA_CAL_MIN_EXPOSURE   0.400F
-#define FPA_CAL_MAX_EXPOSURE  1000000.0F
-
 #define FPA_MIN_EXPOSURE               0.400F //0.271F     // 0.6F //0.271F     // [us]
-#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
-
-#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend
 
 #define FPA_DATA_RESOLUTION 14
 #define FPA_PIXEL_PITCH                25E-6F
