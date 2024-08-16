@@ -103,7 +103,6 @@ architecture rtl of xro3503A_digio_map is
    signal lsync_i          : std_logic;
    signal fsync_i          : std_logic;
    signal mclk_i           : std_logic;
-   signal mclk_pipe        : std_logic_vector(1 downto 0);
    signal dac_csn_i        : std_logic;
    signal dac_sd_i         : std_logic;
    signal dac_sclk_i       : std_logic;
@@ -120,9 +119,6 @@ architecture rtl of xro3503A_digio_map is
    signal dac_sd_iob       : std_logic;
    signal dac_sclk_iob     : std_logic;
    signal fsm_sreset       : std_logic;
-   
-   signal prog_mclk_i      : std_logic;
-   signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
    
    signal fpa_pwr_override : std_logic;
    
@@ -234,8 +230,6 @@ begin
             
          else
             
-            mclk_pipe <= mclk_pipe(mclk_pipe'high-1 downto 0) & FPA_MCLK;  -- FSYNC et LSYNC sont en retard de 2 MCLK_SOURCE alors on retarde la sortie de MCLK pour les réaligner.
-            
             case fpa_digio_fsm is          
                
                -- delai
@@ -295,7 +289,7 @@ begin
                   prog_csn_i <= PROG_CSN;
                   lsync_i <= FPA_LSYNC;
                   fsync_i <= FPA_INT;
-                  mclk_i <= mclk_pipe(mclk_pipe'high);
+                  mclk_i <= FPA_MCLK;   -- FSYNC et LSYNC sont alignés sur les fronts descendants de MCLK comme dans la spec.
                   if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
                      fpa_digio_fsm <= fpa_cst_output_st;
                   end if;
@@ -305,7 +299,7 @@ begin
                
                when fpa_cst_output_st => -- la sortie du detecteur reste à la valeur nulle
                   -- on laisse passer seulement MCLK. Les autres signaux restent a leur derniere valeur
-                  mclk_i <= mclk_pipe(mclk_pipe'high);
+                  mclk_i <= FPA_MCLK;
                   if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
                      fpa_digio_fsm <= passthru_st;
                   end if;

@@ -286,7 +286,7 @@ begin
                
                when readout_st =>                    --
                   readout_in_progress <= '1';
-                  lsync_pipe(0) <= sol_pipe_pclk(0) or sol_pipe_pclk(1);  --           
+                  lsync_pipe(0) <= sol_pipe_pclk(0);  -- LSYNC monte pour un coup de PCLK
                   if lsync_pipe(1) = '1' and lsync_pipe(0) = '0' then    -- on compte les lsync
                      lsync_cnt <= lsync_cnt + 1; 
                   end if;
