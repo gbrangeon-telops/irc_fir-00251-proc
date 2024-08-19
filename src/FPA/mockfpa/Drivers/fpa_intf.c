@@ -75,6 +75,7 @@ typedef struct mockfpa_param_s  mockfpa_param_t;
 
 // Global variables
 t_FpaStatus gStat;                        // devient une variable globale
+t_FpaResolutionCfg gFpaResolutionCfg[FPA_MAX_NUMBER_CONFIG_MODE] = {FPA_STANDARD_RESOLUTION};
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
