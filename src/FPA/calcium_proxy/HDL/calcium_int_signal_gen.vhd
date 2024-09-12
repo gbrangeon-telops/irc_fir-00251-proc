@@ -52,7 +52,7 @@ architecture rtl of calcium_int_signal_gen is
       );
    end component;
    
-   type int_gen_fsm_type is (idle, prog_trig_param_st, xtra_trig_param_st, acq_trig_param_st, check_int_cnt_st, int_delay_st, int_delay2_st, int_gen_st);
+   type int_gen_fsm_type is (idle, int_param_st, check_int_cnt_st, int_delay_st, int_delay2_st, int_gen_st);
    type int_fdbk_fsm_type is (idle, int_fdbk_dly_st, int_fdbk_gen_st);
    
    signal int_gen_fsm               : int_gen_fsm_type;
@@ -119,32 +119,24 @@ begin
                   permit_int_change_i <= not ACQ_TRIG and not XTRA_TRIG and not PROG_TRIG;
                   if ACQ_TRIG = '1' then        -- ACQ_TRIG uniquement car ne jamais envoyer acq_int_i en mode XTRA_TRIG
                      acq_frame <= '1';
-                     int_gen_fsm <= acq_trig_param_st;
+                     int_gen_fsm <= int_param_st;
                   end if;
                   if XTRA_TRIG = '1' then
                      acq_frame <= '0';
-                     int_gen_fsm <= xtra_trig_param_st;
+                     int_gen_fsm <= int_param_st;
                   end if;
                   if PROG_TRIG = '1' then
                      acq_frame <= '0';
-                     int_gen_fsm <= prog_trig_param_st;
+                     int_gen_fsm <= int_param_st;
                   end if;
                
-               when prog_trig_param_st =>
-                  int_cnt <= resize(FPA_INTF_CFG.COMN.FPA_PROG_TRIG_INT_TIME, int_cnt'length);
-                  int_time_i <= resize(FPA_INTF_CFG.COMN.FPA_PROG_TRIG_INT_TIME, int_time_i'length);
-                  int_gen_fsm <= check_int_cnt_st;
-               
-               when xtra_trig_param_st =>
-                  int_cnt <= resize(FPA_INTF_CFG.COMN.FPA_XTRA_TRIG_INT_TIME, int_cnt'length);
-                  int_time_i <= resize(FPA_INTF_CFG.COMN.FPA_XTRA_TRIG_INT_TIME, int_time_i'length);
-                  int_gen_fsm <= check_int_cnt_st;
-               
-               when acq_trig_param_st =>          -- pour ameliorer timings et aussi pour sortir les données avant le signal de validation qu'est acq_int.
-                  int_cnt <= resize(FPA_INTF_CFG.INT_SIGNAL_HIGH_TIME, int_cnt'length);
-                  frame_id_i <= frame_id_i + 1;   -- on ne change pas d'ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
+               when int_param_st =>          -- pour ameliorer timings et aussi pour sortir les données avant le signal de validation qu'est acq_int.
+                  if acq_frame = '1' then
+                     frame_id_i <= frame_id_i + 1;   -- on ne change pas d'ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
+                  end if;
                   int_indx_i <= resize(FPA_INTF_CFG.INT_INDX, int_indx_i'length);
                   int_time_i <= resize(FPA_INTF_CFG.INT_TIME, int_time_i'length);
+                  int_cnt <= resize(FPA_INTF_CFG.INT_SIGNAL_HIGH_TIME, int_cnt'length);
                   int_gen_fsm <= check_int_cnt_st;
                
                when check_int_cnt_st =>

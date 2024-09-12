@@ -170,110 +170,101 @@
 #define bPixBECtrl_idx              15
 #define bPixClampDelayCnt_idx       16
 #define bPixTstNOCCnt_idx           17
-#define bIntCntLSB_idx              18
-#define bIntCnt_idx                 19
-#define bIntCntMSB_idx              20
-#define bFrmHoldOffLSB_idx          21
-#define bFrmHoldOff_idx             22
-#define bFrmHoldOffMSB_idx          23
-#define bClkRowDelayCnt_idx         24
-#define bClkCtrlDSMDiv_idx          25
-#define bDSMCyclesLSB_idx           26
-#define bDSMCyclesMSB_idx           27
-#define bDSMDeltaCnt_idx            28
-#define bDSMOHCnt_idx               29
-#define bDSMQRstCnt_idx             30
-#define bDSMDelayCntLSB_idx         31
-#define bDSMDelayCntMSB_idx         32
-#define bDSMInitDelayCntLSB_idx     33
-#define bDSMInitDelayCntMSB_idx     34
-#define bDSMSeedRowsSel_idx         35
-#define bColGrpStart_idx            36
-#define bColGrpStop_idx             37
-#define bTstDig_idx                 38
-#define bTstAddrDig1_idx            39
-#define bTstAddrDig2_idx            40
-#define bADCtrl_idx                 41
-#define bADOSamp_idx                42
-#define bADDigOSLSB_idx             43
-#define bADDigOS_idx                44
-#define bADDigOSMSB_idx             45
-#define bADRstCnt_idx               46
-#define bADCalCtrl_idx              47
-#define bADCalOSampCtrl_idx         48
-#define bADCalConstLSB_idx          49
-#define bADCalConstMSB_idx          50
-#define bADCal2Const_idx            51
-#define bADCalClkLSB_idx            52
-#define bADCalClkMSB_idx            53
-#define bADCal2ClkLSB_idx           54
-#define bADCal2ClkMSB_idx           55
-#define bADCalDigOSLSB_idx          56
-#define bADCalDigOS_idx             57
-#define bADCalDigOSMSB_idx          58
-#define bADCalCnt1_idx              59
-#define bADCalCnt2_idx              60
-#define bDVPOffsetLSB_idx           61
-#define bDVPOffset_idx              62
-#define bDVPOffsetMSB_idx           63
-#define bResidueHandler_idx         64
-#define bResDataMaxLSB_idx          65
-#define bResDataMax_idx             66
-#define bResDataMaxMSB_idx          67
-#define bDataHandler_idx            68
-#define bOutCtrl_idx                69
-#define bTxCtrl_idx                 70
-#define bLVDSCtrl_idx               71
-#define bSkewXCLK_idx               72
-#define bSkewX1_idx                 73
-#define bSkewX2_idx                 74
-#define bSkewX3_idx                 75
-#define bSkewX4_idx                 76
-#define bSkewX5_idx                 77
-#define bSkewX6_idx                 78
-#define bSkewX7_idx                 79
-#define bSkewX8_idx                 80
-#define bClkCoreCnt_idx             81
-#define bClkColCnt_idx              82
-#define b3PixBiasMstr1_idx          83
-#define b3PixPDIBias_idx            84
-#define b3PixCPDIBias_idx           85
-#define b3PixCompRef_idx            86
-#define b3PixCompRefBias1_idx       87
-#define b3PixCompRefBias2_idx       88
-#define b3PixQNB_idx                89
-#define b3PixQNBBias1_idx           90
-#define b3PixQNBBias2_idx           91
-#define b3PixAnaCtrl_idx            92
-#define b3RstLimRamp_idx            93
-#define b3PixRstLim_idx             94
-#define b3PixAnaEn_idx              95
-#define b3TstAna_idx                96
-#define b3TR2I_idx                  97
-#define b3PixBiasMstr2_idx          98
-#define b3PixClamp_idx              99
-#define b3PixClampCtrl_idx          100
-#define b3BISTRmpCtrl_3p3_idx       101
-#define b3BISTSlope_idx             102
-#define b3BISTOffset_idx            103
-#define b3BISTRmpBias_idx           104
-#define b3ColBias_idx               105
-#define b3ColCtrl_idx               106
-#define b3ColDRBias_idx             107
-#define b3ADCtrl_idx                108
-#define b3ADBiasMstr_idx            109
-#define b3ADBiasBuf_idx             110
-#define b3ADBiasComp_idx            111
-#define b3ADRamp_idx                112
-#define b3ADRampTrim_idx            113
-#define b3ADBiasRampBuf_idx         114
-#define b3ADRefLow_idx              115
-#define b3ADRmpI1Ctrl_idx           116
-#define b3ADBiasRmpI1DR_idx         117
-#define b3LVDSBiasMstr_idx          118
-#define b3LVDSBias_idx              119
-#define b3LVDSBiasRec_idx           120
-#define b3TstAddrAna_idx            121
+#define bFrmHoldOffLSB_idx          18
+#define bFrmHoldOff_idx             19
+#define bFrmHoldOffMSB_idx          20
+#define bClkRowDelayCnt_idx         21
+#define bClkCtrlDSMDiv_idx          22
+#define bDSMDeltaCnt_idx            23
+#define bDSMOHCnt_idx               24
+#define bDSMQRstCnt_idx             25
+#define bDSMSeedRowsSel_idx         26
+#define bColGrpStart_idx            27
+#define bColGrpStop_idx             28
+#define bTstDig_idx                 29
+#define bTstAddrDig1_idx            30
+#define bTstAddrDig2_idx            31
+#define bADCtrl_idx                 32
+#define bADOSamp_idx                33
+#define bADDigOSLSB_idx             34
+#define bADDigOS_idx                35
+#define bADDigOSMSB_idx             36
+#define bADRstCnt_idx               37
+#define bADCalCtrl_idx              38
+#define bADCalOSampCtrl_idx         39
+#define bADCalConstLSB_idx          40
+#define bADCalConstMSB_idx          41
+#define bADCal2Const_idx            42
+#define bADCalClkLSB_idx            43
+#define bADCalClkMSB_idx            44
+#define bADCal2ClkLSB_idx           45
+#define bADCal2ClkMSB_idx           46
+#define bADCalDigOSLSB_idx          47
+#define bADCalDigOS_idx             48
+#define bADCalDigOSMSB_idx          49
+#define bADCalCnt1_idx              50
+#define bADCalCnt2_idx              51
+#define bDVPOffsetLSB_idx           52
+#define bDVPOffset_idx              53
+#define bDVPOffsetMSB_idx           54
+#define bResidueHandler_idx         55
+#define bResDataMaxLSB_idx          56
+#define bResDataMax_idx             57
+#define bResDataMaxMSB_idx          58
+#define bDataHandler_idx            59
+#define bOutCtrl_idx                60
+#define bTxCtrl_idx                 61
+#define bLVDSCtrl_idx               62
+#define bSkewXCLK_idx               63
+#define bSkewX<1>_idx               64
+#define bSkewX<2>_idx               65
+#define bSkewX<3>_idx               66
+#define bSkewX<4>_idx               67
+#define bSkewX<5>_idx               68
+#define bSkewX<6>_idx               69
+#define bSkewX<7>_idx               70
+#define bSkewX<8>_idx               71
+#define bClkCoreCnt_idx             72
+#define bClkColCnt_idx              73
+#define b3PixBiasMstr1_idx          74
+#define b3PixPDIBias_idx            75
+#define b3PixCPDIBias_idx           76
+#define b3PixCompRef_idx            77
+#define b3PixCompRefBias1_idx       78
+#define b3PixCompRefBias2_idx       79
+#define b3PixQNB_idx                80
+#define b3PixQNBBias1_idx           81
+#define b3PixQNBBias2_idx           82
+#define b3PixAnaCtrl_idx            83
+#define b3RstLimRamp_idx            84
+#define b3PixRstLim_idx             85
+#define b3PixAnaEn_idx              86
+#define b3TstAna_idx                87
+#define b3TR2I_idx                  88
+#define b3PixBiasMstr2_idx          89
+#define b3PixClamp_idx              90
+#define b3PixClampCtrl_idx          91
+#define b3BISTRmpCtrl_3p3_idx       92
+#define b3BISTSlope_idx             93
+#define b3BISTOffset_idx            94
+#define b3BISTRmpBias_idx           95
+#define b3ColBias_idx               96
+#define b3ColCtrl_idx               97
+#define b3ColDRBias_idx             98
+#define b3ADCtrl_idx                99
+#define b3ADBiasMstr_idx            100
+#define b3ADBiasBuf_idx             101
+#define b3ADBiasComp_idx            102
+#define b3ADRamp_idx                103
+#define b3ADRampTrim_idx            104
+#define b3ADBiasRampBuf_idx         105
+#define b3ADRefLow_idx              106
+#define b3ADRmpI1Ctrl_idx           107
+#define b3ADBiasRmpI1DR_idx         108
+#define b3LVDSBiasMstr_idx          109
+#define b3LVDSBias_idx              110
+#define b3LVDSBiasRec_idx           111
+#define b3TstAddrAna_idx            112
 /* Macros GET et SET pour certains champs des registres */
 #define REG_FIELD_GET(idx, mask, shift)            ((RoicRegs[idx].data & (mask)) >> (shift))
 #define REG_FIELD_SET(idx, mask, shift, val)       BitMaskClr(RoicRegs[idx].data, (mask)); BitMaskSet(RoicRegs[idx].data, ((val) << (shift)) & (mask))
@@ -382,23 +373,14 @@ static t_RoicRegister RoicRegs[] = {
       /* bPixBECtrl */           {.addr = 19,  .data = 7},
       /* bPixClampDelayCnt */    {.addr = 20,  .data = 0},
       /* bPixTstNOCCnt */        {.addr = 21,  .data = 8},
-      /* bIntCntLSB */           {.addr = 22,  .data = 9},
-      /* bIntCnt */              {.addr = 23,  .data = 0},
-      /* bIntCntMSB */           {.addr = 24,  .data = 0},
       /* bFrmHoldOffLSB */       {.addr = 25,  .data = 0},
       /* bFrmHoldOff */          {.addr = 26,  .data = 0},
       /* bFrmHoldOffMSB */       {.addr = 27,  .data = 0},
       /* bClkRowDelayCnt */      {.addr = 28,  .data = 0},
       /* bClkCtrlDSMDiv */       {.addr = 29,  .data = 1},
-      /* bDSMCyclesLSB */        {.addr = 30,  .data = 0},
-      /* bDSMCyclesMSB */        {.addr = 31,  .data = 0},
       /* bDSMDeltaCnt */         {.addr = 32,  .data = 1},
       /* bDSMOHCnt */            {.addr = 33,  .data = 0},
       /* bDSMQRstCnt */          {.addr = 34,  .data = 3},
-      /* bDSMDelayCntLSB */      {.addr = 35,  .data = 0},
-      /* bDSMDelayCntMSB */      {.addr = 36,  .data = 0},
-      /* bDSMInitDelayCntLSB */  {.addr = 37,  .data = 0},
-      /* bDSMInitDelayCntMSB */  {.addr = 38,  .data = 0},
       /* bDSMSeedRowsSel */      {.addr = 39,  .data = 6},
       /* bColGrpStart */         {.addr = 40,  .data = 1},
       /* bColGrpStop */          {.addr = 41,  .data = 80},
@@ -487,6 +469,20 @@ static t_RoicRegister RoicRegs[] = {
       /* b3LVDSBiasRec */        {.addr = 210, .data = 110},
       /* b3TstAddrAna */         {.addr = 240, .data = 0}
 };
+// L'exposure time et les timings DSM ne sont plus transmis dans la config complète.
+// Seul le VHDL programme ces paramètres.
+// Par contre on peut les lire pour avoir leurs valeurs.
+static t_RoicRegister ReadOnlyRoicRegs[] = {
+      /* bIntCntLSB */           {.addr = 22,  .data = 0},
+      /* bIntCnt */              {.addr = 23,  .data = 0},
+      /* bIntCntMSB */           {.addr = 24,  .data = 0},
+      /* bDSMCyclesLSB */        {.addr = 30,  .data = 0},
+      /* bDSMCyclesMSB */        {.addr = 31,  .data = 0},
+      /* bDSMDelayCntLSB */      {.addr = 35,  .data = 0},
+      /* bDSMDelayCntMSB */      {.addr = 36,  .data = 0},
+      /* bDSMInitDelayCntLSB */  {.addr = 37,  .data = 0},
+      /* bDSMInitDelayCntMSB */  {.addr = 38,  .data = 0}
+};
 
 
 // Prototypes fonctions internes
@@ -494,7 +490,7 @@ void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_SpecificParams(calcium_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH, t_calcium_DSM_timings *pDSM);
-void FPA_SendRoicRegs(const t_FpaIntf *ptrA);
+uint8_t FPA_SendRoicRegs(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
@@ -664,9 +660,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
-   // intégration des prog
-   ptrA->fpa_xtra_trig_int_time = (uint32_t)(FPA_MIN_EXPOSURE/1e6F * VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_prog_trig_int_time = (uint32_t)(FPA_MIN_EXPOSURE/1e6F * VHD_CLK_100M_RATE_HZ);
+   // intégration des prog (ne sont pas utilisés)
+   ptrA->fpa_xtra_trig_int_time = (uint32_t)(pGCRegs->ExposureTimeMin/1e6F * VHD_CLK_100M_RATE_HZ);
+   ptrA->fpa_prog_trig_int_time = (uint32_t)(pGCRegs->ExposureTimeMin/1e6F * VHD_CLK_100M_RATE_HZ);
    
    // conversion du temps d'intégration
    ptrA->intclk_to_clk100_conv_numerator = (uint32_t)roundf(VHD_CLK_100M_RATE_HZ * exp2f((float)EXP_TIME_CONV_DENOMINATOR_BIT_POS) / CALCIUM_CLK_CORE_HZ);
@@ -783,10 +779,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->compr_bypass_shift = (uint32_t)gCompressionBypassShift;
    if (gCompressionAlgorithm == CA_BitShift && pGCRegs->CalibrationMode != CM_Raw0)
       FPA_ERR("Bit Shift compression should only be used in Raw0");
-   
-   // Nombre de données envoyées pour la programmation du ROIC
-   // Si 0, il n'y aura pas de programmation du ROIC, mais la nouvelle fpa cfg sera appliquée.
-   ptrA->roic_tx_nb_data = NUM_OF(RoicRegs) + 1;  // on envoie toujours tous les registres + le header
 
    // paramètres de calcul des DSM
    ptrA->dsm_period_constants = DSM.DSMConstants_clk;
@@ -901,7 +893,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    FPA_SendProximCfg(&ProximCfg, ptrA);
 
    // envoi des données de programmation du ROIC
-   FPA_SendRoicRegs(ptrA);
+   // si roic_tx_nb_data est à 0, il n'y aura pas de programmation du ROIC, mais la nouvelle fpa cfg sera appliquée.
+   ptrA->roic_tx_nb_data = FPA_SendRoicRegs(ptrA);
     
    // envoi du reste de la config 
    WriteStruct(ptrA);
@@ -1351,23 +1344,6 @@ void FPA_BuildRoicRegs(const gcRegistersData_t *pGCRegs, calcium_param_t *ptrH, 
    uint32_t bClkRowCnt = (uint32_t)roundf(ptrH->readoutRowTime * CALCIUM_CLK_COL_HZ - 1.0f); // delay is bClkRowCnt + 1
    RoicRegs[bClkRowCntLSB_idx].data = (uint8_t)bClkRowCnt;
    RoicRegs[bClkRowCntMSB_idx].data = (uint8_t)(bClkRowCnt >> 8);
-
-   // Exposure time
-   uint32_t bIntCnt = pDSM->CorrectedExposureTime_clk - 1;     // delay is bIntCnt + 1
-   RoicRegs[bIntCntLSB_idx].data = (uint8_t)bIntCnt;
-   RoicRegs[bIntCnt_idx].data    = (uint8_t)(bIntCnt >> 8);
-   RoicRegs[bIntCntMSB_idx].data = (uint8_t)(bIntCnt >> 16);
-
-   // DSM timings
-   uint32_t bDSMCycles = pDSM->NbDSMPeriod - 2;      // number of cycles is bDSMCycles + 1 and there is 1 DSMPeriod for DSMInitDelay
-   RoicRegs[bDSMCyclesLSB_idx].data = (uint8_t)bDSMCycles;
-   RoicRegs[bDSMCyclesMSB_idx].data = (uint8_t)(bDSMCycles >> 8);
-   uint32_t bDSMDelayCnt = pDSM->DSMPeriod_clk - pDSM->DSMConstants_clk - 1;       // delay is bDSMDelayCnt + 1
-   RoicRegs[bDSMDelayCntLSB_idx].data = (uint8_t)bDSMDelayCnt;
-   RoicRegs[bDSMDelayCntMSB_idx].data = (uint8_t)(bDSMDelayCnt >> 8);
-   uint32_t bDSMInitDelayCnt = pDSM->DSMPeriod_clk - 1;     // delay is bDSMInitDelayCnt + 1
-   RoicRegs[bDSMInitDelayCntLSB_idx].data = (uint8_t)bDSMInitDelayCnt;
-   RoicRegs[bDSMInitDelayCntMSB_idx].data = (uint8_t)(bDSMInitDelayCnt >> 8);
 }
 
 //--------------------------------------------------------------------------
@@ -1428,13 +1404,15 @@ void FPA_CalculateDSMTimings(float userExposureTime_usec, t_calcium_DSM_timings 
 
 //--------------------------------------------------------------------------
 // Pour envoyer les données de programmation au ROIC
+// Retourne le nombre de données envoyées
 //--------------------------------------------------------------------------
-void FPA_SendRoicRegs(const t_FpaIntf *ptrA)
+uint8_t FPA_SendRoicRegs(const t_FpaIntf *ptrA)
 {
    extern bool gFpaReadReg;
 
    uint32_t *p_addr = (uint32_t *)(ptrA->ADD + ARW_PROG_MEM_BASE_ADD) + PROG_MEM_TX_OFFSET;  // l'offset est divisé par 4 dans le vhd
-   uint8_t nbRegs = ptrA->roic_tx_nb_data;   // header inclus
+   uint8_t nbRegs = NUM_OF(RoicRegs);  // on envoie toujours tous les registres
+   uint8_t nbRORegs = 0;   // par défaut on n'envoie pas les registres Read-only
    uint8_t ii;
    uint8_t writeFlag = 1;  // par défaut on écrit la config contenue dans RoicRegs
    t_RoicRegister dataMask = {.word = 0xFFFF};   // par défaut l'adresse et le data ne sont pas masqués
@@ -1446,15 +1424,15 @@ void FPA_SendRoicRegs(const t_FpaIntf *ptrA)
    // Traitement des demandes du debug terminal
    if (gFpaReadReg)
    {
+      nbRORegs = NUM_OF(ReadOnlyRoicRegs);   // on lit la valeur des registres Read-only
       writeFlag = 0;
       dataMask.data = 0;   // le data est forcé à 0
    }
 
-   FPA_PRINTF("%u registers sent to ROIC", nbRegs);
-   nbRegs--;   // on enlève le header
+   FPA_PRINTF("%u registers sent to ROIC", nbRegs + nbRORegs + 1);   // header inclus
 
    // Envoi du header
-   uint16_t header = (uint16_t)(HDR_START_PATTERN | HDR_LOAD_BIT(writeFlag) | HDR_FRM_SYNC | HDR_PAGE_ID | HDR_NBR_DATA(nbRegs));
+   uint16_t header = (uint16_t)(HDR_START_PATTERN | HDR_LOAD_BIT(writeFlag) | HDR_FRM_SYNC | HDR_PAGE_ID | HDR_NBR_DATA(nbRegs + nbRORegs)); // header exclu
    *p_addr++ = (uint32_t)header;
    FPA_PRINTF(" 0x%04X", header);
 
@@ -1464,6 +1442,15 @@ void FPA_SendRoicRegs(const t_FpaIntf *ptrA)
       *p_addr++ = (uint32_t)(RoicRegs[ii].word & dataMask.word);
       FPA_PRINTF(" 0x%04X", (RoicRegs[ii].word & dataMask.word));
    }
+
+   // Envoi des registres Read-only
+   for (ii = 0; ii < nbRORegs; ii++)
+   {
+      *p_addr++ = (uint32_t)(ReadOnlyRoicRegs[ii].word & dataMask.word);
+      FPA_PRINTF(" 0x%04X", (ReadOnlyRoicRegs[ii].word & dataMask.word));
+   }
+
+   return nbRegs + nbRORegs + 1;   // nombre de registres + le header
 }
 
 //--------------------------------------------------------------------------
