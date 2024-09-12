@@ -900,6 +900,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->offcorr_coeff0           = 0;
 
    // Affichage de debug
+   /*
    FPA_PRINTF(" ptrA->fpa_diag_mode                         =  %d", (int32_t)( ptrA->fpa_diag_mode                          ) );
    FPA_PRINTF(" ptrA->fpa_diag_type                         =  %d", (int32_t)( ptrA->fpa_diag_type                          ) );
    FPA_PRINTF(" ptrA->fpa_pwr_on                            =  %d", (int32_t)( ptrA->fpa_pwr_on                             ) );
@@ -1021,7 +1022,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    FPA_PRINTF(" ptrA->offcorr_line_start                    =  %d", (int32_t)( ptrA->offcorr_line_start                     ) );
    FPA_PRINTF(" ptrA->offcorr_line_end                      =  %d", (int32_t)( ptrA->offcorr_line_end                       ) );
    FPA_PRINTF(" ptrA->offcorr_coeff0                        =  %d", (int32_t)( ptrA->offcorr_coeff0                         ) );
-
+*/
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
     
