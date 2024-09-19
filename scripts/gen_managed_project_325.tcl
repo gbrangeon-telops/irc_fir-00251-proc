@@ -1,5 +1,9 @@
+#get root directory relative to this file
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+source $current_file_location_absolute_path/setEnvironment.tcl
+
 set proj_name "managed_ip_project"
-set root_dir "D:/Telops/FIR-00251-Proc"
+set root_dir "$projectDir"
 set FPGA_SIZE "325"
 set script_dir $root_dir/scripts
 set ip_dir $root_dir/IP/$FPGA_SIZE

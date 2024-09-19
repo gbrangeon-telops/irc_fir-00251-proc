@@ -1,44 +1,44 @@
 
 vdel -all
-SetActiveLib -work
+setactivelib work
 
 
 
-acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
-acom D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
+acom $FIR251COMMON/VHDL/tel2000pkg.vhd
+acom $FIR251COMMON/VHDL/img_header_define.vhd
 
-acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
+acom $FIR251COMMON/VHDL/Utilities/rst_conditioner.vhd
 
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w28_d16\fwft_afifo_w28_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d16\fwft_sfifo_w32_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w64_d16\fwft_sfifo_w64_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w65_d16\fwft_sfifo_w65_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w40_d16\fwft_sfifo_w40_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\tdp_ram_w8_d2048\tdp_ram_w8_d2048_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_sfifo_d2048\t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl	 
-acom "D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_afifo_d1024\t_axi4_stream64_afifo_d1024_sim_netlist.vhdl"
-acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64\sfifo_w8_d64_sim_netlist.vhdl	
-acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64_no_output_reg\sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
-acom "D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl"
-acom "D:\Telops\FIR-00251-Proc\IP\160\ip_axis_32_to_64\ip_axis_32_to_64_sim_netlist.vhdl"
-acom "D:\Telops\FIR-00251-Common\VHDL\Utilities\axis_32_to_64_wrap.vhd"
+acom $FIR251PROC/IP/160/fwft_afifo_w28_d16/fwft_afifo_w28_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w32_d16/fwft_sfifo_w32_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w64_d16/fwft_sfifo_w64_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w65_d16/fwft_sfifo_w65_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w40_d16/fwft_sfifo_w40_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/tdp_ram_w8_d2048/tdp_ram_w8_d2048_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/t_axi4_stream32_sfifo_d2048/t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/t_axi4_stream64_afifo_d512/t_axi4_stream64_afifo_d512_sim_netlist.vhdl	 
+acom "$FIR251PROC/IP/325/t_axi4_stream64_afifo_d1024/t_axi4_stream64_afifo_d1024_sim_netlist.vhdl"
+acom $FIR251PROC/IP/160/sfifo_w8_d64/sfifo_w8_d64_sim_netlist.vhdl	
+acom $FIR251PROC/IP/160/sfifo_w8_d64_no_output_reg/sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
+acom "$FIR251PROC/IP/160/fwft_sfifo_w3_d16/fwft_sfifo_w3_d16_sim_netlist.vhdl"
+acom "$FIR251PROC/IP/160/ip_axis_32_to_64/ip_axis_32_to_64_sim_netlist.vhdl"
+acom "$FIR251COMMON/VHDL/Utilities/axis_32_to_64_wrap.vhd"
 
 
 
-acom "D:\Telops\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd"
-do "D:\Telops\FIR-00251-Proc\src\Trig\HDL\compil_trig_gen.do"
+acom "$FIR251COMMON/VHDL/Buffering/BufferingDefine.vhd"
+do "$FIR251PROC/src/Trig/HDL/compil_trig_gen.do"
 
-acom  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd
-acom  d:\Telops\FIR-00251-Proc\src\FPA\blackbird1280D\HDL\FPA_define.vhd
-acom -incr -nowarn DAGGEN_0523 d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\proxy_define.vhd
-acom "D:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\TestBench\blackbird1280D_testbench_pkg.vhd"	
-do D:\Telops\FIR-00251-Proc\src\FPA\blackbird1280D\hdl\compil_blackbird1280D.do
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\TestBench\scd_proxy_sim.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\blackbird1280D_top_tb.bde   
-acom "D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_RandomMiso.vhd"
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\TestBench\blackbird1280D_top_tb_TB.vhd
+acom  $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fpa_common_pkg.vhd
+acom  $FIR251PROC/src/FPA/blackbird1280D/HDL/FPA_define.vhd
+acom -incr -nowarn DAGGEN_0523 $FIR251PROC/src/FPA/scd_proxy/HDL/proxy_define.vhd
+acom "$FIR251PROC/aldec/src/FPA/blackbird1280D/src/TestBench/blackbird1280D_testbench_pkg.vhd"	
+do $FIR251PROC/src/FPA/blackbird1280D/hdl/compil_blackbird1280D.do
+acom $FIR251PROC/aldec/src/FPA/blackbird1280D/src/TestBench/scd_proxy_sim.vhd
+acom $FIR251PROC/aldec/src/FPA/blackbird1280D/src/blackbird1280D_top_tb.bde   
+acom "$FIR251COMMON/VHDL/Utilities/axis64_RandomMiso.vhd"
+acom $FIR251PROC/aldec/src/FPA/blackbird1280D/src/TestBench/blackbird1280D_top_tb_TB.vhd
 
 
 --------------------

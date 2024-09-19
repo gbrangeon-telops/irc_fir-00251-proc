@@ -1,14 +1,14 @@
 #savealltabs
-#SetActiveLib -work
+#setactivelib work
 #clearlibrary 	
 
 #Packages
-acom d:\Telops\FIR-00251-Proc\src\ExposureTime\HDL\exposure_define.vhd
+acom $FIR251PROC/src/ExposureTime/HDL/exposure_define.vhd
                                                                        
 #utilities
-do D:\Telops\FIR-00251-Proc\src\compil_utilities.do                                                                     
+do $FIR251PROC/src/compil_utilities.do                                                                     
 
 # sources                                                              
-acom d:\Telops\FIR-00251-Proc\src\ExposureTime\HDL\exp_time_mb_intf.vhd
-acom d:\Telops\FIR-00251-Proc\src\ExposureTime\HDL\exp_time_manager.vhd
-acom d:\Telops\FIR-00251-Proc\src\ExposureTime\HDL\exposure_time_ctrl.bde
+acom $FIR251PROC/src/ExposureTime/HDL/exp_time_mb_intf.vhd
+acom $FIR251PROC/src/ExposureTime/HDL/exp_time_manager.vhd
+acom $FIR251PROC/src/ExposureTime/HDL/exposure_time_ctrl.bde

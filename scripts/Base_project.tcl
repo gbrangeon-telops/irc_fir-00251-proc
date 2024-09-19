@@ -1,7 +1,7 @@
 set src_dir $root_dir/src
 set constr_dir $root_dir/src/constraints
-set common_hdl_dir "d:/Telops/Common_HDL"
-set fpa_common_dir "D:/Telops/Common_HDL/Common_Projects/TEL2000/FPA_common/src"
+set common_hdl_dir "$commonHDLDir"
+set fpa_common_dir "$common_hdl_dir/Common_Projects/TEL2000/FPA_common/src"
 set ip_dir "$root_dir/IP/${FPGA_SIZE}"
 set proj_name [get_project]
 set sensor [string range $proj_name 19 end]

@@ -6,15 +6,10 @@ if { $argc == 2 } {
     error "ERROR: Invalid Arguments"
 }
 
+#set variables
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
 
-set binDir ""
-set elfFile ""
-set sdkDir ""
-set baseName ""
-set releaseFile ""
-#from input bring the same issue, it must be the absolute path
-set script_dir "D:/Telops/FIR-00251-Proc/bin/scripts"
-source "${script_dir}/setEnvironment.tcl" 
+source "$current_file_location_absolute_path/setEnvironment.tcl"
 setEnvironmentVariable $sensor_name $fpga_size
 set mb_objcopy_file [file join "${xDir}/SDK/2018.3/gnu/microblaze/nt/" bin mb-objcopy.exe]  
 

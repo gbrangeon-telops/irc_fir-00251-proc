@@ -1,12 +1,13 @@
 # Supported size_arg: "160", "325" and "both"
 proc create_proc_sw {detector {size_arg "both"}} {
 set current_path [exec pwd]
+global current_file_location_absolute_path
 
 #Switch directory
-cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
+cd "$current_file_location_absolute_path/fir_00251_proc_${detector}"
 
 #Set workspace
-setws -switch "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/"
+setws -switch "$current_file_location_absolute_path/fir_00251_proc_${detector}/"
 
 if {$size_arg == "both" || $size_arg == "160"} {
    #Create HW projects, In the case already exist, update HW 
@@ -22,12 +23,12 @@ if {$size_arg == "both" || $size_arg == "160"} {
    
 
    #Import projects
-   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
-   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"
+   importprojects "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
+   importprojects "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"
    
    #Import makefile
-   file delete "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160/makefile.defs"
-   file link "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160/makefile.defs" "D:/Telops/FIR-00251-Proc/sdk/makefile.defs"
+   file delete "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160/makefile.defs"
+   file link "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160/makefile.defs" "D:/Telops/FIR-00251-Proc/sdk/makefile.defs"
 
 
    #Delay to avoid "Configuration with name release is not defined" error
@@ -54,12 +55,12 @@ if {$size_arg == "both" || $size_arg == "325"} {
  
 
    #Import projects
-   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
-   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
+   importprojects "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
+   importprojects "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
    
    #Import makefile
-   file delete "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325/makefile.defs"
-   file link "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325/makefile.defs" "D:/Telops/FIR-00251-Proc/sdk/makefile.defs"
+   file delete "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325/makefile.defs"
+   file link "$current_file_location_absolute_path/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325/makefile.defs" "D:/Telops/FIR-00251-Proc/sdk/makefile.defs"
 
    #Delay to avoid "Configuration with name release is not defined" error
    after 6000
@@ -80,11 +81,13 @@ cd $current_path
 # Supported compile_arg: "boot_only", "main_only" and "both"
 proc build_proc_sw {detector size {compile_arg "both"}} {
 set current_path [exec pwd]
+global current_file_location_absolute_path
+
 #Switch directory
-cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
+cd "$current_file_location_absolute_path/fir_00251_proc_${detector}"
 
 #Set workspace
-setws -switch "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/"
+setws -switch "$current_file_location_absolute_path/fir_00251_proc_${detector}/"
 
 #Configure in release mode and clean projects
 if {$compile_arg == "both" || $compile_arg == "boot_only"} {

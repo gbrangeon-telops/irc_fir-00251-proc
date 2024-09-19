@@ -1,4 +1,6 @@
-source "D:/Telops/FIR-00251-Proc/sdk/sdk_proc_cmd.tcl"
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+puts "current_file_location_absolute_path=$current_file_location_absolute_path"
+source "$current_file_location_absolute_path/sdk_proc_cmd.tcl"
 
 
 create_proc_sw blackbird1280D

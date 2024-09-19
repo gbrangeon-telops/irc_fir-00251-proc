@@ -2,14 +2,17 @@ set sensorName=%1
 set fpgaSize=%2
 set baseName=fir_00251_proc_%sensorName%
 
-set commonDir=D:\Telops\FIR-00251-Common
-set projectDir=D:\Telops\FIR-00251-Proc
+set currentDir=%~dp0\..\..\..
+call %currentDir%\setEnvironment.bat %1 %2
+
+set commonDir=%currentDir%\irc_fir-00251-common
+set projectDir=%currentDir%\irc_fir-00251-proc
 set sdkDir=%projectDir%\sdk\%baseName%
 set srcDir=%projectDir%\src
 set binDir=%projectDir%\bin\%baseName%
 set scriptsDir=%projectDir%\bin\scripts
-set outputDir=D:\Telops\FIR-00251-Output
-set storageDir=D:\Telops\FIR-00257-Storage
+set outputDir=%currentDir%\irc_fir-00251-output
+set storageDir=%currentDir%\ircam_fir-00251-storage_temp
 set ntxminiDir=\\STARK\DisqueTELOPS\Production\IRCAM\Firmwares\FIR-00251-NTx-Mini\Archives
 
 set elfFile=%binDir%\%baseName%_%fpgaSize%.elf

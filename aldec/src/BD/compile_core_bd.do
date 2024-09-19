@@ -1,24 +1,24 @@
 alib work
-SetActiveLib work
+setactivelib work
 
 
 # Compile 
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_lmb_bram_if_cntlr_v4_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_lmb_v10_v3_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_blk_mem_gen_v8_1.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_mdm_v3_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_microblaze_v9_2.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_axi_intc_v4_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_axi_gpio_v2_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_axi_timer_v2_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_axi_uart16550_v2_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_proc_sys_reset_v5_0.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_core_xadc_wiz_1_0_axi_xadc.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_axi_protocol_converter_v2_1.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_core_auto_cc.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_core_auto_us.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_core_xbar.do
-do d:\telops\fir-00251-Proc\aldec\src\BD\compile_mig_series7_1_0.do
+do $FIR251PROC/aldec/src/BD/compile_lmb_bram_if_cntlr_v4_0.do
+do $FIR251PROC/aldec/src/BD/compile_lmb_v10_v3_0.do
+do $FIR251PROC/aldec/src/BD/compile_blk_mem_gen_v8_1.do
+do $FIR251PROC/aldec/src/BD/compile_mdm_v3_0.do
+do $FIR251PROC/aldec/src/BD/compile_microblaze_v9_2.do
+do $FIR251PROC/aldec/src/BD/compile_axi_intc_v4_0.do
+do $FIR251PROC/aldec/src/BD/compile_axi_gpio_v2_0.do
+do $FIR251PROC/aldec/src/BD/compile_axi_timer_v2_0.do
+do $FIR251PROC/aldec/src/BD/compile_axi_uart16550_v2_0.do
+do $FIR251PROC/aldec/src/BD/compile_proc_sys_reset_v5_0.do
+do $FIR251PROC/aldec/src/BD/compile_core_xadc_wiz_1_0_axi_xadc.do
+do $FIR251PROC/aldec/src/BD/compile_axi_protocol_converter_v2_1.do
+do $FIR251PROC/aldec/src/BD/compile_core_auto_cc.do
+do $FIR251PROC/aldec/src/BD/compile_core_auto_us.do
+do $FIR251PROC/aldec/src/BD/compile_core_xbar.do
+do $FIR251PROC/aldec/src/BD/compile_mig_series7_1_0.do
 
 
 alog -O2 -sve   -work work $dsn/../xilinx/fir_0251_Proc.srcs/sources_1/bd/core/ip/core_axi_protocol_converter_0_0/sim/core_axi_protocol_converter_0_0.v
@@ -97,7 +97,7 @@ acom -O3 -work work -2002  -relax $dsn/../src/BD/bd_wrapper.vhd
 acom -O3 -work work -2002  -relax $dsn/src/Testbench/Microblaze/microblaze_stim.vhd
 acom -O3 -work work -2002  -relax $dsn/src/Testbench/Microblaze/MicroBlaze_tb.bde
 
-asim -G  /MicroBlaze_tb/MB/core_wrapper_i/core_i/MCU/microblaze_1_local_memory/lmb_bram/U0/native_mem_map_module/mem_map_module/C_INIT_FILE="D:\Telops\FIR-00251-Proc\xilinx\fir_0251_Proc.sim\sim_1\behav\core_lmb_bram_0.mem" -ses +access +r +m+MicroBlaze_tb MicroBlaze_tb MicroBlaze_tb
+asim -G  /MicroBlaze_tb/MB/core_wrapper_i/core_i/MCU/microblaze_1_local_memory/lmb_bram/U0/native_mem_map_module/mem_map_module/C_INIT_FILE="$FIR251PROC/xilinx/fir_0251_Proc.sim/sim_1/behav/core_lmb_bram_0.mem" -ses +access +r +m+MicroBlaze_tb MicroBlaze_tb MicroBlaze_tb
 
 
 

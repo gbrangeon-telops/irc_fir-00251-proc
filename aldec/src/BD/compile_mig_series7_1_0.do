@@ -1,5 +1,5 @@
 alib work
-SetActiveLib work
+setactivelib work
 
 #Clocking
 alog -O2 -sve -l unisim -work work $dsn/../xilinx/fir_0251_Proc.srcs/sources_1/bd/core/ip/core_mig_7series_1_0/core_mig_7series_1_0/user_design/rtl/clocking/mig_7series_v2_0_iodelay_ctrl.v
@@ -102,7 +102,7 @@ alog -O2 -sve   -work work $dsn/../xilinx/fir_0251_Proc.srcs/sources_1/bd/core/i
 
 alog -O2 -sve   -work work $dsn/../xilinx/fir_0251_Proc.srcs/sources_1/bd/core/ip/core_mig_7series_1_0/core_mig_7series_1_0/user_design/rtl/core_mig_7series_1_0_mig_sim.v
 
-SetActiveLib work
+setactivelib work
 
 
 

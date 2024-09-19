@@ -1,11 +1,11 @@
-SetActiveLib -work
+setactivelib work
 clearlibrary fir_00229
 
 
 
 # Top level
-acom  d:\Telops\Common_HDL\SPI\ad7478_driver.vhd
-acom d:\Telops\FIR-00229\src\FIR-00229\IRIG\ad7478_driver_TB.vhd
+acom  $COMMON_HDL/SPI/ad7478_driver.vhd
+acom d:/Telops/FIR-00229/src/FIR-00229/IRIG/ad7478_driver_TB.vhd
 
  
 asim -ses ad7478_driver_TB 

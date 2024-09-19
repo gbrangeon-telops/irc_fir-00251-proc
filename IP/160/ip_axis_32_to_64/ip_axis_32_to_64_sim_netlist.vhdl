@@ -1,8 +1,8 @@
--- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Thu Feb 22 03:46:49 2024
--- Host        : Telops331 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3.1_AR71948_AR71898 (win64) Build 2489853 Tue Mar 26 04:20:25 MDT 2019
+-- Date        : Tue Sep 17 13:58:57 2024
+-- Host        : TELOPS352 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim -rename_top ip_axis_32_to_64 -prefix
 --               ip_axis_32_to_64_ ip_axis32_merge_axis64_sim_netlist.vhdl
 -- Design      : ip_axis32_merge_axis64
@@ -1940,7 +1940,7 @@ entity ip_axis_32_to_64 is
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of ip_axis_32_to_64 : entity is "yes";
   attribute X_CORE_INFO : string;
-  attribute X_CORE_INFO of ip_axis_32_to_64 : entity is "axis_dwidth_converter_v1_1_17_axis_dwidth_converter,Vivado 2018.3_AR71948_AR71898";
+  attribute X_CORE_INFO of ip_axis_32_to_64 : entity is "axis_dwidth_converter_v1_1_17_axis_dwidth_converter,Vivado 2018.3.1_AR71948_AR71898";
 end ip_axis_32_to_64;
 
 architecture STRUCTURE of ip_axis_32_to_64 is

@@ -1,10 +1,10 @@
--- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Thu Feb 22 09:35:14 2024
--- Host        : Telops331 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3.1_AR71948_AR71898 (win64) Build 2489853 Tue Mar 26 04:20:25 MDT 2019
+-- Date        : Wed Sep 18 15:15:16 2024
+-- Host        : TELOPS352 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
---               D:/Telops/FIR-00251-Proc/IP/325/histogram_axis_tmi_4pix_0/histogram_axis_tmi_4pix_0_stub.vhdl
+--               D:/Telops/Git/ircam_fir-00251-proc_temp/IP/325/histogram_axis_tmi_4pix_0/histogram_axis_tmi_4pix_0_stub.vhdl
 -- Design      : histogram_axis_tmi_4pix_0
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7k325tfbg676-1
@@ -46,6 +46,6 @@ attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
 attribute black_box_pad_pin of stub : architecture is "areset,clear_mem,ext_data_in[31:0],ext_data_in2[31:0],msb_pos[1:0],rx_tdata[63:0],rx_tlast,rx_tready,rx_tvalid,tmi_mosi_add[6:0],tmi_mosi_dval,tmi_mosi_rnw,clk,ext_data_out[31:0],ext_data_out2[31:0],histogram_rdy,timestamp[31:0],tmi_miso_busy,tmi_miso_error,tmi_miso_idle,tmi_miso_rd_data[20:0],tmi_miso_rd_dval";
 attribute x_core_info : string;
-attribute x_core_info of stub : architecture is "histogram_axis_tmi_4pix,Vivado 2018.3_AR71948_AR71898";
+attribute x_core_info of stub : architecture is "histogram_axis_tmi_4pix,Vivado 2018.3.1_AR71948_AR71898";
 begin
 end;

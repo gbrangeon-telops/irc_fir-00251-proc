@@ -139,7 +139,8 @@ proc updateVersionFile {sensor_name fpga_size} {
 }
 
 proc updateReleaseSvnRevsFile {scripts_dir sensor_name fpga_size} {
-    set revFile ""
+    global scriptsDir
+	set revFile ""
     set svn_subwcrev ""
     set hwFile ""
     set elfFile ""
@@ -155,37 +156,26 @@ proc updateReleaseSvnRevsFile {scripts_dir sensor_name fpga_size} {
         puts "Error: Can't delete $revFile"
     }
     set Vfo [open $revFile w]
-    puts $Vfo "set rel_proc_hw_rev \$WCREV\$"
+	set rev [git_get_rev ${hwFile} 1]
+    puts $Vfo "set rel_out_hw_rev \"$rev\""
     close $Vfo
     puts "$svn_subwcrev $hwFile $revFile $revFile"
-    if {[ catch {[exec $svn_subwcrev $hwFile $revFile $revFile]} ]} {
-        puts "SubWCRev.exe Hw done"
-    }
-    set Vfo [open $revFile a]
-    puts $Vfo "set rel_proc_sw_rev \$WCREV\$"
-    close $Vfo
-    if {[ catch {[exec $svn_subwcrev $elfFile $revFile $revFile]} ]} {
-        puts "SubWCRev.exe elf done"
-    }
-    set Vfo [open $revFile a]
-    puts $Vfo "set rel_proc_boot_rev \$WCREV\$"
-    close $Vfo
-    if {[ catch {[exec $svn_subwcrev $bootFile $revFile $revFile]} ]} {
-        puts "SubWCRev.exe boot done"
-    }
-    set Vfo [open $revFile a]
-    puts $Vfo "set rel_proc_common_rev \$WCREV\$"
-    close $Vfo
-    if {[ catch {[exec $svn_subwcrev $commonDir $revFile $revFile]} ]} {
-        puts "SubWCRev.exe boot done"
-    }
     
-    #add revsion file 
-    set tortoiseSvnBin "$tortoiseSVNDir/bin/svn.exe"
-    if {[ catch {[exec $tortoiseSvnBin add $revFile]} ]} {
-        puts "Target is already versioned"
-    }
+    set Vfo [open $revFile a]
+	set rev [git_get_rev ${elfFile} 1]
+    puts $Vfo "set rel_proc_sw_rev \"$rev\""
+    close $Vfo
     
+    set Vfo [open $revFile a]
+	set rev [git_get_rev ${bootFile} 1]
+    puts $Vfo "set rel_proc_boot_rev \"$rev\""
+    close $Vfo
+   
+    set Vfo [open $revFile a]
+	set rev [git_get_rev ${commonDir} 1]
+    puts $Vfo "set rel_proc_common_rev \"$rev\""
+    close $Vfo
+ 
 }
 
 proc generateReleaseFile {sensorName fpgaSize} {
@@ -366,22 +356,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set procBuildInfoBootLoader ""
     set procBuildInfoCommon ""
 
-    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+(\d+)} $procBuildInfoFileSubstr match procBuildInfoHardware]} {
+    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $procBuildInfoFileSubstr match procBuildInfoHardware]} {
         set procBuildInfoHardware $procBuildInfoHardware
     } else {
         set error 1
     }
-    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)} $procBuildInfoFileSubstr match procBuildInfoSoftware]} {
+    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $procBuildInfoFileSubstr match procBuildInfoSoftware]} {
         set procBuildInfoSoftware $procBuildInfoSoftware
     } else {
         set error 1
     }
-    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)} $procBuildInfoFileSubstr match procBuildInfoBootLoader]} {
+    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $procBuildInfoFileSubstr match procBuildInfoBootLoader]} {
         set procBuildInfoBootLoader $procBuildInfoBootLoader
     } else {
         set error 1
     }
-    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $procBuildInfoFileSubstr match procBuildInfoCommon]} {
+    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $procBuildInfoFileSubstr match procBuildInfoCommon]} {
         set procBuildInfoCommon $procBuildInfoCommon
     } else {
         set error 1
@@ -401,22 +391,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set outputBuildInfoBootLoader ""
     set outputBuildInfoCommon ""
 
-    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+(\d+)} $outputBuildInfoFileSubstr match outputBuildInfoHardware]} {
+    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $outputBuildInfoFileSubstr match outputBuildInfoHardware]} {
         set outputBuildInfoHardware $outputBuildInfoHardware
     } else {
         set error 1
     }
-    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)} $outputBuildInfoFileSubstr match outputBuildInfoSoftware]} {
+    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $outputBuildInfoFileSubstr match outputBuildInfoSoftware]} {
         set outputBuildInfoSoftware $outputBuildInfoSoftware
     } else {
         set error 1
     }
-    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)} $outputBuildInfoFileSubstr match outputBuildInfoBootLoader]} {
+    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $outputBuildInfoFileSubstr match outputBuildInfoBootLoader]} {
         set outputBuildInfoBootLoader $outputBuildInfoBootLoader
     } else {
         set error 1
     }
-    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $outputBuildInfoFileSubstr match outputBuildInfoCommon]} {
+    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $outputBuildInfoFileSubstr match outputBuildInfoCommon]} {
         set outputBuildInfoCommon $outputBuildInfoCommon
     } else {
         set error 1
@@ -436,22 +426,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set storageBuildInfoBootLoader1 ""
     set storageBuildInfoCommon1 ""
 
-    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr1 match storageBuildInfoHardware1]} {
+    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr1 match storageBuildInfoHardware1]} {
         set storageBuildInfoHardware1 $storageBuildInfoHardware1
     } else {
         set error 1
     }
-    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr1 match storageBuildInfoSoftware1]} {
+    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr1 match storageBuildInfoSoftware1]} {
         set storageBuildInfoSoftware1 $storageBuildInfoSoftware1
     } else {
         set error 1
     }
-    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr1 match storageBuildInfoBootLoader1]} {
+    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr1 match storageBuildInfoBootLoader1]} {
         set storageBuildInfoBootLoader1 $storageBuildInfoBootLoader1
     } else {
         set error 1
     }
-    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr1 match storageBuildInfoCommon1]} {
+    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr1 match storageBuildInfoCommon1]} {
         set storageBuildInfoCommon1 $storageBuildInfoCommon1
     } else {
         set error 1
@@ -468,22 +458,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set storageBuildInfoBootLoader2 ""
     set storageBuildInfoCommon2 ""
 
-    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr2 match storageBuildInfoHardware2]} {
+    if {[regexp {SVN_HARDWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr2 match storageBuildInfoHardware2]} {
         set storageBuildInfoHardware2 $storageBuildInfoHardware2
     } else {
         set error 1
     }
-    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr2 match storageBuildInfoSoftware2]} {
+    if {[regexp {SVN_SOFTWARE_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr2 match storageBuildInfoSoftware2]} {
         set storageBuildInfoSoftware2 $storageBuildInfoSoftware2
     } else {
         set error 1
     }
-    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr2 match storageBuildInfoBootLoader2]} {
+    if {[regexp {SVN_BOOTLOADER_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr2 match storageBuildInfoBootLoader2]} {
         set storageBuildInfoBootLoader2 $storageBuildInfoBootLoader2
     } else {
         set error 1
     }
-    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+(\d+)} $storageBuildInfoFileSubstr2 match storageBuildInfoCommon2]} {
+    if {[regexp {SVN_COMMON_REV[^\n\r0-9]+0x([a-fA-F0-9]+)} $storageBuildInfoFileSubstr2 match storageBuildInfoCommon2]} {
         set storageBuildInfoCommon2 $storageBuildInfoCommon2
     } else {
         set error 1
@@ -500,22 +490,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set outputReleaseInfoBootLoader ""
     set outputReleaseInfoCommon ""
 
-    if {[regexp {rel_out_hw_rev[^\n\r0-9]+(\d+)} $outputReleaseInfoFileStr match outputReleaseInfoHardware]} {
+    if {[regexp {rel_out_hw_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $outputReleaseInfoFileStr match outputReleaseInfoHardware]} {
         set outputReleaseInfoHardware $outputReleaseInfoHardware
     } else {
         set error 1
     }
-    if {[regexp {rel_out_sw_rev[^\n\r0-9]+(\d+)} $outputReleaseInfoFileStr match outputReleaseInfoSoftware]} {
+    if {[regexp {rel_out_sw_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $outputReleaseInfoFileStr match outputReleaseInfoSoftware]} {
         set outputReleaseInfoSoftware $outputReleaseInfoSoftware
     } else {
         set error 1
     }
-    if {[regexp {rel_out_boot_rev[^\n\r0-9]+(\d+)} $outputReleaseInfoFileStr match outputReleaseInfoBootLoader]} {
+    if {[regexp {rel_out_boot_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $outputReleaseInfoFileStr match outputReleaseInfoBootLoader]} {
         set outputReleaseInfoBootLoader $outputReleaseInfoBootLoader
     } else {
         set error 1
     }
-    if {[regexp {rel_out_common_rev[^\n\r0-9]+(\d+)} $outputReleaseInfoFileStr match outputReleaseInfoCommon]} {
+    if {[regexp {rel_out_common_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $outputReleaseInfoFileStr match outputReleaseInfoCommon]} {
         set outputReleaseInfoCommon $outputReleaseInfoCommon
     } else {
         set error 1
@@ -532,22 +522,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set storageReleaseInfoBootLoader1 ""
     set storageReleaseInfoCommon1 ""
 
-    if {[regexp {rel_storage_hw_rev1[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr1 match storageReleaseInfoHardware1]} {
+    if {[regexp {rel_storage_hw_rev1[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr1 match storageReleaseInfoHardware1]} {
         set storageReleaseInfoHardware1 $storageReleaseInfoHardware1
     } else {
         set error 1
     }
-    if {[regexp {rel_storage_sw_rev1[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr1 match storageReleaseInfoSoftware1]} {
+    if {[regexp {rel_storage_sw_rev1[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr1 match storageReleaseInfoSoftware1]} {
         set storageReleaseInfoSoftware1 $storageReleaseInfoSoftware1
     } else {
         set error 1
     }
-    if {[regexp {rel_storage_boot_rev1[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr1 match storageReleaseInfoBootLoader1]} {
+    if {[regexp {rel_storage_boot_rev1[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr1 match storageReleaseInfoBootLoader1]} {
         set storageReleaseInfoBootLoader1 $storageReleaseInfoBootLoader1
     } else {
         set error 1
     }
-    if {[regexp {rel_storage_common_rev1[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr1 match storageReleaseInfoCommon1]} {
+    if {[regexp {rel_storage_common_rev1[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr1 match storageReleaseInfoCommon1]} {
         set storageReleaseInfoCommon1 $storageReleaseInfoCommon1
     } else {
         set error 1
@@ -559,22 +549,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set storageReleaseInfoBootLoader2 ""
     set storageReleaseInfoCommon2 ""
 
-    if {[regexp {rel_storage_hw_rev2[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr2 match storageReleaseInfoHardware2]} {
+    if {[regexp {rel_storage_hw_rev2[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr2 match storageReleaseInfoHardware2]} {
         set storageReleaseInfoHardware2 $storageReleaseInfoHardware2
     } else {
         set error 1
     }
-    if {[regexp {rel_storage_sw_rev2[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr2 match storageReleaseInfoSoftware2]} {
+    if {[regexp {rel_storage_sw_rev2[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr2 match storageReleaseInfoSoftware2]} {
         set storageReleaseInfoSoftware2 $storageReleaseInfoSoftware2
     } else {
         set error 1
     }
-    if {[regexp {rel_storage_boot_rev2[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr2 match storageReleaseInfoBootLoader2]} {
+    if {[regexp {rel_storage_boot_rev2[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr2 match storageReleaseInfoBootLoader2]} {
         set storageReleaseInfoBootLoader2 $storageReleaseInfoBootLoader2
     } else {
         set error 1
     }
-    if {[regexp {rel_storage_common_rev2[^\n\r0-9]+(\d+)} $storageReleaseInfoFileStr2 match storageReleaseInfoCommon2]} {
+    if {[regexp {rel_storage_common_rev2[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $storageReleaseInfoFileStr2 match storageReleaseInfoCommon2]} {
         set storageReleaseInfoCommon2 $storageReleaseInfoCommon2
     } else {
         set error 1
@@ -591,22 +581,22 @@ proc verifyRelease {sensorName fpgaSize} {
     set procReleaseInfoBootLoader ""
     set procReleaseInfoCommon ""
 
-    if {[regexp {rel_proc_hw_rev[^\n\r0-9]+(\d+)} $procReleaseInfoFileStr match procReleaseInfoHardware]} {
+    if {[regexp {rel_proc_hw_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $procReleaseInfoFileStr match procReleaseInfoHardware]} {
         set procReleaseInfoHardware $procReleaseInfoHardware
     } else {
         set error 1
     }
-    if {[regexp {rel_proc_sw_rev[^\n\r0-9]+(\d+)} $procReleaseInfoFileStr match procReleaseInfoSoftware]} {
+    if {[regexp {rel_proc_sw_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $procReleaseInfoFileStr match procReleaseInfoSoftware]} {
         set procReleaseInfoSoftware $procReleaseInfoSoftware
     } else {
         set error 1
     }
-    if {[regexp {rel_proc_boot_rev[^\n\r0-9]+(\d+)} $procReleaseInfoFileStr match procReleaseInfoBootLoader]} {
+    if {[regexp {rel_proc_boot_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $procReleaseInfoFileStr match procReleaseInfoBootLoader]} {
         set procReleaseInfoBootLoader $procReleaseInfoBootLoader
     } else {
         set error 1
     }
-    if {[regexp {rel_proc_common_rev[^\n\r0-9]+(\d+)} $procReleaseInfoFileStr match procReleaseInfoCommon]} {
+    if {[regexp {rel_proc_common_rev[^\n\r0-9]+\"([a-zA-Z0-9]+)\"} $procReleaseInfoFileStr match procReleaseInfoCommon]} {
         set procReleaseInfoCommon $procReleaseInfoCommon
     } else {
         set error 1
@@ -964,8 +954,8 @@ proc FirmwareReleaseScript_step3 {sensorName fpgaSize logFile} {
 
 }
 
-global scriptsDir
-set scriptsDir "D:/Telops/FIR-00251-Proc/bin/scripts" 
+source setEnvironment.tcl
+ 
 
 set TestMode "None"
 #Argument check
@@ -974,7 +964,6 @@ if { $argc == 1 } {
 	set TestMode [lindex $argv 0 ]
 } 
 
-set projectDir "D:/Telops/FIR-00251-Proc"
 set FirmwareReleaseListFile "$projectDir/bin/FirmwareReleaseList.txt"
 set FirmwareReleaseVersionFile "$projectDir/bin/FirmwareReleaseVersion.txt"
 set FirmwareReleaseLogFile "$projectDir/bin/FirmwareRelease.log"
@@ -1062,11 +1051,9 @@ if {$errorFlag != ""} {
     error "Error: $errorFlag"
 }
 
-cd "d:/Telops/fir-00251-Proc/"
 set preReleaseMessage "Pre-release $firmwareReleaseVersion"
-exec $tortoiseSvnBin commit $projectDir -m \"$preReleaseMessage\"
-after 1000
-exec $tortoiseSvnBin update $projectDir
+exec git add -u
+exec git commit -m \"$preReleaseMessage\"
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "*****************************************"
@@ -1139,9 +1126,8 @@ if {$errorFlag != ""} {
 }
 cd "$projectDir"
 set releaseMessage "Release $firmwareReleaseVersion"
-exec $tortoiseSvnBin commit $projectDir -m \"$releaseMessage\"
-after 1000
-exec $tortoiseSvnBin update $projectDir
+exec git add -u
+exec git commit -m \"$releaseMessage\"
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "*****************************************"
@@ -1155,31 +1141,39 @@ puts $releaseDate
 set tagPath "/tags/$releaseDate - $releaseMessage"
 set svnDir "http://einstein/svn/firmware/"
 set tagDone "Done"
-if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Common $svnDir/FIR-00251-Common$tagPath -m \"$releaseMessage\"} errMsg]} {
-		puts "Error can't create FIR-00251-Common tags (details follow):"
-        puts "$errMsg"
-        set tagDone "Failed"
-}
-if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini $svnDir/FIR-00251-NTx-Mini$tagPath -m \"$releaseMessage\"} errMsg]} {
-		puts "Error can't create FIR-00251-NTx-Mini tags (details follow):"
-        puts "$errMsg"
-        set tagDone "Failed"
-}
-if {[catch {exec $tortoiseSvnBin copy $projectDir $svnDir/FIR-00251-Proc$tagPath -m \"$releaseMessage\"} errMsg]} {
-		puts "Error can't create FIR-00251-Proc tags (details follow):"
-        puts "$errMsg"
-        set tagDone "Failed"
-}
-if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Output $svnDir/FIR-00251-Output$tagPath -m \"$releaseMessage\"} errMsg]} {
-		puts "Error can't create FIR-00251-Output tags (details follow):"
-        puts "$errMsg"
-        set tagDone "Failed"
-}
-if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00257-Storage $svnDir/FIR-00257-Storage$tagPath -m \"$releaseMessage\"} errMsg]} {
-		puts "Error can't create FIR-00257-Storage tags (details follow):"
-        puts "$errMsg"
-        set tagDone "Failed"
-}
+
+set tag "$releaseDate - $releaseMessage"
+git_tag($commonDir $tag $releaseMessage)
+git_tag($ntxMiniDir $tag $releaseMessage)
+git_tag($projectDir $tag $releaseMessage)
+git_tag($outputDir $tag $releaseMessage)
+git_tag($storageDir $tag $releaseMessage)
+
+# if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Common $svnDir/FIR-00251-Common$tagPath -m \"$releaseMessage\"} errMsg]} {
+		# puts "Error can't create FIR-00251-Common tags (details follow):"
+        # puts "$errMsg"
+        # set tagDone "Failed"
+# }
+# if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-NTx-Mini $svnDir/FIR-00251-NTx-Mini$tagPath -m \"$releaseMessage\"} errMsg]} {
+		# puts "Error can't create FIR-00251-NTx-Mini tags (details follow):"
+        # puts "$errMsg"
+        # set tagDone "Failed"
+# }
+# if {[catch {exec $tortoiseSvnBin copy $projectDir $svnDir/FIR-00251-Proc$tagPath -m \"$releaseMessage\"} errMsg]} {
+		# puts "Error can't create FIR-00251-Proc tags (details follow):"
+        # puts "$errMsg"
+        # set tagDone "Failed"
+# }
+# if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00251-Output $svnDir/FIR-00251-Output$tagPath -m \"$releaseMessage\"} errMsg]} {
+		# puts "Error can't create FIR-00251-Output tags (details follow):"
+        # puts "$errMsg"
+        # set tagDone "Failed"
+# }
+# if {[catch {exec $tortoiseSvnBin copy D:/Telops/FIR-00257-Storage $svnDir/FIR-00257-Storage$tagPath -m \"$releaseMessage\"} errMsg]} {
+		# puts "Error can't create FIR-00257-Storage tags (details follow):"
+        # puts "$errMsg"
+        # set tagDone "Failed"
+# }
 
 set fid [open $FirmwareReleaseLogFile a]
 puts $fid "Release tags $tagDone"

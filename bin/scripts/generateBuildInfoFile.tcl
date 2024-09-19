@@ -1,3 +1,7 @@
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+
+source $current_file_location_absolute_path/setEnvironment.tcl
+
 proc genCore {scriptEnvironment sensorName fpgaSize} {
     #set global var here 
     set srcDir ""
@@ -40,41 +44,28 @@ proc genCore {scriptEnvironment sensorName fpgaSize} {
         puts $Vfo   " "
     } 
     # Get hardware revision
-    #%svn_subwcrev% %hwFile% %buildInfoFile% %buildInfoFile%
-    set localModif "\$WCMODS?-:\$\$WCREV\$"
-    puts $Vfo "#define SVN_HARDWARE_REV ${localModif}"
+	set rev [git_get_rev ${hwFile} 0]
+    puts $Vfo "#define SVN_HARDWARE_REV ${rev}"
     close $Vfo
-    if {[ catch {[exec $svn_subwcrev ${hwFile}  ${buildInfoFile}  ${buildInfoFile}]} ]} {
-        set errorsvn 0
-        puts $errorsvn
-        puts "SubWCRev.exe Hw done"
-    }
+    
     set Vfo [open $buildInfoFile a]
     # Get software revision
-    #%svn_subwcrev% %elfFile% %buildInfoFile% %buildInfoFile%
-    puts $Vfo  "#define SVN_SOFTWARE_REV      ${localModif}"
+	set rev [git_get_rev ${elfFile} 0]
+    puts $Vfo  "#define SVN_SOFTWARE_REV      ${rev}"
     close $Vfo
-    if {[ catch {[exec $svn_subwcrev ${elfFile}  ${buildInfoFile}  ${buildInfoFile}]} ]} {
-        set errorsvn 0
-        puts "SubWCRev.exe Sw done"
-    }
+  
     set Vfo [open $buildInfoFile a]
     # Get boot loader revision
-    puts $Vfo  " #define SVN_BOOTLOADER_REV   ${localModif}"
+	set rev [git_get_rev ${bootFile} 0]
+    puts $Vfo  " #define SVN_BOOTLOADER_REV   ${rev}"
     close $Vfo
-    if {[ catch {[exec $svn_subwcrev ${bootFile}  ${buildInfoFile}  ${buildInfoFile}]} ]} {
-        set errorsvn 0
-        puts "SubWCRev.exe Sw done"
-    }
+    
     set Vfo [open $buildInfoFile a]
     # Get common directory revision
-    #%svn_subwcrev% %commonDir% %buildInfoFile% %buildInfoFile%
-    puts $Vfo  " #define SVN_COMMON_REV      ${localModif}"
+	set rev [git_get_rev ${commonDir} 0]
+    puts $Vfo  " #define SVN_COMMON_REV      ${rev}"
     close $Vfo
-    if {[ catch {[exec $svn_subwcrev ${commonDir} ${buildInfoFile}  ${buildInfoFile}]} ]} {
-       set errorsvn 
-       puts "SubWCRev.exe Common done"
-    }
+    
     set Vfo [open $buildInfoFile a]
     # Check for uncommitted changes
     puts $Vfo   " "
@@ -102,8 +93,7 @@ if { $argc != 1 } {
     set sensorName [lindex $argv 0 ]
 }
 #prefere to use the path here instead of input because it is just one place
-set scriptEnvironment "D:/Telops/FIR-00251-Proc/bin/scripts/setEnvironment.tcl"
-source $scriptEnvironment
+set scriptEnvironment "$current_file_location_absolute_path/setEnvironment.tcl"
 
 genCore $scriptEnvironment $sensorName "160"
 

@@ -1,45 +1,45 @@
 #savealltabs
 #adel -all
-#SetActiveLib -work
+#setactivelib work
 #clearlibrary 	
 
 #packages
 acom -nowarn DAGGEN_0523 -incr \
- d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd2\fastrd2_define.vhd \
- D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\FPA_define.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\proxy_define.vhd \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_define.vhd \
- d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
+ $FIR251COMMON/VHDL/tel2000pkg.vhd \
+ $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fpa_common_pkg.vhd \
+ $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fleg_brd_define.vhd \
+ $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fastrd2/fastrd2_define.vhd \
+ $FIR251PROC/src/FPA/suphawkA/HDL/FPA_define.vhd \
+ $FIR251PROC/src/FPA/suphawkA/HDL/proxy_define.vhd \
+ $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/adc_brd_define.vhd \
+ $FIR251COMMON/VHDL/img_header_define.vhd \
+ $FIR251COMMON/VHDL/iserdes/adc/fpa_serdes_define.vhd
    
 #utilities
-do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
+do $FIR251PROC/src/compil_utilities.do
 
 # sources FPA common 
-acom -relax d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ad5648_driver.vhd 
-do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do
-do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd2\compil_fastrd2_common.do
+acom -relax $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/ad5648_driver.vhd 
+do $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/compil_fpa_common.do
+do $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fastrd2/compil_fastrd2_common.do
 
 # fichiers suphawk
 acom  -nowarn DAGGEN_0523 -incr \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_clks_gen_core.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_clks_mmcm.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_clks_gen.bde \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_detector_ctrler.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_dig_data_reg.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_mux_ctrl_reg.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_wdw_ctrl_reg.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_wdw_data_reg.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_readout_kernel.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_readout_ctrler.bde \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_spi_tx_check.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_digio_map.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_elcorr_refs_ctrl.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_mblaze_intf.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_prog_ctrler.bde \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_hw_driver.bde \
-D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL\suphawkA_intf.bde
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_clks_gen_core.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_clks_mmcm.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_clks_gen.bde \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_detector_ctrler.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_dig_data_reg.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_mux_ctrl_reg.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_wdw_ctrl_reg.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_wdw_data_reg.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_readout_kernel.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_readout_ctrler.bde \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_spi_tx_check.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_digio_map.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_elcorr_refs_ctrl.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_mblaze_intf.vhd \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_prog_ctrler.bde \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_hw_driver.bde \
+$FIR251PROC/src/FPA/suphawkA/HDL/suphawkA_intf.bde
  

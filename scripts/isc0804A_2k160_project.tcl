@@ -1,5 +1,9 @@
 #Set global variable
-set root_dir "d:/Telops/fir-00251-Proc"
+#get root directory relative to this file
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+source $current_file_location_absolute_path/setEnvironment.tcl
+
+set root_dir "$projectDir"
 set sensor "isc0804A_2k"
 set FPGA_SIZE "160"
 set proj_name "fir_00251_proc_${FPGA_SIZE}_${sensor}"
@@ -8,7 +12,7 @@ set FPA_path $root_dir/src/FPA/${sensor}
 set proj_dir $root_dir/xilinx/${sensor}
 set script_dir $root_dir/scripts
 set aldec_dir $root_dir/aldec/compile
-set common251_dir "d:/Telops/fir-00251-Common/VHDL"
+set common251_dir "$commonDir/VHDL"
 
 # Create project
 create_project $proj_name $proj_dir

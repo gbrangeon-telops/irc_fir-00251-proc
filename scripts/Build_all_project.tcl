@@ -1,4 +1,8 @@
-set base_dir "d:/Telops/fir-00251-Proc"
+#get root directory relative to this file
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+source $current_file_location_absolute_path/setEnvironment.tcl
+
+set base_dir "$projectDir"
 set detector_list ""
 
 #Enable release build configuration to ignore possible debug cores

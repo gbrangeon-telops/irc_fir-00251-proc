@@ -1,10 +1,10 @@
--- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Wed Mar 13 09:07:29 2024
--- Host        : TELOPS316 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3.1_AR71948_AR71898 (win64) Build 2489853 Tue Mar 26 04:20:25 MDT 2019
+-- Date        : Wed Sep 18 15:07:53 2024
+-- Host        : TELOPS352 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
---               D:/Telops/FIR-00251-Proc/IP/325/ip_axis_fi32tofp32/ip_axis_fi32tofp32_stub.vhdl
+--               D:/Telops/Git/ircam_fir-00251-proc_temp/IP/325/ip_axis_fi32tofp32/ip_axis_fi32tofp32_stub.vhdl
 -- Design      : ip_axis_fi32tofp32
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7k325tfbg676-1
@@ -36,6 +36,6 @@ attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
 attribute black_box_pad_pin of stub : architecture is "aclk,aresetn,s_axis_a_tvalid,s_axis_a_tready,s_axis_a_tdata[31:0],s_axis_a_tuser[7:0],s_axis_a_tlast,m_axis_result_tvalid,m_axis_result_tready,m_axis_result_tdata[31:0],m_axis_result_tuser[7:0],m_axis_result_tlast";
 attribute x_core_info : string;
-attribute x_core_info of stub : architecture is "floating_point_v7_1_7,Vivado 2018.3";
+attribute x_core_info of stub : architecture is "floating_point_v7_1_7,Vivado 2018.3.1_AR71948_AR71898";
 begin
 end;

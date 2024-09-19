@@ -14,7 +14,7 @@ set clkName [get_property NAME [get_bd_ports -filter {TYPE == clk && DIR == O}]]
 set clkFreq [get_property CONFIG.FREQ_HZ [get_bd_ports -filter {TYPE == clk && DIR == O}]]
 
 #open a file to write to
-set filename  "d:/telops/fir-00251-Proc/src/sw/tel2000_param.h"
+set filename  "$root_dir/src/sw/tel2000_param.h"
 set fd1 [open $filename "w"]
 
 #Start to write the First line of the header file (DOXYGEN)

@@ -1,10 +1,10 @@
--- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3_AR71948_AR71898 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Thu Feb 22 09:34:54 2024
--- Host        : Telops331 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2018.3.1_AR71948_AR71898 (win64) Build 2489853 Tue Mar 26 04:20:25 MDT 2019
+-- Date        : Wed Sep 18 15:15:43 2024
+-- Host        : TELOPS352 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/325/ip_axis32_merge_axis64/ip_axis32_merge_axis64_sim_netlist.vhdl
+--               D:/Telops/Git/ircam_fir-00251-proc_temp/IP/325/ip_axis32_merge_axis64/ip_axis32_merge_axis64_sim_netlist.vhdl
 -- Design      : ip_axis32_merge_axis64
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -1944,7 +1944,7 @@ entity ip_axis32_merge_axis64 is
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of ip_axis32_merge_axis64 : entity is "yes";
   attribute X_CORE_INFO : string;
-  attribute X_CORE_INFO of ip_axis32_merge_axis64 : entity is "axis_dwidth_converter_v1_1_17_axis_dwidth_converter,Vivado 2018.3_AR71948_AR71898";
+  attribute X_CORE_INFO of ip_axis32_merge_axis64 : entity is "axis_dwidth_converter_v1_1_17_axis_dwidth_converter,Vivado 2018.3.1_AR71948_AR71898";
 end ip_axis32_merge_axis64;
 
 architecture STRUCTURE of ip_axis32_merge_axis64 is

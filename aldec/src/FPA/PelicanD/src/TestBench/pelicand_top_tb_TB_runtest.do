@@ -1,44 +1,44 @@
 
-SetActiveLib -work
+setactivelib work
 clearlibrary pelicanD
 
 
 
-acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
-acom D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
+acom $FIR251COMMON/VHDL/tel2000pkg.vhd
+acom $FIR251COMMON/VHDL/img_header_define.vhd
 
-acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
+acom $FIR251COMMON/VHDL/Utilities/rst_conditioner.vhd
 
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w28_d16\fwft_afifo_w28_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d16\fwft_sfifo_w32_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w64_d16\fwft_sfifo_w64_d16_sim_netlist.vhdl
---acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w41_d16\fwft_sfifo_w41_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w40_d16\fwft_sfifo_w40_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\tdp_ram_w8_d2048\tdp_ram_w8_d2048_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_sfifo_d2048\t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64\sfifo_w8_d64_sim_netlist.vhdl	
-acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64_no_output_reg\sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_afifo_w28_d16/fwft_afifo_w28_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w32_d16/fwft_sfifo_w32_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w64_d16/fwft_sfifo_w64_d16_sim_netlist.vhdl
+--acom $FIR251PROC/IP/160/fwft_sfifo_w41_d16/fwft_sfifo_w41_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/fwft_sfifo_w40_d16/fwft_sfifo_w40_d16_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/tdp_ram_w8_d2048/tdp_ram_w8_d2048_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/t_axi4_stream32_sfifo_d2048/t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/t_axi4_stream64_afifo_d512/t_axi4_stream64_afifo_d512_sim_netlist.vhdl
+acom $FIR251PROC/IP/160/sfifo_w8_d64/sfifo_w8_d64_sim_netlist.vhdl	
+acom $FIR251PROC/IP/160/sfifo_w8_d64_no_output_reg/sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
  
-acom "D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl"
-acom "D:\Telops\FIR-00251-Proc\IP\160\ip_axis_32_to_64\ip_axis_32_to_64_sim_netlist.vhdl"
-do D:\Telops\FIR-00251-Proc\src\FPA\PelicanD\hdl\compil_PelicanD.do
-acom "D:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src\TestBench\pelicand_testbench_pkg.vhd"	 
+acom "$FIR251PROC/IP/160/fwft_sfifo_w3_d16/fwft_sfifo_w3_d16_sim_netlist.vhdl"
+acom "$FIR251PROC/IP/160/ip_axis_32_to_64/ip_axis_32_to_64_sim_netlist.vhdl"
+do $FIR251PROC/src/FPA/PelicanD/hdl/compil_PelicanD.do
+acom "$FIR251PROC/aldec/src/FPA/PelicanD/src/TestBench/pelicand_testbench_pkg.vhd"	 
 
-acom "D:\Telops\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd"
-do "D:\Telops\FIR-00251-Proc\src\Trig\HDL\compil_trig_gen.do"
-#runexe "d:/telops/fir-00251-Proc/src/copy_to_cpp.bat"
+acom "$FIR251COMMON/VHDL/Buffering/BufferingDefine.vhd"
+do "$FIR251PROC/src/Trig/HDL/compil_trig_gen.do"
+#runexe "$FIR251PROC/src/copy_to_cpp.bat"
 #adel mb_model
-#cd D:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src
+#cd $FIR251PROC/aldec/src/FPA/PelicanD/src
 #buildc PelicanD.dlm
 #addfile mb_model.dll
 #addsc mb_model.dll
 ##
-#acom "D:\Telops\FIR-00251-Proc\aldec\src\Testbench\SystemC\mb_model_wrapper.vhd"	 
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src\TestBench\scd_proxy_sim.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src\PelicanD_top_tb.bde
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src\TestBench\pelicand_top_tb_TB.vhd
+#acom "$FIR251PROC/aldec/src/Testbench/SystemC/mb_model_wrapper.vhd"	 
+acom $FIR251PROC/aldec/src/FPA/PelicanD/src/TestBench/scd_proxy_sim.vhd
+acom $FIR251PROC/aldec/src/FPA/PelicanD/src/PelicanD_top_tb.bde
+acom $FIR251PROC/aldec/src/FPA/PelicanD/src/TestBench/pelicand_top_tb_TB.vhd
 #
 #
 asim -ses pelicand_top_tb_TB  													   

@@ -1,14 +1,18 @@
+#get root directory relative to this file
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+set parts [file split $current_file_location_absolute_path]
+set root_location_absolute_path [file join {*}[lrange $parts 0 end-3]]
+
+set commonDir "$root_location_absolute_path/irc_fir-00251-common"
+set projectDir "$root_location_absolute_path/irc_fir-00251-proc"
+set srcDir "$projectDir/src"
+set scriptsDir "$projectDir/bin/scripts"
+set outputDir "$root_location_absolute_path/irc_fir-00251-output"
+set storageDir "$root_location_absolute_path/ircam_fir-00257-storage_temp"
+set ntxminiDir "//STARK/DisqueTELOPS/Production/IRCAM/Firmwares/FIR-00251-NTx-Mini/Archives"
+
 proc setEnvironmentVariable {sensorName fpgaSize} {
     upvar 1 baseName baseName
-    upvar 1 commonDir commonDir
-    upvar 1 projectDir projectDir
-    upvar 1 sdkDir sdkDir
-    upvar 1 srcDir srcDir
-    upvar 1 binDir binDir
-    upvar 1 scriptsDir scriptsDir
-    upvar 1 outputDir outputDir
-    upvar 1 storageDir storageDir
-    upvar 1 ntxminiDir ntxminiDir
     upvar 1 elfFile elfFile
     upvar 1 bootFile bootFile
     upvar 1 hwFile hwFile
@@ -37,15 +41,8 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     upvar 1  sensorHeight sensorHeight
 
     set baseName "fir_00251_proc_$sensorName"
-    set commonDir "D:/Telops/FIR-00251-Common"
-    set projectDir "D:/Telops/FIR-00251-Proc"
-    set sdkDir "$projectDir/sdk/$baseName"
-    set srcDir "$projectDir/src"
     set binDir "$projectDir/bin/$baseName"
-    set scriptsDir "$projectDir/bin/scripts"
-    set outputDir "D:/Telops/FIR-00251-Output"
-    set storageDir "D:/Telops/FIR-00257-Storage"
-    set ntxminiDir "//STARK/DisqueTELOPS/Production/IRCAM/Firmwares/FIR-00251-NTx-Mini/Archives"
+	set sdkDir "$projectDir/sdk/$baseName"
     set elfFile "$binDir/${baseName}_$fpgaSize.elf"
     set bootFile "$sdkDir/${baseName}_boot_$fpgaSize/Release/${baseName}_boot_$fpgaSize.elf"
     set hwFile "$sdkDir/${baseName}_$fpgaSize.hdf"
@@ -104,4 +101,55 @@ proc setEnvironmentVariable {sensorName fpgaSize} {
     }
     puts "Xilinx directory: $xDir"
     set x_promgen "$xDir/14.7/LabTools/LabTools/bin/nt64/promgen.exe"
+}
+
+
+
+#git tools
+
+proc is_git_file_modified {filepath} {
+	set status [catch {exec git diff $filepath } result]
+	if {$result == ""} {
+	   set returnValue 0	   
+	} else {
+	   set returnValue 1
+	}
+	return $returnValue
+}
+
+proc git_last_modification_commit_hash {filepath} {
+	set is_file [file isfile $filepath]
+	if {$is_file == 1} {
+		set directory [file dirname $filepath]
+	} else {
+		set directory $filepath
+	}
+	#switch dir to be able to execute the git command correctly when folder is outside current repo
+	set current_dir [pwd]
+	cd $directory
+	set status [catch {exec  git log -n 1 --pretty=format:%h -- $filepath } result]
+	cd $current_dir
+
+	return $result
+}
+
+proc git_get_rev {filepath trace_modified} {
+	set git_diff_status [is_git_file_modified $filepath]
+	if {$git_diff_status == 0 || $trace_modified==0} {
+	   set hash [git_last_modification_commit_hash $filepath]
+	} else {
+	   set hash "modified"
+	}
+    puts "the hash value is $hash"
+
+	return $hash
+}
+
+proc git_tag {path tag message} {
+	set current_dir [pwd]
+	cd $directory
+	set status [catch {exec  git tag $tag -m $message } result]
+	cd $current_dir
+	
+	
 }

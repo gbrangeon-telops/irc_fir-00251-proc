@@ -1,6 +1,7 @@
 proc create_tsir_project {detector} {
 	
-	set base_dir "d:/Telops/fir-00251-Proc"
+	global base_dir
+	#set base_dir "d:/Telops/fir-00251-Proc"
 	
 	#force writable directory
 	file attributes $base_dir/xilinx/ -readonly 0
@@ -10,8 +11,9 @@ proc create_tsir_project {detector} {
 }
 
 proc build_tsir_project {{release 0}} {
-	
-	set base_dir "d:/Telops/fir-00251-Proc"
+	global base_dir
+
+	#set base_dir "d:/Telops/fir-00251-Proc"
 	#Get project name
 	set proj_name [get_project]
 	#Get sensor if possible

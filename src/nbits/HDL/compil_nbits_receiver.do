@@ -1,5 +1,5 @@
 #savealltabs
-#SetActiveLib -work
+#setactivelib work
 #clearlibrary 	
 
 
@@ -7,25 +7,25 @@
 
 # common
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\Common_HDL\Utilities\sync_reset.vhd \
- d:\Telops\Common_HDL\Utilities\dcm_reset.vhd \
+ "$COMMON_HDL/Utilities/sync_reset.vhd" \
+ "$COMMON_HDL/Utilities/dcm_reset.vhd" \
 #TODO Edit if more than 4 channel are needed
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd
+ "$FIR251COMMON/VHDL/iserdes/clink/fpa_serdes_define.vhd"
 acom -incr -nowarn DAGGEN_0523 -2008 \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_serdes_clk_wrapper.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\idelay_wrapper.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\iserdes_wrapper.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\iserdes_nbits_wrapper.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_delay_validator_core.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\high_duration_meas.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_validator_ctrler.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_delay_validator.bde \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_delay_ctrl.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_bitslip_ctrl.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_calibration.bde \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_serdes_clk_wrapper.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/idelay_wrapper.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/clink/iserdes_wrapper.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/iserdes_nbits_wrapper.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_delay_validator_core.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/clink/high_duration_meas.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/clink/clink_validator_ctrler.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/clink/clink_signals_validator.bde" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_delay_validator.bde" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_delay_ctrl.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_bitslip_ctrl.vhd" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_calibration.bde" \
 # NBITS
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_deserializer.bde \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\nbits_generic\nbits_receiver_nch.bde
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_deserializer.bde" \
+ "$FIR251COMMON/VHDL/iserdes/nbits_generic/nbits_receiver_nch.bde"
 
 #__END BUILD NBITS

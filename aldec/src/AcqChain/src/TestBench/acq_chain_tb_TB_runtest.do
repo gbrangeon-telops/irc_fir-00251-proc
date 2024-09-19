@@ -1,97 +1,97 @@
 
-SetActiveLib -work
+setactivelib work
 clearlibrary AcqChain
 
-acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
-acom D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
+acom $FIR251COMMON/VHDL/tel2000pkg.vhd
+acom $FIR251COMMON/VHDL/img_header_define.vhd
 
-acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis32_data_cnt.vhd
-acom d:\Telops\FIR-00251-Proc\IP\fwft_afifo_w28_d16\fwft_afifo_w28_d16_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w28_d16\fwft_sfifo_w28_d16_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w32_d16\fwft_sfifo_w32_d16_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\tdp_ram_w8_d2048\tdp_ram_w8_d2048_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\axi_uartlite_100MHz_921600\axi_uartlite_100MHz_921600_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\sfifo_w8_d64\sfifo_w8_d64_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\sfifo_w8_d16\sfifo_w8_d16_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\sp_ram_byte_w32_d64\sp_ram_byte_w32_d64_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\t_axi4_lite32_w_afifo_d16\t_axi4_lite32_w_afifo_d16_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\t_axi4_lite32_w_afifo_d64\t_axi4_lite32_w_afifo_d64_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d16\fwft_sfifo_w8_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Common\IP\axis_32_to_16\axis_32_to_16_funcsim.vhdl
-acom d:\Telops\Common_HDL\Matlab\axi4_stream_file_output_32.vhd
-acom d:\Telops\Common_HDL\Matlab\axi4_stream_file_output_16.vhd
+acom $FIR251COMMON/VHDL/Utilities/axis32_data_cnt.vhd
+acom $FIR251PROC/IP/fwft_afifo_w28_d16/fwft_afifo_w28_d16_funcsim.vhdl
+acom $FIR251PROC/IP/fwft_sfifo_w28_d16/fwft_sfifo_w28_d16_funcsim.vhdl
+acom $FIR251PROC/IP/fwft_sfifo_w32_d16/fwft_sfifo_w32_d16_funcsim.vhdl
+acom $FIR251PROC/IP/fwft_sfifo_w33_d16/fwft_sfifo_w33_d16_funcsim.vhdl
+acom $FIR251PROC/IP/tdp_ram_w8_d2048/tdp_ram_w8_d2048_funcsim.vhdl
+acom $FIR251PROC/IP/axi_uartlite_100MHz_921600/axi_uartlite_100MHz_921600_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_funcsim.vhdl
+acom $FIR251PROC/IP/sfifo_w8_d64/sfifo_w8_d64_funcsim.vhdl
+acom $FIR251PROC/IP/sfifo_w8_d16/sfifo_w8_d16_funcsim.vhdl
+acom $FIR251PROC/IP/sp_ram_byte_w32_d64/sp_ram_byte_w32_d64_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_lite32_w_afifo_d16/t_axi4_lite32_w_afifo_d16_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_lite32_w_afifo_d64/t_axi4_lite32_w_afifo_d64_funcsim.vhdl
+acom $FIR251PROC/IP/fwft_sfifo_w8_d16/fwft_sfifo_w8_d16_funcsim.vhdl
+acom $FIR251COMMON/IP/axis_32_to_16/axis_32_to_16_funcsim.vhdl
+acom $COMMON_HDL/Matlab/axi4_stream_file_output_32.vhd
+acom $COMMON_HDL/Matlab/axi4_stream_file_output_16.vhd
 
 
---acom d:\Telops\FIR-00251-Proc\IP\t_axi4_stream16_sfifo_d16\t_axi4_stream16_sfifo_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d16\t_axi4_stream32_sfifo_d16_funcsim.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d32\t_axi4_stream32_sfifo_d32_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d64\t_axi4_stream32_sfifo_d64_funcsim.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d128\t_axi4_stream32_sfifo_d128_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d256\t_axi4_stream32_sfifo_d256_funcsim.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d512\t_axi4_stream32_sfifo_d512_funcsim.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d1024\t_axi4_stream32_sfifo_d1024_funcsim.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_sfifo_d2048\t_axi4_stream32_sfifo_d2048_funcsim.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d16\t_axi4_stream32_afifo_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
+--acom $FIR251PROC/IP/t_axi4_stream16_sfifo_d16/t_axi4_stream16_sfifo_d16_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d16/t_axi4_stream32_sfifo_d16_funcsim.vhdl
+--acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d32/t_axi4_stream32_sfifo_d32_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d64/t_axi4_stream32_sfifo_d64_funcsim.vhdl
+--acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d128/t_axi4_stream32_sfifo_d128_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d256/t_axi4_stream32_sfifo_d256_funcsim.vhdl
+--acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d512/t_axi4_stream32_sfifo_d512_funcsim.vhdl
+--acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d1024/t_axi4_stream32_sfifo_d1024_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d2048/t_axi4_stream32_sfifo_d2048_funcsim.vhdl
+--acom $FIR251PROC/IP/t_axi4_stream32_afifo_d16/t_axi4_stream32_afifo_d16_funcsim.vhdl
+acom $FIR251PROC/IP/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_funcsim.vhdl
 
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis_fi32tofp32\ip_axis_fi32tofp32_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis_fp32tofi32\ip_axis_fp32tofi32_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis32_fanout2\ip_axis32_fanout2_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis32_fanout3\ip_axis32_fanout3_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_add\ip_fp32_axis_add_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_divide\ip_fp32_axis_divide_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis_fi32tofp32\ip_axis_fi32tofp32_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis_fp32tofi32\ip_axis_fp32tofi32_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_add\ip_fp32_axis_add_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_mult\ip_fp32_axis_mult_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_sqroot\ip_fp32_axis_sqroot_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_subtract\ip_fp32_axis_subtract_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis_fi32tofp32/ip_axis_fi32tofp32_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis_fp32tofi32/ip_axis_fp32tofi32_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis32_fanout2/ip_axis32_fanout2_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis32_fanout3/ip_axis32_fanout3_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_add/ip_fp32_axis_add_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_divide/ip_fp32_axis_divide_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis_fi32tofp32/ip_axis_fi32tofp32_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis_fp32tofi32/ip_axis_fp32tofi32_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_add/ip_fp32_axis_add_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_mult/ip_fp32_axis_mult_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_sqroot/ip_fp32_axis_sqroot_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_subtract/ip_fp32_axis_subtract_funcsim.vhdl
 #   
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_sqroot\ip_fp32_axis_sqroot_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_fp32_axis_subtract\ip_fp32_axis_subtract_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\tdp_ram_w32_d16384\tdp_ram_w32_d16384_funcsim.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\ip_axis16_merge_axis32\ip_axis16_merge_axis32_funcsim.vhdl 
+#acom $FIR251PROC/IP/ip_fp32_axis_sqroot/ip_fp32_axis_sqroot_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_fp32_axis_subtract/ip_fp32_axis_subtract_funcsim.vhdl
+#acom $FIR251PROC/IP/tdp_ram_w32_d16384/tdp_ram_w32_d16384_funcsim.vhdl
+#acom $FIR251PROC/IP/ip_axis16_merge_axis32/ip_axis16_merge_axis32_funcsim.vhdl 
 #
-#acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis16_merge_axis32.vhd
+#acom $FIR251COMMON/VHDL/Utilities/axis16_merge_axis32.vhd
 #
 
 #utilities
-do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
---do D:\Telops\FIR-00251-Proc\src\Calibration\HDL\compile_common.do
+do $FIR251PROC/src/compil_utilities.do
+--do $FIR251PROC/src/Calibration/HDL/compile_common.do
                                                                                                                    
-do D:\Telops\FIR-00251-Proc\src\FPA\PelicanD\hdl\compil_PelicanD.do
-do D:\Telops\FIR-00251-Proc\src\FPA\ScorpiolwD\hdl\compil_ScorpiolwD.do
-do D:\Telops\FIR-00251-Proc\src\ExposureTime\hdl\compil_exposure_time.do
-do D:\Telops\FIR-00251-Proc\src\Hder\hdl\compil_hder_inserter.do
-do D:\Telops\FIR-00251-Proc\src\Trig\hdl\compil_trig_gen.do
-#do D:\Telops\FIR-00251-Proc\src\Calibration\HDL\compil_calibration.do
+do $FIR251PROC/src/FPA/PelicanD/hdl/compil_PelicanD.do
+do $FIR251PROC/src/FPA/ScorpiolwD/hdl/compil_ScorpiolwD.do
+do $FIR251PROC/src/ExposureTime/hdl/compil_exposure_time.do
+do $FIR251PROC/src/Hder/hdl/compil_hder_inserter.do
+do $FIR251PROC/src/Trig/hdl/compil_trig_gen.do
+#do $FIR251PROC/src/Calibration/HDL/compil_calibration.do
 
-acom "D:\Telops\FIR-00251-Proc\aldec\src\Testbench\SystemC\mb_model_wrapper.vhd"
-#acom d:\Telops\FIR-00251-Proc\aldec\src\AcqChain\src\pelicanD_core_dummy.vhd
-#acom d:\Telops\FIR-00251-Proc\aldec\src\AcqChain\src\PelicanD_dummy.bde
-#acom d:\Telops\FIR-00251-Proc\aldec\src\AcqChain\src\efa_00254_dummy.vhd 
-#acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis32_RandomMiso.vhd
+acom "$FIR251PROC/aldec/src/Testbench/SystemC/mb_model_wrapper.vhd"
+#acom $FIR251PROC/aldec/src/AcqChain/src/pelicanD_core_dummy.vhd
+#acom $FIR251PROC/aldec/src/AcqChain/src/PelicanD_dummy.bde
+#acom $FIR251PROC/aldec/src/AcqChain/src/efa_00254_dummy.vhd 
+#acom $FIR251COMMON/VHDL/Utilities/axis32_RandomMiso.vhd
                                                                      
 # KERNEL: WARNING: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis_32_to_16_wrap.vhd
-acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis16_to_axis32.vhd
-acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis16_data_cnt.vhd
-acom d:\Telops\FIR-00251-Common\VHDL\Utilities\axis32_data_cnt.vhd
+acom $FIR251COMMON/VHDL/Utilities/axis_32_to_16_wrap.vhd
+acom $FIR251COMMON/VHDL/Utilities/axis16_to_axis32.vhd
+acom $FIR251COMMON/VHDL/Utilities/axis16_data_cnt.vhd
+acom $FIR251COMMON/VHDL/Utilities/axis32_data_cnt.vhd
 
 
 ###
 ##                                                                      
-runexe "d:/telops/fir-00251-Proc/src/copy_to_cpp.bat"
+runexe "$FIR251PROC/src/copy_to_cpp.bat"
 adel mb_model
-cd D:\Telops\FIR-00251-Proc\aldec\src\AcqChain\src
+cd $FIR251PROC/aldec/src/AcqChain/src
 buildc acq_chain.dlm
 addfile mb_model.dll
 addsc mb_model.dll
 
-acom d:\Telops\FIR-00251-Proc\aldec\src\AcqChain\src\acq_chain_tb.bde
-acom  d:\Telops\FIR-00251-Proc\aldec\src\AcqChain\src\TestBench\acq_chain_tb_TB.vhd
+acom $FIR251PROC/aldec/src/AcqChain/src/acq_chain_tb.bde
+acom  $FIR251PROC/aldec/src/AcqChain/src/TestBench/acq_chain_tb_TB.vhd
 ##                        
                                                                                 
 --wave UUT/U1/U1/*                       

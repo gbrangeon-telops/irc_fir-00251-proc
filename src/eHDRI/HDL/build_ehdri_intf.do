@@ -1,21 +1,19 @@
 alib work
-setActivelib work
+setactivelib work
 
-setenv EHDRI_INTF "D:\Telops\FIR-00251-Proc\src\eHDRI\HDL"
-setenv COMMON "D:\Telops\FIR-00251-Common\VHDL"
-setenv COMMON_HDL "D:\Telops\Common_HDL"
-setenv PROC "D:\Telops\FIR-00251-Proc"
+setenv EHDRI_INTF "$FIR251PROC/src/eHDRI/HDL"
+
 
 # Package
-acom  "D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd"
+acom  "$FIR251COMMON/VHDL/tel2000pkg.vhd"
 
 #common_hdl
-acom "$COMMON_HDL\Utilities\SYNC_RESET.vhd"
-acom "$COMMON\Utilities\axil32_to_native.vhd"
+acom "$COMMON_HDL/Utilities/SYNC_RESET.vhd"
+acom "$FIR251COMMON/VHDL/Utilities/axil32_to_native.vhd"
 
 #source EHDRI
-acom "$EHDRI_INTF\ehdri_ctrl.vhd"
-acom "$EHDRI_INTF\ehdri_SM.vhd"
+acom "$EHDRI_INTF/ehdri_ctrl.vhd"
+acom "$EHDRI_INTF/ehdri_SM.vhd"
 
 #Top
-acom "$EHDRI_INTF\EHDRI_toplevel.bde"
+acom "$EHDRI_INTF/EHDRI_toplevel.bde"

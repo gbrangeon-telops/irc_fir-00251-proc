@@ -1,6 +1,7 @@
 
-#Import build functions
-source "D:/Telops/FIR-00251-Proc/sdk/sdk_proc_cmd.tcl"
+#get root directory relative to this file
+set current_file_location_absolute_path [file normalize [file dirname [info script]]]
+source $current_file_location_absolute_path/sdk_proc_cmd.tcl
 
 #Parse arguments
 if {$argc < 2} {return -code error "At least 2 arguments are expected"}

@@ -1,40 +1,38 @@
 #savealltabs
-SetActiveLib -work
+setactivelib work
 #clearlibrary 	
 
-setenv COMMON "D:\Telops\FIR-00251-Common"
-
 #Packages and utilities
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_define.vhd
-acom d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
-do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
+acom $FIR251PROC/src/Trig/HDL/trig_define.vhd
+acom $FIR251COMMON/VHDL/img_header_define.vhd
+do $FIR251PROC/src/compil_utilities.do
 
 #signal stat
 acom \
- "$COMMON\VHDL\signal_stat\min_max_define.vhd" \
- "$COMMON\VHDL\signal_stat\min_max_ctrl.vhd" \
- "$COMMON\VHDL\signal_stat\delay_measurement.vhd" \
- "$COMMON\VHDL\signal_stat\trig_delay.bde" \
- "$COMMON\VHDL\signal_stat\period_duration.vhd" \
- "$COMMON\VHDL\signal_stat\trig_period.bde" \
- "$COMMON\VHDL\signal_stat\trig_period_8ch.bde"
+ "$FIR251COMMON/VHDL/signal_stat/min_max_define.vhd" \
+ "$FIR251COMMON/VHDL/signal_stat/min_max_ctrl.vhd" \
+ "$FIR251COMMON/VHDL/signal_stat/delay_measurement.vhd" \
+ "$FIR251COMMON/VHDL/signal_stat/trig_delay.bde" \
+ "$FIR251COMMON/VHDL/signal_stat/period_duration.vhd" \
+ "$FIR251COMMON/VHDL/signal_stat/trig_period.bde" \
+ "$FIR251COMMON/VHDL/signal_stat/trig_period_8ch.bde"
 
 #MBlaze config
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_mblaze_intf.vhd	
+acom $FIR251PROC/src/Trig/HDL/trig_gen_mblaze_intf.vhd	
 
 #generateur de statut
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_status.vhd
+acom $FIR251PROC/src/Trig/HDL/trig_gen_status.vhd
 
 #generateurs de trigs
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_conditioner.vhd
+acom $FIR251PROC/src/Trig/HDL/trig_conditioner.vhd
 
 # trigger controller
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\progr_clk_div.vhd 
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_ctler_core.vhd
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_ctler.bde  
+acom $FIR251PROC/src/Trig/HDL/progr_clk_div.vhd 
+acom $FIR251PROC/src/Trig/HDL/trig_gen_ctler_core.vhd
+acom $FIR251PROC/src/Trig/HDL/trig_gen_ctler.bde  
 
 # stamper et RTC  
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\edge_detect.vhd
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_stamper_ctler.vhd
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_stamper.bde
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen.bde
+acom $FIR251PROC/src/Trig/HDL/edge_detect.vhd
+acom $FIR251PROC/src/Trig/HDL/trig_stamper_ctler.vhd
+acom $FIR251PROC/src/Trig/HDL/trig_stamper.bde
+acom $FIR251PROC/src/Trig/HDL/trig_gen.bde
