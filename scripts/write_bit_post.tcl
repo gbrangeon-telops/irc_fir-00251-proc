@@ -48,4 +48,8 @@ if {[get_property is_enabled [get_files $encrypt_file]] == 1} {
    }
 }
 
-exec $base_dir/scripts/updateHwSvnRev.bat ${sensor} ${FPGA_SIZE} ${encrypt_key_name}
+#Build git revision
+source $base_dir/scripts/updateHwRev.tcl 
+updateHwSvnRev ${FPGA_SIZE} ${sensor} ${FPGA_SIZE} ${encrypt_key_name}
+#exec $base_dir/scripts/updateHwSvnRev.bat ${sensor} ${FPGA_SIZE} ${encrypt_key_name}
+ 

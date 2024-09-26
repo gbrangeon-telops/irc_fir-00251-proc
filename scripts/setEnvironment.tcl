@@ -20,3 +20,55 @@ puts "commonDir:$commonDir"
 puts "outputDir:$outputDir"
 puts "projectDir:$projectDir"
 puts "sdkDir:$sdkDir"
+
+
+#git tools
+
+proc is_git_file_modified {filepath} {
+	set is_file [file isfile $filepath]
+	if {$is_file == 1} {
+		set directory [file dirname $filepath]
+	} else {
+		set directory $filepath
+	}
+	#switch dir to be able to execute the git command correctly when folder is outside current repo
+	set current_dir [pwd]
+	cd $directory
+	set status [catch {exec git diff $filepath } result]
+	if {$result == ""} {
+	   set returnValue 0	   
+	} else {
+	   set returnValue 1
+	}
+	cd $current_dir
+	return $returnValue
+}
+
+proc git_last_modification_commit_hash {filepath} {
+	set is_file [file isfile $filepath]
+	if {$is_file == 1} {
+		set directory [file dirname $filepath]
+	} else {
+		set directory $filepath
+	}
+	#switch dir to be able to execute the git command correctly when folder is outside current repo
+	set current_dir [pwd]
+	cd $directory
+	set status [catch {exec  git log -n 1 --pretty=format:%h -- $filepath } result]
+	cd $current_dir
+
+	return $result
+}
+
+proc git_get_rev {filepath trace_modified} {
+	set git_diff_status [is_git_file_modified $filepath]
+	set revision [git_last_modification_commit_hash $filepath]
+	if {$git_diff_status == 0 || $trace_modified==0} {
+	   set hash "$revision"
+	} else {
+	   set hash "*$revision"
+	}
+    puts "the hash value is $hash"
+
+	return $hash
+}
