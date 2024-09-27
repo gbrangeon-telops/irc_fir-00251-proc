@@ -38,5 +38,5 @@ wave UUT/U4/*
 wave UUT/U1/*
 wave UUT/U1/g0/U2/*
 
---run 20 us
+-- run 20 us
 run 20 ms

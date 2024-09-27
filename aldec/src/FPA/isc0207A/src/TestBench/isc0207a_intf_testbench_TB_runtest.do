@@ -39,13 +39,13 @@ acom $FIR251PROC/IP/160/fwft_afifo_wr66_rd132_d512/fwft_afifo_wr66_rd132_d512_si
 #acom $FIR251PROC/IP/160/afifo_w57d16/afifo_w57d16_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_afifo_w62_d16/fwft_afifo_w62_d16_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w72_d16/fwft_sfifo_w72_d16_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/fwft_afifo_w72_d128/fwft_afifo_w72_d128_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/fwft_afifo_w72_d128/fwft_afifo_w72_d128_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_sfifo_w1_d16/fwft_sfifo_w1_d16_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w3_d16/fwft_sfifo_w3_d16_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_sfifo_w3_d256/fwft_sfifo_w3_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w76_d256/fwft_sfifo_w76_d256_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_sfifo_w8_d256/fwft_sfifo_w8_d256_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/fwft_sfifo_w64_d256/fwft_sfifo_w64_d256_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/fwft_sfifo_w64_d256/fwft_sfifo_w64_d256_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_sfifo_w8_d64/fwft_sfifo_w8_d64_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_sfifo_w56_d256/fwft_sfifo_w56_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_sim_netlist.vhdl
@@ -56,27 +56,27 @@ acom $FIR251PROC/IP/160/fwft_afifo_w8_d256/fwft_afifo_w8_d256_sim_netlist.vhdl
 
 acom $FIR251PROC/IP/160/fwft_sfifo_w32_d256/fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_afifo_w96_d128/fwft_afifo_w96_d128_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/fwft_afifo_w72_d128/fwft_afifo_w72_d128_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/fwft_afifo_w72_d128/fwft_afifo_w72_d128_sim_netlist.vhdl
 -- acom $FIR251PROC/IP/160/afifo_w72_d256/afifo_w72_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/afifo_w72_d16/afifo_w72_d16_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_afifo_w72_d16/fwft_afifo_w72_d16_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/afpa_single_div_ip/afpa_single_div_ip_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/afpa_single_div_ip/afpa_single_div_ip_sim_netlist.vhdl
 acom $FIR251PROC/aldec/src/FPA/isc0207a/src/afpa_single_div_ip.vhd
 #acom $FIR251PROC/IP/160/fwft_sfifo_w80_d256/fwft_sfifo_w80_d256_sim_netlist.vhdl 
 
 acom $FIR251PROC/aldec/src/FPA/isc0207a/src/var_shift_reg_w16_d32.vhd
 
---acom $FIR251PROC/IP/160/var_shift_reg_w16_d32/var_shift_reg_w16_d32_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/var_shift_reg_w16_d32/var_shift_reg_w16_d32_sim_netlist.vhdl
 
 acom $FIR251PROC/IP/160/isc0207a_5_0_MHz_mmcm/isc0207a_5_0_MHz_mmcm_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/isc0207a_6_6_MHz_mmcm/isc0207a_6_6_MHz_mmcm_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/isc0207a_7_1_MHz_mmcm/isc0207a_7_1_MHz_mmcm_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/isc0207a_7_5_MHz_mmcm/isc0207a_7_5_MHz_mmcm_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/isc0207a_8_0_MHz_mmcm/isc0207a_8_0_MHz_mmcm_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/isc0207a_6_6_MHz_mmcm/isc0207a_6_6_MHz_mmcm_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/isc0207a_7_1_MHz_mmcm/isc0207a_7_1_MHz_mmcm_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/isc0207a_7_5_MHz_mmcm/isc0207a_7_5_MHz_mmcm_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/isc0207a_8_0_MHz_mmcm/isc0207a_8_0_MHz_mmcm_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/isc0207a_8_3_MHz_mmcm/isc0207a_8_3_MHz_mmcm_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/isc0207a_8_4_MHz_mmcm/isc0207a_8_4_MHz_mmcm_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/isc0207a_8_5_MHz_mmcm/isc0207a_8_5_MHz_mmcm_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/isc0207a_9_0_MHz_mmcm/isc0207a_9_0_MHz_mmcm_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/isc0207a_9_0_MHz_mmcm/isc0207a_9_0_MHz_mmcm_sim_netlist.vhdl
 
 #acom $FIR251PROC/IP/160/isc0207a_9_5_MHz_mmcm/isc0207a_9_5_MHz_mmcm_sim_netlist.vhdl
 -- acom $FIR251PROC/IP/160/isc0207a_10_0_MHz_mmcm/isc0207a_10_0_MHz_mmcm_sim_netlist.vhdl
@@ -124,53 +124,53 @@ acom  $FIR251PROC/aldec/src/FPA/isc0207a/src/TestBench/isc0207a_intf_testbench_T
 asim -ses isc0207a_intf_testbench_TB 
 
 -- spi_mux_ctrl
---wave UUT/U1/U21/U1/* 
+-- wave UUT/U1/U21/U1/* 
  
 -- monit adc driver
---wave UUT/U1/U21/U4/U2/* 
+-- wave UUT/U1/U21/U4/U2/* 
 
 
 -- monit adc
---wave UUT/U1/U21/U4/*
+-- wave UUT/U1/U21/U4/*
 
 -- monit adc dummy
---wave UUT/U7/* 
+-- wave UUT/U7/* 
  
 -- switch
---wave UUT/U1/U21/U3/*
+-- wave UUT/U1/U21/U3/*
 
 
 -- adc brd_id_reader
---wave UUT/U1/U21/U5/U2/*
+-- wave UUT/U1/U21/U5/U2/*
 
 -- services ctrl
---wave UUT/U1/U21/U5/U2/* 
+-- wave UUT/U1/U21/U5/U2/* 
 
 -- mb_interface
---wave UUT/U1/U4/*  
+-- wave UUT/U1/U4/*  
 
 -- digio map
---wave UUT/U1/U19/*
+-- wave UUT/U1/U19/*
 
 -- intf_sequencer
---wave UUT/U1/U2/*  
+-- wave UUT/U1/U2/*  
 
 -- fpa_prog_controller
---wave UUT/U1/U5/U2/* 
+-- wave UUT/U1/U5/U2/* 
 
 
 -- module FPA
 #wave UUT/U1/U9/U6/* 
 
---wave UUT/U14/U1/* 
---wave UUT/U14/U11/*
---wave UUT/TRACE_ERR*
+-- wave UUT/U14/U1/* 
+-- wave UUT/U14/U11/*
+-- wave UUT/TRACE_ERR*
  
  -- flex brd_id_reader
---wave UUT/U1/U21/U6/U2/*
---wave UUT/U1/U21/U6/*
+-- wave UUT/U1/U21/U6/U2/*
+-- wave UUT/U1/U21/U6/*
 
---wave UUT/U1/U9/U1/* 
+-- wave UUT/U1/U9/U1/* 
 
 #wave UUT/U1/U5/U5/U1/*
 #wave UUT/U1/U5/U5/U2/*
@@ -179,25 +179,25 @@ asim -ses isc0207a_intf_testbench_TB
 #wave UUT/U1/U5/U5/*
 #wave UUT/U1/U5/U2/U1/*
 
---wave UUT/U1/U26/U1/*
---wave UUT/U1/U26/U2/*
+-- wave UUT/U1/U26/U1/*
+-- wave UUT/U1/U26/U2/*
 
---wave UUT/U1/U5/U21/*
---wave UUT/U1/U5/*
+-- wave UUT/U1/U5/U21/*
+-- wave UUT/U1/U5/*
 
---wave UUT/U1/U9/ID_A/U1/U23/* 
---wave UUT/U1/U9/ID_A/U5/*
---wave UUT/U1/U9/ID_A/U23/*
+-- wave UUT/U1/U9/ID_A/U1/U23/* 
+-- wave UUT/U1/U9/ID_A/U5/*
+-- wave UUT/U1/U9/ID_A/U23/*
 
---wave UUT/U1/U9/ID_A/U1/U1/*
---wave UUT/U1/U9/ID_A/U1/U1/*
+-- wave UUT/U1/U9/ID_A/U1/U1/*
+-- wave UUT/U1/U9/ID_A/U1/U1/*
 
 #wave UUT/U1/U9/U18/* 
 #wave UUT/U1/U5/U4/* 
 #wave UUT/U1/U5/U2/*
 
 wave UUT/U1/* 
---wave UUT/U25/*
+-- wave UUT/U25/*
 
---run 20 us
+-- run 20 us
 run 7 ms

@@ -24,16 +24,16 @@ acom $COMMON_HDL/Matlab/axi4_stream_file_output_32.vhd
 acom $COMMON_HDL/Matlab/axi4_stream_file_output_16.vhd
 
 
---acom $FIR251PROC/IP/t_axi4_stream16_sfifo_d16/t_axi4_stream16_sfifo_d16_funcsim.vhdl
+-- acom $FIR251PROC/IP/t_axi4_stream16_sfifo_d16/t_axi4_stream16_sfifo_d16_funcsim.vhdl
 acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d16/t_axi4_stream32_sfifo_d16_funcsim.vhdl
---acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d32/t_axi4_stream32_sfifo_d32_funcsim.vhdl
+-- acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d32/t_axi4_stream32_sfifo_d32_funcsim.vhdl
 acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d64/t_axi4_stream32_sfifo_d64_funcsim.vhdl
---acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d128/t_axi4_stream32_sfifo_d128_funcsim.vhdl
+-- acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d128/t_axi4_stream32_sfifo_d128_funcsim.vhdl
 acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d256/t_axi4_stream32_sfifo_d256_funcsim.vhdl
---acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d512/t_axi4_stream32_sfifo_d512_funcsim.vhdl
---acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d1024/t_axi4_stream32_sfifo_d1024_funcsim.vhdl
+-- acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d512/t_axi4_stream32_sfifo_d512_funcsim.vhdl
+-- acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d1024/t_axi4_stream32_sfifo_d1024_funcsim.vhdl
 acom $FIR251PROC/IP/t_axi4_stream32_sfifo_d2048/t_axi4_stream32_sfifo_d2048_funcsim.vhdl
---acom $FIR251PROC/IP/t_axi4_stream32_afifo_d16/t_axi4_stream32_afifo_d16_funcsim.vhdl
+-- acom $FIR251PROC/IP/t_axi4_stream32_afifo_d16/t_axi4_stream32_afifo_d16_funcsim.vhdl
 acom $FIR251PROC/IP/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_funcsim.vhdl
 
 #acom $FIR251PROC/IP/ip_axis_fi32tofp32/ip_axis_fi32tofp32_funcsim.vhdl
@@ -59,7 +59,7 @@ acom $FIR251PROC/IP/t_axi4_stream32_afifo_d512/t_axi4_stream32_afifo_d512_funcsi
 
 #utilities
 do $FIR251PROC/src/compil_utilities.do
---do $FIR251PROC/src/Calibration/HDL/compile_common.do
+-- do $FIR251PROC/src/Calibration/HDL/compile_common.do
                                                                                                                    
 do $FIR251PROC/src/FPA/PelicanD/hdl/compil_PelicanD.do
 do $FIR251PROC/src/FPA/ScorpiolwD/hdl/compil_ScorpiolwD.do
@@ -94,85 +94,85 @@ acom $FIR251PROC/aldec/src/AcqChain/src/acq_chain_tb.bde
 acom  $FIR251PROC/aldec/src/AcqChain/src/TestBench/acq_chain_tb_TB.vhd
 ##                        
                                                                                 
---wave UUT/U1/U1/*                       
+-- wave UUT/U1/U1/*                       
 
 asim -ses acq_chain_tb_TB 
 ##
-##--add wave -noreg -hexadecimal -literal {/hder_inserter_top_tb_TB/U3/U1/MB_MOSI}
+##-- add wave -noreg -hexadecimal -literal {/hder_inserter_top_tb_TB/U3/U1/MB_MOSI}
 ##
 ##-- PELICAND receveur config
---wave UUT/U1/U4/*
+-- wave UUT/U1/U4/*
 ##
 ##-- PELICAND detecteur freq_id
---wave UUT/U1/U7/*
+-- wave UUT/U1/U7/*
 ##
 ##-- trig controller
---wave UUT/U1/U1/*
+-- wave UUT/U1/U1/*
 
 
 ##-- sequenceur
---wave UUT/U1/U2/*  
+-- wave UUT/U1/U2/*  
 ##
 ##-- frame io interface
---wave UUT/U1/U19/*            
+-- wave UUT/U1/U19/*            
 #
 ##-- hw driver sequencer
---wave UUT/U1/U5/U1/*                   
+-- wave UUT/U1/U5/U1/*                   
 #
 ##-- hw serial module--
 #wave UUT/U1/U5/U2/*                   
 #
 ##-- hw uart block--
-#--wave UUT/U1/U5/U6/* 
+#-- wave UUT/U1/U5/U6/* 
 #
 ##-- hw ram
-#--wave UUT/U1/U5/U3/*                     
+#-- wave UUT/U1/U5/U3/*                     
 #                    
 ##-- stat gen
---wave UUT/U1/U6/* 
+-- wave UUT/U1/U6/* 
 #
 ##-- diag data gen
---wave UUT/U1/U9/U1/*
+-- wave UUT/U1/U9/U1/*
 #
 ##-- PELICAND  data dispatcher
 #wave UUT/U1/U9/U6/*
 #
 ##-- dout fifo
-#--wave UUT/U1/U8/* 
+#-- wave UUT/U1/U8/* 
 #
-##--fifo writer
+##-- fifo writer
 #wave UUT/U1/U9/U2/*  
 #
 ##hw driver
 ##wave UUT/U1/U5/*
 #
 ##top level pelicanD
-#--wave UUT/U1/*
+#-- wave UUT/U1/*
 
 ##Core Dummy--
---wave UUT/U7/U7/* 
+-- wave UUT/U7/U7/* 
 
 ## efa  254--
---wave UUT/U6/* 
+-- wave UUT/U6/* 
 
 ## Dummy uart-
---wave UUT/U7/U6/* 
+-- wave UUT/U7/U6/* 
 
 ## Dummy data gen-
 #wave UUT/U7/U3/* 
 
 ## hder inserter
---wave UUT/U3/U5/* 
+-- wave UUT/U3/U5/* 
 
 ## hder inserter sequencer
---wave UUT/U3/U4/* 
+-- wave UUT/U3/U4/* 
 
 ## hder inserter : trig header fifo
---wave UUT/U3/U6/*
+-- wave UUT/U3/U6/*
 
---wave UUT/U11/U25/*
---wave UUT/U12/*  
---wave UUT/U13/*
+-- wave UUT/U11/U25/*
+-- wave UUT/U12/*  
+-- wave UUT/U13/*
 #wave UUT/U3/U19/*
 wave UUT/U14/* 
 wave UUT/U15/*

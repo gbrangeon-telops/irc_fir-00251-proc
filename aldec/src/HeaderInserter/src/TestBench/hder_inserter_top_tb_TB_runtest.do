@@ -28,21 +28,21 @@ acom $FIR251PROC/aldec/src/HeaderInserter/src/TestBench/hder_inserter_top_tb_TB.
 
 asim -ses hder_inserter_top_tb_TB 
 
---add wave -noreg -hexadecimal -literal {/hder_inserter_top_tb_TB/U3/U1/MB_MOSI}
+-- add wave -noreg -hexadecimal -literal {/hder_inserter_top_tb_TB/U3/U1/MB_MOSI}
 
 -- receveur config
 #wave UUT/U3/U1/*
 
 -- fifo header lent
---wave UUT/U3/U1/U2/*
+-- wave UUT/U3/U1/U2/*
 
 -- sequenceur
 wave UUT/U3/U4/* 
 
 -- fpa header fifo
---wave UUT/U3/U3/*  
+-- wave UUT/U3/U3/*  
 
 -- frame id fifo
---wave UUT/U3/U4/U3/*
+-- wave UUT/U3/U4/U3/*
 
 run  3 ms

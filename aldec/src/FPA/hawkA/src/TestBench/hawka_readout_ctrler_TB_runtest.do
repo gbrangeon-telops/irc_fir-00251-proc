@@ -20,8 +20,8 @@ do $FIR251PROC/src/compil_utilities.do
 
 acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_clks_gen.vhd
 acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fpa_diag_line_gen.vhd
---acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_diag_data_gen.vhd
---acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_digio_map.vhd
+-- acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_diag_data_gen.vhd
+-- acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_digio_map.vhd
 
 acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_readout_ctrler.vhd
 acom  $FIR251PROC/aldec/src/FPA/hawkA/src/TestBench/hawka_readout_ctrler_TB.vhd
@@ -30,32 +30,32 @@ acom  $FIR251PROC/aldec/src/FPA/hawkA/src/TestBench/hawka_readout_ctrler_TB.vhd
 asim -ses hawka_readout_ctrler_TB 
 
 -- diag gen
---wave UUT/U2/* 
+-- wave UUT/U2/* 
 
 -- diag gen
---wave UUT/U2/Udbg/*
+-- wave UUT/U2/Udbg/*
 
 -- dval gen
 wave UUT/*
 
---wave UUT/U6/*
+-- wave UUT/U6/*
 
 -- data dispatcher
---wave UUT/U18/* 
+-- wave UUT/U18/* 
 
 -- sample counter
---wave UUT/U22/*
+-- wave UUT/U22/*
 
 -- sample selection
---wave UUT/U7/*
+-- wave UUT/U7/*
 
 -- sample sum
---wave UUT/U23/* 
+-- wave UUT/U23/* 
 
 -- sample mean
---wave UUT/U28/*
+-- wave UUT/U28/*
 
 -- data reorder
---wave UUT/U12/*
+-- wave UUT/U12/*
                      
 run 10 ms

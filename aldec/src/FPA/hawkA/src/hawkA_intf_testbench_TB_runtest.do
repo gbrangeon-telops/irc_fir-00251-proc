@@ -24,12 +24,12 @@ acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/adc_brd_define.vhd
 acom $FIR251PROC/src/FPA/fpa_trig_precontroller.vhd
 
 acom $FIR251COMMON/VHDL/Utilities/axil32_to_native.vhd
---acom $FIR251PROC/IP/160/fwft_afifo_w62_d16/fwft_afifo_w62_d16_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/fwft_afifo_w62_d16/fwft_afifo_w62_d16_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w72_d16/fwft_sfifo_w72_d16_sim_netlist.vhdl
 #acom $FIR251PROC/IP/160/fwft_sfifo_w33_d16/fwft_sfifo_w33_d16_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w3_d16/fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w76_d256/fwft_sfifo_w76_d256_sim_netlist.vhdl
---acom $FIR251PROC/IP/160/fwft_sfifo_w8_d256/fwft_sfifo_w8_d256_sim_netlist.vhdl
+-- acom $FIR251PROC/IP/160/fwft_sfifo_w8_d256/fwft_sfifo_w8_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w32_d256/fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/fwft_sfifo_w16_d256/fwft_sfifo_w16_d256_sim_netlist.vhdl
 acom $FIR251PROC/IP/160/sfifo_w10_d256/sfifo_w10_d256_sim_netlist.vhdl 
@@ -64,7 +64,7 @@ acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/monitoring_adc_ctrl.vhd
 
 acom $COMMON_HDL/SPI/spi_rx.vhd
 acom $COMMON_HDL/SPI/spi_tx.vhd
---acom $FIR251PROC/src/QuadADC/HDL/quad_adc_ctrl.vhd
+-- acom $FIR251PROC/src/QuadADC/HDL/quad_adc_ctrl.vhd
 
 acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/spi_mux_ctler.vhd
 acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/afpa_services_ctrl.vhd
@@ -92,7 +92,7 @@ acom $FIR251PROC/aldec/src/FPA/hawkA/src/fpa_temp_dummy.vhd
 acom $FIR251PROC/aldec/src/FPA/hawkA/src/digio_dummy.vhd
 acom $FIR251PROC/aldec/src/FPA/hawkA/src/flexV_dummy.vhd
 
---acom $FIR251PROC(FG)/src/Quad_serdes/HDL/quad_data_sync.vhd
+-- acom $FIR251PROC(FG)/src/Quad_serdes/HDL/quad_data_sync.vhd
 
 acom $FIR251PROC/aldec/src/FPA/hawkA/src/hawkA_intf_testbench.bde
 
@@ -103,75 +103,75 @@ acom  $FIR251PROC/aldec/src/FPA/hawkA/src/hawkA_intf_testbench_TB.vhd
 asim -ses hawkA_intf_testbench_TB 
 
 
---wave UUT/U1/U5/U2/U1/* 
+-- wave UUT/U1/U5/U2/U1/* 
 wave UUT/U1/U5/*
 
 -- wave UUT/U1/U2/* 
 
 -- spi_mux_ctrl
---wave UUT/U1/U21/U1/* 
+-- wave UUT/U1/U21/U1/* 
  
 -- monit adc driver
---wave UUT/U1/U21/U4/U2/* 
+-- wave UUT/U1/U21/U4/U2/* 
 
 
 -- monit adc
---wave UUT/U1/U21/U4/*
+-- wave UUT/U1/U21/U4/*
 
 -- monit adc dummy
---wave UUT/U7/* 
+-- wave UUT/U7/* 
  
 -- switch
---wave UUT/U1/U21/U3/*
+-- wave UUT/U1/U21/U3/*
 
 
 -- adc brd_id_reader
---wave UUT/U1/U21/U5/U2/*
+-- wave UUT/U1/U21/U5/U2/*
 
 -- services ctrl
---wave UUT/U1/U21/U8/* 
+-- wave UUT/U1/U21/U8/* 
 
 -- mb_interface
---wave UUT/U1/U4/*  
+-- wave UUT/U1/U4/*  
 
 -- digio map
---wave UUT/U1/U19/*
+-- wave UUT/U1/U19/*
 
 -- intf_sequencer
---wave UUT/U1/U2/*  
+-- wave UUT/U1/U2/*  
 
 -- fpa_prog_controller
---wave UUT/U1/U5/U2/* 
+-- wave UUT/U1/U5/U2/* 
 
 
 -- module FPA
---wave UUT/U1/* 
+-- wave UUT/U1/* 
 
---wave UUT/U14/U1/* 
---wave UUT/U14/U11/*
---wave UUT/TRACE_ERR*
+-- wave UUT/U14/U1/* 
+-- wave UUT/U14/U11/*
+-- wave UUT/TRACE_ERR*
  
  -- flex brd_id_reader
---wave UUT/U1/U21/U6/U2/*
---wave UUT/U1/U21/U6/*
+-- wave UUT/U1/U21/U6/U2/*
+-- wave UUT/U1/U21/U6/*
 
---wave UUT/U1/U9/U1/*
---wave UUT/U1/U9/U22/*  OK
---wave UUT/U1/U9/U23/*  OK
+-- wave UUT/U1/U9/U1/*
+-- wave UUT/U1/U9/U22/*  OK
+-- wave UUT/U1/U9/U23/*  OK
 
---wave UUT/U1/U9/U7/*
---wave UUT/U1/U9/U2/U1/* 
---wave UUT/U1/U9/U18/*
---wave UUT/U1/U19/*
---wave UUT/U1/U5/U5/*
+-- wave UUT/U1/U9/U7/*
+-- wave UUT/U1/U9/U2/U1/* 
+-- wave UUT/U1/U9/U18/*
+-- wave UUT/U1/U19/*
+-- wave UUT/U1/U5/U5/*
 wave UUT/U1/U9/U18/*
---wave UUT/U1/U9/U2/U4/*
---wave UUT/U1/U9/U2/U2/*
---wave UUT/U1/U9/U2/U1/U1/*
+-- wave UUT/U1/U9/U2/U4/*
+-- wave UUT/U1/U9/U2/U2/*
+-- wave UUT/U1/U9/U2/U1/U1/*
 
 #wave UUT/U1/U5/U2/U5/*
 #wave UUT/U1/U5/U2/U1/*
---wave UUT/U1/U19/*
+-- wave UUT/U1/U19/*
 wave UUT/U1/*
 
 run 10 ms

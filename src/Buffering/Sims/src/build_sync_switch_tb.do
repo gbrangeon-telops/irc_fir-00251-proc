@@ -31,7 +31,7 @@ acom "$FIR251COMMON/VHDL/Utilities/axis32_img_boundaries.vhd"
 acom "$FIR251COMMON/VHDL/Utilities/axis32_stub.vhd"  
 
 #simulation src
---acom "$BUF_INTF_SIM/src/sync_switch_tb_stim.vhd"
+-- acom "$BUF_INTF_SIM/src/sync_switch_tb_stim.vhd"
 acom "$COMMON_HDL/matlab/axis_file_input_16.vhd"
 acom "$COMMON_HDL/matlab/axis_file_input_32.vhd"
 acom "$COMMON_HDL/matlab/axis_file_output_32.vhd"

@@ -1,6 +1,6 @@
 #savealltabs
---setactivelib work
---clearlibrary 	
+-- setactivelib work
+-- clearlibrary 	
 alib work
 setactivelib work
 
@@ -24,7 +24,7 @@ acom -incr -nowarn DAGGEN_0523 \
  "$FIR251COMMON/VHDL/iserdes/clink/clink_bitslip_ctrl.vhd" \
  "$FIR251COMMON/VHDL/iserdes/clink/clink_calibration.bde" 
 
---acom -incr -nowarn DAGGEN_0523 \
+-- acom -incr -nowarn DAGGEN_0523 \
 acom "$FIR251PROC/src/bb1920_serdes/HDL/scd_proxy2_dout.vhd"
 acom "$FIR251PROC/src/bb1920_serdes/HDL/scd_proxy2_dsync.vhd"
 acom "$FIR251PROC/src/bb1920_serdes/HDL/scd_proxy2_mux_dsync.vhd"

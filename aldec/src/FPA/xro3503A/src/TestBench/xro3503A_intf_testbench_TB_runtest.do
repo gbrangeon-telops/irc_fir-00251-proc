@@ -99,55 +99,55 @@ asim -ses xro3503A_intf_testbench_TB
 wave UUT/U1/*
 
 -- spi_mux_ctrl
---wave UUT/U1/U21/U1/* 
+-- wave UUT/U1/U21/U1/* 
  
 -- monit adc
---wave UUT/U1/U21/U4/*
---wave UUT/U1/U21/U4/U2/*
+-- wave UUT/U1/U21/U4/*
+-- wave UUT/U1/U21/U4/U2/*
 -- monit adc dummy
---wave UUT/U7/* 
+-- wave UUT/U7/* 
  
 -- switch
---wave UUT/U1/U21/U3/*
+-- wave UUT/U1/U21/U3/*
 
 -- adc brd_id_reader
---wave UUT/U1/U21/U5/*
+-- wave UUT/U1/U21/U5/*
 
 -- services ctrl
---wave UUT/U1/U21/U8/* 
+-- wave UUT/U1/U21/U8/* 
 
  -- flex brd_id_reader
---wave UUT/U1/U21/U6/*
+-- wave UUT/U1/U21/U6/*
 
 -- mb_interface
---wave UUT/U1/U4/*  
+-- wave UUT/U1/U4/*  
 
 -- digio map
---wave UUT/U1/U19/*
+-- wave UUT/U1/U19/*
 
 -- intf_sequencer
---wave UUT/U1/U2/*  
+-- wave UUT/U1/U2/*  
 
 -- hw_driver
---wave UUT/U1/U5/* 
---wave UUT/U1/U5/U5/*
---wave UUT/U1/U5/U2/U2/*
+-- wave UUT/U1/U5/* 
+-- wave UUT/U1/U5/U5/*
+-- wave UUT/U1/U5/U2/U2/*
 
 -- data_ctrl
---wave UUT/U1/U9/*
---wave UUT/U1/U9/U18/*
---wave UUT/U1/U9/U6/*
---wave UUT/U1/U9/U19/*
+-- wave UUT/U1/U9/*
+-- wave UUT/U1/U9/U18/*
+-- wave UUT/U1/U9/U6/*
+-- wave UUT/U1/U9/U19/*
  
 -- clk_gen
---wave UUT/U1/U26/U1/*
+-- wave UUT/U1/U26/U1/*
 
 -- status
---wave UUT/U1/U6/*
+-- wave UUT/U1/U6/*
 
---wave UUT/U14/U1/* 
---wave UUT/U14/U11/*
---wave UUT/TRACE_ERR*
+-- wave UUT/U14/U1/* 
+-- wave UUT/U14/U11/*
+-- wave UUT/TRACE_ERR*
 
---run 20 us
+-- run 20 us
 run 10 ms

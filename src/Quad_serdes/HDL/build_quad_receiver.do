@@ -5,8 +5,8 @@ setenv ADC_INTF "$FIR251PROC/src/Quad_serdes/HDL"
 setenv FPA_COMMON "$COMMON_HDL/Common_Projects/TEL2000/FPA_common/src"
 	   
 # Package
-acom -incr "$FIR251COMMON/tel2000pkg.vhd"
-acom "$FIR251COMMON/iserdes/adc/fpa_serdes_define.vhd"
+acom -incr "$FIR251COMMON/VHDL/tel2000pkg.vhd"
+acom "$FIR251COMMON/VHDL/iserdes/adc/fpa_serdes_define.vhd"
 acom "$FPA_COMMON/fpa_common_pkg.vhd"
 
 #common_hdl
@@ -24,16 +24,15 @@ acom -incr -nowarn DAGGEN_0523 \
 "$COMMON_HDL/SPI/spi_tx.vhd"
 	   	 
 acom -incr -nowarn DAGGEN_0523 \
-#"$PROC/IP/afifo_w57d16/afifo_w57d16_funcsim.vhdl" \
-"$FIR251COMMON/iserdes/idelay_wrapper.vhd" \
-"$FIR251COMMON/iserdes/adc/adc_iserdes_wrapper.vhd" \
-"$FIR251COMMON/iserdes/adc/adc_serdes_clk_wrapper.vhd" \
-"$FIR251COMMON/iserdes/adc/adc_pattern_validator.vhd" \
-"$FIR251COMMON/iserdes/adc/adc_pattern_validator_ctrler.vhd" \
-"$FIR251COMMON/iserdes/clink/clink_delay_ctrl.vhd" \
-"$FIR251COMMON/iserdes/clink/clink_bitslip_ctrl.vhd" \
-"$FIR251COMMON/iserdes/clink/clink_calibration.bde" \
-"$FIR251COMMON/iserdes/adc/quad_pattern_validator.bde" \
+"$FIR251COMMON/VHDL/iserdes/idelay_wrapper.vhd" \
+"$FIR251COMMON/VHDL/iserdes/adc/adc_iserdes_wrapper.vhd" \
+"$FIR251COMMON/VHDL/iserdes/adc/adc_serdes_clk_wrapper.vhd" \
+"$FIR251COMMON/VHDL/iserdes/adc/adc_pattern_validator.vhd" \
+"$FIR251COMMON/VHDL/iserdes/adc/adc_pattern_validator_ctrler.vhd" \
+"$FIR251COMMON/VHDL/iserdes/clink/clink_delay_ctrl.vhd" \
+"$FIR251COMMON/VHDL/iserdes/clink/clink_bitslip_ctrl.vhd" \
+"$FIR251COMMON/VHDL/iserdes/clink/clink_calibration.bde" \
+"$FIR251COMMON/VHDL/iserdes/adc/quad_pattern_validator.bde" \
 "$ADC_INTF/quad_data_deserializer.bde" \
 "$ADC_INTF/quad_data_sync.vhd" \
 "$ADC_INTF/quad_data_sync_v2.vhd" \

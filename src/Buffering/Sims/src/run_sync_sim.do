@@ -8,5 +8,5 @@ asim -ses +access +r sync_switch_top
 #transcript off
 do "$BUF_INTF_SIM/src/sync_waveform.do"
 #transcript on
---run 150 us
+-- run 150 us
 run 32 us

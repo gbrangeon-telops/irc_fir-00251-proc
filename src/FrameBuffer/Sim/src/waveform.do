@@ -1,7 +1,7 @@
 onerror { resume }
 transcript off	  
    
-add wave -named_row "--------------------------STIM----------------------------------"
+add wave -named_row "-------------------------- STIM----------------------------------"
 add wave -noreg -logic {/Top/U1/CLK_DATA}
 add wave -noreg -logic {/Top/U1/CLK_DIN}
 add wave -noreg -logic {/Top/U1/ARESETN}
@@ -14,7 +14,7 @@ add wave -noreg -logic {/Top/U1/transmit}
 add wave -noreg -logic {}
 add wave -noreg -logic {}
  
- add wave -named_row "---------------Writer (input)----------------------"
+ add wave -named_row "--------------- Writer (input)----------------------"
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TVALID}	
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TDATA}	
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TLAST}	
@@ -27,19 +27,19 @@ add wave -noreg -logic {}
 add wave -noreg -logic {}
 add wave -noreg -logic {}
 
-add wave -named_row "---------------Writer (output)----------------------"
+add wave -named_row "--------------- Writer (output)----------------------"
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TVALID}	
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TDATA}	
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TLAST}	
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MISO.TREADY}
 
-add wave -named_row "---------------Reader(output)----------------------"
+add wave -named_row "--------------- Reader(output)----------------------"
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TVALID}	
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TDATA}	
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TLAST}	
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MISO.TREADY}	  
 
-add wave -named_row "---------------config----------------------"
+add wave -named_row "--------------- config----------------------"
 
 add wave -noreg -logic {/Top/U2/g0/U6/USER_CFG}  
 add wave -noreg -logic {/Top/U2/g0/U6/FB_CFG}  

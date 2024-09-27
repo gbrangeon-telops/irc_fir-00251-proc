@@ -32,7 +32,7 @@ acom $FIR251PROC/IP/scorpiomwA_18MHz_mmcm/scorpiomwA_18MHz_mmcm_funcsim.vhdl
 
 do $FIR251PROC/src/FPA/scorpiomwA/HDL/compil_scorpiomwA.do 
 
---acom $FIR251PROC/src/FPA/scorpiomwA/HDL/scorpiomwA_clks_gen.vhd
+-- acom $FIR251PROC/src/FPA/scorpiomwA/HDL/scorpiomwA_clks_gen.vhd
 acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fpa_diag_line_gen.vhd
 acom $FIR251PROC/aldec/src/FPA/scorpiomwA/src/scorpiomwa_hw_ctrl_tb.bde
 acom $FIR251PROC/aldec/src/FPA/scorpiomwA/src/TestBench/scorpiomwa_hw_ctrl_tb_TB.vhd
@@ -42,23 +42,23 @@ asim -ses scorpiomwa_hw_ctrl_tb_TB
 
 
 -- mb interface
---wave UUT/U4/*
+-- wave UUT/U4/*
   
   -- fpa_ ctler
---wave UUT/U5/U2/U3/*
+-- wave UUT/U5/U2/U3/*
   
    -- readout controller
 wave UUT/U5/U5/*
  
  
 -- scorpiomwA_digio_map
---wave UUT/U19/* 
+-- wave UUT/U19/* 
 
 
 -- scorpiomwA_digio_map
---wave UUT/U19/* 
+-- wave UUT/U19/* 
 
 -- readout controller
---wave UUT/U9/U1/U1/*
+-- wave UUT/U9/U1/U1/*
  
 run 20 ms

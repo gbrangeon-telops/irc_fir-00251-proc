@@ -46,23 +46,23 @@ asim -ses calcium_services_testbench_stim
 wave UUT/U1/*
 
 -- spi_mux_ctrl
---wave UUT/U1/U1/* 
+-- wave UUT/U1/U1/* 
  
 -- monit adc
---wave UUT/U1/U4/*
---wave UUT/U1/U4/U2/*
+-- wave UUT/U1/U4/*
+-- wave UUT/U1/U4/U2/*
 -- monit adc dummy
---wave UUT/U7/* 
+-- wave UUT/U7/* 
  
 -- switch
---wave UUT/U1/U3/*
+-- wave UUT/U1/U3/*
 
 -- services ctrl
---wave UUT/U1/U8/* 
+-- wave UUT/U1/U8/* 
 
 -- ddc brd_id_reader
---wave UUT/U1/U6/*
---wave UUT/U1/U6/U2*
+-- wave UUT/U1/U6/*
+-- wave UUT/U1/U6/U2*
 
 
 

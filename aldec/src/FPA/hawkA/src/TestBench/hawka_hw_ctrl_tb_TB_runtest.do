@@ -27,8 +27,8 @@ acom $FIR251PROC/IP/fwft_sfifo_w72_d16/fwft_sfifo_w72_d16_funcsim.vhdl
 acom $FIR251PROC/IP/fwft_sfifo_w33_d16/fwft_sfifo_w33_d16_funcsim.vhdl
 acom $FIR251PROC/IP/fwft_sfifo_w76_d256/fwft_sfifo_w76_d256_funcsim.vhdl
 
---acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_clks_gen.vhd
---acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fpa_diag_line_gen.vhd
+-- acom $FIR251PROC/src/FPA/hawkA/HDL/hawkA_clks_gen.vhd
+-- acom $COMMON_HDL/Common_Projects/TEL2000/FPA_common/src/fpa_diag_line_gen.vhd
 acom $FIR251PROC/aldec/src/FPA/hawkA/src/TestBench/hawka_hw_ctrl_tb_TB.vhd
 
 
@@ -36,38 +36,38 @@ asim -ses hawka_hw_ctrl_tb_TB
 
 
 -- mb interface
---wave UUT/U4/*
+-- wave UUT/U4/*
 
 -- afpa_hw_driver_ctrler
---wave UUT/U5/U4/*
+-- wave UUT/U5/U4/*
 
 -- dac ctrler 
---wave UUT/U5/U3/U2/* 
+-- wave UUT/U5/U3/U2/* 
 
 -- dac spi 
---wave UUT/U5/U3/U1/*
+-- wave UUT/U5/U3/U1/*
   
   -- fpa_ ctler
---wave UUT/U5/U2/U6/*
+-- wave UUT/U5/U2/U6/*
   
    -- fpa_ ctler
---wave UUT/U5/U2/U5/*
+-- wave UUT/U5/U2/U5/*
  
  
 -- hawkA_digio_map
---wave UUT/U19/* 
+-- wave UUT/U19/* 
 
 
 -- clocks gen
---wave UUT/U26/* 
+-- wave UUT/U26/* 
                   
 -- diag dval gen
---wave UUT/U3/* 
+-- wave UUT/U3/* 
 
 -- diag dval gen
---wave UUT/U9/U5/* 
+-- wave UUT/U9/U5/* 
 
---wave UUT/U9/U3/* 
+-- wave UUT/U9/U3/* 
                   
 wave UUT/U5/U5/*                 
 run 10 ms

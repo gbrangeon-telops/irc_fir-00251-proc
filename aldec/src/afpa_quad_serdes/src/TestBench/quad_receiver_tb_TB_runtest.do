@@ -17,7 +17,7 @@ asim -ses quad_receiver_tb_TB
 
 
 wave UUT/U12/*
---wave UUT/U5/*
+-- wave UUT/U5/*
 
---run 20 us
+-- run 20 us
  run 30 ms

@@ -80,73 +80,73 @@ acom $FIR251PROC/aldec/src/FPA/isc0804A_2k/src/TestBench/isc0804A_2k_intf_testbe
 asim -ses isc0804A_2k_intf_testbench_TB 
 
 -- spi_mux_ctrl
---wave UUT/U1/U21/U1/* 
+-- wave UUT/U1/U21/U1/* 
  
 -- monit adc driver
---wave UUT/U1/U21/U4/U2/* 
+-- wave UUT/U1/U21/U4/U2/* 
 
 
 -- monit adc
---wave UUT/U1/U21/U4/*
+-- wave UUT/U1/U21/U4/*
 
 -- monit adc dummy
---wave UUT/U7/* 
+-- wave UUT/U7/* 
  
 -- switch
---wave UUT/U1/U21/U3/*
+-- wave UUT/U1/U21/U3/*
 
 
 -- adc brd_id_reader
---wave UUT/U1/U21/U5/U2/*
+-- wave UUT/U1/U21/U5/U2/*
 
 -- services ctrl
---wave UUT/U1/U21/U5/U2/* 
+-- wave UUT/U1/U21/U5/U2/* 
 
 -- mb_interface
---wave UUT/U1/U4/*  
+-- wave UUT/U1/U4/*  
 
 -- intf_sequencer
---wave UUT/U1/U2/*  
+-- wave UUT/U1/U2/*  
 
 -- fpa_prog_controller
---wave UUT/U1/U5/U2/* 
+-- wave UUT/U1/U5/U2/* 
 
 -- status
---wave UUT/U1/U6/* 
+-- wave UUT/U1/U6/* 
 
 -- afpa hw driver controller
---wave UUT/U1/U5/U4/* 
+-- wave UUT/U1/U5/U4/* 
 
 -- int gen
---wave UUT/U1/U5/U1/* 
+-- wave UUT/U1/U5/U1/* 
 
 -- readout controller
---wave UUT/U1/U5/U5/U4/* 
---wave UUT/U1/U5/U5/U2/* 
---wave UUT/U1/U5/U5/U10/* 
---wave UUT/U1/U5/U5/U7/* 
---wave UUT/U1/U5/U5/U1/*
---wave UUT/U1/U5/U5/U8/* 
---wave UUT/U1/U5/U5/U6/* 
---wave UUT/U1/U5/U5/U5/* 
---wave UUT/U1/U5/U5/* 
+-- wave UUT/U1/U5/U5/U4/* 
+-- wave UUT/U1/U5/U5/U2/* 
+-- wave UUT/U1/U5/U5/U10/* 
+-- wave UUT/U1/U5/U5/U7/* 
+-- wave UUT/U1/U5/U5/U1/*
+-- wave UUT/U1/U5/U5/U8/* 
+-- wave UUT/U1/U5/U5/U6/* 
+-- wave UUT/U1/U5/U5/U5/* 
+-- wave UUT/U1/U5/U5/* 
 
 -- clocks_gen
---wave UUT/U1/U26/U2/* 
---wave UUT/U1/U26/U2/U2/* 
---wave UUT/U1/U26/U2/U3/* 
---wave UUT/U1/U26/U1/* 
+-- wave UUT/U1/U26/U2/* 
+-- wave UUT/U1/U26/U2/U2/* 
+-- wave UUT/U1/U26/U2/U3/* 
+-- wave UUT/U1/U26/U1/* 
 wave UUT/U1/U26/*
 
---wave UUT/U1/U5/U4/* 
---wave UUT/U14/U11/*
---wave UUT/TRACE_ERR*
+-- wave UUT/U1/U5/U4/* 
+-- wave UUT/U14/U11/*
+-- wave UUT/TRACE_ERR*
  
  -- flex brd_id_reader
---wave UUT/U1/U21/U6/U2/*
---wave UUT/U1/U21/U6/*
+-- wave UUT/U1/U21/U6/U2/*
+-- wave UUT/U1/U21/U6/*
 
---wave UUT/U1/U5/U5/U5/* 
+-- wave UUT/U1/U5/U5/U5/* 
   
 #wave UUT/U1/U5/U5/U5/* 
 #wave UUT/U1/U5/U5/U4/* 
@@ -155,7 +155,7 @@ wave UUT/U1/U26/*
 #wave UUT/U1/U5/U5/U7/*
 
 -- le outfifo
---wave UUT/U1/U33/* 
+-- wave UUT/U1/U33/* 
 
 #wave UUT/U1/U5/U5/U5/*
 #wave UUT/U1/U5/U5/U5/*
@@ -170,10 +170,10 @@ wave UUT/U1/U26/*
 #wave UUT/U1/U9/U1/U8/*
 #wave UUT/U1/U9/U1/U9/*
 
---wave UUT/U1/U5/U21/*
---wave UUT/U1/U5/U4/*
+-- wave UUT/U1/U5/U21/*
+-- wave UUT/U1/U5/U4/*
 
---wave UUT/U1/U9/U10/*
+-- wave UUT/U1/U9/U10/*
 
 -- Data Controller
 #wave UUT/U1/U9/CH1/*
@@ -185,23 +185,23 @@ wave UUT/U1/U9/U22/g1/U2/*
 #wave UUT/U1/U9/CH3/*
 #wave UUT/U16/*  
   
---wave UUT/U1/U5/U4/*
+-- wave UUT/U1/U5/U4/*
 
---wave UUT/U1/*
+-- wave UUT/U1/*
 #wave UUT/U1/U4/*
 
---wave UUT/U1/U9/U1/g0/U5/*
---wave UUT/U1/U9/U1/g0/U1/*
+-- wave UUT/U1/U9/U1/g0/U5/*
+-- wave UUT/U1/U9/U1/g0/U1/*
 #wave UUT/U1/U9/U1/g0/U7/*
 #wave UUT/U1/U9/U1/g0/U3/*
---wave UUT/U11/*
---wave UUT/U1/U2/*
+-- wave UUT/U11/*
+-- wave UUT/U1/U2/*
 
---wave UUT/U1/U23/U5/*
---wave UUT/U15/*
+-- wave UUT/U1/U23/U5/*
+-- wave UUT/U15/*
 
---wave UUT/U1/U9/U11/*
-#--wave UUT/U1/U9/U12/U3/*
+-- wave UUT/U1/U9/U11/*
+#-- wave UUT/U1/U9/U12/U3/*
 #wave UUT/U1/U5/U2/*
 #wave UUT/U1/U5/U2/U21/*
 #wave UUT/U1/U5/*
@@ -209,16 +209,16 @@ wave UUT/U1/U9/U22/g1/U2/*
 
 #wave UUT/U1/U9/U2/U4/U2/*
 #wave UUT/U1/U9/U2/U4/U2/UB/*
---wave UUT/U1/U9/*
---wave UUT/U1/U9/U18/* 
---wave UUT/U1/U9/ID_A/*
---wave UUT/U1/U9/U15/*
+-- wave UUT/U1/U9/*
+-- wave UUT/U1/U9/U18/* 
+-- wave UUT/U1/U9/ID_A/*
+-- wave UUT/U1/U9/U15/*
 
 #wave UUT/U1/U25/* 
 #wave UUT/U1/U25/U1/*
 #wave UUT/U1/U25/U1/U1/*
 
 wave UUT/U1/*
---run 100 ms
+-- run 100 ms
 run 15 ms
---9.1 ms
+-- 9.1 ms

@@ -110,49 +110,49 @@ add wave -noreg -logic {}
 
 add wave -named_row "--------------------- All others signals-----------------------"
 
-add wave -named_row "---------------------Sim diag data -----------------------"
+add wave -named_row "--------------------- Sim diag data -----------------------"
 add wave UUT/U3/U1/*
 
-add wave -named_row "---------------------Fifo out -----------------------"
+add wave -named_row "--------------------- Fifo out -----------------------"
 add wave UUT/U5/*
 
 
-add wave -named_row "---------------------Data dispatcher _ test pattern -----------------------"
+add wave -named_row "--------------------- Data dispatcher _ test pattern -----------------------"
 add wave UUT/U1/U9/U1/*
 
-add wave -named_row "---------------------Data dispatcher _ fifo writer -----------------------"
+add wave -named_row "--------------------- Data dispatcher _ fifo writer -----------------------"
 add wave UUT/U1/U9/U4/*
 
-add wave -named_row "---------------------Data dispatcher -----------------------"
+add wave -named_row "--------------------- Data dispatcher -----------------------"
 add wave UUT/U1/U9/U6/*
 
-add wave -named_row "---------------------mblaze intf -----------------------"
+add wave -named_row "--------------------- mblaze intf -----------------------"
 wave UUT/U1/U4/* 
 
-add wave -named_row "-------------------scd_proxy_stim----------------------------------"
+add wave -named_row "------------------- scd_proxy_stim----------------------------------"
 add wave UUT/U3/*
-add wave -named_row "---------------------scd_diag_data_gen-----------------------"
+add wave -named_row "--------------------- scd_diag_data_gen-----------------------"
 add wave UUT/U3/U2/*
 	  
-add wave -named_row "---------------------scd trig ctler-----------------------"
+add wave -named_row "--------------------- scd trig ctler-----------------------"
 wave UUT/U1/U1/*  
  
-add wave -named_row "---------------------scd prog ctrler-----------------------"
+add wave -named_row "--------------------- scd prog ctrler-----------------------"
 wave UUT/U1/U5/U1/* 
 
-add wave -named_row "---------------------scd serial module-----------------------"
+add wave -named_row "--------------------- scd serial module-----------------------"
 wave UUT/U1/U5/U2/* 
 
-add wave -named_row "---------------------scd io intf -----------------------"
+add wave -named_row "--------------------- scd io intf -----------------------"
 wave UUT/U1/U19/*
 
-add wave -named_row "---------------------fpa intf sequencer -----------------------"
+add wave -named_row "--------------------- fpa intf sequencer -----------------------"
 wave UUT/U1/U2/*
 
-#add wave -named_row "---------------------watchdog -----------------------"
+#add wave -named_row "--------------------- watchdog -----------------------"
 #wave UUT/U1/U26/*	
 
-add wave -named_row "---------------------sim -----------------------"
+add wave -named_row "--------------------- sim -----------------------"
 wave UUT/U1/g0/U32/*
 
 run 30 ms
